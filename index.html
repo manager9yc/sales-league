@@ -206,18 +206,37 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 
 /* ══ DASHBOARD ══ */
 .dash-wrap { max-width: 900px; margin: 0 auto; padding: 0 0 80px; }
-.vgrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
-@media(min-width:480px){ .vgrid { grid-template-columns: repeat(4,1fr); } }
-@media(min-width:640px){ .vgrid { grid-template-columns: repeat(5,1fr); } }
-.vbtn { background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 6px; text-align: center; cursor: pointer; transition: all 0.15s; }
-.vbtn.active { background: var(--orange); border-color: var(--orange); }
-.vbtn:hover:not(.active) { border-color: var(--orange); }
-.vavatar { width: 36px; height: 36px; border-radius: 50%; background: var(--card2); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--orange); margin: 0 auto 6px; }
-.vbtn.active .vavatar { background: rgba(255,255,255,0.2); color: #fff; border-color: rgba(255,255,255,0.3); }
-.vname { font-size: 11px; font-weight: 600; color: var(--text); line-height: 1.2; }
-.vbtn.active .vname { color: #fff; }
-.vteam { font-size: 10px; color: var(--muted); margin-top: 2px; }
-.vbtn.active .vteam { color: rgba(255,255,255,0.6); }
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.modal-box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 520px; max-height: 80vh; overflow: hidden; display: flex; flex-direction: column; }
+.modal-head { padding: 18px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.modal-head-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: #fff; }
+.modal-close { background: transparent; border: none; color: var(--muted); font-size: 22px; cursor: pointer; padding: 4px 8px; line-height: 1; }
+.modal-close:hover { color: #fff; }
+.modal-search { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.modal-search input { width: 100%; background: var(--card2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; }
+.modal-search input:focus { border-color: var(--orange); }
+.modal-list { overflow-y: auto; padding: 8px; }
+.modal-team-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--orange); padding: 10px 10px 6px; }
+.modal-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; cursor: pointer; transition: background 0.15s; }
+.modal-item:hover { background: var(--card2); }
+.modal-item.active { background: rgba(255,107,0,0.15); }
+.modal-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--card2); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--orange); flex-shrink: 0; }
+.modal-item.active .modal-avatar { background: var(--orange); color: #fff; border-color: var(--orange); }
+.modal-item-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.modal-item.active .modal-item-name { color: var(--orange); }
+.modal-item-team { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+/* SELECT BTN */
+.select-vendedor-btn { width: 100%; background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.15s; }
+.select-vendedor-btn:hover { border-color: var(--orange); }
+.svb-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--card2); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 17px; color: var(--orange); flex-shrink: 0; }
+.svb-text { flex: 1; text-align: left; }
+.svb-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2px; }
+.svb-name { font-size: 15px; font-weight: 600; color: var(--text); }
+.svb-arrow { color: var(--muted); font-size: 16px; }
 .dash-inner { padding: 16px; }
 .d-profile { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
 .d-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--orange); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #fff; flex-shrink: 0; }
@@ -362,8 +381,29 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
     </div>
   </div>
   <div style="padding:20px 16px 0;max-width:900px;margin:0 auto">
-    <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Escolhe um vendedor</div>
-    <div class="vgrid" id="vgrid"></div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Vendedor</div>
+    <button class="select-vendedor-btn" onclick="abrirModal()">
+      <div class="svb-avatar" id="svbAvatar">👤</div>
+      <div class="svb-text">
+        <div class="svb-label">Clica para selecionar</div>
+        <div class="svb-name" id="svbName">Nenhum vendedor selecionado</div>
+      </div>
+      <div class="svb-arrow">›</div>
+    </button>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalOverlay" onclick="fecharModalFora(event)">
+    <div class="modal-box">
+      <div class="modal-head">
+        <span class="modal-head-title">Selecionar Vendedor</span>
+        <button class="modal-close" onclick="fecharModal()">✕</button>
+      </div>
+      <div class="modal-search">
+        <input type="text" id="modalSearch" placeholder="Pesquisar nome..." oninput="filtrarModal(this.value)">
+      </div>
+      <div class="modal-list" id="modalList"></div>
+    </div>
   </div>
   <div class="dash-inner" id="dashInner" style="display:none;max-width:900px;margin:0 auto"></div>
 </div>
@@ -583,14 +623,77 @@ equipas.forEach(eq => eq.nomes.forEach(n => nomeParaEquipaLabel[n] = eq.label.re
 function dashIni(nome){ return nome.split(' ').map(x=>x[0]).slice(0,2).join(''); }
 function dashTot(d){ return categorias.reduce((s,c)=>s+(d[c.key]||0),0); }
 
+let vendedorAtual = null;
+
 function buildVgrid(allDados) {
   const nomes = [...new Set(allDados.map(d=>d.nome))].sort();
-  document.getElementById('vgrid').innerHTML = nomes.map(n => `
-    <div class="vbtn" id="vbtn-${n.replace(/ /g,'_').replace(/[^a-zA-Z0-9_]/g,'')}" onclick="mostrarDash('${n.replace(/'/g,"\\'")}')">
-      <div class="vavatar">${dashIni(n)}</div>
-      <div class="vname">${n.split(' ')[0]}<br><span style="font-weight:400">${n.split(' ').slice(1).join(' ')}</span></div>
-      <div class="vteam">${nomeParaEquipaLabel[n]||''}</div>
-    </div>`).join('');
+  renderModalList(nomes, '');
+}
+
+function renderModalList(nomes, filtro) {
+  const lista = document.getElementById('modalList');
+  if (!lista) return;
+  const f = filtro.toLowerCase();
+  const filtered = nomes.filter(n => n.toLowerCase().includes(f));
+
+  // group by equipa
+  const grupos = {};
+  filtered.forEach(n => {
+    const eq = nomeParaEquipaLabel[n] || 'Outros';
+    if (!grupos[eq]) grupos[eq] = [];
+    grupos[eq].push(n);
+  });
+
+  let html = '';
+  Object.keys(grupos).sort().forEach(eq => {
+    if (!filtro) html += `<div class="modal-team-label">${eq}</div>`;
+    grupos[eq].forEach(n => {
+      const isActive = n === vendedorAtual;
+      html += `<div class="modal-item ${isActive?'active':''}" onclick="selecionarDoModal('${n.replace(/'/g,"\\'")}')">
+        <div class="modal-avatar">${dashIni(n)}</div>
+        <div>
+          <div class="modal-item-name">${n}</div>
+          <div class="modal-item-team">${nomeParaEquipaLabel[n]||''}</div>
+        </div>
+      </div>`;
+    });
+  });
+
+  if (!html) html = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">Nenhum resultado</div>';
+  lista.innerHTML = html;
+}
+
+function abrirModal() {
+  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('modalSearch').value = '';
+  const todosNomes = [...new Set(equipas.flatMap(e=>e.nomes))];
+  renderModalList(todosNomes, '');
+  setTimeout(() => document.getElementById('modalSearch').focus(), 100);
+}
+
+function fecharModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function fecharModalFora(e) {
+  if (e.target === document.getElementById('modalOverlay')) fecharModal();
+}
+
+function filtrarModal(val) {
+  const todosNomes = [...new Set(equipas.flatMap(e=>e.nomes))];
+  renderModalList(todosNomes, val);
+}
+
+function selecionarDoModal(nome) {
+  vendedorAtual = nome;
+  fecharModal();
+  // update button
+  document.getElementById('svbAvatar').textContent = dashIni(nome);
+  document.getElementById('svbAvatar').style.background = 'var(--orange)';
+  document.getElementById('svbAvatar').style.color = '#fff';
+  document.getElementById('svbName').textContent = nome;
+  document.getElementById('svbName').style.color = 'var(--orange)';
+  mostrarDash(nome);
 }
 
 function mostrarDash(nome) {
@@ -600,10 +703,7 @@ function mostrarDash(nome) {
     di.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">⏳</div><p>A carregar dados...</p></div>';
     return;
   }
-  const id = nome.replace(/ /g,'_').replace(/[^a-zA-Z0-9_]/g,'');
-  document.querySelectorAll('.vbtn').forEach(b => b.classList.remove('active'));
-  const btn = document.getElementById('vbtn-'+id);
-  if(btn) btn.classList.add('active');
+  vendedorAtual = nome;
 
   const dadosVendedor = dashAllDados.filter(d=>d.nome===nome);
   if(!dadosVendedor.length){ return; }
