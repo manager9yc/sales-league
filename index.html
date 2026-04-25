@@ -630,6 +630,7 @@ function showToast(msg) {
 async function submeter() {
   if (!nomeSel) { showToast('⚠️ Seleciona o teu nome primeiro'); return; }
   if (!document.getElementById('dataRegisto').value) { showToast('⚠️ Escolhe a data'); return; }
+  iniciarAudio();
   const btn = document.getElementById('submitBtn');
   btn.textContent = '✓ A guardar...';
   btn.style.background = '#00AA44';
@@ -885,6 +886,11 @@ function mostrarProgressoRegisto(nome, payload) {
   }
 
   prog.innerHTML = metasHtml;
+
+  // Tocar som se conquistou alguma medalha
+  if (conquistadas.length > 0) {
+    setTimeout(() => tocarSomMedalha(), 600);
+  }
 }
 
 renderTabs();
@@ -1266,22 +1272,34 @@ function verificarRecorde(nome, payload) {
 }
 
 
+let audioCtx = null;
+
+function iniciarAudio() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
 function tocarSomMedalha() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const notas = [523, 659, 784, 1047]; // C5, E5, G5, C6
+    iniciarAudio();
+    if (!audioCtx) return;
+    const notas = [523, 659, 784, 1047];
     notas.forEach((freq, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(audioCtx.destination);
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
-      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.12);
-      gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + i * 0.12 + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.3);
-      osc.start(ctx.currentTime + i * 0.12);
-      osc.stop(ctx.currentTime + i * 0.12 + 0.3);
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.13);
+      gain.gain.setValueAtTime(0, audioCtx.currentTime + i * 0.13);
+      gain.gain.linearRampToValueAtTime(0.35, audioCtx.currentTime + i * 0.13 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.13 + 0.35);
+      osc.start(audioCtx.currentTime + i * 0.13);
+      osc.stop(audioCtx.currentTime + i * 0.13 + 0.35);
     });
   } catch(e) {}
 }
@@ -1290,7 +1308,6 @@ function showRecordToast(titulo, msg) {
   const t = document.getElementById('recordToast');
   t.innerHTML = '<span class="rt-title">' + titulo + '</span><div style="font-size:14px;margin-top:4px;opacity:0.9">' + msg + '</div>';
   t.classList.add('show');
-  tocarSomMedalha();
   setTimeout(()=>t.classList.remove('show'), 4000);
 }
 
