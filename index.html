@@ -398,7 +398,9 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
     <div class="success" id="successMsg">
       <span class="success-icon">🏆</span>
       <h2>Registado!</h2>
-      <p>O teu registo foi guardado.<br>Boas vendas!</p>
+      <p>O teu registo foi guardado. Boas vendas!</p>
+      <div id="successProgress" style="margin-top:20px;text-align:left"></div>
+      <div id="successCountdown" style="margin-top:16px;font-size:12px;color:var(--muted)"></div>
     </div>
   </div>
 </div>
@@ -636,10 +638,24 @@ async function submeter() {
   } catch(e) { console.error('Erro ao guardar:', e); }
   document.getElementById('formMain').classList.add('hide');
   document.getElementById('successMsg').classList.add('show');
-  setTimeout(() => {
-    resetForm();
-    goTo('ranking', document.querySelectorAll('.nav-btn')[1]);
-  }, 1800);
+
+  // Show progress and medals for this vendedor
+  mostrarProgressoRegisto(nomeSel, payload);
+
+  // Countdown to ranking
+  let secs = 5;
+  const cdEl = document.getElementById('successCountdown');
+  cdEl.textContent = 'A abrir o ranking em ' + secs + 's...';
+  const cdInterval = setInterval(() => {
+    secs--;
+    if (secs > 0) {
+      cdEl.textContent = 'A abrir o ranking em ' + secs + 's...';
+    } else {
+      clearInterval(cdInterval);
+      resetForm();
+      goTo('ranking', document.querySelectorAll('.nav-btn')[1]);
+    }
+  }, 1000);
 }
 
 function resetForm() {
@@ -743,6 +759,65 @@ function renderRanking(dados) {
       el.style.width = el.dataset.pct + '%';
     });
   }, 120);
+}
+
+
+function mostrarProgressoRegisto(nome, payload) {
+  const prog = document.getElementById('successProgress');
+  if (!prog) return;
+
+  // Get current month data for this vendedor from dashAllDados + new payload
+  const mesAtual = new Date().getMonth();
+  const anoAtual = new Date().getFullYear();
+  const dadosMes = dashAllDados.filter(d => {
+    if (d.nome !== nome) return false;
+    const dt = new Date(d.data || '');
+    return !isNaN(dt) && dt.getMonth() === mesAtual && dt.getFullYear() === anoAtual;
+  });
+
+  // Add current payload
+  const totaisMes = {};
+  categorias.forEach(cat => { totaisMes[cat.key] = dadosMes.reduce((s,d)=>s+(d[cat.key]||0),0) + (payload[cat.key]||0); });
+
+  // Metas progress
+  let metasHtml = '<div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">As tuas metas este mês</div>';
+  metasHtml += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">';
+  categorias.forEach(cat => {
+    const v = totaisMes[cat.key] || 0;
+    const meta = metas[cat.key] || 1;
+    const pct = Math.min(100, Math.round((v/meta)*100));
+    const done = pct >= 100;
+    metasHtml += `<div style="background:var(--card);border:1px solid ${done?'#00CC66':''};border-radius:10px;padding:10px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:15px">${cat.emoji}</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${done?'#00CC66':'var(--orange)'}">${pct}%</span>
+      </div>
+      <div style="font-size:11px;font-weight:600;margin-bottom:5px">${cat.label}</div>
+      <div style="height:5px;background:var(--border);border-radius:3px">
+        <div style="width:${pct}%;height:100%;background:${done?'#00CC66':'var(--orange)'};border-radius:3px"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:3px"><span>${v}</span><span>${meta}</span></div>
+    </div>`;
+  });
+  metasHtml += '</div>';
+
+  // Medalhas
+  const dadosTodos = [...dashAllDados.filter(d=>d.nome===nome), payload];
+  const medalhas = calcularMedalhas(dadosTodos);
+  metasHtml += '<div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Medalhas</div>';
+  metasHtml += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  medalhas.forEach(m => {
+    metasHtml += `<div style="background:${m.earned?'rgba(255,107,0,0.1)':'var(--card)'};border:1px solid ${m.earned?'var(--orange)':'var(--border)'};border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:8px;${m.earned?'':'opacity:0.5'}">
+      <span style="font-size:18px;${m.earned?'':'filter:grayscale(1)'}">${m.icon}</span>
+      <div>
+        <div style="font-size:11px;font-weight:600;color:${m.earned?'var(--text)':'var(--muted)'}">${m.name}</div>
+        <div style="font-size:10px;color:var(--muted)">${m.desc}</div>
+      </div>
+    </div>`;
+  });
+  metasHtml += '</div>';
+
+  prog.innerHTML = metasHtml;
 }
 
 renderTabs();
