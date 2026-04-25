@@ -390,7 +390,7 @@ const categorias = [
   { key:'elogios',   label:'Elogios',             emoji:'⭐' },
 ];
 
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwA637xS__QPjmt2p9swpkl4cuaqWDw2-U9VFkRRxck3ls_HfB89F17c0NxUMmSj4Y/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwaqE3zFMJYGTXXV60xn4pQX1gM904eXTeqtdz8yDfU3Qyuc9RqpGuAJD9Hzh52WQKl/exec';
 
 const vals = {onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0};
 let nomeSel = null, equipaAtiva = null;
@@ -461,7 +461,7 @@ async function submeter() {
     elogios:   vals.elogios
   };
   try {
-    await fetch(SHEETS_URL, { method:'POST', body: JSON.stringify(payload) });
+    await fetch(SHEETS_URL, { method:'POST', body: JSON.stringify(payload), mode:'no-cors' });
   } catch(e) { console.error('Erro ao guardar:', e); }
   document.getElementById('formMain').classList.add('hide');
   document.getElementById('successMsg').classList.add('show');
@@ -513,14 +513,19 @@ function secDiv(icon, title) {
   return `<div class="sec-divider"><span>${icon}</span><span>${title}</span></div>`;
 }
 
-async function carregarRanking() {
-  try {
-    const res = await fetch(SHEETS_URL + '?action=getRanking');
-    const dados = await res.json();
-    renderRanking(dados);
-  } catch(e) {
-    renderRanking([]);
-  }
+
+function jsonpCall(url) {
+  var script = document.createElement('script');
+  script.src = url;
+  script.onerror = function() { console.error('JSONP error'); };
+  document.head.appendChild(script);
+  setTimeout(function(){ document.head.removeChild(script); }, 5000);
+}
+function carregarRanking() {
+  jsonpCall(SHEETS_URL + '?action=getRanking&callback=onRankingLoaded');
+}
+function onRankingLoaded(dados) {
+  renderRanking(Array.isArray(dados) ? dados : []);
 }
 
 function renderRanking(dados) {
@@ -730,24 +735,16 @@ function mostrarDash(nome) {
 
 let dashAllDados = [];
 
-async function carregarDashboard() {
-  // show all vendedores immediately from equipas list
+function carregarDashboard() {
   const todosNomes = [...new Set(equipas.flatMap(e=>e.nomes))];
   buildVgrid(todosNomes.map(n=>({nome:n})));
-
-  // show loading in dash area
   const di = document.getElementById('dashInner');
   di.style.display = 'block';
   di.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">📊</div><p>Clica num vendedor para ver o perfil</p></div>';
-
-  try {
-    const res = await fetch(SHEETS_URL + '?action=getTodos');
-    const dados = await res.json();
-    dashAllDados = Array.isArray(dados) ? dados : [];
-  } catch(e) {
-    dashAllDados = [];
-    di.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">⚠️</div><p>Erro ao carregar dados.<br>Verifica a ligação ao Google Sheets.</p></div>';
-  }
+  jsonpCall(SHEETS_URL + '?action=getTodos&callback=onTodosLoaded');
+}
+function onTodosLoaded(dados) {
+  dashAllDados = Array.isArray(dados) ? dados : [];
 }
 
 
