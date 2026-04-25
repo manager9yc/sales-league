@@ -203,6 +203,67 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
   .hero-slashes { display: none !important; }
   @page { margin: 1cm; size: A4; }
 }
+
+/* ══ DASHBOARD ══ */
+.dash-wrap { max-width: 900px; margin: 0 auto; padding: 0 0 80px; }
+.vgrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+@media(min-width:480px){ .vgrid { grid-template-columns: repeat(4,1fr); } }
+@media(min-width:640px){ .vgrid { grid-template-columns: repeat(5,1fr); } }
+.vbtn { background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 6px; text-align: center; cursor: pointer; transition: all 0.15s; }
+.vbtn.active { background: var(--orange); border-color: var(--orange); }
+.vbtn:hover:not(.active) { border-color: var(--orange); }
+.vavatar { width: 36px; height: 36px; border-radius: 50%; background: var(--card2); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--orange); margin: 0 auto 6px; }
+.vbtn.active .vavatar { background: rgba(255,255,255,0.2); color: #fff; border-color: rgba(255,255,255,0.3); }
+.vname { font-size: 11px; font-weight: 600; color: var(--text); line-height: 1.2; }
+.vbtn.active .vname { color: #fff; }
+.vteam { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.vbtn.active .vteam { color: rgba(255,255,255,0.6); }
+.dash-inner { padding: 16px; }
+.d-profile { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+.d-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--orange); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #fff; flex-shrink: 0; }
+.d-pname { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: #fff; line-height: 1; }
+.d-pteam { font-size: 12px; color: var(--muted); margin-top: 2px; letter-spacing: 1px; text-transform: uppercase; }
+.d-badge { display: inline-block; background: rgba(255,107,0,0.15); border: 1px solid rgba(255,107,0,0.3); border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600; color: var(--orange); margin-top: 5px; }
+.d-total { background: linear-gradient(135deg,rgba(255,107,0,0.18),rgba(255,107,0,0.04)); border: 1px solid rgba(255,107,0,0.3); border-radius: 14px; padding: 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.d-total-val { font-family: 'Bebas Neue', sans-serif; font-size: 54px; color: var(--orange); line-height: 1; }
+.d-total-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
+.d-total-desc { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.d-slabel { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--orange); margin-bottom: 10px; margin-top: 20px; }
+.d-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 20px; }
+.d-card-title { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #fff; margin-bottom: 14px; }
+.d-chart { display: flex; align-items: flex-end; gap: 10px; height: 110px; position: relative; }
+.d-chart::before { content: ''; position: absolute; bottom: 22px; left: 0; right: 0; height: 1px; background: var(--border); }
+.d-cbar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; }
+.d-cbar-val { font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: var(--orange); }
+.d-cbar-val.hi { color: #fff; }
+.d-cbar { width: 100%; border-radius: 4px 4px 0 0; background: var(--orange); opacity: 0.5; min-height: 4px; margin-bottom: 22px; }
+.d-cbar.hi { opacity: 1; background: linear-gradient(180deg,#fff,var(--orange)); }
+.d-crow { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.d-crow:last-child { border-bottom: none; }
+.d-cpos { width: 22px; font-size: 12px; font-weight: 700; color: var(--muted); text-align: center; flex-shrink: 0; }
+.d-cpos.hi { color: var(--orange); }
+.d-cnom { width: 90px; font-size: 13px; font-weight: 600; color: var(--text); flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.d-cnom.hi { color: var(--orange); }
+.d-cbarwrap { flex: 1; background: var(--card2); border-radius: 3px; height: 18px; overflow: hidden; }
+.d-cbarfill { height: 100%; background: var(--border); border-radius: 3px; transition: width 0.8s ease; }
+.d-cbarfill.hi { background: var(--orange); }
+.d-cscore { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--muted); width: 32px; text-align: right; flex-shrink: 0; }
+.d-cscore.hi { color: var(--orange); }
+.d-brow { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+.d-brow:last-child { border-bottom: none; }
+.d-bemoji { font-size: 18px; width: 26px; flex-shrink: 0; }
+.d-blbl { flex: 1; font-size: 13px; font-weight: 500; }
+.d-bbarwrap { width: 100px; background: var(--card2); border-radius: 3px; height: 6px; overflow: hidden; }
+@media(min-width:400px){ .d-bbarwrap { width: 130px; } }
+.d-bbar { height: 100%; background: var(--orange); border-radius: 3px; transition: width 0.8s ease; }
+.d-bval { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--text); width: 32px; text-align: right; flex-shrink: 0; }
+.d-hrow { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--border); }
+.d-hrow:last-child { border-bottom: none; }
+.d-hmonth { font-size: 14px; font-weight: 600; }
+.d-hmonth.hi { color: var(--orange); }
+.d-hbadge { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; background: rgba(255,107,0,0.15); color: var(--orange); border-radius: 10px; padding: 3px 8px; }
+.d-htotal { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--muted); }
+.d-htotal.hi { color: var(--orange); }
 </style>
 </head>
 <body>
@@ -210,6 +271,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 <div class="nav">
   <button class="nav-btn active" onclick="goTo('form',this)">📋 Registo</button>
   <button class="nav-btn" onclick="goTo('ranking',this)">🏆 Ranking</button>
+  <button class="nav-btn" onclick="goTo('dash',this)">📊 Dashboard</button>
 </div>
 
 <!-- FORM -->
@@ -283,6 +345,29 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
   <div class="rank-main" id="rankMain"></div>
 </div>
 
+
+<!-- DASHBOARD -->
+<div class="screen" id="screen-dash">
+  <div style="background:#0C0C0C;position:relative;overflow:hidden">
+    <div style="padding:28px 24px 0;text-align:center;position:relative">
+      <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#FF6B00"></div>
+      <div style="position:absolute;right:0;top:0;bottom:0;width:4px;background:#FF6B00"></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,10vw,64px);color:#fff;line-height:0.95;letter-spacing:2px">DASHBOARD</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-top:6px">Perfil individual · Vasco da Gama</div>
+    </div>
+    <div style="background:#FF6B00;margin-top:20px;padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:16px">
+      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:4px;color:#fff">2026</span>
+      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
+    </div>
+  </div>
+  <div style="padding:20px 16px 0;max-width:900px;margin:0 auto">
+    <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Escolhe um vendedor</div>
+    <div class="vgrid" id="vgrid"></div>
+  </div>
+  <div class="dash-inner" id="dashInner" style="display:none;max-width:900px;margin:0 auto"></div>
+</div>
+
 <button class="print-btn" id="printBtn" onclick="window.print()">🖨️ Imprimir</button>
 <div class="toast" id="toast"></div>
 
@@ -321,6 +406,7 @@ function goTo(screen, btn) {
   btn.classList.add('active');
   document.getElementById('printBtn').style.display = screen === 'ranking' ? 'flex' : 'none';
   if (screen === 'ranking') carregarRanking();
+  if (screen === 'dash') carregarDashboard();
 }
 
 function renderTabs() {
@@ -486,6 +572,175 @@ function renderRanking(dados) {
 }
 
 renderTabs();
+
+// ══ DASHBOARD ══
+const nomeParaEquipaLabel = {};
+equipas.forEach(eq => eq.nomes.forEach(n => nomeParaEquipaLabel[n] = eq.label.replace(/^\S+\s/,'')));
+
+function dashIni(nome){ return nome.split(' ').map(x=>x[0]).slice(0,2).join(''); }
+function dashTot(d){ return categorias.reduce((s,c)=>s+(d[c.key]||0),0); }
+
+function buildVgrid(allDados) {
+  const nomes = [...new Set(allDados.map(d=>d.nome))].sort();
+  document.getElementById('vgrid').innerHTML = nomes.map(n => `
+    <div class="vbtn" id="vbtn-${n.replace(/ /g,'_').replace(/[^a-zA-Z0-9_]/g,'')}" onclick="mostrarDash('${n.replace(/'/g,"\\'")}')">
+      <div class="vavatar">${dashIni(n)}</div>
+      <div class="vname">${n.split(' ')[0]}<br><span style="font-weight:400">${n.split(' ').slice(1).join(' ')}</span></div>
+      <div class="vteam">${nomeParaEquipaLabel[n]||''}</div>
+    </div>`).join('');
+}
+
+function mostrarDash(nome) {
+  if (!dashAllDados.length) return;
+  const id = nome.replace(/ /g,'_').replace(/[^a-zA-Z0-9_]/g,'');
+  document.querySelectorAll('.vbtn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('vbtn-'+id);
+  if(btn) btn.classList.add('active');
+
+  const dadosVendedor = dashAllDados.filter(d=>d.nome===nome);
+  if(!dadosVendedor.length){ return; }
+
+  // agrupar por mes
+  const porMes = {};
+  dadosVendedor.forEach(d => {
+    const dt = new Date(d.data || d.Data || '');
+    const mes = dt && !isNaN(dt) ? dt.toLocaleDateString('pt-PT',{month:'short',year:'numeric'}) : 'Sem data';
+    if(!porMes[mes]) porMes[mes] = { mes, onlines:0, sprays:0, palmilhas:0, camisolas:0, sacos:0, garrafas:0, elogios:0 };
+    categorias.forEach(c => { porMes[mes][c.key] += (d[c.key]||0); });
+  });
+  const mesesArr = Object.values(porMes);
+
+  const totalAcum = dadosVendedor.reduce((s,d)=>s+dashTot(d),0);
+  const pos1 = [...new Set(dashAllDados.map(d=>d.nome))]
+    .map(n=>({n, v:dashAllDados.filter(d=>d.nome===n).reduce((s,d)=>s+(d.onlines||0),0)}))
+    .sort((a,b)=>b.v-a.v).findIndex(r=>r.n===nome)+1;
+
+  // semanas do mes atual
+  const mesAtual = new Date().getMonth();
+  const anoAtual = new Date().getFullYear();
+  const semanas = [0,0,0,0];
+  dadosVendedor.forEach(d => {
+    const dt = new Date(d.data || d.Data || '');
+    if(!isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual) {
+      const dia = dt.getDate();
+      const sem = Math.min(3, Math.floor((dia-1)/7));
+      semanas[sem] += dashTot(d);
+    }
+  });
+  const maxSem = Math.max(...semanas,1);
+
+  // breakdown acumulado
+  const breakdown = categorias.map(c=>({...c, v:dadosVendedor.reduce((s,d)=>s+(d[c.key]||0),0)}));
+  const maxB = Math.max(...breakdown.map(x=>x.v),1);
+
+  // compare onlines loja
+  const compRank = [...new Set(dashAllDados.map(d=>d.nome))]
+    .map(n=>({n, v:dashAllDados.reduce((s,d)=>d.nome===n?s+(d.onlines||0):s,0)}))
+    .sort((a,b)=>b.v-a.v).slice(0,8);
+  const maxO = compRank[0]?.v||1;
+
+  const html = `
+    <div class="d-profile">
+      <div class="d-avatar">${dashIni(nome)}</div>
+      <div>
+        <div class="d-pname">${nome}</div>
+        <div class="d-pteam">${nomeParaEquipaLabel[nome]||'Loja'}</div>
+        <div class="d-badge">#${pos1}º em Onlines (acumulado)</div>
+      </div>
+    </div>
+
+    <div class="d-slabel">Total acumulado 2026</div>
+    <div class="d-total">
+      <div>
+        <div class="d-total-lbl">Todas as categorias</div>
+        <div class="d-total-val">${totalAcum}</div>
+        <div class="d-total-desc">unidades vendidas · todos os meses</div>
+      </div>
+      <div style="font-size:44px">📦</div>
+    </div>
+
+    <div class="d-slabel">Por artigo — acumulado</div>
+    <div class="d-card">
+      <div class="d-card-title">Todas as categorias</div>
+      ${breakdown.map(b=>`
+        <div class="d-brow">
+          <span class="d-bemoji">${b.emoji}</span>
+          <span class="d-blbl">${b.label}</span>
+          <div class="d-bbarwrap"><div class="d-bbar" style="width:${Math.round(b.v/maxB*100)}%"></div></div>
+          <span class="d-bval">${b.v}</span>
+        </div>`).join('')}
+    </div>
+
+    <div class="d-slabel">Evolução semanal — mês atual</div>
+    <div class="d-card">
+      <div class="d-card-title">Unidades por semana</div>
+      <div class="d-chart">
+        ${semanas.map((v,i)=>`
+          <div class="d-cbar-wrap" style="position:relative">
+            <div class="d-cbar-val ${i===semanas.length-1?'hi':''}">${v}</div>
+            <div class="d-cbar ${i===semanas.length-1?'hi':''}" style="height:${Math.round(v/maxSem*88)}px"></div>
+          </div>`).join('')}
+        <div style="position:absolute;bottom:0;left:0;right:0;display:flex;gap:10px">
+          ${['Sem 1','Sem 2','Sem 3','Sem 4 ▶'].map(l=>`<div style="flex:1;font-size:10px;color:var(--muted);text-align:center">${l}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="d-slabel">Comparação com a loja — Onlines acumulado</div>
+    <div class="d-card">
+      <div class="d-card-title">Top 8</div>
+      ${compRank.map((item,i)=>{
+        const hi=item.n===nome;
+        const pct=Math.round(item.v/maxO*100);
+        return `<div class="d-crow">
+          <div class="d-cpos ${hi?'hi':''}">${i+1}º</div>
+          <div class="d-cnom ${hi?'hi':''}">${item.n.split(' ')[0]}</div>
+          <div class="d-cbarwrap"><div class="d-cbarfill ${hi?'hi':''}" style="width:${pct}%"></div></div>
+          <div class="d-cscore ${hi?'hi':''}">${item.v}</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="d-slabel">Histórico por mês</div>
+    <div class="d-card">
+      <div class="d-card-title">Total de unidades vendidas</div>
+      ${mesesArr.map(d=>{
+        const t=categorias.reduce((s,c)=>s+(d[c.key]||0),0);
+        const mesAtualLabel = new Date().toLocaleDateString('pt-PT',{month:'short',year:'numeric'});
+        const hi=d.mes===mesAtualLabel;
+        return `<div class="d-hrow">
+          <div class="d-hmonth ${hi?'hi':''}">${hi?'📍 ':''} ${d.mes}</div>
+          ${hi?'<div class="d-hbadge">Mês atual</div>':'<div></div>'}
+          <div class="d-htotal ${hi?'hi':''}">${t}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+
+  const di = document.getElementById('dashInner');
+  di.style.display = 'block';
+  di.innerHTML = html;
+  setTimeout(()=>di.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+let dashAllDados = [];
+
+async function carregarDashboard() {
+  try {
+    const res = await fetch(SHEETS_URL + '?action=getTodos');
+    const dados = await res.json();
+    dashAllDados = Array.isArray(dados) ? dados : [];
+  } catch(e) {
+    dashAllDados = [];
+  }
+  const todosNomes = [...new Set(equipas.flatMap(e=>e.nomes))];
+  const nomesComDados = [...new Set(dashAllDados.map(d=>d.nome))];
+  const nomesParaMostrar = nomesComDados.length ? nomesComDados : todosNomes.slice(0,10);
+  buildVgrid(nomesParaMostrar.map(n=>({nome:n})));
+  if(nomesParaMostrar.length) mostrarDash(nomesParaMostrar[0]);
+}
+
+
 </script>
 </body>
 </html>
