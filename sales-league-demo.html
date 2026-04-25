@@ -591,7 +591,12 @@ function buildVgrid(allDados) {
 }
 
 function mostrarDash(nome) {
-  if (!dashAllDados.length) return;
+  if (!dashAllDados.length) {
+    const di = document.getElementById('dashInner');
+    di.style.display = 'block';
+    di.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">⏳</div><p>A carregar dados...</p></div>';
+    return;
+  }
   const id = nome.replace(/ /g,'_').replace(/[^a-zA-Z0-9_]/g,'');
   document.querySelectorAll('.vbtn').forEach(b => b.classList.remove('active'));
   const btn = document.getElementById('vbtn-'+id);
@@ -726,18 +731,23 @@ function mostrarDash(nome) {
 let dashAllDados = [];
 
 async function carregarDashboard() {
+  // show all vendedores immediately from equipas list
+  const todosNomes = [...new Set(equipas.flatMap(e=>e.nomes))];
+  buildVgrid(todosNomes.map(n=>({nome:n})));
+
+  // show loading in dash area
+  const di = document.getElementById('dashInner');
+  di.style.display = 'block';
+  di.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">📊</div><p>Clica num vendedor para ver o perfil</p></div>';
+
   try {
     const res = await fetch(SHEETS_URL + '?action=getTodos');
     const dados = await res.json();
     dashAllDados = Array.isArray(dados) ? dados : [];
   } catch(e) {
     dashAllDados = [];
+    di.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">⚠️</div><p>Erro ao carregar dados.<br>Verifica a ligação ao Google Sheets.</p></div>';
   }
-  const todosNomes = [...new Set(equipas.flatMap(e=>e.nomes))];
-  const nomesComDados = [...new Set(dashAllDados.map(d=>d.nome))];
-  const nomesParaMostrar = nomesComDados.length ? nomesComDados : todosNomes.slice(0,10);
-  buildVgrid(nomesParaMostrar.map(n=>({nome:n})));
-  if(nomesParaMostrar.length) mostrarDash(nomesParaMostrar[0]);
 }
 
 
