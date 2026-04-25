@@ -643,7 +643,7 @@ async function submeter() {
   mostrarProgressoRegisto(nomeSel, payload);
 
   // Countdown to ranking
-  let secs = 5;
+  let secs = 10;
   const cdEl = document.getElementById('successCountdown');
   cdEl.textContent = 'A abrir o ranking em ' + secs + 's...';
   const cdInterval = setInterval(() => {
@@ -653,7 +653,8 @@ async function submeter() {
     } else {
       clearInterval(cdInterval);
       resetForm();
-      goTo('ranking', document.querySelectorAll('.nav-btn')[1]);
+      const rankBtn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.textContent.includes('Ranking'));
+      if (rankBtn) goTo('ranking', rankBtn);
     }
   }, 1000);
 }
