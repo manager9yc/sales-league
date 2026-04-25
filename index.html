@@ -82,13 +82,14 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .submit-btn { width: 100%; background: var(--orange); border: none; border-radius: 14px; color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; padding: 18px; margin-top: 28px; cursor: pointer; transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s; box-shadow: 0 4px 20px rgba(255,107,0,0.35); }
 .submit-btn:hover { box-shadow: 0 6px 28px rgba(255,107,0,0.55); }
 .submit-btn:active { opacity: 0.88; transform: scale(0.98); }
+.submit-btn.loading { background: #28a745; box-shadow: 0 4px 20px rgba(40,167,69,0.4); transform: scale(0.98); }
 
-.success { display: none; text-align: center; padding: 60px 20px; }
+.success { display: none; padding: 0 0 40px; }
 .success.show { display: block; animation: fadeUp 0.4s ease; }
 @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-.success-icon { font-size: 64px; margin-bottom: 16px; display: block; animation: bounceIn 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+.success-icon { font-size: 56px; display: block; animation: bounceIn 0.6s cubic-bezier(0.34,1.56,0.64,1); }
 @keyframes bounceIn { from { transform:scale(0); } to { transform:scale(1); } }
-.success h2 { font-family: 'Bebas Neue', sans-serif; font-size: 40px; color: var(--orange); margin-bottom: 8px; }
+.success h2 { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: #fff; margin-bottom: 4px; }
 .success p { color: var(--muted); font-size: 15px; }
 .form-main.hide { display: none; }
 
@@ -326,7 +327,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .admin-date { font-size: 11px; color: var(--muted); }
 
 /* ══ PIN LOCK ══ */
-.pin-overlay { position:absolute; inset:0; background:var(--dark); z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; border-radius:0; }
+.pin-overlay { position:relative; background:transparent; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px 20px 40px; }
 .pin-overlay.hidden { display:none; }
 .pin-icon { font-size:48px; margin-bottom:16px; }
 .pin-title { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:2px; color:#fff; margin-bottom:6px; }
@@ -393,14 +394,21 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
       <div class="card">
         <div class="prod-row" style="padding:0"><div class="prod-info"><div class="prod-emoji">⭐</div><div><div class="prod-name">Elogios</div><div class="prod-hint">Escritos ou Google Reviews</div></div></div><div class="counter"><button class="cbtn minus" onclick="change('elogios',-1)">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onclick="change('elogios',1)">+</button></div></div>
       </div>
-      <button class="submit-btn" onclick="submeter()">Registar o meu dia →</button>
+      <button class="submit-btn" id="submitBtn" onclick="submeter()">Registar o meu dia →</button>
     </div>
     <div class="success" id="successMsg">
-      <span class="success-icon">🏆</span>
-      <h2>Registado!</h2>
-      <p>O teu registo foi guardado. Boas vendas!</p>
-      <div id="successProgress" style="margin-top:20px;text-align:left"></div>
-      <div id="successCountdown" style="margin-top:16px;font-size:12px;color:var(--muted)"></div>
+      <!-- HERO CONFIRMAÇÃO -->
+      <div style="background:linear-gradient(135deg,rgba(40,167,69,0.2),rgba(40,167,69,0.05));border-bottom:1px solid rgba(40,167,69,0.3);padding:32px 20px;text-align:center">
+        <span class="success-icon">✅</span>
+        <h2 style="margin-top:10px">Registo Guardado!</h2>
+        <p id="successNomeLabel" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);letter-spacing:2px;margin:6px 0 4px"></p>
+        <p style="color:var(--muted);font-size:13px">Boas vendas hoje 💪</p>
+        <div id="successCountdown" style="margin-top:12px;font-size:12px;color:var(--muted)"></div>
+      </div>
+      <!-- METAS E MEDALHAS -->
+      <div style="padding:20px 16px 0;max-width:900px;margin:0 auto">
+        <div id="successProgress"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -483,7 +491,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
       <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
     </div>
   </div>
-  <div class="admin-wrap" style="position:relative">
+  <div class="admin-wrap">
 
     <!-- PIN LOCK -->
     <div class="pin-overlay" id="pinOverlay">
@@ -620,6 +628,13 @@ function showToast(msg) {
 async function submeter() {
   if (!nomeSel) { showToast('⚠️ Seleciona o teu nome primeiro'); return; }
   if (!document.getElementById('dataRegisto').value) { showToast('⚠️ Escolhe a data'); return; }
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = '✓ A guardar...';
+  btn.style.background = '#00AA44';
+  btn.style.boxShadow = '0 4px 20px rgba(0,170,68,0.4)';
+  btn.disabled = true;
+  const sbtn = document.getElementById('submitBtn');
+  if (sbtn) { sbtn.classList.add('loading'); sbtn.textContent = '✓ A guardar...'; }
   const equipa = equipas.find(e=>e.id===equipaAtiva)?.label.replace(/^\S+\s/,'') || '';
   const payload = {
     data: document.getElementById('dataRegisto').value,
@@ -640,6 +655,8 @@ async function submeter() {
   document.getElementById('successMsg').classList.add('show');
 
   // Show progress and medals for this vendedor
+  const snl = document.getElementById('successNomeLabel');
+  if (snl) snl.textContent = nomeSel.toUpperCase();
   mostrarProgressoRegisto(nomeSel, payload);
 
   // Countdown to ranking
@@ -666,6 +683,8 @@ function resetForm() {
   Object.keys(vals).forEach(k => { vals[k]=0; const el=document.getElementById(k); el.textContent=0; el.classList.remove('nz'); });
   document.getElementById('formMain').classList.remove('hide');
   document.getElementById('successMsg').classList.remove('show');
+  const sbtn = document.getElementById('submitBtn');
+  if (sbtn) { sbtn.classList.remove('loading'); sbtn.textContent = 'Registar o meu dia →'; }
 }
 
 // RANKING
