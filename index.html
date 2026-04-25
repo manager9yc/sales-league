@@ -516,11 +516,10 @@ function secDiv(icon, title) {
 
 async function carregarRanking() {
   try {
-    const proxy = 'https://api.allorigins.win/get?url=';
+    const proxy = 'https://corsproxy.io/?';
     const url = encodeURIComponent(SHEETS_URL + '?action=getRanking');
     const res = await fetch(proxy + url);
-    const json = await res.json();
-    const dados = JSON.parse(json.contents);
+    const dados = await res.json();
     renderRanking(Array.isArray(dados) ? dados : []);
   } catch(e) {
     renderRanking([]);
@@ -741,11 +740,10 @@ async function carregarDashboard() {
   di.style.display = 'block';
   di.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">⏳</div><p>A carregar dados...</p></div>';
   try {
-    const proxy = 'https://api.allorigins.win/get?url=';
+    const proxy = 'https://corsproxy.io/?';
     const url = encodeURIComponent(SHEETS_URL + '?action=getTodos');
     const res = await fetch(proxy + url);
-    const json = await res.json();
-    dashAllDados = JSON.parse(json.contents);
+    dashAllDados = await res.json();
     if (!Array.isArray(dashAllDados)) dashAllDados = [];
     di.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">📊</div><p>Clica num vendedor para ver o perfil</p></div>';
   } catch(e) {
