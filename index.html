@@ -514,18 +514,17 @@ function secDiv(icon, title) {
 }
 
 
-function jsonpCall(url) {
-  var script = document.createElement('script');
-  script.src = url;
-  script.onerror = function() { console.error('JSONP error'); };
-  document.head.appendChild(script);
-  setTimeout(function(){ document.head.removeChild(script); }, 5000);
-}
-function carregarRanking() {
-  jsonpCall(SHEETS_URL + '?action=getRanking&callback=onRankingLoaded');
-}
-function onRankingLoaded(dados) {
-  renderRanking(Array.isArray(dados) ? dados : []);
+async function carregarRanking() {
+  try {
+    const proxy = 'https://api.allorigins.win/get?url=';
+    const url = encodeURIComponent(SHEETS_URL + '?action=getRanking');
+    const res = await fetch(proxy + url);
+    const json = await res.json();
+    const dados = JSON.parse(json.contents);
+    renderRanking(Array.isArray(dados) ? dados : []);
+  } catch(e) {
+    renderRanking([]);
+  }
 }
 
 function renderRanking(dados) {
@@ -735,16 +734,24 @@ function mostrarDash(nome) {
 
 let dashAllDados = [];
 
-function carregarDashboard() {
+async function carregarDashboard() {
   const todosNomes = [...new Set(equipas.flatMap(e=>e.nomes))];
   buildVgrid(todosNomes.map(n=>({nome:n})));
   const di = document.getElementById('dashInner');
   di.style.display = 'block';
-  di.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">📊</div><p>Clica num vendedor para ver o perfil</p></div>';
-  jsonpCall(SHEETS_URL + '?action=getTodos&callback=onTodosLoaded');
-}
-function onTodosLoaded(dados) {
-  dashAllDados = Array.isArray(dados) ? dados : [];
+  di.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">⏳</div><p>A carregar dados...</p></div>';
+  try {
+    const proxy = 'https://api.allorigins.win/get?url=';
+    const url = encodeURIComponent(SHEETS_URL + '?action=getTodos');
+    const res = await fetch(proxy + url);
+    const json = await res.json();
+    dashAllDados = JSON.parse(json.contents);
+    if (!Array.isArray(dashAllDados)) dashAllDados = [];
+    di.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">📊</div><p>Clica num vendedor para ver o perfil</p></div>';
+  } catch(e) {
+    dashAllDados = [];
+    di.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">⚠️</div><p>Erro ao carregar dados.</p></div>';
+  }
 }
 
 
