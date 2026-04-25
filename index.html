@@ -653,6 +653,7 @@ async function submeter() {
   } catch(e) { console.error('Erro ao guardar:', e); }
   document.getElementById('formMain').classList.add('hide');
   document.getElementById('successMsg').classList.add('show');
+  window.scrollTo({top: 0, behavior: 'smooth'});
 
   // Show progress and medals for this vendedor
   const snl = document.getElementById('successNomeLabel');
@@ -731,6 +732,27 @@ async function carregarRanking() {
   } catch(e) {
     renderRanking([]);
   }
+  // Check for medal winners using full history
+  if (dashAllDados.length) verificarMedalhasRanking();
+}
+
+function verificarMedalhasRanking() {
+  const vencedores = [];
+  const todosNomes = [...new Set(dashAllDados.map(d=>d.nome))];
+  todosNomes.forEach(nome => {
+    const dadosNome = dashAllDados.filter(d=>d.nome===nome);
+    const medalhas = calcularMedalhas(dadosNome);
+    medalhas.filter(m=>m.earned).forEach(m => {
+      vencedores.push({ nome, medalha: m });
+    });
+  });
+  if (!vencedores.length) return;
+  // Show one at a time with delay
+  vencedores.slice(0,5).forEach((v, i) => {
+    setTimeout(() => {
+      showRecordToast(v.medalha.icon + ' ' + v.medalha.name, v.nome + ' conquistou esta medalha!');
+    }, i * 3500);
+  });
 }
 
 function renderRanking(dados) {
@@ -824,18 +846,38 @@ function mostrarProgressoRegisto(nome, payload) {
   // Medalhas
   const dadosTodos = [...dashAllDados.filter(d=>d.nome===nome), payload];
   const medalhas = calcularMedalhas(dadosTodos);
-  metasHtml += '<div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Medalhas</div>';
-  metasHtml += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
-  medalhas.forEach(m => {
-    metasHtml += `<div style="background:${m.earned?'rgba(255,107,0,0.1)':'var(--card)'};border:1px solid ${m.earned?'var(--orange)':'var(--border)'};border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:8px;${m.earned?'':'opacity:0.5'}">
-      <span style="font-size:18px;${m.earned?'':'filter:grayscale(1)'}">${m.icon}</span>
-      <div>
-        <div style="font-size:11px;font-weight:600;color:${m.earned?'var(--text)':'var(--muted)'}">${m.name}</div>
-        <div style="font-size:10px;color:var(--muted)">${m.desc}</div>
-      </div>
-    </div>`;
-  });
-  metasHtml += '</div>';
+  const conquistadas = medalhas.filter(m => m.earned);
+  const porConquistar = medalhas.filter(m => !m.earned);
+
+  if (conquistadas.length) {
+    metasHtml += '<div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00CC66;margin-bottom:8px">✅ Conquistadas</div>';
+    metasHtml += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">';
+    conquistadas.forEach(m => {
+      metasHtml += `<div style="background:rgba(0,204,102,0.08);border:1px solid #00CC66;border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:18px">${m.icon}</span>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--text)">${m.name}</div>
+          <div style="font-size:10px;color:var(--muted)">${m.desc}</div>
+        </div>
+      </div>`;
+    });
+    metasHtml += '</div>';
+  }
+
+  if (porConquistar.length) {
+    metasHtml += '<div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">🔒 Por conquistar</div>';
+    metasHtml += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+    porConquistar.forEach(m => {
+      metasHtml += `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:8px;opacity:0.5">
+        <span style="font-size:18px;filter:grayscale(1)">${m.icon}</span>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--muted)">${m.name}</div>
+          <div style="font-size:10px;color:var(--muted)">${m.desc}</div>
+        </div>
+      </div>`;
+    });
+    metasHtml += '</div>';
+  }
 
   prog.innerHTML = metasHtml;
 }
@@ -1179,18 +1221,29 @@ const metas = {
 
 // ══ MEDALHAS ══
 function calcularMedalhas(dados) {
-  const total = dados.reduce((s,d)=>s+dashTot(d),0);
-  const onlinesTotal = dados.reduce((s,d)=>s+(d.onlines||0),0);
-  const spraysTotal = dados.reduce((s,d)=>s+(d.sprays||0),0);
-  const elogiosTotal = dados.reduce((s,d)=>s+(d.elogios||0),0);
-  const diasComRegisto = new Set(dados.map(d=>d.data)).size;
+  const mesAtual = new Date().getMonth();
+  const anoAtual = new Date().getFullYear();
+  const dadosMes = dados.filter(d => {
+    const dt = new Date(d.data||'');
+    return !isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual;
+  });
+  const onlinesMes   = dadosMes.reduce((s,d)=>s+(d.onlines||0),0);
+  const spraysMes    = dadosMes.reduce((s,d)=>s+(d.sprays||0),0);
+  const palmilhasMes = dadosMes.reduce((s,d)=>s+(d.palmilhas||0),0);
+  const camisolasMes = dadosMes.reduce((s,d)=>s+(d.camisolas||0),0);
+  const sacosMes     = dadosMes.reduce((s,d)=>s+(d.sacos||0),0);
+  const garrafasMes  = dadosMes.reduce((s,d)=>s+(d.garrafas||0),0);
+  const elogiosMes   = dadosMes.reduce((s,d)=>s+(d.elogios||0),0);
+  const diasComRegisto = new Set(dadosMes.map(d=>d.data)).size;
   return [
-    { icon:'🥇', name:'Liga Master',    desc:'200+ unidades acumuladas',  earned: total >= 200 },
-    { icon:'🖥️', name:'Rei dos Onlines', desc:'Meta de Onlines atingida',  earned: onlinesTotal >= metas.onlines },
-    { icon:'🧴', name:'Spray King',      desc:'Meta de Sprays atingida',   earned: spraysTotal >= metas.sprays },
-    { icon:'⭐', name:'Favorito',        desc:'5+ elogios recebidos',      earned: elogiosTotal >= 5 },
-    { icon:'📅', name:'Consistente',     desc:'10+ dias com registo',      earned: diasComRegisto >= 10 },
-    { icon:'🔥', name:'Em Chamas',       desc:'50+ unidades num mês',      earned: dados.some(d=>dashTot(d)>=50) },
+    { icon:'🖥️', name:'Rei dos Onlines',    desc:'30 onlines este mês',           earned: onlinesMes >= 30 },
+    { icon:'🧴', name:'Spray King',          desc:'30 sprays este mês',            earned: spraysMes >= 30 },
+    { icon:'🦶', name:'Palmilhas Master',    desc:'20 palmilhas este mês',         earned: palmilhasMes >= 20 },
+    { icon:'⚽', name:'Camisolas Pro',       desc:'15 camisolas este mês',         earned: camisolasMes >= 15 },
+    { icon:'🛍️', name:'Eco Champion',       desc:'600 sacos este mês',            earned: sacosMes >= 600 },
+    { icon:'💧', name:'Hydration Boss',      desc:'15 garrafas este mês',          earned: garrafasMes >= 15 },
+    { icon:'⭐', name:'Favorito',            desc:'3 elogios este mês',            earned: elogiosMes >= 3 },
+    { icon:'📅', name:'Consistente',         desc:'10+ dias com registo este mês', earned: diasComRegisto >= 10 },
   ];
 }
 
