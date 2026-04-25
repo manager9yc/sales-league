@@ -168,6 +168,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 
 .print-btn { position: fixed; bottom: 20px; right: 18px; background: var(--orange); color: #fff; border: none; border-radius: 50px; padding: 12px 20px; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 20px rgba(255,107,0,0.5); z-index: 40; display: none; align-items: center; gap: 6px; transition: transform 0.15s, box-shadow 0.15s; }
 .print-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,107,0,0.65); }
+@media (max-width: 768px) { .print-btn { display: none !important; } }
 
 @media (max-width: 480px) { .td-bar { display: none; } }
 @media (min-width: 768px) {
@@ -311,8 +312,8 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .medal-desc { font-size: 10px; color: var(--muted); margin-top: 1px; }
 
 /* ══ RECORDE TOAST ══ */
-.record-toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -200%); background: linear-gradient(135deg, #FF6B00, #FF8C00); color: #fff; border-radius: 20px; padding: 20px 28px; font-size: 15px; font-weight: 600; box-shadow: 0 12px 40px rgba(255,107,0,0.6); transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1); z-index: 9999; text-align: center; min-width: 260px; max-width: 90vw; }
-.record-toast.show { transform: translate(-50%, -50%); }
+.record-toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, #FF6B00, #FF8C00); color: #fff; border-radius: 20px; padding: 20px 28px; font-size: 15px; font-weight: 600; box-shadow: 0 12px 40px rgba(255,107,0,0.6); z-index: 9999; text-align: center; min-width: 260px; max-width: 90vw; opacity: 0; pointer-events: none; transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1); transform: translate(-50%, -40%); }
+.record-toast.show { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
 .record-toast .rt-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; display: block; margin-bottom: 4px; }
 
 /* ══ ADMIN ══ */
@@ -429,6 +430,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
     </div>
   </div>
   <div class="rank-main" id="rankMain"></div>
+<div class="record-toast" id="recordToast"></div>
 </div>
 
 
@@ -538,7 +540,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
   </div>
 </div>
 
-<div class="record-toast" id="recordToast"></div>
+
 <button class="print-btn" id="printBtn" onclick="window.print()">🖨️ Imprimir</button>
 <div class="toast" id="toast"></div>
 
@@ -647,7 +649,6 @@ async function submeter() {
     garrafas:  vals.garrafas,
     elogios:   vals.elogios
   };
-  verificarRecorde(nomeSel, payload);
   try {
     await fetch(SHEETS_URL, { method:'POST', body: JSON.stringify(payload), mode:'no-cors' });
   } catch(e) { console.error('Erro ao guardar:', e); }
@@ -1265,6 +1266,7 @@ function verificarRecorde(nome, payload) {
 }
 
 function showRecordToast(titulo, msg) {
+  if (!document.getElementById('screen-ranking').classList.contains('active')) return;
   const t = document.getElementById('recordToast');
   t.innerHTML = '<span class="rt-title">' + titulo + '</span><div style="font-size:14px;margin-top:4px;opacity:0.9">' + msg + '</div>';
   t.classList.add('show');
