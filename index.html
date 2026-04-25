@@ -311,9 +311,9 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .medal-desc { font-size: 10px; color: var(--muted); margin-top: 1px; }
 
 /* ══ RECORDE TOAST ══ */
-.record-toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-100px); background: linear-gradient(135deg, #FF6B00, #FF8C00); color: #fff; border-radius: 14px; padding: 14px 20px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 30px rgba(255,107,0,0.5); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); z-index: 300; white-space: nowrap; text-align: center; }
-.record-toast.show { transform: translateX(-50%) translateY(0); }
-.record-toast .rt-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; display: block; }
+.record-toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -200%); background: linear-gradient(135deg, #FF6B00, #FF8C00); color: #fff; border-radius: 20px; padding: 20px 28px; font-size: 15px; font-weight: 600; box-shadow: 0 12px 40px rgba(255,107,0,0.6); transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1); z-index: 9999; text-align: center; min-width: 260px; max-width: 90vw; }
+.record-toast.show { transform: translate(-50%, -50%); }
+.record-toast .rt-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; display: block; margin-bottom: 4px; }
 
 /* ══ ADMIN ══ */
 .admin-wrap { max-width: 900px; margin: 0 auto; padding: 0 0 80px; }
@@ -742,7 +742,8 @@ function verificarMedalhasRanking() {
   todosNomes.forEach(nome => {
     const dadosNome = dashAllDados.filter(d=>d.nome===nome);
     const medalhas = calcularMedalhas(dadosNome);
-    medalhas.filter(m=>m.earned).forEach(m => {
+    const novasMedalhas = calcularMedalhas(dadosNome).filter(m=>m.earned);
+    novasMedalhas.forEach(m => {
       vencedores.push({ nome, medalha: m });
     });
   });
@@ -750,7 +751,10 @@ function verificarMedalhasRanking() {
   // Show one at a time with delay
   vencedores.slice(0,5).forEach((v, i) => {
     setTimeout(() => {
-      showRecordToast(v.medalha.icon + ' ' + v.medalha.name, v.nome + ' conquistou esta medalha!');
+      showRecordToast(
+        v.medalha.icon + '  ' + v.nome,
+        '🏅 Conquistou a medalha <strong>' + v.medalha.name + '</strong>'
+      );
     }, i * 3500);
   });
 }
@@ -1255,14 +1259,14 @@ function verificarRecorde(nome, payload) {
     if ((payload[cat.key]||0) === 0) return;
     const maxAnterior = dadosAnteriores.reduce((m,d)=>Math.max(m,d[cat.key]||0),0);
     if ((payload[cat.key]||0) > maxAnterior && maxAnterior > 0) {
-      showRecordToast('🏆 Novo recorde!', cat.emoji + ' ' + cat.label + ': ' + payload[cat.key]);
+      showRecordToast('🏆 Novo recorde pessoal!', cat.emoji + '  ' + nome + ' — ' + cat.label + ': ' + payload[cat.key]);
     }
   });
 }
 
 function showRecordToast(titulo, msg) {
   const t = document.getElementById('recordToast');
-  t.innerHTML = '<span class="rt-title">' + titulo + '</span>' + msg;
+  t.innerHTML = '<span class="rt-title">' + titulo + '</span><div style="font-size:14px;margin-top:4px;opacity:0.9">' + msg + '</div>';
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 4000);
 }
