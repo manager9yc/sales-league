@@ -273,33 +273,7 @@ const categorias = [
   { key:'elogios',   label:'Elogios',             emoji:'⭐' },
 ];
 
-const dadosDemo = [
-  {nome:'António Pinto',   onlines:36,sprays:8, palmilhas:9, camisolas:4,sacos:2,garrafas:4,elogios:3},
-  {nome:'Ariana Santos',   onlines:20,sprays:19,palmilhas:19,camisolas:7,sacos:5,garrafas:3,elogios:6},
-  {nome:'Vasco Tavares',   onlines:7, sprays:6, palmilhas:3, sacos:1,garrafas:2,elogios:1},
-  {nome:'Miguel Viegas',   onlines:8, sprays:4, palmilhas:10,sacos:0,garrafas:1,elogios:2},
-  {nome:'João Ferreira',   onlines:28,sprays:9, palmilhas:4, camisolas:5,sacos:3,garrafas:5,elogios:2},
-  {nome:'Beatriz Rosa',    onlines:5, sprays:7, palmilhas:4, sacos:1,garrafas:2,elogios:0},
-  {nome:'Ricardo Esteves', onlines:9, sprays:5, palmilhas:2, sacos:0,garrafas:1,elogios:1},
-  {nome:'Ricardo Eusébio', onlines:9, sprays:11,palmilhas:5, sacos:1,garrafas:3,elogios:2},
-  {nome:'Rodrigo Araújo',  onlines:10,sprays:14,palmilhas:6, camisolas:2,sacos:2,garrafas:4,elogios:2},
-  {nome:'Mariana Lourenço',onlines:4, sprays:3, palmilhas:2, sacos:4,garrafas:6,elogios:1},
-  {nome:'Beatriz Carreiro',onlines:6, sprays:7, palmilhas:3, sacos:3,garrafas:5,elogios:2},
-  {nome:'Catarina Cardoso',onlines:3, sprays:2, palmilhas:1, sacos:2,garrafas:3,elogios:0},
-  {nome:'Lara Ferreira',   onlines:2, sprays:4, palmilhas:2, sacos:5,garrafas:4,elogios:1},
-  {nome:'Nicole Pinto',    onlines:5, sprays:7, palmilhas:4, sacos:6,garrafas:8,elogios:1},
-  {nome:'Rafaela Gomes',   onlines:7, sprays:9, palmilhas:10,camisolas:3,sacos:4,garrafas:7,elogios:4},
-  {nome:'Beatriz Cruz',    onlines:3, sprays:5, palmilhas:6, sacos:3,garrafas:5,elogios:2},
-  {nome:'Leandra Ricardo', onlines:4, sprays:10,palmilhas:5, sacos:2,garrafas:3,elogios:1},
-  {nome:'Beatriz Jerónimo',onlines:6, sprays:9, palmilhas:5, sacos:2,garrafas:3,elogios:1},
-  {nome:'Diogo Porfírio',  onlines:10,sprays:14,palmilhas:4, sacos:3,garrafas:4,elogios:2},
-  {nome:'Edgar Castro',    onlines:9, sprays:5, palmilhas:3, sacos:2,garrafas:2,elogios:1},
-  {nome:'André Louro',     onlines:14,sprays:8, palmilhas:6, sacos:1,garrafas:3,elogios:2},
-  {nome:'Sérgio Correia',  onlines:20,sprays:11,palmilhas:12,camisolas:6,sacos:2,garrafas:5,elogios:4},
-  {nome:'Diogo Silva',     onlines:9, sprays:5, palmilhas:3, sacos:1,garrafas:2,elogios:1},
-  {nome:'Palmira Camilo',  onlines:2, sprays:3, palmilhas:1, sacos:4,garrafas:6,elogios:0},
-  {nome:'Luís Pereira',    onlines:3, sprays:2, palmilhas:2, sacos:3,garrafas:4,elogios:1},
-];
+const SHEETS_URL = 'SEU_APPS_SCRIPT_URL_AQUI';
 
 const vals = {onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0};
 let nomeSel = null, equipaAtiva = null;
@@ -314,7 +288,7 @@ function goTo(screen, btn) {
   document.getElementById('screen-'+screen).classList.add('active');
   btn.classList.add('active');
   document.getElementById('printBtn').style.display = screen === 'ranking' ? 'flex' : 'none';
-  if (screen === 'ranking') renderRanking(dadosDemo);
+  if (screen === 'ranking') carregarRanking();
 }
 
 function renderTabs() {
@@ -353,9 +327,24 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-function submeter() {
+async function submeter() {
   if (!nomeSel) { showToast('⚠️ Seleciona o teu nome primeiro'); return; }
   if (!document.getElementById('dataRegisto').value) { showToast('⚠️ Escolhe a data'); return; }
+  const equipa = equipas.find(e=>e.id===equipaAtiva)?.label.replace(/^\S+\s/,'') || '';
+  const payload = {
+    data: document.getElementById('dataRegisto').value,
+    nome: nomeSel, equipa,
+    onlines:   vals.onlines,
+    sprays:    vals.sprays,
+    palmilhas: vals.palmilhas,
+    camisolas: vals.camisolas,
+    sacos:     vals.sacos,
+    garrafas:  vals.garrafas,
+    elogios:   vals.elogios
+  };
+  try {
+    await fetch(SHEETS_URL, { method:'POST', body: JSON.stringify(payload) });
+  } catch(e) { console.error('Erro ao guardar:', e); }
   document.getElementById('formMain').classList.add('hide');
   document.getElementById('successMsg').classList.add('show');
   setTimeout(() => {
@@ -404,6 +393,16 @@ function catBlock(emoji, label, rows, agora, delay) {
 
 function secDiv(icon, title) {
   return `<div class="sec-divider"><span>${icon}</span><span>${title}</span></div>`;
+}
+
+async function carregarRanking() {
+  try {
+    const res = await fetch(SHEETS_URL + '?action=getRanking');
+    const dados = await res.json();
+    renderRanking(dados);
+  } catch(e) {
+    renderRanking([]);
+  }
 }
 
 function renderRanking(dados) {
