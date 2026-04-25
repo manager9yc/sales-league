@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
 <title>Sales League 2026 — Sport Zone</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -16,7 +16,7 @@
   --muted: #999;
   --text: #f0f0f0;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
 body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
 
 /* NAV */
@@ -177,11 +177,31 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
   .cat-name { font-size: 28px; }
 }
 @media print {
-  .nav, .print-btn, .toast { display: none !important; }
-  body { background: #fff; color: #000; }
-  .rank-hero { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .cat-block { break-inside: avoid; opacity: 1 !important; transform: none !important; animation: none !important; }
-  .bar-fg { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .nav, .print-btn, .toast, #screen-form { display: none !important; }
+  #screen-ranking { display: block !important; }
+  body { background: #fff !important; color: #000 !important; font-size: 12px; }
+  .rank-hero { background: #000 !important; padding: 20px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .rank-title { font-size: 48px !important; color: #fff !important; }
+  .rank-store, .rank-eyebrow, .rank-pill, .rank-sz, .rank-icon { display: none !important; }
+  .rank-main { padding: 10px 0 !important; max-width: 100% !important; }
+  .cat-block { break-inside: avoid; opacity: 1 !important; transform: none !important; animation: none !important; margin-bottom: 16px !important; }
+  .cat-head { background: #000 !important; border: 1px solid #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .cat-name { color: #fff !important; font-size: 18px !important; }
+  .cat-emoji { display: none; }
+  .cat-head::after { display: none !important; }
+  .rank-table { background: #fff !important; border: 1px solid #ccc !important; }
+  .rank-table tbody tr { border-bottom: 1px solid #ccc !important; background: #fff !important; }
+  .rank-1 { background: #f0f0f0 !important; }
+  .td-name { color: #000 !important; font-size: 13px !important; }
+  .td-score { color: #000 !important; font-size: 16px !important; font-weight: bold; }
+  .td-pos { color: #000 !important; }
+  .bar-bg { background: #ddd !important; }
+  .bar-fg { background: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .last-up { color: #666 !important; }
+  .sec-divider { background: #eee !important; border: 1px solid #ccc !important; border-left: 4px solid #000 !important; }
+  .sec-divider span:last-child { color: #000 !important; }
+  .hero-slashes { display: none !important; }
+  @page { margin: 1cm; size: A4; }
 }
 </style>
 </head>
@@ -224,7 +244,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
         <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🧴</div><div><div class="prod-name">Sprays</div><div class="prod-hint">Limpeza, Desodorizante e Impermeabilizante</div></div></div><div class="counter"><button class="cbtn minus" onclick="change('sprays',-1)">−</button><div class="cval" id="sprays">0</div><button class="cbtn plus" onclick="change('sprays',1)">+</button></div></div>
         <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🦶</div><div><div class="prod-name">Palmilhas</div><div class="prod-hint">Excepto Fila</div></div></div><div class="counter"><button class="cbtn minus" onclick="change('palmilhas',-1)">−</button><div class="cval" id="palmilhas">0</div><button class="cbtn plus" onclick="change('palmilhas',1)">+</button></div></div>
         <div class="prod-row"><div class="prod-info"><div class="prod-emoji">⚽</div><div><div class="prod-name">Camisolas Oficiais</div><div class="prod-hint">Futebol oficial</div></div></div><div class="counter"><button class="cbtn minus" onclick="change('camisolas',-1)">−</button><div class="cval" id="camisolas">0</div><button class="cbtn plus" onclick="change('camisolas',1)">+</button></div></div>
-        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🛍️</div><div><div class="prod-name">Sacos Reutilizáveis</div><div class="prod-hint">Eco bags</div></div></div><div class="counter"><button class="cbtn minus" onclick="change('sacos',-1)">−</button><div class="cval" id="sacos">0</div><button class="cbtn plus" onclick="change('sacos',1)">+</button></div></div>
+        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🛍️</div><div><div class="prod-name">Sacos Reutilizáveis</div><div class="prod-hint">Eco bags</div></div></div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><div class="counter"><button class="cbtn minus" onclick="change('sacos',-10)" style="font-size:13px;width:34px;color:#999">−10</button><button class="cbtn minus" onclick="change('sacos',-1)">−</button><input type="number" id="sacos" value="0" min="0" oninput="vals.sacos=Math.max(0,parseInt(this.value)||0);this.classList.toggle('nz',vals.sacos>0)" style="width:48px;text-align:center;background:transparent;border:none;color:var(--orange);font-family:'Bebas Neue',sans-serif;font-size:17px;outline:none;-moz-appearance:textfield"><button class="cbtn plus" onclick="change('sacos',1)">+</button><button class="cbtn plus" onclick="change('sacos',10)" style="font-size:13px;width:34px">+10</button></div></div></div>
         <div class="prod-row"><div class="prod-info"><div class="prod-emoji">💧</div><div><div class="prod-name">Garrafas</div><div class="prod-hint">Garrafas da liga de vendas</div></div></div><div class="counter"><button class="cbtn minus" onclick="change('garrafas',-1)">−</button><div class="cval" id="garrafas">0</div><button class="cbtn plus" onclick="change('garrafas',1)">+</button></div></div>
       </div>
       <div class="sec-label">Elogios recebidos</div>
@@ -263,11 +283,11 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 
 <script>
 const equipas = [
-  { id:'calcado',   label:'👟 Calçado & Sneaker', nomes:['António Pinto','Ariana Santos','Vasco Tavares','Yorky Reyes','Miguel Viegas','João Ferreira','João Paiva','Mariana Pereira','Beatriz Rosa','Ricardo Esteves','Jorge Teixeira','Ricardo Eusébio','Rodrigo Araújo','Rodrigo Santos'] },
-  { id:'textil',    label:'👕 Têxtil',             nomes:['Mariana Lourenço','Beatriz Carreiro','Catarina Cardoso','Lara Ferreira','Mariana Vieira','Catarina Tavares','Diana Bernardo','Ana Morais','Daniela Correia'] },
-  { id:'caixa',     label:'🧾 Caixa',              nomes:['Nicole Pinto','Ricardo Pereira','Rafaela Gomes','Beatriz Cruz','Núria Correia','Leandra Ricardo','Beatriz Jerónimo','Diogo Porfírio','Edgar Castro','Maria Coelho'] },
-  { id:'sup',       label:'🎯 Direção',            nomes:['Dário Santos','Carla Frade','Susana Morgado','André Louro','Sérgio Correia','Diogo Silva','Soraia Alves','Tânia Costa','Florisbela Tavares','Ana Ferreira'] },
-  { id:'logistica', label:'📦 Logística',          nomes:['Palmira Camilo','Ana Rodrigues','Zezita Segunda','Tânia Coutinho','Tiago Pinto','Sana Branta','Elisabete Oliveira','Luís Pereira','Bruna Araújo'] }
+  { id:'calcado',   label:'👟 Calçado',   nomes:['António Pinto','Ariana Santos','Vasco Tavares','Yorky Reyes','Miguel Viegas','João Ferreira','João Paiva','Mariana Pereira','Beatriz Rosa','Ricardo Esteves','Jorge Teixeira','Ricardo Eusébio','Rodrigo Araújo','Rodrigo Santos'] },
+  { id:'textil',    label:'👕 Têxtil',    nomes:['Mariana Lourenço','Beatriz Carreiro','Catarina Cardoso','Lara Ferreira','Mariana Vieira','Catarina Tavares','Diana Bernardo','Ana Morais','Daniela Correia'] },
+  { id:'caixa',     label:'🧾 Caixa',     nomes:['Nicole Pinto','Ricardo Pereira','Rafaela Gomes','Beatriz Cruz','Núria Correia','Leandra Ricardo','Beatriz Jerónimo','Diogo Porfírio','Edgar Castro','Maria Coelho'] },
+  { id:'logistica', label:'📦 Logística', nomes:['Palmira Camilo','Ana Rodrigues','Zezita Segunda','Tânia Coutinho','Tiago Pinto','Sana Branta','Elisabete Oliveira','Luís Pereira','Bruna Araújo'] },
+  { id:'sup',       label:'🎯 Direção',   nomes:['Dário Santos','Carla Frade','Susana Morgado','André Louro','Sérgio Correia','Diogo Silva','Soraia Alves','Tânia Costa','Florisbela Tavares','Ana Ferreira'] }
 ];
 
 const categorias = [
@@ -364,7 +384,7 @@ function resetForm() {
   nomeSel = null; equipaAtiva = null;
   document.querySelectorAll('.team-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('nameGrid').innerHTML = '<div class="name-empty">Escolhe a tua equipa primeiro</div>';
-  Object.keys(vals).forEach(k => { vals[k]=0; const el=document.getElementById(k); el.textContent=0; el.classList.remove('nz'); });
+  Object.keys(vals).forEach(k => { vals[k]=0; const el=document.getElementById(k); if(el.tagName==='INPUT'){el.value=0;}else{el.textContent=0;} el.classList.remove('nz'); });
   document.getElementById('formMain').classList.remove('hide');
   document.getElementById('successMsg').classList.remove('show');
 }
@@ -426,7 +446,7 @@ function renderRanking(dados) {
 
   html += secDiv('🏅', 'Ranking por Secção');
   const equipaLabels = {
-    calcado:   'Calçado & Sneaker',
+    calcado:   'Calçado',
     textil:    'Têxtil',
     caixa:     'Caixa',
     sup:       'Direção',
