@@ -283,6 +283,62 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .d-hbadge { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; background: rgba(255,107,0,0.15); color: var(--orange); border-radius: 10px; padding: 3px 8px; }
 .d-htotal { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--muted); }
 .d-htotal.hi { color: var(--orange); }
+
+/* ══ METAS / PROGRESS ══ */
+.meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
+@media(min-width:500px){ .meta-grid { grid-template-columns: repeat(3,1fr); } }
+@media(min-width:700px){ .meta-grid { grid-template-columns: repeat(4,1fr); } }
+.meta-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.meta-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.meta-emoji { font-size: 18px; }
+.meta-pct { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--orange); }
+.meta-pct.done { color: #00CC66; }
+.meta-label { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.meta-bar-bg { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 4px; }
+.meta-bar-fill { height: 100%; border-radius: 3px; background: var(--orange); transition: width 1s ease; }
+.meta-bar-fill.done { background: #00CC66; }
+.meta-nums { font-size: 10px; color: var(--muted); display: flex; justify-content: space-between; }
+
+/* ══ MEDALHAS ══ */
+.medals-wrap { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+.medal { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 8px; }
+.medal.earned { border-color: var(--orange); background: rgba(255,107,0,0.08); }
+.medal-icon { font-size: 20px; filter: grayscale(1) opacity(0.3); }
+.medal.earned .medal-icon { filter: none; }
+.medal-name { font-size: 12px; font-weight: 600; color: var(--muted); }
+.medal.earned .medal-name { color: var(--text); }
+.medal-desc { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+/* ══ RECORDE TOAST ══ */
+.record-toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-100px); background: linear-gradient(135deg, #FF6B00, #FF8C00); color: #fff; border-radius: 14px; padding: 14px 20px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 30px rgba(255,107,0,0.5); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); z-index: 300; white-space: nowrap; text-align: center; }
+.record-toast.show { transform: translateX(-50%) translateY(0); }
+.record-toast .rt-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; display: block; }
+
+/* ══ ADMIN ══ */
+.admin-wrap { max-width: 900px; margin: 0 auto; padding: 0 0 80px; }
+.admin-day-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.admin-day-row:last-child { border-bottom: none; }
+.admin-nome { font-size: 14px; font-weight: 600; color: var(--text); }
+.admin-equipa { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.admin-vals { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.admin-val { font-size: 11px; background: var(--card2); border-radius: 6px; padding: 3px 8px; color: var(--muted); }
+.admin-val.nz { color: var(--orange); background: rgba(255,107,0,0.1); }
+.admin-date { font-size: 11px; color: var(--muted); }
+
+/* ══ PIN LOCK ══ */
+.pin-overlay { position:absolute; inset:0; background:var(--dark); z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; border-radius:0; }
+.pin-overlay.hidden { display:none; }
+.pin-icon { font-size:48px; margin-bottom:16px; }
+.pin-title { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:2px; color:#fff; margin-bottom:6px; }
+.pin-sub { font-size:13px; color:var(--muted); margin-bottom:24px; }
+.pin-dots { display:flex; gap:12px; margin-bottom:24px; }
+.pin-dot { width:14px; height:14px; border-radius:50%; background:var(--border); transition:background 0.15s; }
+.pin-dot.filled { background:var(--orange); }
+.pin-pad { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:240px; width:100%; }
+.pin-key { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; font-family:'Bebas Neue',sans-serif; font-size:24px; color:#fff; cursor:pointer; text-align:center; transition:all 0.1s; -webkit-tap-highlight-color:transparent; }
+.pin-key:active { background:var(--orange); border-color:var(--orange); transform:scale(0.95); }
+.pin-key.del { font-size:18px; color:var(--muted); }
+.pin-error { color:#FF4444; font-size:13px; margin-top:12px; min-height:18px; }
 </style>
 </head>
 <body>
@@ -291,6 +347,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
   <button class="nav-btn active" onclick="goTo('form',this)">📋 Registo</button>
   <button class="nav-btn" onclick="goTo('ranking',this)">🏆 Ranking</button>
   <button class="nav-btn" onclick="goTo('dash',this)">📊 Dashboard</button>
+  <button class="nav-btn" onclick="goTo('admin',this)">⚙️ Admin</button>
 </div>
 
 <!-- FORM -->
@@ -408,6 +465,70 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
   <div class="dash-inner" id="dashInner" style="display:none;max-width:900px;margin:0 auto"></div>
 </div>
 
+
+<!-- ADMIN -->
+<div class="screen" id="screen-admin">
+  <div style="background:#0C0C0C;position:relative;overflow:hidden">
+    <div style="padding:28px 24px 0;text-align:center;position:relative">
+      <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#FF6B00"></div>
+      <div style="position:absolute;right:0;top:0;bottom:0;width:4px;background:#FF6B00"></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,10vw,64px);color:#fff;line-height:0.95;letter-spacing:2px">ADMINISTRAÇÃO</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-top:6px">Registos do dia · Vasco da Gama</div>
+    </div>
+    <div style="background:#FF6B00;margin-top:20px;padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:16px">
+      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:4px;color:#fff" id="adminDataLabel">Hoje</span>
+      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
+    </div>
+  </div>
+  <div class="admin-wrap" style="position:relative">
+
+    <!-- PIN LOCK -->
+    <div class="pin-overlay" id="pinOverlay">
+      <div class="pin-icon">🔒</div>
+      <div class="pin-title">Área Restrita</div>
+      <div class="pin-sub">Introduz o PIN de acesso</div>
+      <div class="pin-dots" id="pinDots">
+        <div class="pin-dot" id="pd0"></div>
+        <div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div>
+      </div>
+      <div class="pin-pad">
+        <button class="pin-key" onclick="pinPress('1')">1</button>
+        <button class="pin-key" onclick="pinPress('2')">2</button>
+        <button class="pin-key" onclick="pinPress('3')">3</button>
+        <button class="pin-key" onclick="pinPress('4')">4</button>
+        <button class="pin-key" onclick="pinPress('5')">5</button>
+        <button class="pin-key" onclick="pinPress('6')">6</button>
+        <button class="pin-key" onclick="pinPress('7')">7</button>
+        <button class="pin-key" onclick="pinPress('8')">8</button>
+        <button class="pin-key" onclick="pinPress('9')">9</button>
+        <div></div>
+        <button class="pin-key" onclick="pinPress('0')">0</button>
+        <button class="pin-key del" onclick="pinDel()">⌫</button>
+      </div>
+      <div class="pin-error" id="pinError"></div>
+    </div>
+
+    <!-- CONTEÚDO ADMIN -->
+    <div id="adminBody" style="display:none">
+      <div style="padding:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <input type="date" id="adminDate" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;cursor:pointer" onchange="carregarAdmin()">
+        <button onclick="carregarAdmin()" style="background:var(--orange);border:none;border-radius:10px;padding:10px 18px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer">Atualizar</button>
+        <div id="adminSummary" style="font-size:12px;color:var(--muted)"></div>
+        <button onclick="bloquearAdmin()" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-left:auto">🔒 Bloquear</button>
+      </div>
+      <div style="padding:0 16px" id="adminContent">
+        <div style="text-align:center;padding:40px;color:var(--muted)">
+          <div style="font-size:36px;margin-bottom:12px">📋</div>
+          <p>Seleciona uma data para ver os registos</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="record-toast" id="recordToast"></div>
 <button class="print-btn" id="printBtn" onclick="window.print()">🖨️ Imprimir</button>
 <div class="toast" id="toast"></div>
 
@@ -447,6 +568,15 @@ function goTo(screen, btn) {
   document.getElementById('printBtn').style.display = screen === 'ranking' ? 'flex' : 'none';
   if (screen === 'ranking') carregarRanking();
   if (screen === 'dash') carregarDashboard();
+  if (screen === 'admin') {
+    if (!adminUnlocked) {
+      pinBuffer = '';
+      for (let i = 0; i < ADMIN_PIN.length; i++) {
+        const dot = document.getElementById('pd'+i);
+        if (dot) dot.classList.remove('filled');
+      }
+    }
+  }
 }
 
 function renderTabs() {
@@ -500,6 +630,7 @@ async function submeter() {
     garrafas:  vals.garrafas,
     elogios:   vals.elogios
   };
+  verificarRecorde(nomeSel, payload);
   try {
     await fetch(SHEETS_URL, { method:'POST', body: JSON.stringify(payload), mode:'no-cors' });
   } catch(e) { console.error('Erro ao guardar:', e); }
@@ -767,6 +898,35 @@ function mostrarDash(nome) {
       <div style="font-size:44px">📦</div>
     </div>
 
+    <div class="d-slabel">Metas do mês atual</div>
+    <div class="meta-grid">
+      ${categorias.map(cat => {
+        const dadosMesAtual = dadosVendedor.filter(d => {
+          const dt = new Date(d.data||'');
+          return !isNaN(dt) && dt.getMonth()===new Date().getMonth() && dt.getFullYear()===new Date().getFullYear();
+        });
+        const v = dadosMesAtual.reduce((s,d)=>s+(d[cat.key]||0),0);
+        const meta = metas[cat.key]||1;
+        const pct = Math.min(100, Math.round((v/meta)*100));
+        const done = pct >= 100;
+        return `<div class="meta-card">
+          <div class="meta-top"><span class="meta-emoji">${cat.emoji}</span><span class="meta-pct ${done?'done':''}">${pct}%</span></div>
+          <div class="meta-label">${cat.label}</div>
+          <div class="meta-bar-bg"><div class="meta-bar-fill ${done?'done':''}" style="width:${pct}%"></div></div>
+          <div class="meta-nums"><span>${v}</span><span>${meta}</span></div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="d-slabel">Medalhas</div>
+    <div class="medals-wrap">
+      ${calcularMedalhas(dadosVendedor).map(m=>`
+        <div class="medal ${m.earned?'earned':''}">
+          <span class="medal-icon">${m.icon}</span>
+          <div><div class="medal-name">${m.name}</div><div class="medal-desc">${m.desc}</div></div>
+        </div>`).join('')}
+    </div>
+
     <div class="d-slabel">Por artigo — acumulado</div>
     <div class="d-card">
       <div class="d-card-title">Todas as categorias</div>
@@ -852,6 +1012,152 @@ async function carregarDashboard() {
   }
 }
 
+
+// ══ PIN ADMIN ══
+const ADMIN_PIN = '999';
+let pinBuffer = '';
+let adminUnlocked = false;
+
+function pinPress(key) {
+  if (pinBuffer.length >= ADMIN_PIN.length) return;
+  pinBuffer += key;
+  for (let i = 0; i < ADMIN_PIN.length; i++) {
+    const dot = document.getElementById('pd'+i);
+    if (dot) dot.classList.toggle('filled', i < pinBuffer.length);
+  }
+  if (pinBuffer.length === ADMIN_PIN.length) {
+    setTimeout(() => {
+      if (pinBuffer === ADMIN_PIN) {
+        adminUnlocked = true;
+        document.getElementById('pinOverlay').classList.add('hidden');
+        document.getElementById('adminBody').style.display = 'block';
+        const hoje = new Date();
+        const pad = n => String(n).padStart(2,'0');
+        const adminDate = document.getElementById('adminDate');
+        if (!adminDate.value) adminDate.value = hoje.getFullYear()+'-'+pad(hoje.getMonth()+1)+'-'+pad(hoje.getDate());
+        carregarAdmin();
+      } else {
+        document.getElementById('pinError').textContent = 'PIN incorreto. Tenta novamente.';
+        pinBuffer = '';
+        for (let i = 0; i < ADMIN_PIN.length; i++) {
+          const dot = document.getElementById('pd'+i);
+          if (dot) dot.classList.remove('filled');
+        }
+        setTimeout(() => { document.getElementById('pinError').textContent = ''; }, 2000);
+      }
+    }, 200);
+  }
+}
+
+function pinDel() {
+  if (pinBuffer.length === 0) return;
+  pinBuffer = pinBuffer.slice(0,-1);
+  for (let i = 0; i < ADMIN_PIN.length; i++) {
+    const dot = document.getElementById('pd'+i);
+    if (dot) dot.classList.toggle('filled', i < pinBuffer.length);
+  }
+  document.getElementById('pinError').textContent = '';
+}
+
+function bloquearAdmin() {
+  adminUnlocked = false;
+  pinBuffer = '';
+  for (let i = 0; i < ADMIN_PIN.length; i++) {
+    const dot = document.getElementById('pd'+i);
+    if (dot) dot.classList.remove('filled');
+  }
+  document.getElementById('pinError').textContent = '';
+  document.getElementById('pinOverlay').classList.remove('hidden');
+  document.getElementById('adminBody').style.display = 'none';
+}
+
+// ══ METAS MENSAIS ══
+const metas = {
+  onlines:   40,
+  sprays:    30,
+  palmilhas: 30,
+  camisolas: 15,
+  sacos:     800,
+  garrafas:  20,
+  elogios:   5
+};
+
+// ══ MEDALHAS ══
+function calcularMedalhas(dados) {
+  const total = dados.reduce((s,d)=>s+dashTot(d),0);
+  const onlinesTotal = dados.reduce((s,d)=>s+(d.onlines||0),0);
+  const spraysTotal = dados.reduce((s,d)=>s+(d.sprays||0),0);
+  const elogiosTotal = dados.reduce((s,d)=>s+(d.elogios||0),0);
+  const diasComRegisto = new Set(dados.map(d=>d.data)).size;
+  return [
+    { icon:'🥇', name:'Liga Master',    desc:'200+ unidades acumuladas',  earned: total >= 200 },
+    { icon:'🖥️', name:'Rei dos Onlines', desc:'Meta de Onlines atingida',  earned: onlinesTotal >= metas.onlines },
+    { icon:'🧴', name:'Spray King',      desc:'Meta de Sprays atingida',   earned: spraysTotal >= metas.sprays },
+    { icon:'⭐', name:'Favorito',        desc:'5+ elogios recebidos',      earned: elogiosTotal >= 5 },
+    { icon:'📅', name:'Consistente',     desc:'10+ dias com registo',      earned: diasComRegisto >= 10 },
+    { icon:'🔥', name:'Em Chamas',       desc:'50+ unidades num mês',      earned: dados.some(d=>dashTot(d)>=50) },
+  ];
+}
+
+// ══ NOTIFICAÇÃO DE RECORDE ══
+function verificarRecorde(nome, payload) {
+  if (!dashAllDados.length) return;
+  const dadosAnteriores = dashAllDados.filter(d=>d.nome===nome);
+  categorias.forEach(cat => {
+    if ((payload[cat.key]||0) === 0) return;
+    const maxAnterior = dadosAnteriores.reduce((m,d)=>Math.max(m,d[cat.key]||0),0);
+    if ((payload[cat.key]||0) > maxAnterior && maxAnterior > 0) {
+      showRecordToast('🏆 Novo recorde!', cat.emoji + ' ' + cat.label + ': ' + payload[cat.key]);
+    }
+  });
+}
+
+function showRecordToast(titulo, msg) {
+  const t = document.getElementById('recordToast');
+  t.innerHTML = '<span class="rt-title">' + titulo + '</span>' + msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 4000);
+}
+
+// ══ ADMIN ══
+async function carregarAdmin() {
+  const dateInput = document.getElementById('adminDate');
+  const data = dateInput.value;
+  if (!data) return;
+  document.getElementById('adminDataLabel').textContent = new Date(data+'T12:00:00').toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'long'});
+  const content = document.getElementById('adminContent');
+  content.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted)"><div style="font-size:28px;margin-bottom:8px">⏳</div><p>A carregar...</p></div>';
+  try {
+    const proxy = 'https://corsproxy.io/?';
+    const url = encodeURIComponent(SHEETS_URL + '?action=getTodos');
+    const res = await fetch(proxy + url);
+    const todos = await res.json();
+    const doDia = Array.isArray(todos) ? todos.filter(d=>d.data===data) : [];
+    if (!doDia.length) {
+      content.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">📭</div><p>Sem registos para este dia</p></div>';
+      document.getElementById('adminSummary').textContent = '';
+      return;
+    }
+    const totalDia = doDia.reduce((s,d)=>s+dashTot(d),0);
+    document.getElementById('adminSummary').textContent = doDia.length + ' registos · ' + totalDia + ' unidades no total';
+    const rows = doDia.map(d => {
+      const vals2 = categorias.map(cat => {
+        const v = d[cat.key]||0;
+        return `<span class="admin-val ${v>0?'nz':''}">${cat.emoji} ${v}</span>`;
+      }).join('');
+      return `<div class="admin-day-row">
+        <div>
+          <div class="admin-nome">${d.nome}</div>
+          <div class="admin-equipa">${d.equipa||''}</div>
+        </div>
+        <div class="admin-vals">${vals2}</div>
+      </div>`;
+    }).join('');
+    content.innerHTML = '<div class="d-card">' + rows + '</div>';
+  } catch(e) {
+    content.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">⚠️ Erro ao carregar</div>';
+  }
+}
 
 </script>
 </body>
