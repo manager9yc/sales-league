@@ -349,7 +349,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .pin-error { color:#FF4444; font-size:13px; margin-top:12px; min-height:18px; }
 
 /* SPLASH */
-.splash{position:fixed;inset:0;z-index:9999;background:var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;transition:opacity 0.6s ease;}
+.splash{position:fixed;inset:0;z-index:9999;background:var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0;transition:opacity 0.6s ease;}
 .splash.out{opacity:0;pointer-events:none;}
 .splash.hidden{display:none;}
 .sp-slash{position:absolute;background:var(--orange);}
@@ -444,13 +444,15 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
   <div class="sp-slash ss1"></div><div class="sp-slash ss2"></div>
   <div class="sp-slash ss3"></div><div class="sp-slash ss4"></div>
   <div class="sp-slash ss5"></div>
-  <div class="sp-inner">
-    <div class="sp-pre">Sport Zone · Vasco da Gama</div>
-    <div class="sp-title">SALES<br>LEAGUE</div>
-    <div class="sp-sub">Liga Vasco da Gama · 2026</div>
-    <div class="sp-bar-wrap"><span>Maio 2026</span></div>
-    <div class="sp-progress"><div class="sp-progress-fill" id="splashBar"></div></div>
-    <button class="sp-btn" onclick="fecharSplash()">Entrar →</button>
+  <div class="sp-inner" style="display:flex;flex-direction:column;align-items:center;height:100%;justify-content:space-between;padding:40px 0 60px">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <div class="sp-pre">Sport Zone · Vasco da Gama</div>
+      <div class="sp-title">SALES<br>LEAGUE</div>
+      <div class="sp-sub">Liga Vasco da Gama · 2026</div>
+      <div class="sp-bar-wrap"><span>Maio 2026</span></div>
+      <div class="sp-progress"><div class="sp-progress-fill" id="splashBar"></div></div>
+    </div>
+    <button class="sp-btn" onclick="fecharSplash()" style="width:80%;max-width:280px;padding:16px;font-size:16px;">Entrar →</button>
   </div>
 </div>
 
@@ -1068,7 +1070,13 @@ function calcCountdown(){
   const fim=new Date(hoje.getFullYear(),hoje.getMonth()+1,0);
   const diff=Math.ceil((fim-hoje)/(1000*60*60*24));
   const el=document.getElementById('rankCountdown');
-  if(el) el.textContent='⏳ Faltam '+diff+' dias';
+  if(!el) return;
+  if(diff<=7){
+    el.textContent='⏳ Faltam '+diff+' dia'+(diff===1?'':'s');
+    el.style.display='inline-block';
+  } else {
+    el.style.display='none';
+  }
 }
 
 // ── MEDAL POPUP ──
@@ -1436,14 +1444,21 @@ async function carregarDashboard() {
   const todosNomes = [...new Set(equipas.flatMap(e=>e.nomes))];
   buildVgrid(todosNomes.map(n=>({nome:n})));
   try {
-    const proxy = 'https://corsproxy.io/?';
-    const url = encodeURIComponent(SHEETS_URL + '?action=getTodos');
-    const res = await fetch(proxy + url);
+    const res = await fetch(SHEETS_URL + '?action=getTodos');
     dashAllDados = await res.json();
     if (!Array.isArray(dashAllDados)) dashAllDados = [];
     renderDashDefault();
   } catch(e) {
-    dashAllDados = [];
+    try {
+      const proxy = 'https://corsproxy.io/?';
+      const url = encodeURIComponent(SHEETS_URL + '?action=getTodos');
+      const res2 = await fetch(proxy + url);
+      dashAllDados = await res2.json();
+      if (!Array.isArray(dashAllDados)) dashAllDados = [];
+      renderDashDefault();
+    } catch(e2) {
+      dashAllDados = [];
+    }
   }
 }
 
