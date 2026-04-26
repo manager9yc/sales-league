@@ -434,6 +434,24 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .install-popup-btns { display: flex; gap: 8px; }
 .install-popup-btn-main { flex: 1; background: var(--orange); border: none; border-radius: 10px; padding: 12px; color: #fff; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 2px; cursor: pointer; }
 .install-popup-btn-close { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; color: var(--muted); font-size: 13px; cursor: pointer; }
+
+/* GESTÃO VENDEDORES */
+.gestao-item{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;}
+.gestao-nome{flex:1;font-size:14px;font-weight:600;color:var(--text);}
+.gestao-equipa{font-size:11px;color:var(--muted);margin-top:1px;}
+.gestao-btn{background:transparent;border:1px solid var(--border);border-radius:7px;padding:5px 10px;font-size:12px;color:var(--muted);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.gestao-btn:hover{border-color:var(--orange);color:var(--orange);}
+.gestao-btn.danger:hover{border-color:#FF4444;color:#FF4444;}
+.gestao-modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px;}
+.gestao-modal.open{display:flex;}
+.gestao-modal-box{background:var(--card);border:1px solid var(--border);border-radius:16px;width:100%;max-width:400px;padding:24px;}
+.gestao-modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff;margin-bottom:16px;}
+.gestao-input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;margin-bottom:10px;}
+.gestao-input:focus{border-color:var(--orange);}
+.gestao-select{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;margin-bottom:16px;}
+.gestao-modal-btns{display:flex;gap:8px;}
+.gestao-confirm-btn{flex:1;background:var(--orange);border:none;border-radius:8px;padding:12px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;}
+.gestao-cancel-btn{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--muted);font-size:13px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -461,7 +479,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
   <div class="medal-confetti" id="medalConfetti"></div>
   <span class="medal-popup-trophy" id="medalTrophy">🏆</span>
   <span class="medal-popup-title" id="medalTitle">Nome</span>
-  <div class="medal-popup-sub" id="medalSub">Medalha</div>
+  <div class="medal-popup-sub" id="medalSub"></div>
 </div>
 
 <div class="nav">
@@ -653,6 +671,17 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 
     <!-- CONTEÚDO ADMIN -->
     <div id="adminBody" style="display:none">
+      <!-- GESTÃO VENDEDORES -->
+      <div style="padding:16px 16px 0">
+        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Gestão de Vendedores</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <button onclick="abrirAdicionarVendedor()" style="background:var(--orange);border:none;border-radius:8px;padding:10px 16px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;cursor:pointer;">+ Adicionar</button>
+          <button onclick="toggleGestaoLista()" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;cursor:pointer;" id="gestaoToggleBtn">Ver lista</button>
+        </div>
+        <div id="gestaoLista" style="display:none"></div>
+      </div>
+      <div style="height:1px;background:var(--border);margin:12px 0"></div>
+
       <div style="padding:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <input type="date" id="adminDate" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;cursor:pointer" onchange="carregarAdmin()">
         <button onclick="carregarAdmin()" style="background:var(--orange);border:none;border-radius:10px;padding:10px 18px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer">Atualizar</button>
@@ -841,7 +870,6 @@ function secDiv(icon, title) {
 
 
 async function carregarRanking() {
-  // Show empty ranking immediately so UI doesn't look stuck
   renderRanking([]);
   try {
     const controller = new AbortController();
@@ -861,7 +889,29 @@ async function carregarRanking() {
       renderRanking([]);
     }
   }
-  if (dashAllDados.length) verificarMedalhasRanking();
+  // Load full data for medals if not already loaded
+  if (!dashAllDados.length) {
+    try {
+      const r = await fetch(SHEETS_URL + '?action=getTodos');
+      const td = await r.json();
+      if (Array.isArray(td)) { dashAllDados = td; renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []); }
+    } catch(e) {}
+  }
+  verificarMedalhasRanking();
+}
+
+async function getRankingFromDados(todos) {
+  // Aggregate current month from full data
+  const mesAtual = new Date().getMonth();
+  const anoAtual = new Date().getFullYear();
+  const agg = {};
+  todos.forEach(d => {
+    const dt = new Date(d.data||'');
+    if (isNaN(dt) || dt.getMonth()!==mesAtual || dt.getFullYear()!==anoAtual) return;
+    if (!agg[d.nome]) agg[d.nome] = {nome:d.nome,equipa:d.equipa||'',onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0};
+    categorias.forEach(cat => { agg[d.nome][cat.key] += (d[cat.key]||0); });
+  });
+  return Object.values(agg);
 }
 
 function verificarMedalhasRanking() {
@@ -1731,6 +1781,109 @@ async function carregarAdmin() {
   }
 }
 
+// ── GESTÃO VENDEDORES ──
+let gestaoAction = null;
+let gestaoTargetNome = null;
+let gestaoTargetEquipa = null;
+
+function populateGestaoSelect() {
+  const sel = document.getElementById('gestaoEquipaSelect');
+  if (!sel) return;
+  sel.innerHTML = equipas.map(e => `<option value="${e.id}">${e.label}</option>`).join('');
+}
+
+function abrirAdicionarVendedor() {
+  gestaoAction = 'add';
+  gestaoTargetNome = null;
+  document.getElementById('gestaoModalTitle').textContent = 'Adicionar Vendedor';
+  document.getElementById('gestaoNomeInput').value = '';
+  document.getElementById('gestaoNomeInput').disabled = false;
+  populateGestaoSelect();
+  document.getElementById('gestaoConfirmBtn').onclick = confirmarGestao;
+  document.getElementById('gestaoModal').classList.add('open');
+}
+
+function abrirMoverVendedor(nome, equipaAtualId) {
+  gestaoAction = 'move';
+  gestaoTargetNome = nome;
+  gestaoTargetEquipa = equipaAtualId;
+  document.getElementById('gestaoModalTitle').textContent = 'Mover Vendedor';
+  document.getElementById('gestaoNomeInput').value = nome;
+  document.getElementById('gestaoNomeInput').disabled = true;
+  populateGestaoSelect();
+  document.getElementById('gestaoEquipaSelect').value = equipaAtualId;
+  document.getElementById('gestaoConfirmBtn').onclick = confirmarGestao;
+  document.getElementById('gestaoModal').classList.add('open');
+}
+
+function fecharGestaoModal() {
+  document.getElementById('gestaoModal').classList.remove('open');
+}
+
+function confirmarGestao() {
+  const nome = document.getElementById('gestaoNomeInput').value.trim();
+  const equipaId = document.getElementById('gestaoEquipaSelect').value;
+  if (!nome) { alert('Introduz o nome'); return; }
+  const equipa = equipas.find(e => e.id === equipaId);
+  if (!equipa) return;
+  if (gestaoAction === 'add') {
+    // Check if already exists
+    const exists = equipas.some(e => e.nomes.includes(nome));
+    if (exists) { alert('Este vendedor já existe'); return; }
+    equipa.nomes.push(nome);
+    equipa.nomes.sort();
+  } else if (gestaoAction === 'move') {
+    // Remove from current equipa
+    equipas.forEach(e => { e.nomes = e.nomes.filter(n => n !== gestaoTargetNome); });
+    // Add to new equipa
+    equipa.nomes.push(gestaoTargetNome);
+    equipa.nomes.sort();
+  }
+  fecharGestaoModal();
+  renderGestaoLista();
+  showToast('✓ Alteração guardada');
+}
+
+function eliminarVendedor(nome) {
+  if (!confirm('Tens a certeza que queres remover ' + nome + '?')) return;
+  equipas.forEach(e => { e.nomes = e.nomes.filter(n => n !== nome); });
+  renderGestaoLista();
+  showToast('Vendedor removido');
+}
+
+function renderGestaoLista() {
+  const lista = document.getElementById('gestaoLista');
+  if (!lista) return;
+  let html = '';
+  equipas.forEach(eq => {
+    if (!eq.nomes.length) return;
+    html += `<div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin:10px 0 6px">${eq.label}</div>`;
+    eq.nomes.forEach(nome => {
+      html += `<div class="gestao-item">
+        <div>
+          <div class="gestao-nome">${nome}</div>
+        </div>
+        <button class="gestao-btn" onclick="abrirMoverVendedor('${nome.replace(/'/g,"\\'")}','${eq.id}')">Mover equipa</button>
+        <button class="gestao-btn danger" onclick="eliminarVendedor('${nome.replace(/'/g,"\\'")}')">Remover</button>
+      </div>`;
+    });
+  });
+  lista.innerHTML = html;
+}
+
+function toggleGestaoLista() {
+  const lista = document.getElementById('gestaoLista');
+  const btn = document.getElementById('gestaoToggleBtn');
+  if (lista.style.display === 'none') {
+    lista.style.display = 'block';
+    renderGestaoLista();
+    btn.textContent = 'Ocultar lista';
+  } else {
+    lista.style.display = 'none';
+    btn.textContent = 'Ver lista';
+  }
+}
+
 // ── INSTALL PROMPT ──
 let deferredPrompt = null;
 
@@ -1788,5 +1941,18 @@ setTimeout(mostrarInstallPopup, 3000);
   </div>
 </div>
 
+
+<!-- GESTÃO VENDEDORES MODAL -->
+<div class="gestao-modal" id="gestaoModal">
+  <div class="gestao-modal-box">
+    <div class="gestao-modal-title" id="gestaoModalTitle">Adicionar Vendedor</div>
+    <input type="text" class="gestao-input" id="gestaoNomeInput" placeholder="Nome completo">
+    <select class="gestao-select" id="gestaoEquipaSelect"></select>
+    <div class="gestao-modal-btns">
+      <button class="gestao-confirm-btn" id="gestaoConfirmBtn">Confirmar</button>
+      <button class="gestao-cancel-btn" onclick="fecharGestaoModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
