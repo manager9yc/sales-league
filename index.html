@@ -524,7 +524,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
         <h2 style="margin-top:10px">Registo Guardado!</h2>
         <p id="successNomeLabel" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);letter-spacing:2px;margin:6px 0 4px"></p>
         <p style="color:var(--muted);font-size:13px">Boas vendas hoje 💪</p>
-        
+        <button onclick="resetForm()" style="margin-top:14px;background:transparent;border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 24px;color:rgba(255,255,255,0.7);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;">← Novo registo</button>
       </div>
       <!-- METAS E MEDALHAS -->
       <div style="padding:20px 16px 0;max-width:900px;margin:0 auto">
@@ -929,6 +929,26 @@ function renderRanking(dados) {
 
   // Team compare
   html += '<div class="slabel" style="margin-top:24px">Por Equipa</div>' + renderTeamCompare(dados);
+  // Medals per vendedor section
+  if (dados.length) {
+    html += '<div class="slabel" style="margin-top:28px">🏅 Medalhas conquistadas este mês</div>';
+    const vendedoresMedalhas = [...new Set(dados.map(d=>d.nome||d))];
+    // Get full data for medals calculation
+    const allNomes = dashAllDados.length ? [...new Set(dashAllDados.map(d=>d.nome))] : vendedoresMedalhas;
+    let medalhasHtml = '<div style="display:flex;flex-direction:column;gap:8px">';
+    allNomes.forEach(nome => {
+      const dadosNome = dashAllDados.filter(d=>d.nome===nome);
+      if (!dadosNome.length) return;
+      const conquistadas = calcularMedalhas(dadosNome).filter(m=>m.earned);
+      if (!conquistadas.length) return;
+      medalhasHtml += `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div style="font-size:13px;font-weight:700;color:#fff;min-width:120px">${nome.split(' ')[0]} ${nome.split(' ')[1]||''}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">${conquistadas.map(m=>`<span title="${m.name}" style="background:rgba(255,107,0,0.1);border:1px solid rgba(255,107,0,0.3);border-radius:8px;padding:4px 10px;font-size:12px;display:flex;align-items:center;gap:4px"><span>${m.icon}</span><span style="color:var(--orange);font-size:11px;font-weight:600">${m.name}</span></span>`).join('')}</div>
+      </div>`;
+    });
+    medalhasHtml += '</div>';
+    html += medalhasHtml;
+  }
   document.getElementById('rankMain').innerHTML = html;
   // Animate rows cascade
   const rows2 = document.querySelectorAll('.rank-table tbody tr');
@@ -961,13 +981,14 @@ function mostrarProgressoRegisto(nome, payload) {
   // Add current payload
   const totaisMes = {};
   categorias.forEach(cat => { totaisMes[cat.key] = dadosMes.reduce((s,d)=>s+(d[cat.key]||0),0) + (payload[cat.key]||0); });
+  const thP = getThresholds(nome);
 
   // Metas progress
   let metasHtml = '<div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">As tuas metas este mês</div>';
   metasHtml += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">';
   categorias.forEach(cat => {
     const v = totaisMes[cat.key] || 0;
-    const meta = metas[cat.key] || 1;
+    const meta = cat.key==='onlines' ? thP.onlines : (metas[cat.key] || 1);
     const pct = Math.min(100, Math.round((v/meta)*100));
     const done = pct >= 100;
     metasHtml += `<div style="background:var(--card);border:1px solid ${done?'#00CC66':''};border-radius:10px;padding:10px">
@@ -1089,7 +1110,8 @@ function mostrarMedalPopup(emoji,nome,medalha){
   trophy.textContent=emoji;
   trophy.className='medal-popup-trophy trophy-anim';
   document.getElementById('medalTitle').textContent=nome;
-  document.getElementById('medalSub').innerHTML='🏅 Conquistou <strong>'+medalha+'</strong>';
+  const hoje6 = new Date().toLocaleDateString('pt-PT',{day:'numeric',month:'long'});
+  document.getElementById('medalSub').innerHTML='🏅 Conquistou <strong>'+medalha+'</strong><br><span style="font-size:12px;opacity:0.8">hoje, '+hoje6+'</span>';
   // Confetti
   const wrap=document.getElementById('medalConfetti'); wrap.innerHTML='';
   ['⭐','✨','🌟','💫','⭐','✨'].forEach((s,i)=>{
@@ -1353,7 +1375,8 @@ function mostrarDash(nome) {
           return !isNaN(dt) && dt.getMonth()===new Date().getMonth() && dt.getFullYear()===new Date().getFullYear();
         });
         const v = dadosMesAtual.reduce((s,d)=>s+(d[cat.key]||0),0);
-        const meta = metas[cat.key]||1;
+        const th3 = getThresholds(nome);
+        const meta = cat.key==='onlines' ? th3.onlines : (metas[cat.key]||1);
         const pct = Math.min(100, Math.round((v/meta)*100));
         const done = pct >= 100;
         return `<div class="meta-card">
@@ -1566,7 +1589,26 @@ const metas = {
 const metasMedalhas = metas;
 
 // ══ MEDALHAS ══
+// Part-times e equipas especiais com limiares reduzidos
+const partTimes = ['Beatriz Jerónimo', 'Maria Coelho', 'Miguel Viegas', 'João Ferreira', 'Rodrigo Araújo', 'Diana Bernardo', 'Ana Morais'];
+const equipaDirecao = ['Dário Santos', 'Carla Frade', 'Susana Morgado', 'André Louro', 'Sérgio Correia', 'Diogo Silva', 'Soraia Alves', 'Tânia Costa', 'Florisbela Tavares', 'Ana Ferreira'];
+const equipaLogistica = ['Palmira Camilo', 'Ana Rodrigues', 'Zezita Segunda', 'Tânia Coutinho', 'Tiago Pinto', 'Sana Branta', 'Elisabete Oliveira', 'Luís Pereira', 'Bruna Araújo'];
+const equipaCalcadoSneaker = ['António Pinto', 'Ariana Santos', 'Vasco Tavares', 'Yorky Reyes', 'Miguel Viegas', 'João Ferreira', 'João Paiva', 'Mariana Pereira', 'Beatriz Rosa', 'Ricardo Esteves', 'Jorge Teixeira', 'Ricardo Eusébio', 'Rodrigo Araújo', 'Rodrigo Santos'];
+
+function getThresholds(nome) {
+  const isPartTime = partTimes.includes(nome);
+  const isDirecao = equipaDirecao.includes(nome);
+  const isLogistica = equipaLogistica.includes(nome);
+  const isCalcado = equipaCalcadoSneaker.includes(nome);
+  return {
+    consistente: (isPartTime || isDirecao || isLogistica) ? 8 : 15,
+    onlines: isCalcado ? 30 : 20,
+  };
+}
+
 function calcularMedalhas(dados) {
+  const nome = dados.length ? dados[0].nome : '';
+  const th = getThresholds(nome);
   const mesAtual = new Date().getMonth();
   const anoAtual = new Date().getFullYear();
   const dadosMes = dados.filter(d => {
@@ -1582,14 +1624,14 @@ function calcularMedalhas(dados) {
   const elogiosMes   = dadosMes.reduce((s,d)=>s+(d.elogios||0),0);
   const diasComRegisto = new Set(dadosMes.map(d=>d.data)).size;
   return [
-    { icon:'🖥️', name:'Rei dos Onlines',  desc:metasMedalhas.onlines+' onlines este mês',       earned: onlinesMes   >= metasMedalhas.onlines },
+    { icon:'🖥️', name:'Rei dos Onlines',  desc:th.onlines+' onlines este mês',                  earned: onlinesMes   >= th.onlines },
     { icon:'🧴', name:'Spray King',        desc:metasMedalhas.sprays+' sprays este mês',         earned: spraysMes    >= metasMedalhas.sprays },
     { icon:'🦶', name:'Palmilhas Master',  desc:metasMedalhas.palmilhas+' palmilhas este mês',   earned: palmilhasMes >= metasMedalhas.palmilhas },
     { icon:'⚽', name:'Camisolas Pro',     desc:metasMedalhas.camisolas+' camisolas este mês',   earned: camisolasMes >= metasMedalhas.camisolas },
     { icon:'🛍️', name:'Eco Champion',     desc:metasMedalhas.sacos+' sacos este mês',           earned: sacosMes     >= metasMedalhas.sacos },
     { icon:'💧', name:'Hydration Boss',    desc:metasMedalhas.garrafas+' garrafas este mês',     earned: garrafasMes  >= metasMedalhas.garrafas },
     { icon:'⭐', name:'Favorito',          desc:metasMedalhas.elogios+' elogios este mês',       earned: elogiosMes   >= metasMedalhas.elogios },
-    { icon:'📅', name:'Consistente',       desc:'10+ dias com registo este mês',                  earned: diasComRegisto >= 10 },
+    { icon:'📅', name:'Consistente',       desc:th.consistente+' dias com registo este mês',     earned: diasComRegisto >= th.consistente },
   ];
 }
 
