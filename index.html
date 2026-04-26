@@ -66,7 +66,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .name-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
 .name-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; min-height: 44px; }
 .name-btn { background: var(--card2); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
-.name-btn.selected { background: var(--orange); border-color: var(--orange); color: #fff; }
+.name-btn.selected { background: var(--orange); border-color: var(--orange); color: #fff; transform: scale(1.03); }
 .name-empty { color: var(--muted); font-size: 13px; font-style: italic; grid-column: span 2; text-align: center; padding: 10px 0; }
 
 .prod-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border); }
@@ -876,7 +876,8 @@ const equipas = [
   { id:'caixa',     label:'🧾 Caixa',     nomes:['Nicole Pinto','Ricardo Pereira','Rafaela Gomes','Beatriz Cruz','Núria Correia','Leandra Ricardo','Beatriz Jerónimo','Diogo Porfírio','Edgar Castro','Maria Coelho'] },
   { id:'textil',    label:'👕 Têxtil',    nomes:['Mariana Lourenço','Beatriz Carreiro','Catarina Cardoso','Lara Ferreira','Mariana Vieira','Catarina Tavares','Diana Bernardo','Ana Morais','Daniela Correia'] },
   { id:'logistica', label:'📦 Logística', nomes:['Palmira Camilo','Zezita Segunda','Tânia Coutinho','Tiago Pinto','Sana Branta','Elisabete Oliveira','Luís Pereira','Bruna Araújo'] },
-  { id:'sup',       label:'🎯 Direção',   nomes:['Dário Santos','Carla Frade','Susana Morgado','André Louro','Sérgio Correia','Diogo Silva','Soraia Alves','Tânia Costa','Florisbela Tavares','Ana Ferreira'] }
+  { id:'sup',       label:'🎯 Direção',   nomes:['Dário Santos','Carla Frade','Susana Morgado','André Louro','Sérgio Correia','Diogo Silva','Soraia Alves','Tânia Costa','Florisbela Tavares','Ana Ferreira'] },
+  { id:'estagios',  label:'🎓 Estagiários', nomes:[] }
 ];
 
 const categorias = [
@@ -1072,33 +1073,30 @@ async function carregarRanking() {
     }
   } catch(e) {}
 
-  // Fetch fresh in background
+  // Fetch fresh - race between direct and proxy
+  const saveAndRender = (dados) => {
+    if (!Array.isArray(dados) || !dados.length) return;
+    window._rankingCache = dados;
+    try { localStorage.setItem('rankingCache', JSON.stringify(dados)); localStorage.setItem('rankingCacheTime', Date.now().toString()); } catch(e) {}
+    renderRanking(dados);
+    const el = document.getElementById('rankLastUpdate');
+    if (el) el.textContent = '✓ Atualizado agora';
+  };
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 4000);
-    const res = await fetch(SHEETS_URL + '?action=getRanking', {signal: controller.signal});
-    clearTimeout(timeout);
-    const dados = await res.json();
-    if (Array.isArray(dados) && dados.length) {
-      window._rankingCache = dados;
-      try { localStorage.setItem('rankingCache', JSON.stringify(dados)); localStorage.setItem('rankingCacheTime', Date.now().toString()); } catch(e) {}
-      renderRanking(dados);
-      const el = document.getElementById('rankLastUpdate');
-      if (el) el.textContent = '✓ Atualizado agora';
-    }
+    const directUrl = SHEETS_URL + '?action=getRanking';
+    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(directUrl);
+    const result = await Promise.race([
+      fetch(directUrl, {cache:'no-store'}).then(r=>r.json()),
+      fetch(proxyUrl, {cache:'no-store'}).then(r=>r.json()),
+      new Promise((_,reject) => setTimeout(()=>reject('timeout'), 5000))
+    ]);
+    saveAndRender(result);
   } catch(e) {
     try {
       const proxy = 'https://corsproxy.io/?';
       const url = encodeURIComponent(SHEETS_URL + '?action=getRanking');
       const res2 = await fetch(proxy + url);
-      const dados2 = await res2.json();
-      if (Array.isArray(dados2) && dados2.length) {
-        window._rankingCache = dados2;
-        try { localStorage.setItem('rankingCache', JSON.stringify(dados2)); localStorage.setItem('rankingCacheTime', Date.now().toString()); } catch(e) {}
-        renderRanking(dados2);
-        const el = document.getElementById('rankLastUpdate');
-        if (el) el.textContent = '✓ Atualizado agora';
-      }
+      saveAndRender(await res2.json());
     } catch(e2) {}
   }
   if (!dashAllDados.length) {
