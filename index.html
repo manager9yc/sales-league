@@ -75,10 +75,10 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .prod-info { display: flex; align-items: center; gap: 12px; }
 .prod-emoji { font-size: 20px; width: 38px; height: 38px; background: var(--card2); border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .prod-name { font-size: 15px; font-weight: 600; }
-.prod-hint { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.prod-hint { font-size: 12px; color: var(--muted); margin-top: 1px; }
 
 .counter { display: flex; align-items: center; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
-.cbtn { width: 38px; height: 38px; background: transparent; border: none; color: var(--text); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.1s; -webkit-user-select: none; user-select: none; }
+.cbtn { width: 46px; height: 46px; background: transparent; border: none; color: var(--text); font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.1s; -webkit-user-select: none; user-select: none; }
 .cbtn:active { background: var(--border); }
 .cbtn.minus { color: var(--muted); }
 .cbtn.plus { color: var(--orange); }
@@ -646,6 +646,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
       <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
     </div>
   </div>
+  <div style="text-align:center;padding:4px 16px;font-size:10px;color:var(--muted);letter-spacing:1px;background:var(--dark)" id="rankLastUpdate"></div>
   <div class="ticker-wrap">
     <div class="ticker">
       <span class="ticker-item"><span class="ticker-dot"></span>Os dados do ranking atualizam cerca de 1 minuto após serem registados</span>
@@ -1054,33 +1055,57 @@ function secDiv(icon, title) {
 
 
 async function carregarRanking() {
-  renderRanking([]);
+  // Show localStorage cache IMMEDIATELY
+  try {
+    const cached = localStorage.getItem('rankingCache');
+    const cachedTime = localStorage.getItem('rankingCacheTime');
+    if (cached) {
+      const dados = JSON.parse(cached);
+      window._rankingCache = dados;
+      renderRanking(dados);
+      if (cachedTime) {
+        const dt = new Date(parseInt(cachedTime));
+        const label = dt.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+        const el = document.getElementById('rankLastUpdate');
+        if (el) el.textContent = '⏱ Última atualização: ' + label;
+      }
+    }
+  } catch(e) {}
+
+  // Fetch fresh in background
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
+    const timeout = setTimeout(() => controller.abort(), 4000);
     const res = await fetch(SHEETS_URL + '?action=getRanking', {signal: controller.signal});
     clearTimeout(timeout);
     const dados = await res.json();
-    if (Array.isArray(dados) && dados.length) window._rankingCache = dados;
-    renderRanking(Array.isArray(dados) ? dados : []);
+    if (Array.isArray(dados) && dados.length) {
+      window._rankingCache = dados;
+      try { localStorage.setItem('rankingCache', JSON.stringify(dados)); localStorage.setItem('rankingCacheTime', Date.now().toString()); } catch(e) {}
+      renderRanking(dados);
+      const el = document.getElementById('rankLastUpdate');
+      if (el) el.textContent = '✓ Atualizado agora';
+    }
   } catch(e) {
     try {
       const proxy = 'https://corsproxy.io/?';
       const url = encodeURIComponent(SHEETS_URL + '?action=getRanking');
       const res2 = await fetch(proxy + url);
       const dados2 = await res2.json();
-      if (Array.isArray(dados2) && dados2.length) window._rankingCache = dados2;
-      renderRanking(Array.isArray(dados2) ? dados2 : []);
-    } catch(e2) {
-      renderRanking([]);
-    }
+      if (Array.isArray(dados2) && dados2.length) {
+        window._rankingCache = dados2;
+        try { localStorage.setItem('rankingCache', JSON.stringify(dados2)); localStorage.setItem('rankingCacheTime', Date.now().toString()); } catch(e) {}
+        renderRanking(dados2);
+        const el = document.getElementById('rankLastUpdate');
+        if (el) el.textContent = '✓ Atualizado agora';
+      }
+    } catch(e2) {}
   }
-  // Load full data for medals if not already loaded
   if (!dashAllDados.length) {
     try {
       const r = await fetch(SHEETS_URL + '?action=getTodos');
       const td = await r.json();
-      if (Array.isArray(td)) { dashAllDados = td; renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []); }
+      if (Array.isArray(td)) dashAllDados = td;
     } catch(e) {}
   }
   verificarMedalhasRanking();
