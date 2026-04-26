@@ -841,8 +841,13 @@ function secDiv(icon, title) {
 
 
 async function carregarRanking() {
+  // Show empty ranking immediately so UI doesn't look stuck
+  renderRanking([]);
   try {
-    const res = await fetch(SHEETS_URL + '?action=getRanking');
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    const res = await fetch(SHEETS_URL + '?action=getRanking', {signal: controller.signal});
+    clearTimeout(timeout);
     const dados = await res.json();
     renderRanking(Array.isArray(dados) ? dados : []);
   } catch(e) {
@@ -901,24 +906,34 @@ function renderRanking(dados) {
 
   // Registos por seccao com barras
   html += renderRegistosPorSeccao(dados);
-  html += renderTeamCompare(dados);
-  // Medals per vendedor section
+
+  // Medals per vendedor - use ranking dados directly (already monthly)
   if (dados.length) {
     html += '<div class="slabel" style="margin-top:28px">🏅 Medalhas conquistadas este mês</div>';
-    const vendedoresMedalhas = [...new Set(dados.map(d=>d.nome||d))];
-    // Get full data for medals calculation
-    const allNomes = dashAllDados.length ? [...new Set(dashAllDados.map(d=>d.nome))] : vendedoresMedalhas;
+    // Group ranking data by nome to use for medal calc
+    const dadosPorNome = {};
+    dados.forEach(v => {
+      if (!dadosPorNome[v.nome]) dadosPorNome[v.nome] = [];
+      dadosPorNome[v.nome].push(v);
+    });
+    // Also use dashAllDados if available for more complete data
+    if (dashAllDados.length) {
+      [...new Set(dashAllDados.map(d=>d.nome))].forEach(nome => {
+        if (!dadosPorNome[nome]) dadosPorNome[nome] = dashAllDados.filter(d=>d.nome===nome);
+      });
+    }
     let medalhasHtml = '<div style="display:flex;flex-direction:column;gap:8px">';
-    allNomes.forEach(nome => {
-      const dadosNome = dashAllDados.filter(d=>d.nome===nome);
-      if (!dadosNome.length) return;
-      const conquistadas = calcularMedalhas(dadosNome).filter(m=>m.earned);
+    let temMedalhas = false;
+    Object.keys(dadosPorNome).forEach(nome => {
+      const conquistadas = calcularMedalhas(dadosPorNome[nome]).filter(m=>m.earned);
       if (!conquistadas.length) return;
+      temMedalhas = true;
       medalhasHtml += `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <div style="font-size:13px;font-weight:700;color:#fff;min-width:120px">${nome.split(' ')[0]} ${nome.split(' ')[1]||''}</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">${conquistadas.map(m=>`<span title="${m.name}" style="background:rgba(255,107,0,0.1);border:1px solid rgba(255,107,0,0.3);border-radius:8px;padding:4px 10px;font-size:12px;display:flex;align-items:center;gap:4px"><span>${m.icon}</span><span style="color:var(--orange);font-size:11px;font-weight:600">${m.name}</span></span>`).join('')}</div>
+        <div style="font-size:13px;font-weight:700;color:#fff;min-width:110px">${nome}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">${conquistadas.map(m=>`<span style="background:rgba(255,107,0,0.1);border:1px solid rgba(255,107,0,0.3);border-radius:8px;padding:4px 10px;font-size:12px;display:flex;align-items:center;gap:4px"><span>${m.icon}</span><span style="color:var(--orange);font-size:11px;font-weight:600">${m.name}</span></span>`).join('')}</div>
       </div>`;
     });
+    if (!temMedalhas) medalhasHtml += '<div style="color:var(--muted);font-size:13px;font-style:italic;padding:12px">Nenhuma medalha conquistada ainda este mês</div>';
     medalhasHtml += '</div>';
     html += medalhasHtml;
   }
