@@ -928,9 +928,14 @@ function buildRows(sorted, key) {
   const max = sorted[0]?.[key] || 1;
   return sorted.map((v, i) => {
     const pct = Math.round((v[key] / max) * 100);
+    const nome = v.nome || v.equipa;
+    const foto = getFoto ? getFoto(nome) : null;
+    const avatarHtml = foto
+      ? `<img src="${foto}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;margin-right:8px;flex-shrink:0;vertical-align:middle">`
+      : `<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--orange);align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#fff;margin-right:8px;flex-shrink:0;vertical-align:middle">${nome.split(' ').map(x=>x[0]).slice(0,2).join('')}</span>`;
     return `<tr class="rank-${i+1}">
       <td class="td-pos">${i+1}</td>
-      <td class="td-name">${v.nome || v.equipa}</td>
+      <td class="td-name" style="display:flex;align-items:center">${avatarHtml}${nome}</td>
       <td class="td-bar"><div class="bar-bg"><div class="bar-fg" data-pct="${pct}" style="width:0%"></div></div></td>
       <td class="td-score">${v[key]}</td>
     </tr>`;
