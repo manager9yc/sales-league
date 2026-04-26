@@ -913,6 +913,7 @@ function goTo(screen, btn) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('screen-'+screen).classList.add('active');
   btn.classList.add('active');
+  try { localStorage.setItem('lastTab', screen); } catch(e) {}
   document.getElementById('printBtn').style.display = screen === 'ranking' ? 'flex' : 'none';
   if (screen === 'ranking') {
     // Show cached data immediately if available
@@ -1081,27 +1082,24 @@ async function carregarRanking() {
       renderRanking([]);
     }
   } catch(e) { renderRanking([]); }
+  // Parallel fetch - race direct vs proxy
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
-    const res = await fetch(SHEETS_URL + '?action=getRanking', {signal: controller.signal});
-    clearTimeout(timeout);
-    const dados = await res.json();
-    if (Array.isArray(dados) && dados.length) window._rankingCache = dados;
-    renderRanking(Array.isArray(dados) ? dados : []);
-  } catch(e) {
-    try {
-      const proxy = 'https://corsproxy.io/?';
-      const url = encodeURIComponent(SHEETS_URL + '?action=getRanking');
-      const res2 = await fetch(proxy + url);
-      const dados2 = await res2.json();
-      if (Array.isArray(dados2) && dados2.length) window._rankingCache = dados2;
-      renderRanking(Array.isArray(dados2) ? dados2 : []);
-    } catch(e2) {
-      renderRanking([]);
+    const directUrl = SHEETS_URL + '?action=getRanking';
+    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(directUrl);
+    const result = await Promise.race([
+      fetch(directUrl, {cache:'no-store'}).then(r=>r.json()).catch(()=>Promise.reject()),
+      fetch(proxyUrl, {cache:'no-store'}).then(r=>r.json()).catch(()=>Promise.reject()),
+      new Promise((_,reject) => setTimeout(()=>reject('timeout'), 6000))
+    ]);
+    if (Array.isArray(result) && result.length) {
+      window._rankingCache = result;
+      try { localStorage.setItem('rankingCache', JSON.stringify(result)); localStorage.setItem('rankingCacheTime', Date.now().toString()); } catch(e2) {}
+      renderRanking(result);
+      const elU = document.getElementById('rankLastUpdate');
+      if (elU) elU.textContent = '✓ Atualizado agora';
     }
-  }
-  // Load full data for medals if not already loaded
+  } catch(e) {}
+
   if (!dashAllDados.length) {
     try {
       const r = await fetch(SHEETS_URL + '?action=getTodos');
@@ -1770,6 +1768,20 @@ function mostrarDash(nome) {
           <div class="d-cscore ${hi?'hi':''}">${item.v}</div>
         </div>`;
       }).join('')}
+    </div>
+
+    <div class="d-slabel">Comparar com outro vendedor</div>
+    <div class="d-card">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <select id="compareWith_${nome.replace(/ /g,'_')}" onchange="renderCompare('${nome.replace(/'/g,String.fromCharCode(92)+String.fromCharCode(39))}',this.value)" style="flex:1;min-width:120px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;">
+          <option value="">Seleciona um vendedor...</option>
+          ${[...new Set(equipas.flatMap(e=>e.nomes))].filter(n=>n!==nome).sort().map(n=>`<option value="${n}">${n}</option>`).join('')}
+        </select>
+        <select id="compareCat_${nome.replace(/ /g,'_')}" onchange="renderCompare('${nome.replace(/'/g,String.fromCharCode(92)+String.fromCharCode(39))}',document.getElementById('compareWith_${nome.replace(/ /g,'_')}')?.value||'')" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;">
+          ${categorias.map(cat=>`<option value="${cat.key}">${cat.emoji} ${cat.label}</option>`).join('')}
+        </select>
+      </div>
+      <div id="compareResult_${nome.replace(/ /g,'_')}" style="color:var(--muted);font-size:13px;text-align:center;padding:8px">Seleciona um vendedor para comparar</div>
     </div>
 
     <div class="d-slabel">Histórico por mês</div>
@@ -2576,6 +2588,15 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
 // Show for iOS after splash closes
 setTimeout(mostrarInstallPopup, 3000);
+
+// Restore last active tab on page load
+try {
+  const lastTab = localStorage.getItem('lastTab');
+  if (lastTab && document.getElementById('screen-'+lastTab)) {
+    const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => (b.getAttribute('onclick')||'').includes("'"+lastTab+"'"));
+    if (btn) goTo(lastTab, btn);
+  }
+} catch(e) {}
 
 </script>
 
