@@ -492,6 +492,14 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .edit-btns { display: flex; gap: 8px; margin-top: 16px; }
 .edit-save { flex: 1; background: var(--orange); border: none; border-radius: 8px; padding: 12px; color: #fff; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 2px; cursor: pointer; }
 .edit-cancel { background: var(--card2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; color: var(--muted); font-size: 13px; cursor: pointer; }
+
+/* TICKER */
+.ticker-wrap { width: 100%; background: rgba(255,107,0,0.12); border-bottom: 1px solid rgba(255,107,0,0.2); overflow: hidden; padding: 8px 0; }
+.ticker { display: flex; white-space: nowrap; animation: ticker-scroll 18s linear infinite; }
+.ticker:hover { animation-play-state: paused; }
+.ticker-item { display: inline-flex; align-items: center; gap: 8px; padding: 0 32px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,107,0,0.9); }
+.ticker-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--orange); flex-shrink: 0; }
+@keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 </style>
 </head>
 <body>
@@ -607,6 +615,14 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
       <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;color:#fff;text-transform:uppercase" id="mesAtualRanking"></span>
       <span class="rank-countdown" id="rankCountdown"></span>
       <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
+    </div>
+  </div>
+  <div class="ticker-wrap">
+    <div class="ticker">
+      <span class="ticker-item"><span class="ticker-dot"></span>Os dados do ranking atualizam cerca de 1 minuto após serem registados</span>
+      <span class="ticker-item"><span class="ticker-dot"></span>Regista o teu dia e os resultados aparecem no ranking em breve</span>
+      <span class="ticker-item"><span class="ticker-dot"></span>Os dados do ranking atualizam cerca de 1 minuto após serem registados</span>
+      <span class="ticker-item"><span class="ticker-dot"></span>Regista o teu dia e os resultados aparecem no ranking em breve</span>
     </div>
   </div>
   <div class="rank-main" id="rankMain"></div>
