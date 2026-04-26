@@ -1976,8 +1976,20 @@ function confirmarApagarRegisto(idx) {
 function abrirEdit(idx) {
   editingRegisto = idx;
   const r = todosRegistos[idx];
-  document.getElementById('editSub').textContent = r.nome + ' · ' + r.data;
-  document.getElementById('editFields').innerHTML = categorias.map(cat => `
+  document.getElementById('editSub').textContent = 'Editar registo';
+  const nomesLista = [...new Set(equipas.flatMap(e=>e.nomes))].sort();
+  document.getElementById('editFields').innerHTML =
+    `<div class="edit-field">
+      <div class="edit-field-label">👤 Nome</div>
+      <select id="editField_nome" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:13px;outline:none;max-width:180px">
+        ${nomesLista.map(n=>`<option value="${n}" ${n===r.nome?'selected':''}>${n}</option>`).join('')}
+      </select>
+    </div>
+    <div class="edit-field">
+      <div class="edit-field-label">📅 Data</div>
+      <input type="date" id="editField_data" value="${r.data||''}" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:13px;outline:none;">
+    </div>` +
+    categorias.map(cat => `
     <div class="edit-field">
       <div class="edit-field-label">${cat.emoji} ${cat.label}</div>
       <input type="number" class="edit-field-input" id="editField_${cat.key}" value="${r[cat.key]||0}" min="0">
@@ -1990,6 +2002,10 @@ async function guardarEdicao() {
   if (editingRegisto === null) return;
   const r = todosRegistos[editingRegisto];
   const updated = {...r};
+  updated.nome = document.getElementById('editField_nome')?.value || r.nome;
+  updated.data = document.getElementById('editField_data')?.value || r.data;
+  // Update equipa based on nome
+  equipas.forEach(eq => { if (eq.nomes.includes(updated.nome)) updated.equipa = eq.label.replace(/^\S+\s/,''); });
   categorias.forEach(cat => {
     updated[cat.key] = parseInt(document.getElementById('editField_'+cat.key)?.value) || 0;
   });
