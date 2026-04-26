@@ -531,7 +531,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 @keyframes shakeBox { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-5deg)} 40%{transform:rotate(5deg)} 60%{transform:rotate(-4deg)} 80%{transform:rotate(4deg)} }
 
 /* FORM TICKER */
-.form-ticker-wrap { background: #ffffff; border-bottom: 2px solid #e0e0e0; overflow: hidden; padding: 11px 0; width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; display: block; }
+.form-ticker-wrap { background: #ffffff; border-bottom: 2px solid #e0e0e0; overflow: hidden; padding: 11px 0; width: 100%; display: block; margin-top: 0; }
 .form-ticker { display: flex; white-space: nowrap; animation: ticker-scroll 10s linear infinite; }
 .form-ticker-item { display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 900; letter-spacing: 6px; color: #111111; padding: 0 28px; text-transform: uppercase; }
 .form-ticker-sep { display: inline-block; color: var(--orange); font-size: 16px; font-weight: 900; padding: 0 8px; }
@@ -588,8 +588,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
       <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
     </div>
   </div>
-  <div class="form-wrap">
-    <div class="form-ticker-wrap">
+  <div class="form-ticker-wrap">
     <div class="form-ticker">
       <span class="form-ticker-item">VASCO DA GAMA</span><span class="form-ticker-sep">✦</span>
       <span class="form-ticker-item">VASCO DA GAMA</span><span class="form-ticker-sep">✦</span>
@@ -597,8 +596,8 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
       <span class="form-ticker-item">VASCO DA GAMA</span><span class="form-ticker-sep">✦</span>
       <span class="form-ticker-item">VASCO DA GAMA</span><span class="form-ticker-sep">✦</span>
       <span class="form-ticker-item">VASCO DA GAMA</span><span class="form-ticker-sep">✦</span>
-    </div>
   </div>
+  <div class="form-wrap">
   <div class="form-main" id="formMain">
       <div class="last-reg-bar" id="lastRegBar" style="display:none"></div>
       <div class="sec-label">Dia</div>
@@ -1304,6 +1303,12 @@ function mostrarProgressoRegisto(nome, payload) {
 // ── SPLASH ──
 let splashProg = 0, splashIv = null;
 function iniciarSplash() {
+  // Skip splash if seen today
+  try {
+    const hoje = new Date().toDateString();
+    if (localStorage.getItem('splashDate') === hoje) { fecharSplash(); return; }
+    localStorage.setItem('splashDate', hoje);
+  } catch(e) {}
   const pc = document.getElementById('spParticles');
   for(let i=0;i<25;i++){
     const p=document.createElement('div'); p.className='sp-particle';
@@ -1863,7 +1868,7 @@ function renderDashDefault() {
 
 
 // ══ PIN ADMIN ══
-const ADMIN_PIN = '999';
+const ADMIN_PIN = '112';
 let pinBuffer = '';
 let adminUnlocked = false;
 
