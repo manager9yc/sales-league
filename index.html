@@ -887,7 +887,7 @@ const categorias = [
   { key:'elogios',   label:'Elogios',             emoji:'⭐' },
 ];
 
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwaqE3zFMJYGTXXV60xn4pQX1gM904eXTeqtdz8yDfU3Qyuc9RqpGuAJD9Hzh52WQKl/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzEFAMnkvjueKCrbj-zksBs-159QQ4PTrGqykfC0mHPDt7l8DdWM-fPnNYe0R--LFMj/exec';
 
 const vals = {onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0};
 let nomeSel = null, equipaAtiva = null;
@@ -951,11 +951,13 @@ function change(campo, delta) {
   setTimeout(() => el.classList.remove('bump'), 150);
 }
 
-function showToast(msg) {
+let toastTimeout = null;
+function showToast(msg, duration) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), duration || 3000);
 }
 
 async function submeter() {
