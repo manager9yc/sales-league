@@ -516,6 +516,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 <!-- MEDAL POPUP -->
 <div class="medal-popup" id="medalPopup" onclick="document.getElementById('medalPopup').classList.remove('show')" style="cursor:pointer">
   <div class="medal-confetti" id="medalConfetti"></div>
+  <div id="medalFoto" style="margin-bottom:10px"></div>
   <span class="medal-popup-trophy" id="medalTrophy">🏆</span>
   <span class="medal-popup-title" id="medalTitle">Nome</span>
   <div class="medal-popup-sub" id="medalSub"></div>
@@ -951,6 +952,9 @@ function resetForm() {
   document.querySelectorAll('.team-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('nameGrid').innerHTML = '<div class="name-empty">Escolhe a tua equipa primeiro</div>';
   Object.keys(vals).forEach(k => { vals[k]=0; const el=document.getElementById(k); el.textContent=0; el.classList.remove('nz'); });
+  // Reset submit button
+  const btn = document.getElementById('submitBtn');
+  if (btn) { btn.textContent = 'Registar o meu dia →'; btn.style.background = ''; btn.style.boxShadow = ''; btn.disabled = false; }
   document.getElementById('formMain').classList.remove('hide');
   document.getElementById('successMsg').classList.remove('show');
   const sbtn = document.getElementById('submitBtn');
@@ -1275,6 +1279,15 @@ function mostrarMedalPopup(emoji,nome,medalha){
   trophy.textContent=emoji;
   trophy.className='medal-popup-trophy trophy-anim';
   document.getElementById('medalTitle').textContent=nome;
+  // Show foto
+  const fotoEl=document.getElementById('medalFoto');
+  if(fotoEl){
+    const foto=getFoto?getFoto(nome):null;
+    const ini=nome.split(' ').map(x=>x[0]).slice(0,2).join('');
+    fotoEl.innerHTML=foto
+      ? `<img src="${foto}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,0.5);margin:0 auto;display:block;">`
+      : `<div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;margin:0 auto;">${ini}</div>`;
+  }
   const hoje6 = new Date().toLocaleDateString('pt-PT',{day:'numeric',month:'long'});
   document.getElementById('medalSub').innerHTML='🏅 Conquistou <strong>'+medalha+'</strong><br><span style="font-size:12px;opacity:0.8">hoje, '+hoje6+'</span>';
   // Confetti
