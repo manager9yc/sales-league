@@ -506,7 +506,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
       <div class="sp-pre">Sport Zone · Vasco da Gama</div>
       <div class="sp-title">SALES<br>LEAGUE</div>
       <div class="sp-sub">Liga Vasco da Gama · 2026</div>
-      <div class="sp-bar-wrap"><span>Maio 2026</span></div>
+      <div class="sp-bar-wrap"><span id="mesAtualSplash"></span></div>
       <div class="sp-progress"><div class="sp-progress-fill" id="splashBar"></div></div>
     </div>
     <button class="sp-btn" onclick="fecharSplash()" style="width:80%;max-width:280px;padding:16px;font-size:16px;">Entrar →</button>
@@ -540,7 +540,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
     </div>
     <div style="background:#FF6B00;margin-top:20px;padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:16px">
       <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;color:#fff;text-transform:uppercase">Maio 2026</span>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;color:#fff;text-transform:uppercase" id="mesAtualForm"></span>
       <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
     </div>
   </div>
@@ -603,7 +603,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
     </div>
     <div style="background:#FF6B00;margin-top:20px;padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
       <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;color:#fff;text-transform:uppercase">Maio 2026</span>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;color:#fff;text-transform:uppercase" id="mesAtualRanking"></span>
       <span class="rank-countdown" id="rankCountdown"></span>
       <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
     </div>
@@ -1245,6 +1245,7 @@ function fecharSplash(){
   setTimeout(()=>s.classList.add('hidden'),600);
 }
 iniciarSplash();
+atualizarMesLabels();
 
 // ── HOLD TO REPEAT ──
 let changeIv=null, changeTo=null;
@@ -1256,6 +1257,19 @@ function startChange(campo,delta,e){
 function stopChange(){clearTimeout(changeTo);clearInterval(changeIv);changeTo=null;changeIv=null;}
 
 // ── RANKING COUNTDOWN ──
+function getMesAtualLabel(){
+  return new Date().toLocaleDateString('pt-PT',{month:'long',year:'numeric'})
+    .replace(/^./,s=>s.toUpperCase());
+}
+
+function atualizarMesLabels(){
+  const label = getMesAtualLabel();
+  ['mesAtualSplash','mesAtualRanking','mesAtualForm'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent=label;
+  });
+}
+
 function calcCountdown(){
   const hoje=new Date();
   const fim=new Date(hoje.getFullYear(),hoje.getMonth()+1,0);
