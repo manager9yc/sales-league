@@ -899,36 +899,23 @@ function renderRanking(dados) {
     d += 0.07;
   });
 
-  html += secDiv('🏅', 'Ranking por Secção');
-  const equipaLabels = {
-    calcado:   'Calçado',
-    textil:    'Têxtil',
-    caixa:     'Caixa',
-    sup:       'Direção',
-    logistica: 'Logística',
-  };
-  const nomeParaEquipa = {};
-  equipas.forEach(eq => eq.nomes.forEach(n => nomeParaEquipa[n] = eq.id));
+  // Registos por secção com barras (estilo team compare)
+  html += '<div class="slabel" style="margin-top:24px">Registos por Secção</div>';
+  const eqLabelsR = {calcado:'👟 Calçado',caixa:'🧾 Caixa',textil:'👕 Têxtil',logistica:'📦 Logística',sup:'🎯 Direção'};
+  const n2eR = {};
+  equipas.forEach(eq => eq.nomes.forEach(n => n2eR[n] = eq.id));
+  const regR = {};
+  Object.keys(eqLabelsR).forEach(id => { regR[id] = 0; });
+  dados.forEach(v => { const id = n2eR[v.nome]; if (id !== undefined && regR[id] !== undefined) regR[id]++; });
+  const secListR = Object.entries(regR).map(([id,v])=>({id,label:eqLabelsR[id],v})).filter(e=>e.v>0).sort((a,b)=>b.v-a.v);
+  if (secListR.length) {
+    const maxRR = secListR[0].v;
+    html += '<div class="card"><div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;margin-bottom:12px">Nº de registos</div>' +
+      secListR.map(e => `<div class="team-bar-row"><div class="team-bar-name">${e.label}</div><div class="team-bar-bg"><div class="team-bar-fill" data-pct="${Math.round(e.v/maxRR*100)}" style="width:0%"></div></div><div class="team-bar-val">${e.v}</div></div>`).join('') + '</div>';
+  }
 
-  const reg = {};
-  Object.keys(equipaLabels).forEach(id => { reg[id] = { equipa: equipaLabels[id], registos: 0 }; });
-  dados.forEach(v => { const id = nomeParaEquipa[v.nome]; if (id && reg[id]) reg[id].registos++; });
-
-  const secList = Object.values(reg).filter(e=>e.registos>0).sort((a,b)=>b.registos-a.registos);
-  const maxR = secList[0]?.registos || 1;
-  const secRows = secList.length ? secList.map((e,i) => {
-    const pct = Math.round((e.registos/maxR)*100);
-    return `<tr class="rank-${i+1}">
-      <td class="td-pos">${i+1}</td>
-      <td class="td-name">${e.equipa}</td>
-      <td class="td-bar"><div class="bar-bg"><div class="bar-fg" data-pct="${pct}" style="width:0%"></div></div></td>
-      <td class="td-score">${e.registos}</td>
-    </tr>`;
-  }).join('') : emptyRows();
-  html += catBlock('🏆', 'Registos por Secção', secRows, agora, d);
-
-  // Team compare
-  html += '<div class="slabel" style="margin-top:24px">Por Equipa</div>' + renderTeamCompare(dados);
+  // Team compare by quantity
+  html += '<div class="slabel" style="margin-top:24px">Vendas por Equipa</div>' + renderTeamCompare(dados);
   // Medals per vendedor section
   if (dados.length) {
     html += '<div class="slabel" style="margin-top:28px">🏅 Medalhas conquistadas este mês</div>';
