@@ -899,23 +899,9 @@ function renderRanking(dados) {
     d += 0.07;
   });
 
-  // Registos por secção com barras (estilo team compare)
-  html += '<div class="slabel" style="margin-top:24px">Registos por Secção</div>';
-  const eqLabelsR = {calcado:'👟 Calçado',caixa:'🧾 Caixa',textil:'👕 Têxtil',logistica:'📦 Logística',sup:'🎯 Direção'};
-  const n2eR = {};
-  equipas.forEach(eq => eq.nomes.forEach(n => n2eR[n] = eq.id));
-  const regR = {};
-  Object.keys(eqLabelsR).forEach(id => { regR[id] = 0; });
-  dados.forEach(v => { const id = n2eR[v.nome]; if (id !== undefined && regR[id] !== undefined) regR[id]++; });
-  const secListR = Object.entries(regR).map(([id,v])=>({id,label:eqLabelsR[id],v})).filter(e=>e.v>0).sort((a,b)=>b.v-a.v);
-  if (secListR.length) {
-    const maxRR = secListR[0].v;
-    html += '<div class="card"><div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;margin-bottom:12px">Nº de registos</div>' +
-      secListR.map(e => `<div class="team-bar-row"><div class="team-bar-name">${e.label}</div><div class="team-bar-bg"><div class="team-bar-fill" data-pct="${Math.round(e.v/maxRR*100)}" style="width:0%"></div></div><div class="team-bar-val">${e.v}</div></div>`).join('') + '</div>';
-  }
-
-  // Team compare by quantity
-  html += '<div class="slabel" style="margin-top:24px">Vendas por Equipa</div>' + renderTeamCompare(dados);
+  // Registos por seccao com barras
+  html += renderRegistosPorSeccao(dados);
+  html += renderTeamCompare(dados);
   // Medals per vendedor section
   if (dados.length) {
     html += '<div class="slabel" style="margin-top:28px">🏅 Medalhas conquistadas este mês</div>';
@@ -1160,6 +1146,23 @@ function calcularNivel(total){
 }
 
 // ── TEAM COMPARE in ranking ──
+function renderRegistosPorSeccao(dados) {
+  var labels = {calcado:'👟 Calçado',caixa:'🧾 Caixa',textil:'👕 Têxtil',logistica:'📦 Logística',sup:'🎯 Direção'};
+  var n2e = {};
+  equipas.forEach(function(eq){ eq.nomes.forEach(function(n){ n2e[n]=eq.id; }); });
+  var reg = {};
+  Object.keys(labels).forEach(function(id){ reg[id]=0; });
+  dados.forEach(function(v){ var id=n2e[v.nome]; if(id&&reg[id]!==undefined) reg[id]++; });
+  var list = Object.keys(labels).map(function(id){ return {label:labels[id],v:reg[id]||0}; }).filter(function(e){ return e.v>0; }).sort(function(a,b){ return b.v-a.v; });
+  if(!list.length) return '';
+  var maxV = list[0].v;
+  var rows = list.map(function(e){
+    var pct = Math.round(e.v/maxV*100);
+    return '<div class="team-bar-row"><div class="team-bar-name">'+e.label+'</div><div class="team-bar-bg"><div class="team-bar-fill" data-pct="'+pct+'" style="width:0%"></div></div><div class="team-bar-val">'+e.v+'</div></div>';
+  }).join('');
+  return '<div class="slabel" style="margin-top:24px">Registos por Secção</div><div class="card"><div style="font-size:13px;color:var(--muted);margin-bottom:10px">Nº de registos submetidos</div>'+rows+'</div>';
+}
+
 function renderTeamCompare(dados){
   const eqLabels={calcado:'👟 Calçado',caixa:'🧾 Caixa',textil:'👕 Têxtil',logistica:'📦 Logística',sup:'🎯 Direção'};
   const n2e={};
