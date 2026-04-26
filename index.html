@@ -78,7 +78,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .prod-hint { font-size: 12px; color: var(--muted); margin-top: 1px; }
 
 .counter { display: flex; align-items: center; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
-.cbtn { width: 46px; height: 46px; background: transparent; border: none; color: var(--text); font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.1s; -webkit-user-select: none; user-select: none; }
+.cbtn { width: 46px; height: 46px; background: transparent; border: none; color: var(--text); font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.1s; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
 .cbtn:active { background: var(--border); }
 .cbtn.minus { color: var(--muted); }
 .cbtn.plus { color: var(--orange); }
@@ -531,7 +531,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 @keyframes shakeBox { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-5deg)} 40%{transform:rotate(5deg)} 60%{transform:rotate(-4deg)} 80%{transform:rotate(4deg)} }
 
 /* FORM TICKER */
-.form-ticker-wrap { background: #ffffff; border-bottom: 2px solid #e0e0e0; overflow: hidden; padding: 11px 0; width: 100%; display: block; margin-top: 0; }
+.form-ticker-wrap { background: #ffffff; border-bottom: 2px solid #e0e0e0; overflow: hidden; padding: 11px 0; width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; display: block; }
 .form-ticker { display: flex; white-space: nowrap; animation: ticker-scroll 10s linear infinite; }
 .form-ticker-item { display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 900; letter-spacing: 6px; color: #111111; padding: 0 28px; text-transform: uppercase; }
 .form-ticker-sep { display: inline-block; color: var(--orange); font-size: 16px; font-weight: 900; padding: 0 8px; }
@@ -588,7 +588,8 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
       <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
     </div>
   </div>
-  <div class="form-ticker-wrap">
+  <div class="form-wrap">
+    <div class="form-ticker-wrap">
     <div class="form-ticker">
       <span class="form-ticker-item">VASCO DA GAMA</span><span class="form-ticker-sep">✦</span>
       <span class="form-ticker-item">VASCO DA GAMA</span><span class="form-ticker-sep">✦</span>
@@ -596,8 +597,8 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
       <span class="form-ticker-item">VASCO DA GAMA</span><span class="form-ticker-sep">✦</span>
       <span class="form-ticker-item">VASCO DA GAMA</span><span class="form-ticker-sep">✦</span>
       <span class="form-ticker-item">VASCO DA GAMA</span><span class="form-ticker-sep">✦</span>
+    </div>
   </div>
-  <div class="form-wrap">
   <div class="form-main" id="formMain">
       <div class="last-reg-bar" id="lastRegBar" style="display:none"></div>
       <div class="sec-label">Dia</div>
@@ -1303,12 +1304,6 @@ function mostrarProgressoRegisto(nome, payload) {
 // ── SPLASH ──
 let splashProg = 0, splashIv = null;
 function iniciarSplash() {
-  // Skip splash if seen today
-  try {
-    const hoje = new Date().toDateString();
-    if (localStorage.getItem('splashDate') === hoje) { fecharSplash(); return; }
-    localStorage.setItem('splashDate', hoje);
-  } catch(e) {}
   const pc = document.getElementById('spParticles');
   for(let i=0;i<25;i++){
     const p=document.createElement('div'); p.className='sp-particle';
@@ -1333,12 +1328,37 @@ atualizarMesLabels();
 
 // ── HOLD TO REPEAT ──
 let changeIv=null, changeTo=null;
+let touchStartY = 0;
+let touchMoved = false;
+
 function startChange(campo,delta,e){
-  if(e&&e.preventDefault)e.preventDefault();
+  if(e && e.type === 'touchstart') {
+    touchStartY = e.touches[0].clientY;
+    touchMoved = false;
+    // Don't preventDefault here - allow scroll detection
+  }
+  if(e && e.type === 'mousedown') e.preventDefault();
   change(campo,delta);
   changeTo=setTimeout(()=>{changeIv=setInterval(()=>change(campo,delta),80);},350);
 }
-function stopChange(){clearTimeout(changeTo);clearInterval(changeIv);changeTo=null;changeIv=null;}
+function stopChange(e){
+  if(e && e.type === 'touchend' && touchMoved) {
+    // User was scrolling, undo the last change
+    clearTimeout(changeTo);clearInterval(changeIv);changeTo=null;changeIv=null;
+    return;
+  }
+  clearTimeout(changeTo);clearInterval(changeIv);changeTo=null;changeIv=null;
+}
+
+document.addEventListener('touchmove', function(e) {
+  if (touchStartY !== 0) {
+    const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
+    if (deltaY > 8) {
+      touchMoved = true;
+      clearTimeout(changeTo);clearInterval(changeIv);changeTo=null;changeIv=null;
+    }
+  }
+}, {passive: true});
 
 // ── RANKING COUNTDOWN ──
 function getMesAtualLabel(){
@@ -1868,7 +1888,7 @@ function renderDashDefault() {
 
 
 // ══ PIN ADMIN ══
-const ADMIN_PIN = '112';
+const ADMIN_PIN = '999';
 let pinBuffer = '';
 let adminUnlocked = false;
 
