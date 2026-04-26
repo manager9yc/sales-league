@@ -56,7 +56,7 @@ body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans
 .date-row { display: flex; align-items: center; gap: 12px; }
 .date-icon { width: 42px; height: 42px; background: var(--orange); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
 .date-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-input[type="date"] { background: transparent; border: none; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 600; outline: none; width: 100%; cursor: pointer; }
+input[type="date"] { /* week starts Sunday via locale */  background: transparent; border: none; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 600; outline: none; width: 100%; cursor: pointer; }
 input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacity(0.4); cursor: pointer; }
 
 .team-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -309,8 +309,9 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .meta-nums { font-size: 10px; color: var(--muted); display: flex; justify-content: space-between; }
 
 /* ══ MEDALHAS ══ */
-.medals-wrap { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
-.medal { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 8px; }
+.medals-wrap { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 4px; }
+@media(min-width:500px){ .medals-wrap { grid-template-columns: repeat(3,1fr); } }
+.medal { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 8px; min-height: 56px; }
 .medal.earned { border-color: var(--orange); background: rgba(255,107,0,0.08); }
 .medal-icon { font-size: 20px; filter: grayscale(1) opacity(0.3); }
 .medal.earned .medal-icon { filter: none; }
@@ -954,10 +955,11 @@ function change(campo, delta) {
 let toastTimeout = null;
 function showToast(msg, duration) {
   const t = document.getElementById('toast');
+  if (!t) return;
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => t.classList.remove('show'), duration || 3000);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), duration || 2500);
 }
 
 async function submeter() {
@@ -1572,6 +1574,12 @@ function mostrarDash(nome) {
 
   const dadosVendedor = dashAllDados.filter(d=>d.nome===nome);
   if(!dadosVendedor.length){ return; }
+  const mesAtualD = new Date().getMonth();
+  const anoAtualD = new Date().getFullYear();
+  const dadosMes = dadosVendedor.filter(d=>{
+    const dt=new Date(d.data||'');
+    return !isNaN(dt)&&dt.getMonth()===mesAtualD&&dt.getFullYear()===anoAtualD;
+  });
 
   // agrupar por mes
   const porMes = {};
@@ -1625,10 +1633,14 @@ function mostrarDash(nome) {
       </div>
     </div>
     <div class="streak-card">
-      <div style="font-size:32px">🔥</div>
+      <div style="font-size:32px">📋</div>
       <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--orange);line-height:1">${calcularStreak(dadosVendedor)}</div>
-        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">dias consecutivos</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--orange);line-height:1">${dadosMes.length}</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">registos este mês</div>
+      </div>
+      <div style="margin-left:auto;text-align:right">
+        <div style="font-size:11px;color:var(--muted)">Meta</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted)">${getThresholds(nome).consistente}</div>
       </div>
     </div>
 
@@ -1694,25 +1706,42 @@ function mostrarDash(nome) {
             <div class="d-cbar ${i===semanas.length-1?'hi':''}" style="height:${Math.round(v/maxSem*88)}px"></div>
           </div>`).join('')}
         <div style="position:absolute;bottom:0;left:0;right:0;display:flex;gap:10px">
-          ${['Sem 1','Sem 2','Sem 3','Sem 4 ▶'].map(l=>`<div style="flex:1;font-size:10px;color:var(--muted);text-align:center">${l}</div>`).join('')}
+          ${(()=>{
+          const hoje=new Date();
+          const startOfYear=new Date(hoje.getFullYear(),0,1);
+          const weekNum=Math.ceil((((hoje-startOfYear)/86400000)+startOfYear.getDay()+1)/7);
+          return [weekNum-3,weekNum-2,weekNum-1,weekNum].map((w,i)=>`<div style="flex:1;font-size:10px;color:var(--muted);text-align:center">Sem ${w>0?w:1}${i===3?' ▶':''}</div>`).join('');
+        })()}
         </div>
       </div>
     </div>
 
-    <div class="d-slabel">Comparação com a loja — Onlines acumulado</div>
-    <div class="d-card">
-      <div class="d-card-title">Top 8</div>
-      ${compRank.map((item,i)=>{
-        const hi=item.n===nome;
-        const pct=Math.round(item.v/maxO*100);
-        return `<div class="d-crow">
-          <div class="d-cpos ${hi?'hi':''}">${i+1}º</div>
-          <div class="d-cnom ${hi?'hi':''}">${item.n.split(' ')[0]}</div>
-          <div class="d-cbarwrap"><div class="d-cbarfill ${hi?'hi':''}" style="width:${pct}%"></div></div>
-          <div class="d-cscore ${hi?'hi':''}">${item.v}</div>
-        </div>`;
-      }).join('')}
+    <div class="d-slabel" style="display:flex;align-items:center;justify-content:space-between">
+      <span>Comparação com a loja</span>
+      <select id="compararCat" onchange="mostrarDash(vendedorAtual)" style="background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:3px 8px;color:var(--text);font-size:11px;outline:none;">
+        ${categorias.map(cat=>`<option value="${cat.key}">${cat.emoji} ${cat.label}</option>`).join('')}
+      </select>
     </div>
+    <div class="d-card">
+      <div class="d-card-title">Top 8 — ${categorias.find(c=>c.key===(document.getElementById('compararCat')?.value||'onlines'))?.label||'Onlines'}</div>
+      ${(()=>{
+        const catKey = document.getElementById('compararCat')?.value || 'onlines';
+        const compRankCat = [...new Set(dashAllDados.map(d=>d.nome))]
+          .map(n=>({n, v:dashAllDados.reduce((s,d)=>d.nome===n?s+(d[catKey]||0):s,0)}))
+          .sort((a,b)=>b.v-a.v).slice(0,8);
+        const maxOCat = compRankCat[0]?.v||1;
+        return compRankCat.map((item,i)=>{
+          const hi=item.n===nome;
+          const pct=Math.round(item.v/maxOCat*100);
+          return `<div class="d-crow">
+            <div class="d-cpos ${hi?'hi':''}">${i+1}º</div>
+            <div class="d-cnom ${hi?'hi':''}">${item.n.split(' ')[0]}</div>
+            <div class="d-cbarwrap"><div class="d-cbarfill ${hi?'hi':''}" style="width:${pct}%"></div></div>
+            <div class="d-cscore ${hi?'hi':''}">${item.v}</div>
+          </div>`;
+        }).join('');
+      })()}
+    </div>    </div>
 
     <div class="d-slabel">Histórico por mês</div>
     <div class="d-card">
@@ -1853,13 +1882,13 @@ function bloquearAdmin() {
 
 // ══ METAS MENSAIS ══
 const metas = {
-  onlines:   40,
+  onlines:   30,
   sprays:    30,
-  palmilhas: 30,
-  camisolas: 15,
+  palmilhas: 20,
+  camisolas: 20,
   sacos:     800,
   garrafas:  20,
-  elogios:   5
+  elogios:   3
 };
 // Medalhas usam os mesmos valores das metas
 const metasMedalhas = metas;
@@ -1877,7 +1906,7 @@ function getThresholds(nome) {
   const isLogistica = equipaLogistica.includes(nome);
   const isCalcado = equipaCalcadoSneaker.includes(nome);
   return {
-    consistente: (isPartTime || isDirecao || isLogistica) ? 8 : 15,
+    consistente: (isPartTime || isDirecao || isLogistica) ? 7 : 15,
     onlines: isCalcado ? 30 : 20,
   };
 }
@@ -1902,15 +1931,28 @@ function calcularMedalhas(dados) {
   const garrafasMes  = dadosMes.reduce((s,d)=>s+(d.garrafas||0),0);
   const elogiosMes   = dadosMes.reduce((s,d)=>s+(d.elogios||0),0);
   const diasComRegisto = new Set(dadosMes.map(d=>d.data)).size;
+  const caixaNomes = equipas.find(e=>e.id==='caixa')?.nomes||[];
+  const isCaixa = caixaNomes.includes(nome);
+  const isCalcadoSneaker2 = equipaCalcadoSneaker.includes(nome);
+
+  const tOnlines    = isCalcadoSneaker2 ? 30 : 15;
+  const tSprays     = (isCalcadoSneaker2 || isCaixa) ? 30 : 15;
+  const tPalmilhas  = isCalcadoSneaker2 ? 20 : 10;
+  const tCamisolas  = (isCalcadoSneaker2 || isCaixa) ? 20 : 10;
+  const tSacos      = isCaixa ? 800 : 150;
+  const tGarrafas   = isCaixa ? 20 : 15;
+  const tElogios    = 3;
+  const tConsistente = th.consistente; // already handles part-times
+
   return [
-    { icon:'🖥️', name:'Rei dos Onlines',  desc:th.onlines+' onlines este mês',                  earned: onlinesMes   >= th.onlines },
-    { icon:'🧴', name:'Spray King',        desc:metasMedalhas.sprays+' sprays este mês',         earned: spraysMes    >= metasMedalhas.sprays },
-    { icon:'🦶', name:'Palmilhas Master',  desc:metasMedalhas.palmilhas+' palmilhas este mês',   earned: palmilhasMes >= metasMedalhas.palmilhas },
-    { icon:'⚽', name:'Camisolas Pro',     desc:metasMedalhas.camisolas+' camisolas este mês',   earned: camisolasMes >= metasMedalhas.camisolas },
-    { icon:'🛍️', name:'Eco Champion',     desc:metasMedalhas.sacos+' sacos este mês',           earned: sacosMes     >= metasMedalhas.sacos },
-    { icon:'💧', name:'Hydration Boss',    desc:metasMedalhas.garrafas+' garrafas este mês',     earned: garrafasMes  >= metasMedalhas.garrafas },
-    { icon:'⭐', name:'Favorito',          desc:metasMedalhas.elogios+' elogios este mês',       earned: elogiosMes   >= metasMedalhas.elogios },
-    { icon:'📅', name:'Consistente',       desc:th.consistente+' dias com registo este mês',     earned: diasComRegisto >= th.consistente },
+    { icon:'🖥️', name:'Rei dos Onlines',  desc:tOnlines+' onlines este mês',       earned: onlinesMes   >= tOnlines },
+    { icon:'🧴', name:'Spray King',        desc:tSprays+' sprays este mês',          earned: spraysMes    >= tSprays },
+    { icon:'🦶', name:'Palmilhas Master',  desc:tPalmilhas+' palmilhas este mês',    earned: palmilhasMes >= tPalmilhas },
+    { icon:'⚽', name:'Camisolas Pro',     desc:tCamisolas+' camisolas este mês',    earned: camisolasMes >= tCamisolas },
+    { icon:'🛍️', name:'Eco Champion',     desc:tSacos+' sacos este mês',            earned: sacosMes     >= tSacos },
+    { icon:'💧', name:'Hydration Boss',    desc:tGarrafas+' garrafas este mês',      earned: garrafasMes  >= tGarrafas },
+    { icon:'⭐', name:'Favorito',          desc:'3 elogios este mês',                earned: elogiosMes   >= tElogios },
+    { icon:'📅', name:'Consistente',       desc:tConsistente+' registos este mês',   earned: diasComRegisto >= tConsistente },
   ];
 }
 
@@ -2162,11 +2204,21 @@ function abrirEdit(idx) {
     categorias.map(cat => `
     <div class="edit-field">
       <div class="edit-field-label">${cat.emoji} ${cat.label}</div>
-      <input type="number" class="edit-field-input" id="editField_${cat.key}" value="${r[cat.key]||0}" min="0">
+      <div style="display:flex;align-items:center;gap:6px">
+        <button onclick="editFieldChange('${cat.key}',-1)" style="width:32px;height:32px;border-radius:50%;background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">−</button>
+        <input type="number" class="edit-field-input" id="editField_${cat.key}" value="${r[cat.key]||0}" min="0" style="width:56px;text-align:center">
+        <button onclick="editFieldChange('${cat.key}',1)" style="width:32px;height:32px;border-radius:50%;background:var(--orange);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">+</button>
+      </div>
     </div>`).join('');
   document.getElementById('editModal').classList.add('open');
 }
 function fecharEdit() { document.getElementById('editModal').classList.remove('open'); editingRegisto = null; }
+function editFieldChange(key, delta) {
+  const el = document.getElementById('editField_' + key);
+  if (!el) return;
+  const newVal = Math.max(0, (parseInt(el.value) || 0) + delta);
+  el.value = newVal;
+}
 
 async function guardarEdicao() {
   if (editingRegisto === null) return;
@@ -2186,7 +2238,7 @@ async function guardarEdicao() {
     const url = encodeURIComponent(SHEETS_URL);
     const res = await fetch(proxy + url, { method:'POST', body: JSON.stringify({action:'editRegisto', rowIndex: editingRegisto+2, data: updated}) });
     const result = await res.json();
-    showToast(result.success ? '✓ Registo atualizado' : '⚠️ Erro ao guardar');
+    showToast(result.success ? '✓ Registo atualizado' : '⚠️ Erro ao guardar', 2500);
     todosRegistos[editingRegisto] = updated;
     if (dadosTab === 'editar') renderRegistosEditar();
     if (dadosTab === 'colaborador') renderRegistosColaborador();
