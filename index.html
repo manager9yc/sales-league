@@ -365,7 +365,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .sp-sub{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;letter-spacing:6px;text-transform:uppercase;color:var(--orange);margin-top:12px;}
 .sp-bar-wrap{background:var(--orange);margin-top:28px;padding:10px 32px;display:inline-flex;align-items:center;gap:12px;}
 .sp-bar-wrap span{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:4px;color:#fff;}
-.sp-progress{width:220px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin-top:20px;overflow:hidden;}
+.sp-progress{width:220px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin-top:20px;overflow:hidden;margin-left:auto;margin-right:auto;}
 .sp-progress-fill{height:100%;background:#fff;border-radius:2px;width:0%;transition:width 0.1s linear;}
 .sp-btn{margin-top:18px;background:transparent;border:1.5px solid rgba(255,255,255,0.25);border-radius:10px;padding:12px 28px;color:rgba(255,255,255,0.7);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;}
 .sp-btn:hover,.sp-btn:active{border-color:var(--orange);color:#fff;}
@@ -593,7 +593,15 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
       <div class="modal-list" id="modalList"></div>
     </div>
   </div>
-  <div class="dash-inner" id="dashInner" style="display:none;max-width:900px;margin:0 auto"></div>
+  <div id="dashInner" style="max-width:900px;margin:0 auto;padding:0 16px 60px">
+    <div style="text-align:center;padding:48px 20px 32px">
+      <div style="font-size:56px;margin-bottom:16px;animation:trophyBounce 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards">📊</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#fff;margin-bottom:8px">O teu perfil</div>
+      <div style="font-size:14px;color:var(--muted);margin-bottom:28px">Seleciona um vendedor para ver o seu dashboard completo</div>
+    </div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Destaques do mês</div>
+    <div id="dashDefaultStats"></div>
+  </div>
 </div>
 
 
@@ -1427,20 +1435,47 @@ let dashAllDados = [];
 async function carregarDashboard() {
   const todosNomes = [...new Set(equipas.flatMap(e=>e.nomes))];
   buildVgrid(todosNomes.map(n=>({nome:n})));
-  const di = document.getElementById('dashInner');
-  di.style.display = 'block';
-  di.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">⏳</div><p>A carregar dados...</p></div>';
   try {
     const proxy = 'https://corsproxy.io/?';
     const url = encodeURIComponent(SHEETS_URL + '?action=getTodos');
     const res = await fetch(proxy + url);
     dashAllDados = await res.json();
     if (!Array.isArray(dashAllDados)) dashAllDados = [];
-    di.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">📊</div><p>Clica num vendedor para ver o perfil</p></div>';
+    renderDashDefault();
   } catch(e) {
     dashAllDados = [];
-    di.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">⚠️</div><p>Erro ao carregar dados.</p></div>';
   }
+}
+
+function renderDashDefault() {
+  const el = document.getElementById('dashDefaultStats');
+  if (!el || !dashAllDados.length) return;
+  const mesAtual = new Date().getMonth();
+  const anoAtual = new Date().getFullYear();
+  const dadosMes = dashAllDados.filter(d => {
+    const dt = new Date(d.data||'');
+    return !isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual;
+  });
+  if (!dadosMes.length) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;font-style:italic">Sem registos este mês ainda</div>'; return; }
+  const agg = {};
+  dadosMes.forEach(d => {
+    if (!agg[d.nome]) agg[d.nome] = {nome:d.nome,onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0};
+    categorias.forEach(cat => { agg[d.nome][cat.key] += (d[cat.key]||0); });
+  });
+  const vendedores = Object.values(agg);
+  let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">';
+  categorias.forEach(cat => {
+    const top = [...vendedores].sort((a,b)=>b[cat.key]-a[cat.key])[0];
+    if (!top || top[cat.key]===0) return;
+    html += `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;position:relative;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--orange)"></div><div style="font-size:18px;margin-bottom:4px">${cat.emoji}</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">${cat.label}</div><div style="font-size:13px;font-weight:600;color:#fff">${top.nome.split(' ')[0]}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--orange)">${top[cat.key]}</div></div>`;
+  });
+  html += '</div>';
+  const hoje5 = new Date().toISOString().split('T')[0];
+  const hojeCount = dadosMes.filter(d=>d.data===hoje5).length;
+  if (hojeCount > 0) {
+    html += `<div style="background:rgba(255,107,0,0.06);border:1px solid rgba(255,107,0,0.2);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px"><span style="font-size:28px">📋</span><div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--orange);line-height:1">${hojeCount}</div><div style="font-size:12px;color:var(--muted)">registo${hojeCount>1?'s':''} hoje</div></div></div>`;
+  }
+  el.innerHTML = html;
 }
 
 
