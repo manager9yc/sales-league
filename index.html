@@ -518,9 +518,9 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .surprise-box-lid.open { transform: rotate(-65deg) translateY(-20px); }
 .surprise-box-lid-ribbon { width: 28px; height: 100%; background: rgba(255,255,255,0.3); border-radius: 4px; }
 .surprise-bow { position: absolute; top: -24px; left: 50%; transform: translateX(-50%); font-size: 36px; }
-.surprise-content { position: absolute; top: 60px; left: 50%; transform: translateX(-50%) translateY(20px); opacity: 0; transition: all 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.3s; text-align: center; width: 200px; pointer-events: none; }
-.surprise-content.show { opacity: 1; transform: translateX(-50%) translateY(-60px); }
-.surprise-content-icon { font-size: 64px; display: block; }
+.surprise-content { position: absolute; top: 50px; left: 50%; transform: translateX(-50%) translateY(20px); opacity: 0; transition: all 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.3s; text-align: center; width: 220px; pointer-events: none; }
+.surprise-content.show { opacity: 1; transform: translateX(-50%) translateY(-80px); }
+.surprise-content-icon { font-size: 96px; display: block; line-height: 1; }
 .surprise-content-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: #fff; letter-spacing: 2px; margin-top: 4px; }
 .surprise-hint { font-size: 13px; color: rgba(255,255,255,0.4); text-align: center; margin-top: 8px; letter-spacing: 1px; }
 .surprise-hint.hidden { opacity: 0; }
@@ -2330,13 +2330,17 @@ function toggleGestaoLista() {
 // ── SURPRISE BOX ──
 const surprisePrizes = [
   { icon: '🍫', text: 'Um chocolate!' },
-  { icon: '🍫', text: 'Um chocolate!' },
-  { icon: '🍫', text: 'Um chocolate!' },
+  { icon: '☕', text: 'Um café!' },
+  { icon: '🍬', text: 'Um saco de gomas!' },
+  { icon: '🧃', text: 'Um sumo!' },
 ];
 
 let surpriseOpened = false;
 
 function mostrarSurprise(nome, medalha) {
+  // Only show once per device per medal
+  const key = 'surpriseShown_' + nome + '_' + medalha;
+  try { if (localStorage.getItem(key)) return; localStorage.setItem(key, '1'); } catch(e) {}
   surpriseOpened = false;
   document.getElementById('surpriseNome').textContent = nome + ' · ' + medalha;
   document.getElementById('surpriseLid').classList.remove('open');
@@ -2523,7 +2527,9 @@ setTimeout(mostrarInstallPopup, 3000);
     <div class="surprise-box">
       <div class="surprise-content" id="surpriseContent">
         <span class="surprise-content-icon" id="surpriseIcon">🍫</span>
-        <div class="surprise-content-text" id="surpriseContentText">Chocolate!</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#FFD700;letter-spacing:3px;margin-top:8px">Ganhaste!</div>
+        <div class="surprise-content-text" id="surpriseContentText">Um chocolate!</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:6px;letter-spacing:1px;line-height:1.4;max-width:160px">Solicita o teu prémio<br>a um membro da Direção</div>
       </div>
       <div class="surprise-box-bottom">
         <div class="surprise-box-ribbon-v"></div>
