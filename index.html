@@ -1708,39 +1708,27 @@ function mostrarDash(nome) {
         <div style="position:absolute;bottom:0;left:0;right:0;display:flex;gap:10px">
           ${(()=>{
           const hoje=new Date();
-          const startOfYear=new Date(hoje.getFullYear(),0,1);
-          const weekNum=Math.ceil((((hoje-startOfYear)/86400000)+startOfYear.getDay()+1)/7);
+          const startCommercial=new Date(hoje.getFullYear(),1,1); // Feb 1
+          const diffDays=Math.floor((hoje-startCommercial)/86400000);
+          const weekNum=Math.max(1,Math.ceil(diffDays/7));
           return [weekNum-3,weekNum-2,weekNum-1,weekNum].map((w,i)=>`<div style="flex:1;font-size:10px;color:var(--muted);text-align:center">Sem ${w>0?w:1}${i===3?' ▶':''}</div>`).join('');
         })()}
         </div>
       </div>
     </div>
 
-    <div class="d-slabel" style="display:flex;align-items:center;justify-content:space-between">
-      <span>Comparação com a loja</span>
-      <select id="compararCat" onchange="mostrarDash(vendedorAtual)" style="background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:3px 8px;color:var(--text);font-size:11px;outline:none;">
-        ${categorias.map(cat=>`<option value="${cat.key}">${cat.emoji} ${cat.label}</option>`).join('')}
-      </select>
-    </div>
-    <div class="d-card">
-      <div class="d-card-title">Top 8 — ${categorias.find(c=>c.key===(document.getElementById('compararCat')?.value||'onlines'))?.label||'Onlines'}</div>
-      ${(()=>{
-        const catKey = document.getElementById('compararCat')?.value || 'onlines';
-        const compRankCat = [...new Set(dashAllDados.map(d=>d.nome))]
-          .map(n=>({n, v:dashAllDados.reduce((s,d)=>d.nome===n?s+(d[catKey]||0):s,0)}))
-          .sort((a,b)=>b.v-a.v).slice(0,8);
-        const maxOCat = compRankCat[0]?.v||1;
-        return compRankCat.map((item,i)=>{
-          const hi=item.n===nome;
-          const pct=Math.round(item.v/maxOCat*100);
-          return `<div class="d-crow">
-            <div class="d-cpos ${hi?'hi':''}">${i+1}º</div>
-            <div class="d-cnom ${hi?'hi':''}">${item.n.split(' ')[0]}</div>
-            <div class="d-cbarwrap"><div class="d-cbarfill ${hi?'hi':''}" style="width:${pct}%"></div></div>
-            <div class="d-cscore ${hi?'hi':''}">${item.v}</div>
-          </div>`;
-        }).join('');
-      })()}
+    <div class="d-slabel">Comparar com outro vendedor</div>
+    <div class="d-card" id="compareCard_${nome.replace(/ /g,'_')}">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+        <select id="compareWith_${nome.replace(/ /g,'_')}" onchange="renderCompare('${nome.replace(/'/g,"\\'")}', this.value)" style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;">
+          <option value="">Seleciona um vendedor...</option>
+          ${[...new Set(equipas.flatMap(e=>e.nomes))].filter(n=>n!==nome).sort().map(n=>`<option value="${n}">${n}</option>`).join('')}
+        </select>
+        <select id="compareCat_${nome.replace(/ /g,'_')}" onchange="renderCompare('${nome.replace(/'/g,"\\'")}', document.getElementById('compareWith_${nome.replace(/ /g,'_')}').value)" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;">
+          ${categorias.map(cat=>`<option value="${cat.key}">${cat.emoji} ${cat.label}</option>`).join('')}
+        </select>
+      </div>
+      <div id="compareResult_${nome.replace(/ /g,'_')}" style="color:var(--muted);font-size:13px;text-align:center;padding:8px">Seleciona um vendedor para comparar</div>
     </div>    </div>
 
     <div class="d-slabel">Histórico por mês</div>
@@ -2509,6 +2497,49 @@ function lancarConfettiSurprise() {
     el.style.cssText = `position:absolute;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>0.5?'50%':'2px'};background:${cols[Math.floor(Math.random()*cols.length)]};left:${Math.random()*100}%;top:-10px;animation:confettiFall ${1.5+Math.random()}s ease-out ${Math.random()*0.8}s forwards;`;
     wrap.appendChild(el);
   }
+}
+
+function renderCompare(nomeA, nomeB) {
+  const idA = nomeA.replace(/ /g,'_');
+  const catKey = document.getElementById('compareCat_'+idA)?.value || 'onlines';
+  const cat = categorias.find(c=>c.key===catKey) || categorias[0];
+  const el = document.getElementById('compareResult_'+idA);
+  if (!el || !nomeB) { if(el) el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:8px">Seleciona um vendedor para comparar</div>'; return; }
+
+  const getTotal = (nome, key) => dashAllDados.filter(d=>d.nome===nome).reduce((s,d)=>s+(d[key]||0),0);
+  const valA = getTotal(nomeA, catKey);
+  const valB = getTotal(nomeB, catKey);
+  const maxV = Math.max(valA, valB, 1);
+
+  const fotoA = getFoto(nomeA);
+  const fotoB = getFoto(nomeB);
+  const avatarA = fotoA ? `<img src="${fotoA}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--orange)">` : `<div style="width:36px;height:36px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff">${nomeA.split(' ').map(x=>x[0]).slice(0,2).join('')}</div>`;
+  const avatarB = fotoB ? `<img src="${fotoB}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">` : `<div style="width:36px;height:36px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--text)">${nomeB.split(' ').map(x=>x[0]).slice(0,2).join('')}</div>`;
+
+  const winner = valA > valB ? 'A' : valB > valA ? 'B' : 'tie';
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div style="flex:1;text-align:center">
+        ${avatarA}
+        <div style="font-size:11px;font-weight:600;color:var(--orange);margin-top:4px">${nomeA.split(' ')[0]}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--orange);line-height:1">${valA}</div>
+        ${winner==='A'?'<div style="font-size:10px;color:var(--orange)">🏆 Vencedor</div>':''}
+      </div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--muted);padding:0 4px">${cat.emoji}<br>VS</div>
+      <div style="flex:1;text-align:center">
+        ${avatarB}
+        <div style="font-size:11px;font-weight:600;color:var(--text);margin-top:4px">${nomeB.split(' ')[0]}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--text);line-height:1">${valB}</div>
+        ${winner==='B'?'<div style="font-size:10px;color:var(--orange)">🏆 Vencedor</div>':''}
+      </div>
+    </div>
+    <div style="display:flex;gap:4px">
+      <div style="height:8px;background:var(--orange);border-radius:4px;transition:width 0.8s ease;width:${Math.round(valA/maxV*100)}%;min-width:4px"></div>
+      <div style="height:8px;background:var(--card2);border-radius:4px;flex:1"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:3px"><span>${nomeA.split(' ')[0]}</span><span>${nomeB.split(' ')[0]}</span></div>
+  `;
 }
 
 // ── INSTALL PROMPT ──
