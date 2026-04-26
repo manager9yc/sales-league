@@ -2201,10 +2201,14 @@ async function executarApagarMes() {
     const res = await fetch(proxy + url, { method:'POST', body: JSON.stringify({action:'apagarMes', mes: mesAtual, ano: anoAtual}) });
     const result = await res.json();
     showToast(result.success ? '✓ Mês apagado (' + (result.deleted||0) + ' registos)' : '⚠️ Erro ao apagar');
-    todosRegistos = todosRegistos.filter(r => {
-      const dt = new Date(r.data||'');
-      return !(dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual);
-    });
+    if (result.success) {
+      // Clear caches
+      todosRegistos = [];
+      dashAllDados = [];
+      window._rankingCache = null;
+      // Reload ranking if visible
+      if (document.getElementById('screen-ranking').classList.contains('active')) carregarRanking();
+    }
   } catch(e) { showToast('⚠️ Erro ao apagar'); }
 }
 
@@ -2216,8 +2220,13 @@ async function executarApagarColaborador(nome) {
     const res = await fetch(proxy + url, { method:'POST', body: JSON.stringify({action:'apagarColaborador', nome}) });
     const result = await res.json();
     showToast(result.success ? '✓ Registos apagados (' + (result.deleted||0) + ')' : '⚠️ Erro ao apagar');
-    todosRegistos = todosRegistos.filter(r => r.nome !== nome);
-    renderRegistosColaborador();
+    if (result.success) {
+      todosRegistos = todosRegistos.filter(r => r.nome !== nome);
+      dashAllDados = dashAllDados.filter(r => r.nome !== nome);
+      window._rankingCache = null;
+      if (document.getElementById('screen-ranking').classList.contains('active')) carregarRanking();
+      renderRegistosColaborador();
+    }
   } catch(e) { showToast('⚠️ Erro ao apagar'); }
 }
 
