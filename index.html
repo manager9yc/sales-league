@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
 <title>Sales League 2026 — Sport Zone</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sales League">
+<meta name="theme-color" content="#FF6B00">
+<link rel="manifest" href="data:application/json,{%20%20%22name%22:%20%22Sales%20League%20VDG%22,%20%20%22short_name%22:%20%22Sales%20League%22,%20%20%22start_url%22:%20%22.%22,%20%20%22display%22:%20%22standalone%22,%20%20%22background_color%22:%20%22#0C0C0C%22,%20%20%22theme_color%22:%20%22#FF6B00%22,%20%20%22icons%22:%20[{%22src%22:%20%22data:image/svg+xml,%3Csvg%20xmlns=\'http://www.w3.org/2000/svg\'%20viewBox=\'0%200%20100%20100\'%3E%3Crect%20width=\'100\'%20height=\'100\'%20fill=\'%23FF6B00\'/%3E%3Ctext%20y=\'.9em\'%20font-size=\'80\'%3E%F0%9F%8F%86%3C/text%3E%3C/svg%3E%22,%20%22sizes%22:%20%22192x192%22,%20%22type%22:%20%22image/svg+xml%22}]}">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -16,12 +22,12 @@
   --muted: #999;
   --text: #f0f0f0;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
+* { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
 
 /* NAV */
 .nav { display: flex; background: #0a0a0a; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 100; }
-.nav-btn { flex: 1; padding: 15px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); border: none; background: transparent; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }
+.nav-btn { flex: 1; padding: 10px 4px 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); border: none; background: transparent; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .nav-btn.active { color: #fff; border-bottom-color: var(--orange); }
 
 /* SCREENS */
@@ -71,7 +77,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .prod-hint { font-size: 11px; color: var(--muted); margin-top: 1px; }
 
 .counter { display: flex; align-items: center; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
-.cbtn { width: 38px; height: 38px; background: transparent; border: none; color: var(--text); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.1s; }
+.cbtn { width: 38px; height: 38px; background: transparent; border: none; color: var(--text); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.1s; -webkit-user-select: none; user-select: none; }
 .cbtn:active { background: var(--border); }
 .cbtn.minus { color: var(--muted); }
 .cbtn.plus { color: var(--orange); }
@@ -341,15 +347,126 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .pin-key:active { background:var(--orange); border-color:var(--orange); transform:scale(0.95); }
 .pin-key.del { font-size:18px; color:var(--muted); }
 .pin-error { color:#FF4444; font-size:13px; margin-top:12px; min-height:18px; }
+
+/* SPLASH */
+.splash{position:fixed;inset:0;z-index:9999;background:var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;transition:opacity 0.6s ease;}
+.splash.out{opacity:0;pointer-events:none;}
+.splash.hidden{display:none;}
+.sp-slash{position:absolute;background:var(--orange);}
+.ss1{width:4px;height:200%;top:-50%;left:18%;transform:rotate(20deg);opacity:.12;}
+.ss2{width:8px;height:200%;top:-50%;left:23%;transform:rotate(20deg);opacity:.06;}
+.ss3{width:4px;height:200%;top:-50%;right:18%;transform:rotate(-20deg);opacity:.12;}
+.ss4{width:8px;height:200%;top:-50%;right:23%;transform:rotate(-20deg);opacity:.06;}
+.ss5{width:140px;height:4px;top:28%;left:-5%;transform:rotate(20deg);opacity:.18;}
+.sp-inner{position:relative;z-index:2;}
+.sp-pre{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:16px;}
+.sp-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(64px,18vw,110px);color:#fff;line-height:0.9;letter-spacing:3px;text-shadow:0 4px 0 rgba(0,0,0,0.3),0 0 40px rgba(255,107,0,0.4);animation:splashIn 0.8s cubic-bezier(0.34,1.2,0.64,1) forwards;}
+@keyframes splashIn{from{opacity:0;transform:scale(0.8) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.sp-sub{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;letter-spacing:6px;text-transform:uppercase;color:var(--orange);margin-top:12px;}
+.sp-bar-wrap{background:var(--orange);margin-top:28px;padding:10px 32px;display:inline-flex;align-items:center;gap:12px;}
+.sp-bar-wrap span{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:4px;color:#fff;}
+.sp-progress{width:220px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin-top:20px;overflow:hidden;}
+.sp-progress-fill{height:100%;background:#fff;border-radius:2px;width:0%;transition:width 0.1s linear;}
+.sp-btn{margin-top:18px;background:transparent;border:1.5px solid rgba(255,255,255,0.25);border-radius:10px;padding:12px 28px;color:rgba(255,255,255,0.7);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;}
+.sp-btn:hover,.sp-btn:active{border-color:var(--orange);color:#fff;}
+.sp-particles{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.sp-particle{position:absolute;border-radius:50%;background:var(--orange);opacity:0;animation:particleFloat linear infinite;}
+@keyframes particleFloat{0%{opacity:0;transform:translateY(100vh) scale(0)}10%{opacity:0.7}90%{opacity:0.3}100%{opacity:0;transform:translateY(-20px) scale(1)}}
+
+/* MEDAL POPUP */
+.medal-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-40%);background:linear-gradient(135deg,#FF6B00,#FF8C00);border-radius:20px;padding:24px 32px;text-align:center;z-index:8888;min-width:280px;max-width:90vw;opacity:0;pointer-events:none;transition:opacity 0.4s ease,transform 0.45s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 16px 50px rgba(255,107,0,0.6);}
+.medal-popup.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%);}
+.medal-popup-trophy{font-size:56px;display:block;margin-bottom:10px;}
+.medal-popup-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#fff;display:block;margin-bottom:6px;}
+.medal-popup-sub{font-size:14px;color:rgba(255,255,255,0.9);}
+.medal-confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:20px;}
+.medal-dot{position:absolute;width:8px;height:8px;border-radius:2px;animation:mDotFall 1.5s ease-out forwards;}
+.medal-star{position:absolute;animation:mStarFloat 1.3s ease-out forwards;font-size:18px;pointer-events:none;}
+@keyframes trophyBounce{0%{transform:scale(0) rotate(-20deg);opacity:0}60%{transform:scale(1.3) rotate(5deg)}80%{transform:scale(0.9)}100%{transform:scale(1);opacity:1}}
+@keyframes mStarFloat{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(-70px) rotate(360deg)}}
+@keyframes mDotFall{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(90px) rotate(720deg);opacity:0}}
+.trophy-anim{animation:trophyBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards;}
+
+/* RANKING COUNTDOWN */
+.rank-countdown{background:rgba(255,255,255,0.12);border-radius:20px;padding:4px 12px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;white-space:nowrap;}
+
+/* RANKING ANIMATION */
+.rank-table tbody tr{opacity:0;transform:translateY(8px);}
+.rank-table tbody tr.row-visible{opacity:1;transform:translateY(0);transition:opacity 0.35s ease,transform 0.35s ease;}
+
+/* LEVEL + STREAK */
+.nivel-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px;}
+.nivel-bronze{background:rgba(205,127,50,0.15);border:1px solid rgba(205,127,50,0.4);color:#CD7F32;}
+.nivel-silver{background:rgba(192,192,192,0.15);border:1px solid rgba(192,192,192,0.4);color:#C0C0C0;}
+.nivel-gold{background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.4);color:#FFD700;}
+.nivel-diamond{background:rgba(100,200,255,0.15);border:1px solid rgba(100,200,255,0.4);color:#64C8FF;}
+.streak-card{background:linear-gradient(135deg,rgba(255,107,0,0.12),rgba(255,107,0,0.03));border:1px solid rgba(255,107,0,0.25);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+
+/* LAST REGISTO */
+.last-reg-bar{background:rgba(255,107,0,0.06);border:1px solid rgba(255,107,0,0.2);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+
+/* TEAM COMPARE */
+.team-bar-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.team-bar-row:last-child{border-bottom:none;}
+.team-bar-name{font-size:13px;font-weight:600;width:110px;flex-shrink:0;}
+.team-bar-bg{flex:1;height:20px;background:var(--card2);border-radius:4px;overflow:hidden;}
+.team-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--orange),var(--orange2));transition:width 1.2s ease;}
+.team-bar-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text);width:36px;text-align:right;flex-shrink:0;}
+
+/* ADMIN SUMMARY */
+.admin-sum-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;}
+@media(min-width:500px){.admin-sum-grid{grid-template-columns:repeat(4,1fr);}}
+.admin-sum-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;}
+.admin-sum-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--orange);}
+.admin-sum-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.top3-row{display:flex;align-items:center;gap:10px;padding:10px;background:var(--card2);border-radius:10px;margin-bottom:6px;}
+.top3-pos{font-size:20px;width:28px;flex-shrink:0;}
+.top3-name{font-size:14px;font-weight:600;flex:1;}
+.top3-score{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);}
+
+/* INSTALL POPUP */
+.install-popup { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 2px solid var(--orange); padding: 20px; z-index: 10000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.34,1.2,0.64,1); }
+.install-popup.show { transform: translateY(0); }
+.install-popup-inner { max-width: 500px; margin: 0 auto; }
+.install-popup-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: #fff; margin-bottom: 4px; }
+.install-popup-sub { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+.install-popup-ios { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 13px; color: var(--text); line-height: 1.6; margin-bottom: 14px; }
+.install-popup-btns { display: flex; gap: 8px; }
+.install-popup-btn-main { flex: 1; background: var(--orange); border: none; border-radius: 10px; padding: 12px; color: #fff; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 2px; cursor: pointer; }
+.install-popup-btn-close { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; color: var(--muted); font-size: 13px; cursor: pointer; }
 </style>
 </head>
 <body>
 
+<!-- SPLASH -->
+<div class="splash" id="splash">
+  <div class="sp-particles" id="spParticles"></div>
+  <div class="sp-slash ss1"></div><div class="sp-slash ss2"></div>
+  <div class="sp-slash ss3"></div><div class="sp-slash ss4"></div>
+  <div class="sp-slash ss5"></div>
+  <div class="sp-inner">
+    <div class="sp-pre">Sport Zone · Vasco da Gama</div>
+    <div class="sp-title">SALES<br>LEAGUE</div>
+    <div class="sp-sub">Liga Vasco da Gama · 2026</div>
+    <div class="sp-bar-wrap"><span>Maio 2026</span></div>
+    <div class="sp-progress"><div class="sp-progress-fill" id="splashBar"></div></div>
+    <button class="sp-btn" onclick="fecharSplash()">Entrar →</button>
+  </div>
+</div>
+
+<!-- MEDAL POPUP -->
+<div class="medal-popup" id="medalPopup">
+  <div class="medal-confetti" id="medalConfetti"></div>
+  <span class="medal-popup-trophy" id="medalTrophy">🏆</span>
+  <span class="medal-popup-title" id="medalTitle">Nome</span>
+  <div class="medal-popup-sub" id="medalSub">Medalha</div>
+</div>
+
 <div class="nav">
-  <button class="nav-btn active" onclick="goTo('form',this)">📋 Registo</button>
-  <button class="nav-btn" onclick="goTo('ranking',this)">🏆 Ranking</button>
-  <button class="nav-btn" onclick="goTo('dash',this)">📊 Dashboard</button>
-  <button class="nav-btn" onclick="goTo('admin',this)">⚙️ Admin</button>
+  <button class="nav-btn active" onclick="goTo('form',this)"><span style="font-size:16px">📋</span><span>Registo</span></button>
+  <button class="nav-btn" onclick="goTo('ranking',this)"><span style="font-size:16px">🏆</span><span>Ranking</span></button>
+  <button class="nav-btn" onclick="goTo('dash',this)"><span style="font-size:16px">📊</span><span>Dashboard</span></button>
+  <button class="nav-btn" onclick="goTo('admin',this)"><span style="font-size:16px">⚙️</span><span>Admin</span></button>
 </div>
 
 <!-- FORM -->
@@ -369,6 +486,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
   </div>
   <div class="form-wrap">
     <div class="form-main" id="formMain">
+      <div class="last-reg-bar" id="lastRegBar" style="display:none"></div>
       <div class="sec-label">Dia</div>
       <div class="card">
         <div class="date-row">
@@ -384,16 +502,16 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
       </div>
       <div class="sec-label">Vendas do dia</div>
       <div class="card">
-        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🖥️</div><div><div class="prod-name">Onlines</div><div class="prod-hint">Vendas online registadas</div></div></div><div class="counter"><button class="cbtn minus" onclick="change('onlines',-1)">−</button><div class="cval" id="onlines">0</div><button class="cbtn plus" onclick="change('onlines',1)">+</button></div></div>
-        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🧴</div><div><div class="prod-name">Sprays</div><div class="prod-hint">Limpeza, Desodorizante e Impermeabilizante</div></div></div><div class="counter"><button class="cbtn minus" onclick="change('sprays',-1)">−</button><div class="cval" id="sprays">0</div><button class="cbtn plus" onclick="change('sprays',1)">+</button></div></div>
-        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🦶</div><div><div class="prod-name">Palmilhas</div><div class="prod-hint">Excepto Fila</div></div></div><div class="counter"><button class="cbtn minus" onclick="change('palmilhas',-1)">−</button><div class="cval" id="palmilhas">0</div><button class="cbtn plus" onclick="change('palmilhas',1)">+</button></div></div>
-        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">⚽</div><div><div class="prod-name">Camisolas Oficiais</div><div class="prod-hint">Futebol oficial</div></div></div><div class="counter"><button class="cbtn minus" onclick="change('camisolas',-1)">−</button><div class="cval" id="camisolas">0</div><button class="cbtn plus" onclick="change('camisolas',1)">+</button></div></div>
-        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🛍️</div><div><div class="prod-name">Sacos Reutilizáveis</div><div class="prod-hint">Eco bags</div></div></div><div class="counter"><button class="cbtn minus" onclick="change('sacos',-1)">−</button><div class="cval" id="sacos">0</div><button class="cbtn plus" onclick="change('sacos',1)">+</button></div></div>
-        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">💧</div><div><div class="prod-name">Garrafas</div><div class="prod-hint">Garrafas da liga de vendas</div></div></div><div class="counter"><button class="cbtn minus" onclick="change('garrafas',-1)">−</button><div class="cval" id="garrafas">0</div><button class="cbtn plus" onclick="change('garrafas',1)">+</button></div></div>
+        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🖥️</div><div><div class="prod-name">Onlines</div><div class="prod-hint">Vendas online registadas</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('onlines',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="onlines">0</div><button class="cbtn plus" onmousedown="startChange('onlines',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',1,event)" ontouchend="stopChange()">+</button></div></div>
+        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🧴</div><div><div class="prod-name">Sprays</div><div class="prod-hint">Limpeza, Desodorizante e Impermeabilizante</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('sprays',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sprays',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="sprays">0</div><button class="cbtn plus" onmousedown="startChange('sprays',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sprays',1,event)" ontouchend="stopChange()">+</button></div></div>
+        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🦶</div><div><div class="prod-name">Palmilhas</div><div class="prod-hint">Excepto Fila</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('palmilhas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('palmilhas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="palmilhas">0</div><button class="cbtn plus" onmousedown="startChange('palmilhas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('palmilhas',1,event)" ontouchend="stopChange()">+</button></div></div>
+        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">⚽</div><div><div class="prod-name">Camisolas Oficiais</div><div class="prod-hint">Futebol oficial</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('camisolas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('camisolas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="camisolas">0</div><button class="cbtn plus" onmousedown="startChange('camisolas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('camisolas',1,event)" ontouchend="stopChange()">+</button></div></div>
+        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🛍️</div><div><div class="prod-name">Sacos Reutilizáveis</div><div class="prod-hint">Eco bags</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('sacos',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sacos',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="sacos">0</div><button class="cbtn plus" onmousedown="startChange('sacos',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sacos',1,event)" ontouchend="stopChange()">+</button></div></div>
+        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">💧</div><div><div class="prod-name">Garrafas</div><div class="prod-hint">Garrafas da liga de vendas</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('garrafas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="garrafas">0</div><button class="cbtn plus" onmousedown="startChange('garrafas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',1,event)" ontouchend="stopChange()">+</button></div></div>
       </div>
       <div class="sec-label">Elogios recebidos</div>
       <div class="card">
-        <div class="prod-row" style="padding:0"><div class="prod-info"><div class="prod-emoji">⭐</div><div><div class="prod-name">Elogios</div><div class="prod-hint">Escritos ou Google Reviews</div></div></div><div class="counter"><button class="cbtn minus" onclick="change('elogios',-1)">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onclick="change('elogios',1)">+</button></div></div>
+        <div class="prod-row" style="padding:0"><div class="prod-info"><div class="prod-emoji">⭐</div><div><div class="prod-name">Elogios</div><div class="prod-hint">Escritos ou Google Reviews</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div></div>
       </div>
       <button class="submit-btn" id="submitBtn" onclick="submeter()">Registar o meu dia →</button>
     </div>
@@ -404,7 +522,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
         <h2 style="margin-top:10px">Registo Guardado!</h2>
         <p id="successNomeLabel" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);letter-spacing:2px;margin:6px 0 4px"></p>
         <p style="color:var(--muted);font-size:13px">Boas vendas hoje 💪</p>
-        <div id="successCountdown" style="margin-top:12px;font-size:12px;color:var(--muted)"></div>
+        
       </div>
       <!-- METAS E MEDALHAS -->
       <div style="padding:20px 16px 0;max-width:900px;margin:0 auto">
@@ -423,9 +541,10 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
       <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,14vw,96px);font-weight:900;color:#fff;line-height:0.95;letter-spacing:2px">SALES<br>LEAGUE</div>
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-top:6px">Vasco da Gama</div>
     </div>
-    <div style="background:#FF6B00;margin-top:20px;padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:16px">
+    <div style="background:#FF6B00;margin-top:20px;padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
       <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;color:#fff;text-transform:uppercase">Maio 2026</span>
+      <span class="rank-countdown" id="rankCountdown"></span>
       <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
     </div>
   </div>
@@ -547,8 +666,8 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 <script>
 const equipas = [
   { id:'calcado',   label:'👟 Calçado',   nomes:['António Pinto','Ariana Santos','Vasco Tavares','Yorky Reyes','Miguel Viegas','João Ferreira','João Paiva','Mariana Pereira','Beatriz Rosa','Ricardo Esteves','Jorge Teixeira','Ricardo Eusébio','Rodrigo Araújo','Rodrigo Santos'] },
-  { id:'textil',    label:'👕 Têxtil',    nomes:['Mariana Lourenço','Beatriz Carreiro','Catarina Cardoso','Lara Ferreira','Mariana Vieira','Catarina Tavares','Diana Bernardo','Ana Morais','Daniela Correia'] },
   { id:'caixa',     label:'🧾 Caixa',     nomes:['Nicole Pinto','Ricardo Pereira','Rafaela Gomes','Beatriz Cruz','Núria Correia','Leandra Ricardo','Beatriz Jerónimo','Diogo Porfírio','Edgar Castro','Maria Coelho'] },
+  { id:'textil',    label:'👕 Têxtil',    nomes:['Mariana Lourenço','Beatriz Carreiro','Catarina Cardoso','Lara Ferreira','Mariana Vieira','Catarina Tavares','Diana Bernardo','Ana Morais','Daniela Correia'] },
   { id:'logistica', label:'📦 Logística', nomes:['Palmira Camilo','Ana Rodrigues','Zezita Segunda','Tânia Coutinho','Tiago Pinto','Sana Branta','Elisabete Oliveira','Luís Pereira','Bruna Araújo'] },
   { id:'sup',       label:'🎯 Direção',   nomes:['Dário Santos','Carla Frade','Susana Morgado','André Louro','Sérgio Correia','Diogo Silva','Soraia Alves','Tânia Costa','Florisbela Tavares','Ana Ferreira'] }
 ];
@@ -609,6 +728,7 @@ function selectName(btn) {
   document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   nomeSel = btn.textContent;
+  mostrarUltimoRegisto(nomeSel);
 }
 
 function change(campo, delta) {
@@ -662,21 +782,7 @@ async function submeter() {
   if (snl) snl.textContent = nomeSel.toUpperCase();
   mostrarProgressoRegisto(nomeSel, payload);
 
-  // Countdown to ranking
-  let secs = 20;
-  const cdEl = document.getElementById('successCountdown');
-  cdEl.textContent = 'A abrir o ranking em ' + secs + 's...';
-  const cdInterval = setInterval(() => {
-    secs--;
-    if (secs > 0) {
-      cdEl.textContent = 'A abrir o ranking em ' + secs + 's...';
-    } else {
-      clearInterval(cdInterval);
-      resetForm();
-      const rankBtn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.textContent.includes('Ranking'));
-      if (rankBtn) goTo('ranking', rankBtn);
-    }
-  }, 1000);
+  // Sem redirecionamento automático
 }
 
 function resetForm() {
@@ -726,23 +832,32 @@ function secDiv(icon, title) {
 
 async function carregarRanking() {
   try {
-    const proxy = 'https://corsproxy.io/?';
-    const url = encodeURIComponent(SHEETS_URL + '?action=getRanking');
-    const res = await fetch(proxy + url);
+    const res = await fetch(SHEETS_URL + '?action=getRanking');
     const dados = await res.json();
     renderRanking(Array.isArray(dados) ? dados : []);
   } catch(e) {
-    renderRanking([]);
+    try {
+      const proxy = 'https://corsproxy.io/?';
+      const url = encodeURIComponent(SHEETS_URL + '?action=getRanking');
+      const res2 = await fetch(proxy + url);
+      const dados2 = await res2.json();
+      renderRanking(Array.isArray(dados2) ? dados2 : []);
+    } catch(e2) {
+      renderRanking([]);
+    }
   }
-  // Check for medal winners using full history
   if (dashAllDados.length) verificarMedalhasRanking();
 }
 
 function verificarMedalhasRanking() {
+  if (!dashAllDados.length) return;
+  const hoje4 = new Date().toISOString().split('T')[0];
   const vencedores = [];
   const todosNomes = [...new Set(dashAllDados.map(d=>d.nome))];
   todosNomes.forEach(nome => {
     const dadosNome = dashAllDados.filter(d=>d.nome===nome);
+    const temHoje = dadosNome.some(d=>d.data===hoje4);
+    if (!temHoje) return;
     const medalhas = calcularMedalhas(dadosNome);
     const novasMedalhas = calcularMedalhas(dadosNome).filter(m=>m.earned);
     novasMedalhas.forEach(m => {
@@ -762,6 +877,7 @@ function verificarMedalhasRanking() {
 }
 
 function renderRanking(dados) {
+  calcCountdown();
   const agora = new Date().toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   let html = '';
   let d = 0.05;
@@ -801,12 +917,21 @@ function renderRanking(dados) {
   }).join('') : emptyRows();
   html += catBlock('🏆', 'Registos por Secção', secRows, agora, d);
 
+  // Team compare
+  html += '<div class="slabel" style="margin-top:24px">Por Equipa</div>' + renderTeamCompare(dados);
   document.getElementById('rankMain').innerHTML = html;
+  // Animate rows cascade
+  const rows2 = document.querySelectorAll('.rank-table tbody tr');
+  rows2.forEach((row,i)=>setTimeout(()=>row.classList.add('row-visible'),i*80));
+  // Animate bars and scores
   setTimeout(() => {
     document.querySelectorAll('.bar-fg[data-pct]').forEach(el => {
       el.style.width = el.dataset.pct + '%';
     });
-  }, 120);
+    document.querySelectorAll('.team-bar-fill[data-pct]').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+  }, 150);
 }
 
 
@@ -887,10 +1012,158 @@ function mostrarProgressoRegisto(nome, payload) {
 
   prog.innerHTML = metasHtml;
 
-  // Tocar som se conquistou alguma medalha
+  // Show medal popup for each earned medal
   if (conquistadas.length > 0) {
-    setTimeout(() => tocarSomMedalha(), 600);
+    conquistadas.forEach((m, i) => {
+      setTimeout(() => mostrarMedalPopup(m.icon, nome, m.name), 800 + i*5500);
+    });
   }
+}
+
+
+// ── SPLASH ──
+let splashProg = 0, splashIv = null;
+function iniciarSplash() {
+  const pc = document.getElementById('spParticles');
+  for(let i=0;i<25;i++){
+    const p=document.createElement('div'); p.className='sp-particle';
+    const size = 4+Math.random()*10;
+    p.style.cssText=`left:${Math.random()*100}%;width:${size}px;height:${size}px;animation-duration:${4+Math.random()*7}s;animation-delay:${Math.random()*5}s;`;
+    pc.appendChild(p);
+  }
+  const bar=document.getElementById('splashBar');
+  splashIv=setInterval(()=>{
+    splashProg+=2; bar.style.width=Math.min(splashProg,100)+'%';
+    if(splashProg>=100){clearInterval(splashIv);fecharSplash();}
+  },100);
+}
+function fecharSplash(){
+  clearInterval(splashIv);
+  const s=document.getElementById('splash');
+  s.classList.add('out');
+  setTimeout(()=>s.classList.add('hidden'),600);
+}
+iniciarSplash();
+
+// ── HOLD TO REPEAT ──
+let changeIv=null, changeTo=null;
+function startChange(campo,delta,e){
+  if(e&&e.preventDefault)e.preventDefault();
+  change(campo,delta);
+  changeTo=setTimeout(()=>{changeIv=setInterval(()=>change(campo,delta),80);},350);
+}
+function stopChange(){clearTimeout(changeTo);clearInterval(changeIv);changeTo=null;changeIv=null;}
+
+// ── RANKING COUNTDOWN ──
+function calcCountdown(){
+  const hoje=new Date();
+  const fim=new Date(hoje.getFullYear(),hoje.getMonth()+1,0);
+  const diff=Math.ceil((fim-hoje)/(1000*60*60*24));
+  const el=document.getElementById('rankCountdown');
+  if(el) el.textContent='⏳ Faltam '+diff+' dias';
+}
+
+// ── MEDAL POPUP ──
+let medalTimer=null;
+function mostrarMedalPopup(emoji,nome,medalha){
+  iniciarAudio();
+  tocarSomMedalha();
+  const popup=document.getElementById('medalPopup');
+  const trophy=document.getElementById('medalTrophy');
+  trophy.textContent=emoji;
+  trophy.className='medal-popup-trophy trophy-anim';
+  document.getElementById('medalTitle').textContent=nome;
+  document.getElementById('medalSub').innerHTML='🏅 Conquistou <strong>'+medalha+'</strong>';
+  // Confetti
+  const wrap=document.getElementById('medalConfetti'); wrap.innerHTML='';
+  ['⭐','✨','🌟','💫','⭐','✨'].forEach((s,i)=>{
+    const el=document.createElement('div'); el.className='medal-star'; el.textContent=s;
+    el.style.left=(8+i*15)+'%'; el.style.top='12%'; el.style.animationDelay=(i*0.15)+'s';
+    wrap.appendChild(el);
+  });
+  const cols=['#fff','#FFD700','#FF4444','#44FF88','#4488FF','#FF88FF'];
+  for(let i=0;i<22;i++){
+    const el=document.createElement('div'); el.className='medal-dot';
+    el.style.background=cols[i%cols.length];
+    el.style.left=(5+Math.random()*90)+'%'; el.style.top='-5%';
+    el.style.animationDelay=(Math.random()*0.8)+'s';
+    el.style.animationDuration=(1.2+Math.random()*0.8)+'s';
+    wrap.appendChild(el);
+  }
+  popup.classList.add('show');
+  clearTimeout(medalTimer);
+  medalTimer=setTimeout(()=>popup.classList.remove('show'),5000);
+}
+
+// ── LAST REGISTO ──
+function mostrarUltimoRegisto(nome){
+  if(!dashAllDados.length) return;
+  const dadosNome=dashAllDados.filter(d=>d.nome===nome).sort((a,b)=>new Date(b.data)-new Date(a.data));
+  if(!dadosNome.length) return;
+  const ultimo=dadosNome[0];
+  const dt=new Date(ultimo.data+'T12:00:00');
+  const hoje2=new Date(); hoje2.setHours(0,0,0,0);
+  const diff=Math.round((hoje2-dt)/(1000*60*60*24));
+  const diffLabel=diff===0?'hoje':diff===1?'ontem':diff+' dias atrás';
+  const vals2=categorias.filter(c=>(ultimo[c.key]||0)>0).map(c=>c.emoji+' '+ultimo[c.key]).join(' · ');
+  const bar=document.getElementById('lastRegBar');
+  if(bar){bar.style.display='flex';bar.innerHTML=`<span style="font-size:20px">⏱️</span><div><div style="font-size:14px;font-weight:600">${nome}</div><div style="font-size:12px;color:var(--muted)">Último registo ${diffLabel}${vals2?' · '+vals2:''}</div></div>`;}
+}
+
+// ── STREAK ──
+function calcularStreak(dados){
+  const datas=[...new Set(dados.map(d=>d.data))].sort().reverse();
+  if(!datas.length) return 0;
+  let streak=0;
+  const hoje3=new Date();
+  for(let i=0;i<datas.length;i++){
+    const d=new Date(datas[i]+'T12:00:00');
+    const expected=new Date(hoje3); expected.setDate(expected.getDate()-i);
+    expected.setHours(0,0,0,0);
+    if(d.toDateString()===expected.toDateString()) streak++;
+    else break;
+  }
+  return streak;
+}
+
+// ── NÍVEL ──
+function calcularNivel(total){
+  if(total>=350) return {label:'Diamante',icon:'💎',css:'nivel-diamond'};
+  if(total>=200) return {label:'Ouro',icon:'🥇',css:'nivel-gold'};
+  if(total>=100) return {label:'Prata',icon:'🥈',css:'nivel-silver'};
+  return {label:'Bronze',icon:'🥉',css:'nivel-bronze'};
+}
+
+// ── TEAM COMPARE in ranking ──
+function renderTeamCompare(dados){
+  const eqLabels={calcado:'👟 Calçado',caixa:'🧾 Caixa',textil:'👕 Têxtil',logistica:'📦 Logística',sup:'🎯 Direção'};
+  const n2e={};
+  equipas.forEach(eq=>eq.nomes.forEach(n=>n2e[n]=eq.id));
+  const totEq={};
+  Object.keys(eqLabels).forEach(id=>{totEq[id]=0;});
+  dados.forEach(v=>{const id=n2e[v.nome];if(id&&totEq[id]!==undefined)totEq[id]+=categorias.reduce((s,c)=>s+(v[c.key]||0),0);});
+  const sorted=Object.entries(totEq).map(([id,v])=>({id,label:eqLabels[id],v})).filter(e=>e.v>0).sort((a,b)=>b.v-a.v);
+  if(!sorted.length) return '';
+  const maxV=sorted[0].v;
+  return '<div class="card"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;margin-bottom:12px">Por Equipa</div>'+
+    sorted.map(e=>`<div class="team-bar-row"><div class="team-bar-name">${e.label}</div><div class="team-bar-bg"><div class="team-bar-fill" data-pct="${Math.round(e.v/maxV*100)}" style="width:0%"></div></div><div class="team-bar-val">${e.v}</div></div>`).join('')+'</div>';
+}
+
+// ── ADMIN SUMMARY ──
+function renderAdminSummary(doDia){
+  if(!doDia.length) return '';
+  const totals={};
+  categorias.forEach(c=>{totals[c.key]=doDia.reduce((s,d)=>s+(d[c.key]||0),0);});
+  const top3=[...doDia].map(d=>({...d,tot:categorias.reduce((s,c)=>s+(d[c.key]||0),0)})).sort((a,b)=>b.tot-a.tot).slice(0,3);
+  const medals=['🥇','🥈','🥉'];
+  let html='<div class="slabel">Resumo da loja</div><div class="admin-sum-grid">';
+  categorias.forEach(c=>{html+=`<div class="admin-sum-card"><span style="font-size:18px;display:block;margin-bottom:4px">${c.emoji}</span><div class="admin-sum-val">${totals[c.key]}</div><div class="admin-sum-lbl">${c.label}</div></div>`;});
+  html+='</div>';
+  if(top3.length){
+    html+='<div class="slabel" style="margin-top:16px">🏆 Top 3 do dia</div>';
+    top3.forEach((v,i)=>{html+=`<div class="top3-row"><span class="top3-pos">${medals[i]}</span><div class="top3-name">${v.nome}<div style="font-size:11px;color:var(--muted)">${v.equipa||''}</div></div><div class="top3-score">${v.tot}</div></div>`;});
+  }
+  return html;
 }
 
 renderTabs();
@@ -1029,10 +1302,20 @@ function mostrarDash(nome) {
   const html = `
     <div class="d-profile">
       <div class="d-avatar">${dashIni(nome)}</div>
-      <div>
+      <div style="flex:1">
         <div class="d-pname">${nome}</div>
         <div class="d-pteam">${nomeParaEquipaLabel[nome]||'Loja'}</div>
-        <div class="d-badge">#${pos1}º em Onlines (acumulado)</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+          <div class="d-badge">#${pos1}º Onlines</div>
+          <span class="nivel-badge ${calcularNivel(totalAcum).css}">${calcularNivel(totalAcum).icon} ${calcularNivel(totalAcum).label}</span>
+        </div>
+      </div>
+    </div>
+    <div class="streak-card">
+      <div style="font-size:32px">🔥</div>
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--orange);line-height:1">${calcularStreak(dadosVendedor)}</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">dias consecutivos</div>
       </div>
     </div>
 
@@ -1229,6 +1512,8 @@ const metas = {
   garrafas:  20,
   elogios:   5
 };
+// Medalhas usam os mesmos valores das metas
+const metasMedalhas = metas;
 
 // ══ MEDALHAS ══
 function calcularMedalhas(dados) {
@@ -1247,14 +1532,14 @@ function calcularMedalhas(dados) {
   const elogiosMes   = dadosMes.reduce((s,d)=>s+(d.elogios||0),0);
   const diasComRegisto = new Set(dadosMes.map(d=>d.data)).size;
   return [
-    { icon:'🖥️', name:'Rei dos Onlines',    desc:'30 onlines este mês',           earned: onlinesMes >= 30 },
-    { icon:'🧴', name:'Spray King',          desc:'30 sprays este mês',            earned: spraysMes >= 30 },
-    { icon:'🦶', name:'Palmilhas Master',    desc:'20 palmilhas este mês',         earned: palmilhasMes >= 20 },
-    { icon:'⚽', name:'Camisolas Pro',       desc:'15 camisolas este mês',         earned: camisolasMes >= 15 },
-    { icon:'🛍️', name:'Eco Champion',       desc:'600 sacos este mês',            earned: sacosMes >= 600 },
-    { icon:'💧', name:'Hydration Boss',      desc:'15 garrafas este mês',          earned: garrafasMes >= 15 },
-    { icon:'⭐', name:'Favorito',            desc:'3 elogios este mês',            earned: elogiosMes >= 3 },
-    { icon:'📅', name:'Consistente',         desc:'10+ dias com registo este mês', earned: diasComRegisto >= 10 },
+    { icon:'🖥️', name:'Rei dos Onlines',  desc:metasMedalhas.onlines+' onlines este mês',       earned: onlinesMes   >= metasMedalhas.onlines },
+    { icon:'🧴', name:'Spray King',        desc:metasMedalhas.sprays+' sprays este mês',         earned: spraysMes    >= metasMedalhas.sprays },
+    { icon:'🦶', name:'Palmilhas Master',  desc:metasMedalhas.palmilhas+' palmilhas este mês',   earned: palmilhasMes >= metasMedalhas.palmilhas },
+    { icon:'⚽', name:'Camisolas Pro',     desc:metasMedalhas.camisolas+' camisolas este mês',   earned: camisolasMes >= metasMedalhas.camisolas },
+    { icon:'🛍️', name:'Eco Champion',     desc:metasMedalhas.sacos+' sacos este mês',           earned: sacosMes     >= metasMedalhas.sacos },
+    { icon:'💧', name:'Hydration Boss',    desc:metasMedalhas.garrafas+' garrafas este mês',     earned: garrafasMes  >= metasMedalhas.garrafas },
+    { icon:'⭐', name:'Favorito',          desc:metasMedalhas.elogios+' elogios este mês',       earned: elogiosMes   >= metasMedalhas.elogios },
+    { icon:'📅', name:'Consistente',       desc:'10+ dias com registo este mês',                  earned: diasComRegisto >= 10 },
   ];
 }
 
@@ -1304,11 +1589,8 @@ function tocarSomMedalha() {
   } catch(e) {}
 }
 function showRecordToast(titulo, msg) {
-  if (!document.getElementById('screen-ranking').classList.contains('active')) return;
-  const t = document.getElementById('recordToast');
-  t.innerHTML = '<span class="rt-title">' + titulo + '</span><div style="font-size:14px;margin-top:4px;opacity:0.9">' + msg + '</div>';
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 4000);
+  // Legacy - kept for compatibility
+  mostrarMedalPopup('🏆', titulo, msg);
 }
 
 // ══ ADMIN ══
@@ -1345,12 +1627,69 @@ async function carregarAdmin() {
         <div class="admin-vals">${vals2}</div>
       </div>`;
     }).join('');
-    content.innerHTML = '<div class="d-card">' + rows + '</div>';
+    const summaryHtml = renderAdminSummary(doDia);
+    content.innerHTML = summaryHtml + '<div class="slabel" style="margin-top:16px">Registos individuais</div><div class="d-card">' + rows + '</div>';
   } catch(e) {
     content.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">⚠️ Erro ao carregar</div>';
   }
 }
 
+// ── INSTALL PROMPT ──
+let deferredPrompt = null;
+
+function mostrarInstallPopup() {
+  if (localStorage.getItem('installDismissed')) return;
+  const popup = document.getElementById('installPopup');
+  const instructions = document.getElementById('installInstructions');
+  const mainBtn = document.getElementById('installMainBtn');
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isAndroid = /Android/.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (isStandalone) return; // Already installed
+  if (isIOS) {
+    instructions.innerHTML = '1. Toca em <strong>⬆️ Partilhar</strong> no Safari<br>2. Seleciona <strong>"Adicionar ao ecrã inicial"</strong><br>3. Toca em <strong>"Adicionar"</strong>';
+    mainBtn.textContent = 'Entendi ✓';
+    mainBtn.onclick = fecharInstall;
+    setTimeout(() => popup.classList.add('show'), 2000);
+  } else if (isAndroid && deferredPrompt) {
+    instructions.innerHTML = 'Adiciona o Sales League ao teu ecrã inicial para acesso rápido, como uma app.';
+    mainBtn.textContent = '📲 Adicionar';
+    mainBtn.onclick = () => {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => { deferredPrompt = null; fecharInstall(); });
+    };
+    setTimeout(() => popup.classList.add('show'), 2000);
+  }
+}
+
+function fecharInstall() {
+  document.getElementById('installPopup').classList.remove('show');
+  localStorage.setItem('installDismissed', '1');
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  mostrarInstallPopup();
+});
+
+// Show for iOS after splash closes
+setTimeout(mostrarInstallPopup, 3000);
+
 </script>
+
+<!-- INSTALL POPUP -->
+<div class="install-popup" id="installPopup">
+  <div class="install-popup-inner">
+    <div class="install-popup-title">📲 Adicionar ao ecrã</div>
+    <div class="install-popup-sub">Guarda o Sales League como atalho para acesso rápido</div>
+    <div class="install-popup-ios" id="installInstructions"></div>
+    <div class="install-popup-btns">
+      <button class="install-popup-btn-main" id="installMainBtn">Instalar</button>
+      <button class="install-popup-btn-close" onclick="fecharInstall()">Agora não</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
