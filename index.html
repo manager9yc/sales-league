@@ -1376,8 +1376,10 @@ function mostrarMedalPopup(emoji,nome,medalha){
   clearTimeout(medalTimer);
   medalTimer=setTimeout(()=>{
     popup.classList.remove('show');
-    // Show surprise box after medal popup
-    setTimeout(()=>mostrarSurprise(nome, medalha), 300);
+    // Show surprise box ONLY if this is the vendedor who just registered
+    if (nome === nomeSel) {
+      setTimeout(()=>mostrarSurprise(nome, medalha), 300);
+    }
   },3000);
 }
 
