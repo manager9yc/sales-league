@@ -1048,27 +1048,28 @@ async function getRankingFromDados(todos) {
 function verificarMedalhasRanking() {
   if (!dashAllDados.length) return;
   const hoje4 = new Date().toISOString().split('T')[0];
+  // Only show each medal once per device per day
+  const shownKey = 'medalhasShown_' + hoje4;
+  let shownSet = [];
+  try { shownSet = JSON.parse(localStorage.getItem(shownKey) || '[]'); } catch(e) {}
   const vencedores = [];
   const todosNomes = [...new Set(dashAllDados.map(d=>d.nome))];
   todosNomes.forEach(nome => {
     const dadosNome = dashAllDados.filter(d=>d.nome===nome);
     const temHoje = dadosNome.some(d=>d.data===hoje4);
     if (!temHoje) return;
-    const medalhas = calcularMedalhas(dadosNome);
-    const novasMedalhas = calcularMedalhas(dadosNome).filter(m=>m.earned);
-    novasMedalhas.forEach(m => {
-      vencedores.push({ nome, medalha: m });
+    calcularMedalhas(dadosNome).filter(m=>m.earned).forEach(m => {
+      const uid = nome + '_' + m.name;
+      if (!shownSet.includes(uid)) vencedores.push({nome, medalha:m, uid});
     });
   });
   if (!vencedores.length) return;
-  // Show one at a time with delay
-  vencedores.slice(0,5).forEach((v, i) => {
+  try { localStorage.setItem(shownKey, JSON.stringify([...shownSet, ...vencedores.map(v=>v.uid)])); } catch(e) {}
+  vencedores.slice(0,5).forEach((v,i) => {
     setTimeout(() => {
-      showRecordToast(
-        v.medalha.icon + '  ' + v.nome,
-        '🏅 Conquistou a medalha <strong>' + v.medalha.name + '</strong>'
-      );
-    }, i * 3500);
+      if (document.getElementById('screen-ranking').classList.contains('active'))
+        mostrarMedalPopup(v.medalha.icon, v.nome, v.medalha.name);
+    }, i * 5500);
   });
 }
 
@@ -1289,7 +1290,7 @@ function mostrarMedalPopup(emoji,nome,medalha){
       : `<div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;margin:0 auto;">${ini}</div>`;
   }
   const hoje6 = new Date().toLocaleDateString('pt-PT',{day:'numeric',month:'long'});
-  document.getElementById('medalSub').innerHTML='🏅 Conquistou <strong>'+medalha+'</strong><br><span style="font-size:12px;opacity:0.8">hoje, '+hoje6+'</span>';
+  document.getElementById('medalSub').innerHTML='🏅 Conquistou a medalha <strong>'+medalha+'</strong><br><span style="font-size:12px;opacity:0.8">hoje, '+hoje6+'</span>';
   // Confetti
   const wrap=document.getElementById('medalConfetti'); wrap.innerHTML='';
   ['⭐','✨','🌟','💫','⭐','✨'].forEach((s,i)=>{
