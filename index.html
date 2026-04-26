@@ -56,7 +56,7 @@ body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans
 .date-row { display: flex; align-items: center; gap: 12px; }
 .date-icon { width: 42px; height: 42px; background: var(--orange); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
 .date-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-input[type="date"] { /* week starts Sunday via locale */  background: transparent; border: none; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 600; outline: none; width: 100%; cursor: pointer; }
+input[type="date"] { background: transparent; border: none; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 600; outline: none; width: 100%; cursor: pointer; }
 input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacity(0.4); cursor: pointer; }
 
 .team-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -66,7 +66,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .name-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
 .name-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; min-height: 44px; }
 .name-btn { background: var(--card2); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
-.name-btn.selected { background: var(--orange); border-color: var(--orange); color: #fff; transform: scale(1.03); }
+.name-btn.selected { background: var(--orange); border-color: var(--orange); color: #fff; }
 .name-empty { color: var(--muted); font-size: 13px; font-style: italic; grid-column: span 2; text-align: center; padding: 10px 0; }
 
 .prod-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border); }
@@ -529,6 +529,12 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .surprise-close:hover { border-color: var(--orange); color: #fff; }
 .surprise-confetti-wrap { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 @keyframes shakeBox { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-5deg)} 40%{transform:rotate(5deg)} 60%{transform:rotate(-4deg)} 80%{transform:rotate(4deg)} }
+
+/* FORM TICKER */
+.form-ticker-wrap { background: var(--card2); border-bottom: 1px solid var(--border); overflow: hidden; padding: 8px 0; }
+.form-ticker { display: flex; white-space: nowrap; animation: ticker-scroll 10s linear infinite; }
+.form-ticker-item { display: inline-block; font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 6px; color: var(--orange); padding: 0 24px; }
+.form-ticker-sep { display: inline-block; color: var(--border); font-size: 12px; padding: 0 4px; }
 </style>
 </head>
 <body>
@@ -583,7 +589,17 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
     </div>
   </div>
   <div class="form-wrap">
-    <div class="form-main" id="formMain">
+    <div class="form-ticker-wrap">
+    <div class="form-ticker">
+      <span class="form-ticker-item">VASCO DA GAMA</span><span class="form-ticker-sep">✦</span>
+      <span class="form-ticker-item">VASCO DA GAMA</span><span class="form-ticker-sep">✦</span>
+      <span class="form-ticker-item">VASCO DA GAMA</span><span class="form-ticker-sep">✦</span>
+      <span class="form-ticker-item">VASCO DA GAMA</span><span class="form-ticker-sep">✦</span>
+      <span class="form-ticker-item">VASCO DA GAMA</span><span class="form-ticker-sep">✦</span>
+      <span class="form-ticker-item">VASCO DA GAMA</span><span class="form-ticker-sep">✦</span>
+    </div>
+  </div>
+  <div class="form-main" id="formMain">
       <div class="last-reg-bar" id="lastRegBar" style="display:none"></div>
       <div class="sec-label">Dia</div>
       <div class="card">
@@ -646,15 +662,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
       <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
     </div>
   </div>
-  <div style="text-align:center;padding:4px 16px;font-size:10px;color:var(--muted);letter-spacing:1px;background:var(--dark)" id="rankLastUpdate"></div>
-  <div class="ticker-wrap">
-    <div class="ticker">
-      <span class="ticker-item"><span class="ticker-dot"></span>Os dados do ranking atualizam cerca de 1 minuto após serem registados</span>
-      <span class="ticker-item"><span class="ticker-dot"></span>Regista o teu dia e os resultados aparecem no ranking em breve</span>
-      <span class="ticker-item"><span class="ticker-dot"></span>Os dados do ranking atualizam cerca de 1 minuto após serem registados</span>
-      <span class="ticker-item"><span class="ticker-dot"></span>Regista o teu dia e os resultados aparecem no ranking em breve</span>
-    </div>
-  </div>
+
   <div class="rank-main" id="rankMain"></div>
 <div class="record-toast" id="recordToast"></div>
 </div>
@@ -957,11 +965,10 @@ function change(campo, delta) {
 let toastTimeout = null;
 function showToast(msg, duration) {
   const t = document.getElementById('toast');
-  if (!t) return;
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => t.classList.remove('show'), duration || 2500);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), duration || 3000);
 }
 
 async function submeter() {
@@ -1056,54 +1063,33 @@ function secDiv(icon, title) {
 
 
 async function carregarRanking() {
-  // Show localStorage cache IMMEDIATELY
+  renderRanking([]);
   try {
-    const cached = localStorage.getItem('rankingCache');
-    const cachedTime = localStorage.getItem('rankingCacheTime');
-    if (cached) {
-      const dados = JSON.parse(cached);
-      window._rankingCache = dados;
-      renderRanking(dados);
-      if (cachedTime) {
-        const dt = new Date(parseInt(cachedTime));
-        const label = dt.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
-        const el = document.getElementById('rankLastUpdate');
-        if (el) el.textContent = '⏱ Última atualização: ' + label;
-      }
-    }
-  } catch(e) {}
-
-  // Fetch fresh - race between direct and proxy
-  const saveAndRender = (dados) => {
-    if (!Array.isArray(dados) || !dados.length) return;
-    window._rankingCache = dados;
-    try { localStorage.setItem('rankingCache', JSON.stringify(dados)); localStorage.setItem('rankingCacheTime', Date.now().toString()); } catch(e) {}
-    renderRanking(dados);
-    const el = document.getElementById('rankLastUpdate');
-    if (el) el.textContent = '✓ Atualizado agora';
-  };
-  try {
-    const directUrl = SHEETS_URL + '?action=getRanking';
-    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(directUrl);
-    const result = await Promise.race([
-      fetch(directUrl, {cache:'no-store'}).then(r=>r.json()),
-      fetch(proxyUrl, {cache:'no-store'}).then(r=>r.json()),
-      new Promise((_,reject) => setTimeout(()=>reject('timeout'), 5000))
-    ]);
-    saveAndRender(result);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    const res = await fetch(SHEETS_URL + '?action=getRanking', {signal: controller.signal});
+    clearTimeout(timeout);
+    const dados = await res.json();
+    if (Array.isArray(dados) && dados.length) window._rankingCache = dados;
+    renderRanking(Array.isArray(dados) ? dados : []);
   } catch(e) {
     try {
       const proxy = 'https://corsproxy.io/?';
       const url = encodeURIComponent(SHEETS_URL + '?action=getRanking');
       const res2 = await fetch(proxy + url);
-      saveAndRender(await res2.json());
-    } catch(e2) {}
+      const dados2 = await res2.json();
+      if (Array.isArray(dados2) && dados2.length) window._rankingCache = dados2;
+      renderRanking(Array.isArray(dados2) ? dados2 : []);
+    } catch(e2) {
+      renderRanking([]);
+    }
   }
+  // Load full data for medals if not already loaded
   if (!dashAllDados.length) {
     try {
       const r = await fetch(SHEETS_URL + '?action=getTodos');
       const td = await r.json();
-      if (Array.isArray(td)) dashAllDados = td;
+      if (Array.isArray(td)) { dashAllDados = td; renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []); }
     } catch(e) {}
   }
   verificarMedalhasRanking();
@@ -1498,6 +1484,30 @@ function renderAdminSummary(doDia){
   return html;
 }
 
+function renderCompare(nomeA, nomeB) {
+  const idA = nomeA.replace(/ /g,'_');
+  const catKey = document.getElementById('compareCat_'+idA)?.value || 'onlines';
+  const cat = categorias.find(c=>c.key===catKey) || categorias[0];
+  const el = document.getElementById('compareResult_'+idA);
+  if (!el || !nomeB) { if(el) el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:8px">Seleciona um vendedor para comparar</div>'; return; }
+  const getTotal = (nome, key) => dashAllDados.filter(d=>d.nome===nome).reduce((s,d)=>s+(d[key]||0),0);
+  const valA = getTotal(nomeA, catKey), valB = getTotal(nomeB, catKey);
+  const maxV = Math.max(valA, valB, 1);
+  const fotoA = getFoto(nomeA), fotoB = getFoto(nomeB);
+  const avA = fotoA ? `<img src="${fotoA}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--orange)">` : `<div style="width:40px;height:40px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff">${nomeA.split(' ').map(x=>x[0]).slice(0,2).join('')}</div>`;
+  const avB = fotoB ? `<img src="${fotoB}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">` : `<div style="width:40px;height:40px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--text)">${nomeB.split(' ').map(x=>x[0]).slice(0,2).join('')}</div>`;
+  const winner = valA > valB ? 'A' : valB > valA ? 'B' : 'tie';
+  el.innerHTML = `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+    <div style="flex:1;text-align:center">${avA}<div style="font-size:11px;font-weight:600;color:var(--orange);margin-top:4px">${nomeA.split(' ')[0]}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--orange);line-height:1">${valA}</div>${winner==='A'?'<div style="font-size:10px;color:var(--orange)">🏆</div>':''}</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted);text-align:center">${cat.emoji}<br>VS</div>
+    <div style="flex:1;text-align:center">${avB}<div style="font-size:11px;font-weight:600;color:var(--text);margin-top:4px">${nomeB.split(' ')[0]}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--text);line-height:1">${valB}</div>${winner==='B'?'<div style="font-size:10px;color:var(--orange)">🏆</div>':''}</div>
+  </div>
+  <div style="height:8px;background:var(--card2);border-radius:4px;overflow:hidden;display:flex;gap:2px">
+    <div style="height:100%;background:var(--orange);border-radius:4px;width:${Math.round(valA/maxV*100)}%;transition:width 0.8s ease"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:3px"><span>${nomeA.split(' ')[0]}: ${valA}</span><span>${nomeB.split(' ')[0]}: ${valB}</span></div>`;
+}
+
 renderTabs();
 
 // ══ DASHBOARD ══
@@ -1597,12 +1607,8 @@ function mostrarDash(nome) {
 
   const dadosVendedor = dashAllDados.filter(d=>d.nome===nome);
   if(!dadosVendedor.length){ return; }
-  const mesAtualD = new Date().getMonth();
-  const anoAtualD = new Date().getFullYear();
-  const dadosMes = dadosVendedor.filter(d=>{
-    const dt=new Date(d.data||'');
-    return !isNaN(dt)&&dt.getMonth()===mesAtualD&&dt.getFullYear()===anoAtualD;
-  });
+  const _mesNow = new Date().getMonth(), _anoNow = new Date().getFullYear();
+  const dadosMesAtual2 = dadosVendedor.filter(d=>{const dt=new Date(d.data||'');return !isNaN(dt)&&dt.getMonth()===_mesNow&&dt.getFullYear()===_anoNow;});
 
   // agrupar por mes
   const porMes = {};
@@ -1658,7 +1664,7 @@ function mostrarDash(nome) {
     <div class="streak-card">
       <div style="font-size:32px">📋</div>
       <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--orange);line-height:1">${dadosMes.length}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--orange);line-height:1">${dadosMesAtual2.length}</div>
         <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">registos este mês</div>
       </div>
       <div style="margin-left:auto;text-align:right">
@@ -1729,30 +1735,25 @@ function mostrarDash(nome) {
             <div class="d-cbar ${i===semanas.length-1?'hi':''}" style="height:${Math.round(v/maxSem*88)}px"></div>
           </div>`).join('')}
         <div style="position:absolute;bottom:0;left:0;right:0;display:flex;gap:10px">
-          ${(()=>{
-          const hoje=new Date();
-          const startCommercial=new Date(hoje.getFullYear(),1,1); // Feb 1
-          const diffDays=Math.floor((hoje-startCommercial)/86400000);
-          const weekNum=Math.max(1,Math.ceil(diffDays/7));
-          return [weekNum-3,weekNum-2,weekNum-1,weekNum].map((w,i)=>`<div style="flex:1;font-size:10px;color:var(--muted);text-align:center">Sem ${w>0?w:1}${i===3?' ▶':''}</div>`).join('');
-        })()}
+          ${(()=>{const hoje=new Date();const startC=new Date(hoje.getFullYear(),1,1);const wn=Math.max(1,Math.ceil(Math.floor((hoje-startC)/86400000)/7));return [wn-3,wn-2,wn-1,wn].map((w,i)=>`<div style="flex:1;font-size:10px;color:var(--muted);text-align:center">Sem ${w>0?w:1}${i===3?' ▶':''}</div>`).join('');})()}
         </div>
       </div>
     </div>
 
-    <div class="d-slabel">Comparar com outro vendedor</div>
-    <div class="d-card" id="compareCard_${nome.replace(/ /g,'_')}">
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
-        <select id="compareWith_${nome.replace(/ /g,'_')}" onchange="renderCompare('${nome.replace(/'/g,"\\'")}', this.value)" style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;">
-          <option value="">Seleciona um vendedor...</option>
-          ${[...new Set(equipas.flatMap(e=>e.nomes))].filter(n=>n!==nome).sort().map(n=>`<option value="${n}">${n}</option>`).join('')}
-        </select>
-        <select id="compareCat_${nome.replace(/ /g,'_')}" onchange="renderCompare('${nome.replace(/'/g,"\\'")}', document.getElementById('compareWith_${nome.replace(/ /g,'_')}').value)" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;">
-          ${categorias.map(cat=>`<option value="${cat.key}">${cat.emoji} ${cat.label}</option>`).join('')}
-        </select>
-      </div>
-      <div id="compareResult_${nome.replace(/ /g,'_')}" style="color:var(--muted);font-size:13px;text-align:center;padding:8px">Seleciona um vendedor para comparar</div>
-    </div>    </div>
+    <div class="d-slabel">Comparação com a loja — Onlines acumulado</div>
+    <div class="d-card">
+      <div class="d-card-title">Top 8</div>
+      ${compRank.map((item,i)=>{
+        const hi=item.n===nome;
+        const pct=Math.round(item.v/maxO*100);
+        return `<div class="d-crow">
+          <div class="d-cpos ${hi?'hi':''}">${i+1}º</div>
+          <div class="d-cnom ${hi?'hi':''}">${item.n.split(' ')[0]}</div>
+          <div class="d-cbarwrap"><div class="d-cbarfill ${hi?'hi':''}" style="width:${pct}%"></div></div>
+          <div class="d-cscore ${hi?'hi':''}">${item.v}</div>
+        </div>`;
+      }).join('')}
+    </div>
 
     <div class="d-slabel">Histórico por mês</div>
     <div class="d-card">
@@ -1945,25 +1946,21 @@ function calcularMedalhas(dados) {
   const caixaNomes = equipas.find(e=>e.id==='caixa')?.nomes||[];
   const isCaixa = caixaNomes.includes(nome);
   const isCalcadoSneaker2 = equipaCalcadoSneaker.includes(nome);
-
   const tOnlines    = isCalcadoSneaker2 ? 30 : 15;
   const tSprays     = (isCalcadoSneaker2 || isCaixa) ? 30 : 15;
   const tPalmilhas  = isCalcadoSneaker2 ? 20 : 10;
   const tCamisolas  = (isCalcadoSneaker2 || isCaixa) ? 20 : 10;
   const tSacos      = isCaixa ? 800 : 150;
   const tGarrafas   = isCaixa ? 20 : 15;
-  const tElogios    = 3;
-  const tConsistente = th.consistente; // already handles part-times
-
   return [
-    { icon:'🖥️', name:'Rei dos Onlines',  desc:tOnlines+' onlines este mês',       earned: onlinesMes   >= tOnlines },
-    { icon:'🧴', name:'Spray King',        desc:tSprays+' sprays este mês',          earned: spraysMes    >= tSprays },
-    { icon:'🦶', name:'Palmilhas Master',  desc:tPalmilhas+' palmilhas este mês',    earned: palmilhasMes >= tPalmilhas },
-    { icon:'⚽', name:'Camisolas Pro',     desc:tCamisolas+' camisolas este mês',    earned: camisolasMes >= tCamisolas },
-    { icon:'🛍️', name:'Eco Champion',     desc:tSacos+' sacos este mês',            earned: sacosMes     >= tSacos },
-    { icon:'💧', name:'Hydration Boss',    desc:tGarrafas+' garrafas este mês',      earned: garrafasMes  >= tGarrafas },
-    { icon:'⭐', name:'Favorito',          desc:'3 elogios este mês',                earned: elogiosMes   >= tElogios },
-    { icon:'📅', name:'Consistente',       desc:tConsistente+' registos este mês',   earned: diasComRegisto >= tConsistente },
+    { icon:'🖥️', name:'Rei dos Onlines',  desc:tOnlines+' onlines este mês',     earned: onlinesMes   >= tOnlines },
+    { icon:'🧴', name:'Spray King',        desc:tSprays+' sprays este mês',        earned: spraysMes    >= tSprays },
+    { icon:'🦶', name:'Palmilhas Master',  desc:tPalmilhas+' palmilhas este mês',  earned: palmilhasMes >= tPalmilhas },
+    { icon:'⚽', name:'Camisolas Pro',     desc:tCamisolas+' camisolas este mês',  earned: camisolasMes >= tCamisolas },
+    { icon:'🛍️', name:'Eco Champion',     desc:tSacos+' sacos este mês',          earned: sacosMes     >= tSacos },
+    { icon:'💧', name:'Hydration Boss',    desc:tGarrafas+' garrafas este mês',    earned: garrafasMes  >= tGarrafas },
+    { icon:'⭐', name:'Favorito',          desc:'3 elogios este mês',              earned: elogiosMes   >= 3 },
+    { icon:'📅', name:'Consistente',       desc:th.consistente+' registos este mês', earned: diasComRegisto >= th.consistente },
   ];
 }
 
@@ -2217,7 +2214,7 @@ function abrirEdit(idx) {
       <div class="edit-field-label">${cat.emoji} ${cat.label}</div>
       <div style="display:flex;align-items:center;gap:6px">
         <button onclick="editFieldChange('${cat.key}',-1)" style="width:32px;height:32px;border-radius:50%;background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">−</button>
-        <input type="number" class="edit-field-input" id="editField_${cat.key}" value="${r[cat.key]||0}" min="0" style="width:56px;text-align:center">
+        <input type="number" class="edit-field-input" id="editField_${cat.key}" value="${r[cat.key]||0}" min="0" style="width:60px;text-align:center">
         <button onclick="editFieldChange('${cat.key}',1)" style="width:32px;height:32px;border-radius:50%;background:var(--orange);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">+</button>
       </div>
     </div>`).join('');
@@ -2227,8 +2224,7 @@ function fecharEdit() { document.getElementById('editModal').classList.remove('o
 function editFieldChange(key, delta) {
   const el = document.getElementById('editField_' + key);
   if (!el) return;
-  const newVal = Math.max(0, (parseInt(el.value) || 0) + delta);
-  el.value = newVal;
+  el.value = Math.max(0, (parseInt(el.value) || 0) + delta);
 }
 
 async function guardarEdicao() {
@@ -2249,7 +2245,7 @@ async function guardarEdicao() {
     const url = encodeURIComponent(SHEETS_URL);
     const res = await fetch(proxy + url, { method:'POST', body: JSON.stringify({action:'editRegisto', rowIndex: editingRegisto+2, data: updated}) });
     const result = await res.json();
-    showToast(result.success ? '✓ Registo atualizado' : '⚠️ Erro ao guardar', 2500);
+    showToast(result.success ? '✓ Registo atualizado' : '⚠️ Erro ao guardar');
     todosRegistos[editingRegisto] = updated;
     if (dadosTab === 'editar') renderRegistosEditar();
     if (dadosTab === 'colaborador') renderRegistosColaborador();
@@ -2520,49 +2516,6 @@ function lancarConfettiSurprise() {
     el.style.cssText = `position:absolute;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>0.5?'50%':'2px'};background:${cols[Math.floor(Math.random()*cols.length)]};left:${Math.random()*100}%;top:-10px;animation:confettiFall ${1.5+Math.random()}s ease-out ${Math.random()*0.8}s forwards;`;
     wrap.appendChild(el);
   }
-}
-
-function renderCompare(nomeA, nomeB) {
-  const idA = nomeA.replace(/ /g,'_');
-  const catKey = document.getElementById('compareCat_'+idA)?.value || 'onlines';
-  const cat = categorias.find(c=>c.key===catKey) || categorias[0];
-  const el = document.getElementById('compareResult_'+idA);
-  if (!el || !nomeB) { if(el) el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:8px">Seleciona um vendedor para comparar</div>'; return; }
-
-  const getTotal = (nome, key) => dashAllDados.filter(d=>d.nome===nome).reduce((s,d)=>s+(d[key]||0),0);
-  const valA = getTotal(nomeA, catKey);
-  const valB = getTotal(nomeB, catKey);
-  const maxV = Math.max(valA, valB, 1);
-
-  const fotoA = getFoto(nomeA);
-  const fotoB = getFoto(nomeB);
-  const avatarA = fotoA ? `<img src="${fotoA}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--orange)">` : `<div style="width:36px;height:36px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#fff">${nomeA.split(' ').map(x=>x[0]).slice(0,2).join('')}</div>`;
-  const avatarB = fotoB ? `<img src="${fotoB}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">` : `<div style="width:36px;height:36px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--text)">${nomeB.split(' ').map(x=>x[0]).slice(0,2).join('')}</div>`;
-
-  const winner = valA > valB ? 'A' : valB > valA ? 'B' : 'tie';
-
-  el.innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-      <div style="flex:1;text-align:center">
-        ${avatarA}
-        <div style="font-size:11px;font-weight:600;color:var(--orange);margin-top:4px">${nomeA.split(' ')[0]}</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--orange);line-height:1">${valA}</div>
-        ${winner==='A'?'<div style="font-size:10px;color:var(--orange)">🏆 Vencedor</div>':''}
-      </div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--muted);padding:0 4px">${cat.emoji}<br>VS</div>
-      <div style="flex:1;text-align:center">
-        ${avatarB}
-        <div style="font-size:11px;font-weight:600;color:var(--text);margin-top:4px">${nomeB.split(' ')[0]}</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--text);line-height:1">${valB}</div>
-        ${winner==='B'?'<div style="font-size:10px;color:var(--orange)">🏆 Vencedor</div>':''}
-      </div>
-    </div>
-    <div style="display:flex;gap:4px">
-      <div style="height:8px;background:var(--orange);border-radius:4px;transition:width 0.8s ease;width:${Math.round(valA/maxV*100)}%;min-width:4px"></div>
-      <div style="height:8px;background:var(--card2);border-radius:4px;flex:1"></div>
-    </div>
-    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:3px"><span>${nomeA.split(' ')[0]}</span><span>${nomeB.split(' ')[0]}</span></div>
-  `;
 }
 
 // ── INSTALL PROMPT ──
