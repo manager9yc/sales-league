@@ -597,10 +597,10 @@ body.theme-ucl .ucl-stars-banner { display:block; }
     </div>
     <div id="splashTop3" style="display:none;width:100%;max-width:400px;margin-bottom:6px">
       <div style="font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);text-align:center;margin-top:14px;margin-bottom:8px">🏆 Top 3 de ontem</div>
-      <div id="splashTop3Content" style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px"></div>
+      <div id="splashTop3Content" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px"></div>
     </div>
     <div style="width:80%;max-width:360px;display:flex;flex-direction:column;gap:8px;margin-bottom:8px">
-      <button onclick="fecharSplash()" style="width:100%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:14px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;cursor:pointer">ENTRAR →</button>
+      <button onclick="fecharSplash()" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:15px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:6px">ENTRAR →</button>
     </div>
     <div style="font-size:10px;color:rgba(255,255,255,0.25);text-align:center;margin-top:4px">ⓘ Esta mensagem não voltará a ser exibida hoje</div>
   </div>
@@ -1359,6 +1359,11 @@ function mostrarProgressoRegisto(nome, payload) {
 // ── SPLASH ──
 let splashProg = 0, splashIv = null;
 function iniciarSplash() {
+  try {
+    const hoje = new Date().toDateString();
+    if (localStorage.getItem('splashDate') === hoje) { fecharSplash(); return; }
+    localStorage.setItem('splashDate', hoje);
+  } catch(e) {}
   carregarSplashTop3();
   const mesLabel=new Date().toLocaleDateString('pt-PT',{month:'long',year:'numeric'}).replace(/^./,s=>s.toUpperCase());
   // Update sp-bar-wrap label if exists
@@ -1632,7 +1637,7 @@ async function carregarSplashTop3(){
       }catch(e){return;}
     }
     if(!Array.isArray(dados)||!dados.length)return;
-    const cats=[{key:'onlines',emoji:'🖥️',label:'Onlines'},{key:'sprays',emoji:'🧴',label:'Sprays'},{key:'palmilhas',emoji:'🦶',label:'Palmilhas'},{key:'camisolas',emoji:'⚽',label:'Camisolas'},{key:'sacos',emoji:'🛍️',label:'Sacos'},{key:'garrafas',emoji:'💧',label:'Garrafas'},{key:'elogios',emoji:'⭐',label:'Elogios'}];
+    const cats=[{key:'onlines',emoji:'🖥️',label:'Onlines'},{key:'sprays',emoji:'🧴',label:'Sprays'},{key:'palmilhas',emoji:'🦶',label:'Palmilhas'},{key:'camisolas',emoji:'⚽',label:'Camisolas'},{key:'sacos',emoji:'🛍️',label:'Sacos'},{key:'garrafas',emoji:'💧',label:'Garrafas'}];
     const medals=['🥇','🥈','🥉'];
     let html='';
     cats.forEach(cat=>{
@@ -2826,9 +2831,7 @@ function desenharRoleta(ang){
     const s=ang+i*sa-Math.PI/2,e=s+sa;
     ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,s,e);ctx.closePath();
     ctx.fillStyle=p.cor;ctx.fill();ctx.strokeStyle='rgba(0,0,0,0.3)';ctx.lineWidth=1.5;ctx.stroke();
-    ctx.save();ctx.translate(cx,cy);ctx.rotate(s+sa/2);ctx.textAlign='right';
-    ctx.font='bold 11px sans-serif';ctx.fillStyle='#fff';ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=3;
-    ctx.fillText(p.icon+' '+p.nome.split(' ').slice(0,3).join(' '),r-8,4);ctx.restore();
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(s+sa/2);ctx.font='24px serif';ctx.textAlign='right';ctx.shadowColor='rgba(0,0,0,0.4)';ctx.shadowBlur=2;ctx.fillText(p.icon,r-12,8);ctx.restore();
   });
   ctx.beginPath();ctx.arc(cx,cy,20,0,Math.PI*2);ctx.fillStyle='#111';ctx.fill();
   ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.lineWidth=2;ctx.stroke();
@@ -2836,6 +2839,7 @@ function desenharRoleta(ang){
 
 function girarRoleta(){
   if(rSpinning)return;rSpinning=true;
+  iniciarAudio();tocarSomCasino();
   if(document.getElementById('wheelSpinBtn'))document.getElementById('wheelSpinBtn').disabled=true;
   const rand=Math.random();let acc=0,wIdx=0;
   for(let i=0;i<premios.length;i++){acc+=premios[i].prob;if(rand<=acc){wIdx=i;break;}}
@@ -2852,7 +2856,7 @@ function girarRoleta(){
 }
 
 function mostrarResultado(p){
-  iniciarAudio();tocarSomMedalha();
+  pararSomCasino();iniciarAudio();tocarSomMedalha();
   const wrap=document.getElementById('rouletteConfetti');
   const cols=['#FF6B00','#FFD700','#FF4444','#44FF88','#4488FF','#FF88FF','#fff'];
   for(let i=0;i<50;i++){const el=document.createElement('div');el.style.cssText=`position:absolute;width:${5+Math.random()*8}px;height:${5+Math.random()*8}px;border-radius:${Math.random()>.5?'50%':'2px'};background:${cols[Math.floor(Math.random()*cols.length)]};left:${Math.random()*100}%;top:-10px;animation:confettiFall ${1.5+Math.random()}s ease-out ${Math.random()}s forwards`;wrap.appendChild(el);}
@@ -2883,6 +2887,34 @@ function abrirDashDeRanking(nome) {
       carregarDashDados().then(() => mostrarDash(nome));
     }
   }, 150);
+}
+
+let casinoTickTimeout = null;
+
+function tocarSomCasino() {
+  if (!audioCtx) return;
+  pararSomCasino();
+  tocarTickCasino(0, 70);
+}
+
+function tocarTickCasino(tick, total) {
+  if (!audioCtx || tick >= total) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.connect(g); g.connect(audioCtx.destination);
+  const progress = tick / total;
+  o.type = 'triangle';
+  o.frequency.setValueAtTime(progress < 0.6 ? 800 : 400, audioCtx.currentTime);
+  g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+  o.start(audioCtx.currentTime);
+  o.stop(audioCtx.currentTime + 0.05);
+  const delay = progress < 0.4 ? 60 : progress < 0.7 ? 100 : progress < 0.85 ? 180 : 320;
+  casinoTickTimeout = setTimeout(() => tocarTickCasino(tick + 1, total), delay);
+}
+
+function pararSomCasino() {
+  if (casinoTickTimeout) { clearTimeout(casinoTickTimeout); casinoTickTimeout = null; }
 }
 
 // ── INSTALL PROMPT ──
@@ -3128,4 +3160,3 @@ try {
 </div>
 </body>
 </html>
-
