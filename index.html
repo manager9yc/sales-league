@@ -28,7 +28,7 @@ body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans
 
 /* NAV */
 .nav { display: flex; background: #0a0a0a; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 100; }
-.nav-btn { flex: 1; padding: 8px 2px 5px; font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted); border: none; background: transparent; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.nav-btn { flex: 1; padding: 7px 2px 5px; font-family: 'Barlow Condensed', sans-serif; font-size: 8px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted); border: none; background: transparent; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .nav-btn.active { color: #fff; border-bottom-color: var(--orange); }
 
 /* SCREENS */
@@ -537,61 +537,27 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .form-ticker-sep { display: inline-block; color: var(--orange); font-size: 16px; font-weight: 900; padding: 0 8px; }
 
 /* ══ THEMES ══ */
-body.theme-dark { --orange:#FF6B00; --orange2:#FF8C00; --dark:#0C0C0C; --card:#161616; --card2:#1e1e1e; --border:#2c2c2c; --muted:#999; --text:#f0f0f0; }
-body.theme-ucl  { --orange:#C9A84C; --orange2:#E8C97A; --dark:#070F1F; --card:#0C1B35; --card2:#132240; --border:#1C3460; --muted:#6B8EC4; --text:#EEF2FF; }
-body.theme-ucl .banner, body.theme-ucl .banner-top, body.theme-ucl [class*="banner"] { background:#070F1F !important; }
-body.theme-ucl .banner-bar, body.theme-ucl [style*="background:#FF6B00"], body.theme-ucl [style*="background: #FF6B00"] { background:linear-gradient(90deg,#070F1F,#0C1B35,#070F1F) !important; border-top:1px solid #C9A84C !important; border-bottom:1px solid rgba(201,168,76,0.3) !important; }
-body.theme-dark .ucl-banner-img { display:none !important; }
-body.theme-dark .ucl-stars-banner { display:none !important; }
-.ucl-banner-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.18; pointer-events:none; z-index:0; display:none; }
-body.theme-ucl .ucl-banner-img { display:block; }
-body.theme-ucl .nav { background:#070F1F !important; border-bottom:1px solid #C9A84C !important; }
-body.theme-ucl .nav-btn.active { color:#C9A84C; border-bottom-color:#C9A84C; }
-body.theme-ucl .submit-btn { background:linear-gradient(90deg,#C9A84C,#E8C97A,#C9A84C) !important; color:#070F1F !important; }
-body.theme-ucl .banner-bar { background:linear-gradient(90deg,#070F1F,#0C1B35,#070F1F) !important; border-top:1px solid #C9A84C; border-bottom:1px solid rgba(201,168,76,0.3); }
-body.theme-ucl .banner-top { background:#070F1F; }
-body.theme-ucl .rank-1 { background:rgba(201,168,76,0.07) !important; }
-body.theme-ucl .rank-1 .td-score { color:#C9A84C !important; }
-body.theme-ucl .rank-1 .bar-fg { background:linear-gradient(90deg,#E8C97A,#C9A84C) !important; }
-.ucl-stars-banner { display:none; font-size:11px; letter-spacing:5px; color:#C9A84C; text-align:center; margin-bottom:6px; position:relative; z-index:2; }
-body.theme-ucl .ucl-stars-banner { display:block; }
-body.theme-ucl #splashUCLImg { display:block !important; opacity:0.12; position:absolute; inset:0; width:100%; height:100%; object-fit:cover; pointer-events:none; z-index:0; }
-
+body.theme-dark{--orange:#FF6B00;--orange2:#FF8C00;--dark:#0C0C0C;--card:#161616;--card2:#1e1e1e;--border:#2c2c2c;--muted:#999;--text:#f0f0f0}
+body.theme-ucl{--orange:#C9A84C;--orange2:#E8C97A;--dark:#070F1F;--card:#0C1B35;--card2:#132240;--border:#1C3460;--muted:#6B8EC4;--text:#EEF2FF}
+.ucl-banner-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.18;pointer-events:none;z-index:0;display:none}
+body.theme-ucl .ucl-banner-img{display:block}
+body.theme-ucl .nav{background:#070F1F!important;border-bottom:1px solid #C9A84C!important}
+body.theme-ucl .nav-btn.active{color:#C9A84C!important;border-bottom-color:#C9A84C!important}
+body.theme-ucl .submit-btn{background:linear-gradient(90deg,#C9A84C,#E8C97A,#C9A84C)!important;color:#070F1F!important}
+body.theme-ucl .banner-bar{background:linear-gradient(90deg,#070F1F,#0C1B35,#070F1F)!important;border-top:1px solid #C9A84C!important}
+body.theme-ucl .banner-top,body.theme-ucl .banner{background:#070F1F!important}
+body.theme-ucl [style*="background:#0C0C0C"]{background:#070F1F!important}
+body.theme-ucl [style*="background:#FF6B00"]:not(button):not(.submit-btn){background:linear-gradient(90deg,#070F1F,#0C1B35,#070F1F)!important}
+body.theme-dark .ucl-banner-img{display:none!important}
+body.theme-dark .ucl-stars-banner{display:none!important}
+.ucl-stars-banner{display:none;font-size:11px;letter-spacing:5px;color:#C9A84C;text-align:center;margin-bottom:6px;position:relative;z-index:2}
+body.theme-ucl .ucl-stars-banner{display:block}
 /* ══ ROULETTE ══ */
-.roulette-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:10000; display:none; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
-.roulette-overlay.open { display:flex; animation:fadeIn 0.3s ease; }
-.roulette-pre { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:rgba(255,255,255,0.5); margin-bottom:6px; }
-.roulette-title { font-family:'Bebas Neue',sans-serif; font-size:34px; letter-spacing:3px; color:#fff; margin-bottom:4px; }
-.roulette-nome { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; color:var(--orange); margin-bottom:20px; text-align:center; }
-.roulette-box-wrap { cursor:pointer; margin-bottom:16px; transition:transform 0.15s; }
-.roulette-box-wrap:hover { transform:scale(1.05); }
-.roulette-box-wrap:active { transform:scale(0.97); }
-.roulette-box { width:160px; height:160px; position:relative; }
-.roulette-box-bottom { width:160px; height:110px; background:linear-gradient(135deg,var(--orange),#FF4500); border-radius:8px 8px 14px 14px; position:absolute; bottom:0; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 32px rgba(255,107,0,0.4); }
-.roulette-box-ribbon-v { position:absolute; width:22px; height:100%; background:rgba(255,255,255,0.22); left:50%; transform:translateX(-50%); border-radius:3px; }
-.roulette-box-ribbon-h { position:absolute; width:100%; height:22px; background:rgba(255,255,255,0.22); top:50%; transform:translateY(-50%); border-radius:3px; }
-.roulette-box-lid { width:160px; height:50px; background:linear-gradient(135deg,#FF8C00,var(--orange)); border-radius:10px; position:absolute; top:0; transform-origin:left center; transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 4px 16px rgba(255,107,0,0.4); display:flex; align-items:center; justify-content:center; }
-.roulette-box-lid.open { transform:rotate(-65deg) translateY(-16px); }
-.roulette-box-lid-ribbon { width:22px; height:100%; background:rgba(255,255,255,0.28); border-radius:3px; }
-.roulette-bow { position:absolute; top:-20px; left:50%; transform:translateX(-50%); font-size:28px; }
-.roulette-hint { font-size:13px; color:rgba(255,255,255,0.4); text-align:center; letter-spacing:1px; margin-top:10px; }
-.roulette-hint.hidden { visibility:hidden; }
-/* Wheel */
-.wheel-container { display:none; flex-direction:column; align-items:center; width:100%; max-width:340px; }
-.wheel-wrap { position:relative; width:260px; height:260px; margin:0 auto 12px; }
-.wheel-canvas { border-radius:50%; box-shadow:0 0 30px rgba(255,107,0,0.3); }
-.wheel-pointer { position:absolute; top:-12px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:12px solid transparent; border-right:12px solid transparent; border-top:24px solid #fff; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-.wheel-spin-btn { background:var(--orange); border:none; border-radius:12px; padding:14px 32px; color:#fff; font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:2px; cursor:pointer; margin-top:8px; transition:transform 0.1s; }
-.wheel-spin-btn:active { transform:scale(0.97); }
-.wheel-spin-btn:disabled { opacity:0.5; cursor:default; }
-.roulette-result { display:none; flex-direction:column; align-items:center; text-align:center; padding:0 20px; }
-.roulette-result-icon { font-size:90px; margin-bottom:8px; animation:trophyBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards; }
-.roulette-result-ganhou { font-family:'Bebas Neue',sans-serif; font-size:36px; color:#FFD700; letter-spacing:3px; }
-.roulette-result-nome { font-family:'Bebas Neue',sans-serif; font-size:26px; color:#fff; letter-spacing:2px; margin-bottom:8px; }
-.roulette-solicita { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:12px 20px; font-size:13px; color:rgba(255,255,255,0.7); line-height:1.5; max-width:300px; margin-bottom:16px; }
-.roulette-close { background:transparent; border:1.5px solid rgba(255,255,255,0.2); border-radius:10px; padding:10px 28px; color:rgba(255,255,255,0.5); font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:3px; text-transform:uppercase; cursor:pointer; }
-.roulette-confetti-wrap { position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:10001; }
-
+.roulette-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:10000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.roulette-overlay.open{display:flex;animation:fadeIn 0.3s ease}
+.wheel-wrap{position:relative;width:260px;height:260px;margin:0 auto 12px}
+.wheel-canvas{border-radius:50%;box-shadow:0 0 30px rgba(255,107,0,0.3)}
+.wheel-pointer{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-top:24px solid #fff;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))}
 </style>
 </head>
 <body>
@@ -602,7 +568,6 @@ body.theme-ucl #splashUCLImg { display:block !important; opacity:0.12; position:
   <div class="sp-slash ss1"></div><div class="sp-slash ss2"></div>
   <div class="sp-slash ss3"></div><div class="sp-slash ss4"></div>
   <div class="sp-slash ss5"></div>
-  <img src="data:image/jpeg;base64,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" class="ucl-banner-img" style="display:none" id="splashUCLImg" alt="">
   <div class="sp-inner" style="display:flex;flex-direction:column;align-items:center;height:100%;justify-content:space-between;padding:40px 0 60px">
     <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
       <div class="sp-pre">Sport Zone · Vasco da Gama</div>
@@ -611,11 +576,18 @@ body.theme-ucl #splashUCLImg { display:block !important; opacity:0.12; position:
       <div class="sp-bar-wrap"><span id="mesAtualSplash"></span></div>
       <div class="sp-progress"><div class="sp-progress-fill" id="splashBar"></div></div>
     </div>
-    <div id="splashTop3" style="width:100%;max-width:400px;margin-bottom:14px;display:none;position:relative;z-index:2">
+    <div id="splashTop3" style="display:none;width:100%;max-width:400px;margin-bottom:10px">
       <div style="font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);text-align:center;margin-bottom:8px">🏆 Top 3 de hoje</div>
       <div id="splashTop3Content" style="display:grid;grid-template-columns:repeat(2,1fr);gap:5px"></div>
     </div>
-    <button class="sp-btn" onclick="fecharSplash()" style="width:80%;max-width:280px;padding:16px;font-size:16px;">Entrar →</button>
+    <div style="width:80%;max-width:360px;display:flex;flex-direction:column;gap:8px;margin-bottom:8px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button onclick="fecharSplash();setTimeout(()=>goTo('ranking',document.querySelectorAll('.nav-btn')[1]),50)" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:11px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer">🏆 RANKING</button>
+        <button onclick="fecharSplash();setTimeout(()=>goTo('form',document.querySelectorAll('.nav-btn')[0]),50)" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:11px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer">📋 REGISTAR</button>
+      </div>
+      <button onclick="fecharSplash()" class="sp-btn" style="width:100%;padding:12px;font-size:15px;">FECHAR →</button>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.25);text-align:center;margin-top:4px">ⓘ Esta mensagem não voltará a ser exibida hoje</div>
   </div>
 </div>
 
@@ -629,12 +601,12 @@ body.theme-ucl #splashUCLImg { display:block !important; opacity:0.12; position:
 </div>
 
 <div class="nav">
-  <button class="nav-btn active" onclick="goTo('form',this)"><span style="font-size:15px">📋</span><span>Registo</span></button>
-  <button class="nav-btn" onclick="goTo('ranking',this)"><span style="font-size:15px">🏆</span><span>Ranking</span></button>
-  <button class="nav-btn" onclick="goTo('dash',this)"><span style="font-size:15px">📊</span><span>Dash</span></button>
-  <button class="nav-btn" onclick="goTo('info',this)"><span style="font-size:15px">ℹ️</span><span>Info</span></button>
-  <button class="nav-btn" onclick="goTo('jogos',this)"><span style="font-size:15px">🎮</span><span>Jogos</span></button>
-  <button class="nav-btn" onclick="goTo('admin',this)"><span style="font-size:15px">⚙️</span><span>Admin</span></button>
+  <button class="nav-btn active" onclick="goTo('form',this)"><span style="font-size:14px">📋</span><span>Registo</span></button>
+  <button class="nav-btn" onclick="goTo('ranking',this)"><span style="font-size:14px">🏆</span><span>Ranking</span></button>
+  <button class="nav-btn" onclick="goTo('dash',this)"><span style="font-size:14px">📊</span><span>Dash</span></button>
+  <button class="nav-btn" onclick="goTo('info',this)"><span style="font-size:14px">ℹ️</span><span>Info</span></button>
+  <button class="nav-btn" onclick="goTo('jogos',this)"><span style="font-size:14px">🎮</span><span>Jogos</span></button>
+  <button class="nav-btn" onclick="goTo('admin',this)"><span style="font-size:14px">⚙️</span><span>Admin</span></button>
 </div>
 
 <!-- FORM -->
@@ -831,16 +803,8 @@ body.theme-ucl #splashUCLImg { display:block !important; opacity:0.12; position:
 
     <!-- CONTEÚDO ADMIN -->
     <div id="adminBody" style="display:none">
-      <!-- TEMA -->
-      <div style="padding:16px 16px 0">
-        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Tema Visual</div>
-        <div style="display:flex;gap:8px">
-          <button onclick="aplicarTema('dark')" id="btnThemeDark" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">⚫ Preto</button>
-          <button onclick="aplicarTema('ucl')" id="btnThemeUCL" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">🏆 Champions</button>
-        </div>
-      </div>
+      <div style="padding:16px 16px 0"><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Tema Visual</div><div style="display:flex;gap:8px"><button onclick="aplicarTema('dark')" id="btnThemeDark" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">⚫ Preto</button><button onclick="aplicarTema('ucl')" id="btnThemeUCL" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">🏆 Champions</button></div></div>
       <div style="height:1px;background:var(--border);margin:12px 16px"></div>
-
       <!-- GESTÃO VENDEDORES -->
       <div style="padding:16px 16px 0">
         <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Gestão de Vendedores</div>
@@ -962,15 +926,7 @@ const equipas = [
   { id:'sup',       label:'🎯 Direção',   nomes:['Dário Santos','Carla Frade','Susana Morgado','André Louro','Sérgio Correia','Diogo Silva','Soraia Alves','Tânia Costa','Florisbela Tavares','Ana Ferreira'] },
   { id:'estagios',  label:'🎓 Estagiários', nomes:[] }
 ];
-
-// Restore equipas from localStorage
-try {
-  const saved = localStorage.getItem('equipasData');
-  if (saved) {
-    const parsed = JSON.parse(saved);
-    parsed.forEach(s => { const e = equipas.find(eq=>eq.id===s.id); if(e) e.nomes = s.nomes; });
-  }
-} catch(e) {}
+try{const sv=localStorage.getItem('equipasData');if(sv){const p=JSON.parse(sv);p.forEach(s=>{const e=equipas.find(eq=>eq.id===s.id);if(e)e.nomes=s.nomes;});}}catch(e){}
 
 const categorias = [
   { key:'onlines',   label:'Onlines',            emoji:'🖥️' },
@@ -994,21 +950,19 @@ document.getElementById('dataRegisto').value = `${hoje.getFullYear()}-${pad(hoje
 function goTo(screen, btn) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  const screenEl = document.getElementById('screen-'+screen);
-  if (screenEl) screenEl.classList.add('active');
-  else { document.getElementById('screen-form').classList.add('active'); return; }
+  const _se=document.getElementById('screen-'+screen); if(_se) _se.classList.add('active'); else return;
   btn.classList.add('active');
   try { localStorage.setItem('lastTab', screen); } catch(e) {}
   document.getElementById('printBtn').style.display = screen === 'ranking' ? 'flex' : 'none';
-  if (screen === 'info') { renderInfo(); }
-  if (screen === 'jogos') { renderSugestoes(); populateSugestaoNomes(); gerarQR(); }
+  if(screen==='info'){renderInfo();renderSugestoes();populateSugestaoNomes();gerarQR();}
+  if(screen==='admin'){renderPremiosLog();renderAdminSugestoes();}
   if (screen === 'ranking') {
     // Show cached data immediately if available
     if (window._rankingCache) renderRanking(window._rankingCache);
     carregarRanking();
   }
   if (screen === 'dash') carregarDashboard();
-  if (screen === 'admin') { renderPremiosLog(); renderAdminSugestoes(); 
+  if (screen === 'admin') {
     if (!adminUnlocked) {
       pinBuffer = '';
       for (let i = 0; i < ADMIN_PIN.length; i++) {
@@ -1391,8 +1345,11 @@ function mostrarProgressoRegisto(nome, payload) {
 // ── SPLASH ──
 let splashProg = 0, splashIv = null;
 function iniciarSplash() {
-  // Load top3 data early
   carregarSplashTop3();
+  const mesLabel=new Date().toLocaleDateString('pt-PT',{month:'long',year:'numeric'}).replace(/^./,s=>s.toUpperCase());
+  // Update sp-bar-wrap label if exists
+  const barSpans = document.querySelectorAll('.sp-bar-wrap span');
+  barSpans.forEach(el=>{ if(el.id==='mesAtualSplash') el.textContent=mesLabel; });
   const pc = document.getElementById('spParticles');
   for(let i=0;i<25;i++){
     const p=document.createElement('div'); p.className='sp-particle';
@@ -1420,16 +1377,11 @@ let changeIv=null, changeTo=null;
 let touchStartY = 0;
 let touchMoved = false;
 
-let lastChangeTime = 0;
+let lastChangeTime=0;
 function startChange(campo,delta,e){
-  if(e && e.type === 'touchstart') {
-    touchStartY = e.touches[0].clientY;
-    touchMoved = false;
-  }
-  if(e && e.type === 'mousedown') e.preventDefault();
-  const now = Date.now();
-  if (now - lastChangeTime < 150) return;
-  lastChangeTime = now;
+  if(e&&e.type==='touchstart'){touchStartY=e.touches[0].clientY;touchMoved=false;}
+  if(e&&e.type==='mousedown')e.preventDefault();
+  const now=Date.now(); if(now-lastChangeTime<150)return; lastChangeTime=now;
   change(campo,delta);
   changeTo=setTimeout(()=>{changeIv=setInterval(()=>{lastChangeTime=Date.now();change(campo,delta);},150);},400);
 }
@@ -1640,19 +1592,45 @@ function renderCompare(nomeA, nomeB) {
   <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:3px"><span>${nomeA.split(' ')[0]}: ${valA}</span><span>${nomeB.split(' ')[0]}: ${valB}</span></div>`;
 }
 
-// ── THEME SWITCHER ──
-function aplicarTema(tema) {
+function aplicarTema(tema){
   document.body.classList.remove('theme-dark','theme-ucl');
   document.body.classList.add('theme-'+tema);
-  try { localStorage.setItem('appTheme', tema); } catch(e) {}
-  const btnD = document.getElementById('btnThemeDark');
-  const btnU = document.getElementById('btnThemeUCL');
-  if (btnD) { btnD.style.borderColor = tema==='dark' ? '#FF6B00' : ''; btnD.style.color = tema==='dark' ? '#FF6B00' : ''; }
-  if (btnU) { btnU.style.borderColor = tema==='ucl' ? '#C9A84C' : ''; btnU.style.color = tema==='ucl' ? '#C9A84C' : ''; }
+  try{localStorage.setItem('appTheme',tema);}catch(e){}
+  const btnD=document.getElementById('btnThemeDark'),btnU=document.getElementById('btnThemeUCL');
+  if(btnD){btnD.style.borderColor=tema==='dark'?'#FF6B00':'';btnD.style.color=tema==='dark'?'#FF6B00':'';}
+  if(btnU){btnU.style.borderColor=tema==='ucl'?'#C9A84C':'';btnU.style.color=tema==='ucl'?'#C9A84C':'';}
 }
+try{aplicarTema(localStorage.getItem('appTheme')||'dark');}catch(e){aplicarTema('dark');}
 
-// Apply saved theme on load
-try { aplicarTema(localStorage.getItem('appTheme') || 'dark'); } catch(e) { aplicarTema('dark'); }
+async function carregarSplashTop3(){
+  try{
+    let dados=null;
+    try{const cv=localStorage.getItem('rankingCache');if(cv)dados=JSON.parse(cv);}catch(e){}
+    if(!dados||!dados.length){
+      try{
+        const r=await Promise.race([
+          fetch(SHEETS_URL+'?action=getRanking',{cache:'no-store'}),
+          fetch('https://corsproxy.io/?'+encodeURIComponent(SHEETS_URL+'?action=getRanking'),{cache:'no-store'}),
+          new Promise((_,rej)=>setTimeout(()=>rej(),4000))
+        ]);
+        dados=await r.json();
+        if(Array.isArray(dados)&&dados.length)try{localStorage.setItem('rankingCache',JSON.stringify(dados));}catch(e){}
+      }catch(e){return;}
+    }
+    if(!Array.isArray(dados)||!dados.length)return;
+    const cats=[{key:'onlines',emoji:'🖥️',label:'Onlines'},{key:'sprays',emoji:'🧴',label:'Sprays'},{key:'palmilhas',emoji:'🦶',label:'Palmilhas'},{key:'camisolas',emoji:'⚽',label:'Camisolas'},{key:'sacos',emoji:'🛍️',label:'Sacos'},{key:'garrafas',emoji:'💧',label:'Garrafas'},{key:'elogios',emoji:'⭐',label:'Elogios'}];
+    const medals=['🥇','🥈','🥉'];
+    let html='';
+    cats.forEach(cat=>{
+      const sorted=[...dados].filter(d=>(d[cat.key]||0)>0).sort((a,b)=>(b[cat.key]||0)-(a[cat.key]||0)).slice(0,3);
+      if(!sorted.length)return;
+      html+=`<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:8px 10px"><div style="font-size:10px;font-weight:700;margin-bottom:4px;color:var(--orange)">${cat.emoji} ${cat.label}</div>${sorted.map((v,i)=>`<div style="display:flex;align-items:center;gap:5px;margin-bottom:2px"><span style="font-size:11px">${medals[i]}</span><span style="font-size:11px;flex:1;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${v.nome.split(' ')[0]}</span><span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--orange)">${v[cat.key]||0}</span></div>`).join('')}</div>`;
+    });
+    if(!html)return;
+    const el=document.getElementById('splashTop3Content'),wrap=document.getElementById('splashTop3');
+    if(el)el.innerHTML=html;if(wrap)wrap.style.display='block';
+  }catch(e){}
+}
 
 renderTabs();
 
@@ -2528,9 +2506,7 @@ function confirmarGestao() {
   }
   fecharGestaoModal();
   renderGestaoLista();
-  if (equipaAtiva) renderNames(equipaAtiva);
-  try { localStorage.setItem('equipasData', JSON.stringify(equipas.map(e=>({id:e.id,nomes:e.nomes})))); } catch(err) {}
-  showToast('✓ ' + (gestaoAction==='add' ? 'Vendedor adicionado!' : 'Equipa alterada!'));
+  showToast('✓ Alteração guardada');
 }
 
 function eliminarVendedor(nome) {
@@ -2585,7 +2561,7 @@ const surprisePrizes = [
 
 let surpriseOpened = false;
 
-function mostrarRoulette(nome, medalha) {
+function mostrarSurprise(nome, medalha) {
   // Only show once per device per medal
   const key = 'surpriseShown_' + nome + '_' + medalha;
   try { if (localStorage.getItem(key)) return; localStorage.setItem(key, '1'); } catch(e) {}
@@ -2680,399 +2656,200 @@ function lancarConfettiSurprise() {
   }
 }
 
-// ── SPLASH TOP 3 ──
-async function carregarSplashTop3() {
-  try {
-    // Try localStorage cache first (instant)
-    let dados = null;
-    try {
-      const cached = localStorage.getItem('rankingCache');
-      if (cached) dados = JSON.parse(cached);
-    } catch(e) {}
-
-    // If no cache, try fetching
-    if (!dados || !dados.length) {
-      try {
-        const res = await Promise.race([
-          fetch(SHEETS_URL + '?action=getRanking', {cache:'no-store'}),
-          fetch('https://corsproxy.io/?' + encodeURIComponent(SHEETS_URL + '?action=getRanking'), {cache:'no-store'}),
-          new Promise((_,rej) => setTimeout(()=>rej('timeout'), 4000))
-        ]);
-        dados = await res.json();
-        if (Array.isArray(dados) && dados.length) {
-          try { localStorage.setItem('rankingCache', JSON.stringify(dados)); } catch(e) {}
-        }
-      } catch(e) { return; }
-    }
-
-    if (!Array.isArray(dados) || !dados.length) return;
-
-    const cats = [
-      {key:'onlines',emoji:'🖥️',label:'Onlines'},
-      {key:'sprays',emoji:'🧴',label:'Sprays'},
-      {key:'palmilhas',emoji:'🦶',label:'Palmilhas'},
-      {key:'camisolas',emoji:'⚽',label:'Camisolas'},
-      {key:'sacos',emoji:'🛍️',label:'Sacos'},
-      {key:'garrafas',emoji:'💧',label:'Garrafas'},
-      {key:'elogios',emoji:'⭐',label:'Elogios'},
-    ];
-    const medals = ['🥇','🥈','🥉'];
-    let html = '';
-    cats.forEach(cat => {
-      const sorted = [...dados]
-        .filter(d => (d[cat.key]||0) > 0)
-        .sort((a,b) => (b[cat.key]||0) - (a[cat.key]||0))
-        .slice(0,3);
-      if (!sorted.length) return;
-      html += `<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:8px 10px">
-        <div style="font-size:10px;font-weight:700;margin-bottom:4px;color:var(--orange)">${cat.emoji} ${cat.label}</div>
-        ${sorted.map((v,i) => `<div style="display:flex;align-items:center;gap:5px;margin-bottom:2px">
-          <span style="font-size:11px">${medals[i]}</span>
-          <span style="font-size:11px;flex:1;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${v.nome.split(' ')[0]}</span>
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--orange)">${v[cat.key]||0}</span>
-        </div>`).join('')}
-      </div>`;
-    });
-
-    if (!html) return;
-    const el = document.getElementById('splashTop3Content');
-    const wrap = document.getElementById('splashTop3');
-    if (el) el.innerHTML = html;
-    if (wrap) wrap.style.display = 'block';
-  } catch(e) {}
-}
-
-// ══ ROULETTE SYSTEM ══
-const premios = [
-  { icon:'☕', nome:'Um café!',                prob:0.20, cor:'#4A2C2A' },
-  { icon:'🍫', nome:'Um chocolate!',           prob:0.25, cor:'#5C3317' },
-  { icon:'🥐', nome:'Um pastel de nata!',      prob:0.10, cor:'#C8963E' },
-  { icon:'🍬', nome:'Um saco de gomas!',       prob:0.15, cor:'#E91E8C' },
-  { icon:'⏰', nome:'Sair 30 min mais cedo!',  prob:0.10, cor:'#1565C0' },
-  { icon:'🎰', nome:'Uma raspadinha!',         prob:0.20, cor:'#2E7D32' },
+// ── INFO + SUGESTÕES + QR ──
+const infoSections=[
+  {title:'🏆 O que é a Sales League',content:'A Sales League é uma competição interna de vendas da loja do Vasco da Gama, onde cada colaborador acumula pontos com base no seu desempenho diário.\nO objetivo é promover foco, consistência e espírito competitivo saudável dentro da equipa.'},
+  {title:'🎯 Objetivo da App',content:'Esta app permite acompanhar em tempo real o desempenho individual e da equipa.\nPodes consultar rankings, pontos, evolução e destacar os melhores resultados.'},
+  {title:'📊 Como ganhar pontos',content:'Os pontos são atribuídos com base no teu desempenho:\n• Unidades vendidas\n• Elogios recebidos\nQuanto melhor o teu desempenho, mais pontos acumulas.'},
+  {title:'📈 Ranking e classificação',content:'O ranking atualiza automaticamente.\n• Os melhores destacam-se no topo\n• A classificação muda diariamente\n• Todos têm oportunidade de subir posições'},
+  {title:'🥇 Medalhas',content:'As medalhas são ajustadas consoante o horário (full-time e part-time) e equipa.\nAo desbloquear uma medalha, ganhas acesso a uma gift box com prémio aleatório:\n• Sair 30 min mais cedo · Chocolate · Café · Pastel de nata · Gomas · Raspadinha'},
+  {title:'⚙️ Como usar a app',content:'1. Consulta o teu desempenho diariamente\n2. Acompanha o ranking da equipa\n3. Define objetivos pessoais\n4. Foca-te nos indicadores com mais impacto\nA consistência diária faz a diferença.'},
+  {title:'📅 Períodos de competição',content:'A liga funciona por ciclos mensais.\nNo final de cada ciclo:\n• O ranking é fechado\n• São atribuídos os prémios\n• Inicia-se uma nova competição'},
+  {title:'⚠️ Regras importantes',content:'• Apenas vendas válidas são contabilizadas\n• Todos os dados devem ser corretos\n• Competição saudável e fair play obrigatório'},
+  {title:'💡 Dicas para subir no ranking',content:'• Foco nos produtos com maior impacto\n• Abordagem ativa ao cliente\n• Consistência diária\n• Acompanhamento regular dos resultados'},
 ];
-
-let rouletteNomeAtual = '';
-let rouletteMedalhaAtual = '';
-let rouletteOpened = false;
-let roletaAngle = 0;
-let roletaSpinning = false;
-let premioGanho = null;
-
-function mostrarRoulette(nome, medalha) {
-  const key = 'surpriseShown_' + nome + '_' + medalha;
-  try { if (localStorage.getItem(key)) return; localStorage.setItem(key, '1'); } catch(e) {}
-  rouletteNomeAtual = nome;
-  rouletteMedalhaAtual = medalha;
-  rouletteOpened = false;
-  roletaAngle = 0;
-  roletaSpinning = false;
-  premioGanho = null;
-
-  document.getElementById('rouletteNome').textContent = nome + ' · ' + medalha;
-  document.getElementById('rouletteBoxSection').style.display = 'block';
-  document.getElementById('wheelContainer').style.display = 'none';
-  document.getElementById('rouletteResult').style.display = 'none';
-  document.getElementById('rouletteLid').classList.remove('open');
-  document.getElementById('rouletteHint').classList.remove('hidden');
-  document.getElementById('rouletteConfetti').innerHTML = '';
-  document.getElementById('wheelSpinBtn').disabled = false;
-
-  desenharRoleta(0);
-  document.getElementById('rouletteOverlay').classList.add('open');
-
-  // Shake box
-  setTimeout(() => {
-    const w = document.getElementById('rouletteBoxWrap');
-    w.style.animation = 'shakeBox 0.5s ease';
-    setTimeout(() => w.style.animation = '', 600);
-  }, 1000);
-}
-
-function abrirRoulette() {
-  if (rouletteOpened) return;
-  rouletteOpened = true;
-  document.getElementById('rouletteLid').classList.add('open');
-  document.getElementById('rouletteHint').classList.add('hidden');
-  setTimeout(() => {
-    document.getElementById('rouletteBoxSection').style.display = 'none';
-    document.getElementById('wheelContainer').style.display = 'flex';
-    desenharRoleta(0);
-  }, 500);
-}
-
-function fecharRoulette() {
-  document.getElementById('rouletteOverlay').classList.remove('open');
-  // Save to admin prizes log
-  if (premioGanho && rouletteNomeAtual) {
-    salvarPremioConcedido(rouletteNomeAtual, premioGanho.nome, premioGanho.icon);
-  }
-}
-
-function desenharRoleta(angOffset) {
-  const canvas = document.getElementById('wheelCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const cx = 130, cy = 130, r = 126;
-  const total = premios.length;
-  const segAngle = (Math.PI * 2) / total;
-  ctx.clearRect(0, 0, 260, 260);
-  premios.forEach((p, i) => {
-    const start = angOffset + i * segAngle - Math.PI / 2;
-    const end = start + segAngle;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, r, start, end);
-    ctx.closePath();
-    ctx.fillStyle = p.cor;
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-    // Text
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(start + segAngle / 2);
-    ctx.textAlign = 'right';
-    ctx.font = 'bold 11px sans-serif';
-    ctx.fillStyle = '#fff';
-    ctx.shadowColor = 'rgba(0,0,0,0.6)';
-    ctx.shadowBlur = 3;
-    ctx.fillText(p.icon + ' ' + p.nome.split(' ').slice(0,3).join(' '), r - 8, 4);
-    ctx.restore();
-  });
-  // Center
-  ctx.beginPath();
-  ctx.arc(cx, cy, 20, 0, Math.PI*2);
-  ctx.fillStyle = '#111';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-}
-
-function girarRoleta() {
-  if (roletaSpinning) return;
-  roletaSpinning = true;
-  document.getElementById('wheelSpinBtn').disabled = true;
-
-  // Pick winner based on probabilities
-  const rand = Math.random();
-  let acc = 0, winIdx = 0;
-  for (let i = 0; i < premios.length; i++) {
-    acc += premios[i].prob;
-    if (rand <= acc) { winIdx = i; break; }
-  }
-  premioGanho = premios[winIdx];
-
-  const segAngle = (Math.PI * 2) / premios.length;
-  const targetAngle = -(winIdx * segAngle + segAngle / 2); // land pointer on winner
-  const spins = 5 + Math.random() * 2;
-  const totalRot = spins * Math.PI * 2 + targetAngle;
-  const duration = 4500 + Math.random() * 1500;
-  const start = performance.now();
-  const startAngle = roletaAngle;
-
-  function animate(now) {
-    const elapsed = now - start;
-    const progress = Math.min(elapsed / duration, 1);
-    const ease = 1 - Math.pow(1 - progress, 4);
-    roletaAngle = startAngle + totalRot * ease;
-    desenharRoleta(roletaAngle);
-    if (progress < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      roletaSpinning = false;
-      mostrarResultadoRoleta(premioGanho);
-    }
-  }
-  requestAnimationFrame(animate);
-}
-
-function mostrarResultadoRoleta(premio) {
-  iniciarAudio(); tocarSomMedalha(); lancarConfettiRoleta();
-  setTimeout(() => {
-    document.getElementById('wheelContainer').style.display = 'none';
-    const res = document.getElementById('rouletteResult');
-    res.style.display = 'flex';
-    document.getElementById('rouletteResultIcon').textContent = premio.icon;
-    document.getElementById('rouletteResultNome').textContent = premio.nome;
-  }, 300);
-}
-
-function lancarConfettiRoleta() {
-  const wrap = document.getElementById('rouletteConfetti');
-  const cols = ['#FF6B00','#FFD700','#FF4444','#44FF88','#4488FF','#FF88FF','#fff'];
-  for (let i = 0; i < 50; i++) {
-    const el = document.createElement('div');
-    el.style.cssText = `position:absolute;width:${5+Math.random()*8}px;height:${5+Math.random()*8}px;border-radius:${Math.random()>0.5?'50%':'2px'};background:${cols[Math.floor(Math.random()*cols.length)]};left:${Math.random()*100}%;top:-10px;animation:confettiFall ${1.5+Math.random()}s ease-out ${Math.random()}s forwards;`;
-    wrap.appendChild(el);
-  }
-}
-
-// ── PRIZES LOG (admin) ──
-let premiosLog = [];
-try { premiosLog = JSON.parse(localStorage.getItem('premiosLog') || '[]'); } catch(e) {}
-
-function salvarPremioConcedido(nome, premio, icon) {
-  premiosLog.unshift({ nome, premio, icon, data: new Date().toLocaleDateString('pt-PT'), estado: 'por_entregar' });
-  try { localStorage.setItem('premiosLog', JSON.stringify(premiosLog)); } catch(e) {}
-}
-
-function renderPremiosLog() {
-  const el = document.getElementById('premiosLogList');
-  if (!el) return;
-  if (!premiosLog.length) { el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">Nenhum prémio registado ainda</div>'; return; }
-  el.innerHTML = premiosLog.map((p,i) => `
-    <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px">
-      <span style="font-size:22px">${p.icon}</span>
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:600">${p.nome}</div>
-        <div style="font-size:11px;color:var(--muted)">${p.premio} · ${p.data}</div>
-      </div>
-      <button onclick="toggleEstadoPremio(${i})" style="background:${p.estado==='entregue'?'rgba(34,197,94,0.15)':'rgba(255,255,255,0.06)'};border:1px solid ${p.estado==='entregue'?'#22C55E':'var(--border)'};border-radius:8px;padding:5px 10px;font-size:11px;color:${p.estado==='entregue'?'#22C55E':'var(--muted)'};cursor:pointer">${p.estado==='entregue'?'✔ Entregue':'⬜ Por entregar'}</button>
-    </div>
-  `).join('');
-}
-
-function toggleEstadoPremio(i) {
-  premiosLog[i].estado = premiosLog[i].estado === 'entregue' ? 'por_entregar' : 'entregue';
-  try { localStorage.setItem('premiosLog', JSON.stringify(premiosLog)); } catch(e) {}
-  renderPremiosLog();
-}
-
-// ── INFO SCREEN ──
-const infoSections = [
-  { title:'🏆 O que é a Sales League', content:'A Sales League é uma competição interna de vendas da loja do Vasco da Gama, onde cada colaborador acumula pontos com base no seu desempenho diário. O objetivo é promover foco, consistência e espírito competitivo saudável dentro da equipa.' },
-  { title:'🎯 Objetivo da App', content:'Esta app permite acompanhar em tempo real o desempenho individual e da equipa. Podes consultar rankings, pontos, evolução e destacar os melhores resultados. A equipa de gestão acompanha o histórico para ter uma visão clara do desempenho de vendas e atendimento.' },
-  { title:'📊 Como ganhar pontos', content:'Os pontos são atribuídos com base no teu desempenho diário:\n• Unidades vendidas (onlines, sprays, palmilhas, camisolas, sacos, garrafas)\n• Elogios recebidos\nQuanto melhor o teu desempenho, mais pontos acumulas.' },
-  { title:'📈 Ranking e classificação', content:'O ranking é atualizado automaticamente e mostra a posição de cada elemento da equipa.\n• Os melhores destacam-se no topo\n• A classificação muda diariamente\n• Todos têm oportunidade de subir posições' },
-  { title:'🥇 Medalhas', content:'As medalhas são ajustadas consoante o tipo de horário (full-time e part-time) e equipa. Ao desbloquear uma medalha, ganhas acesso a uma gift box com prémio aleatório:\n• Sair 30 min mais cedo\n• Chocolate · Café · Pastel de nata\n• Saco de gomas · Raspadinha' },
-  { title:'⚙️ Como usar a app', content:'1. Consulta o teu desempenho diariamente\n2. Acompanha o ranking da equipa\n3. Define objetivos pessoais\n4. Foca-te nos indicadores com mais impacto\nA consistência diária faz a diferença.' },
-  { title:'📅 Períodos de competição', content:'A liga funciona por ciclos mensais.\nNo final de cada ciclo:\n• O ranking é fechado\n• São atribuídos os prémios ao longo do mês\n• Inicia-se uma nova competição' },
-  { title:'⚠️ Regras importantes', content:'• Apenas vendas válidas são contabilizadas\n• Todos os dados devem ser corretos\n• O objetivo é competição saudável\n• Fair play é obrigatório' },
-  { title:'💡 Dicas para subir no ranking', content:'• Foco nos produtos com maior impacto\n• Abordagem ativa ao cliente\n• Consistência diária\n• Acompanhamento regular dos resultados' },
-  { title:'❓ FAQ', content:'Quando atualiza o ranking? → Instantaneamente\nPosso recuperar posições? → Sim, o ranking é dinâmico\nComo sei quantos pontos tenho? → No Dashboard\nEnganei-me a lançar um registo, posso corrigir? → Solicita ajuste à chefia' },
+const faqItems=[
+  {q:'Quando atualiza o ranking?',a:'O ranking atualiza automaticamente, cerca de 1 minuto após o registo.'},
+  {q:'Posso recuperar posições?',a:'Sim! O ranking é dinâmico e muda diariamente. Basta melhorar o teu desempenho.'},
+  {q:'Como sei quantos pontos tenho?',a:'Acede ao Dashboard e seleciona o teu nome para ver o teu perfil completo.'},
+  {q:'Enganei-me a lançar um registo, posso corrigir?',a:'Se inseriste a menos, cria um novo registo. Se inseriste a mais, solicita ajuste à chefia.'},
+  {q:'Com que frequência devo registar?',a:'Diariamente! A consistência é o fator mais importante para a medalha "Consistente".'},
 ];
+let infoOpenIdx=-1,faqOpenIdx=-1;
+function toggleInfo(i){infoOpenIdx=infoOpenIdx===i?-1:i;renderInfo();}
+function toggleFaq(i){faqOpenIdx=faqOpenIdx===i?-1:i;renderInfo();}
 
-let infoOpenIdx = -1;
-
-function renderInfo() {
-  const el = document.getElementById('infoContent');
-  if (!el) return;
-  el.innerHTML = infoSections.map((s,i) => `
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden">
-      <div onclick="toggleInfo(${i})" style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer">
-        <span style="font-size:14px;font-weight:600;color:var(--text)">${s.title}</span>
-        <span style="font-size:18px;color:var(--orange);transition:transform 0.3s;transform:rotate(${infoOpenIdx===i?'180':'0'}deg)">▾</span>
-      </div>
-      <div style="max-height:${infoOpenIdx===i?'400px':'0'};overflow:hidden;transition:max-height 0.3s ease">
-        <div style="padding:0 16px 14px;font-size:13px;color:var(--muted);line-height:1.6;white-space:pre-line">${s.content}</div>
-      </div>
-    </div>
-  `).join('');
+function renderInfo(){
+  const el=document.getElementById('infoContent');
+  if(!el)return;
+  let html=infoSections.map((s,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden"><div onclick="toggleInfo(${i})" style="padding:13px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer"><span style="font-size:14px;font-weight:600;color:var(--text)">${s.title}</span><span style="font-size:16px;color:var(--orange);transition:transform 0.3s;transform:rotate(${infoOpenIdx===i?'180':'0'}deg)">▾</span></div><div style="max-height:${infoOpenIdx===i?'400px':'0'};overflow:hidden;transition:max-height 0.3s ease"><div style="padding:0 16px 13px;font-size:13px;color:var(--muted);line-height:1.6;white-space:pre-line">${s.content}</div></div></div>`).join('');
+  html+=`<div style="height:1px;background:var(--border);margin:14px 0"></div><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">❓ PERGUNTAS FREQUENTES</div>${faqItems.map((item,qi)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden"><div onclick="toggleFaq(${qi})" style="padding:13px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;cursor:pointer"><span style="font-size:13px;font-weight:600;color:var(--text);flex:1">${item.q}</span><span style="font-size:16px;color:var(--orange);flex-shrink:0;transition:transform 0.3s;transform:rotate(${faqOpenIdx===qi?'180':'0'}deg)">▾</span></div><div style="max-height:${faqOpenIdx===qi?'200px':'0'};overflow:hidden;transition:max-height 0.3s ease"><div style="padding:0 16px 13px;font-size:13px;color:var(--muted);line-height:1.6;border-top:1px solid var(--border)">${item.a}</div></div></div>`).join('')}`;
+  el.innerHTML=html;
 }
 
-function toggleInfo(i) {
-  infoOpenIdx = infoOpenIdx === i ? -1 : i;
-  renderInfo();
+let sugestoes=[];
+try{sugestoes=JSON.parse(localStorage.getItem('sugestoes')||'[]');}catch(e){}
+
+function populateSugestaoNomes(){
+  const sel=document.getElementById('sugestaoNome');
+  if(!sel)return;
+  const nomes=[...new Set(equipas.flatMap(e=>e.nomes))].sort();
+  sel.innerHTML='<option value="">Seleciona o teu nome...</option>'+nomes.map(n=>`<option value="${n}">${n}</option>`).join('');
 }
 
-// ── SUGESTÕES ──
-let sugestoes = [];
-try { sugestoes = JSON.parse(localStorage.getItem('sugestoes') || '[]'); } catch(e) {}
-
-function populateSugestaoNomes() {
-  const sel = document.getElementById('sugestaoNome');
-  if (!sel) return;
-  const nomes = [...new Set(equipas.flatMap(e=>e.nomes))].sort();
-  sel.innerHTML = '<option value="">Seleciona o teu nome...</option>' + nomes.map(n=>`<option value="${n}">${n}</option>`).join('');
-}
-
-function enviarSugestao() {
-  const nome = document.getElementById('sugestaoNome')?.value;
-  const texto = document.getElementById('sugestaoTexto')?.value?.trim();
-  if (!nome) { showToast('⚠️ Seleciona o teu nome'); return; }
-  if (!texto || texto.length < 5) { showToast('⚠️ Escreve uma sugestão'); return; }
-  sugestoes.unshift({ nome, texto, data: new Date().toLocaleDateString('pt-PT'), estado:'em_analise', resposta:'' });
-  try { localStorage.setItem('sugestoes', JSON.stringify(sugestoes)); } catch(e) {}
-  document.getElementById('sugestaoTexto').value = '';
-  document.getElementById('sugestaoNome').value = '';
+function enviarSugestao(){
+  const nome=document.getElementById('sugestaoNome')?.value;
+  const texto=document.getElementById('sugestaoTexto')?.value?.trim();
+  if(!nome){showToast('⚠️ Seleciona o teu nome');return;}
+  if(!texto||texto.length<5){showToast('⚠️ Escreve uma sugestão');return;}
+  sugestoes.unshift({nome,texto,data:new Date().toLocaleDateString('pt-PT'),estado:'em_analise',resposta:''});
+  try{localStorage.setItem('sugestoes',JSON.stringify(sugestoes));}catch(e){}
+  document.getElementById('sugestaoTexto').value='';
+  document.getElementById('sugestaoNome').value='';
   renderSugestoes();
   showToast('✓ Sugestão enviada!');
 }
 
-function renderSugestoes() {
-  const el = document.getElementById('sugestoesList');
-  if (!el) return;
-  if (!sugestoes.length) { el.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:16px">Ainda sem sugestões</div>'; return; }
-  const estadoCor = { em_analise:'#F59E0B', aprovada:'#22C55E', implementada:'#3B82F6' };
-  const estadoLabel = { em_analise:'Em análise', aprovada:'Aprovada', implementada:'Implementada' };
-  el.innerHTML = sugestoes.map((s,i) => `
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:13px;font-weight:600;color:var(--text)">${s.nome}</span>
-        <span style="font-size:10px;font-weight:700;color:${estadoCor[s.estado]||'#F59E0B'};background:${estadoCor[s.estado]||'#F59E0B'}22;border-radius:6px;padding:2px 8px">${estadoLabel[s.estado]||'Em análise'}</span>
-      </div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:6px;line-height:1.4">${s.texto}</div>
-      <div style="font-size:10px;color:var(--border);margin-bottom:${s.resposta?'8px':'0'}">${s.data}</div>
-      ${s.resposta ? `<div style="background:rgba(255,107,0,0.06);border-left:3px solid var(--orange);border-radius:4px;padding:8px 10px;font-size:12px;color:var(--muted);line-height:1.4"><strong style="color:var(--orange)">Resposta:</strong> ${s.resposta}</div>` : ''}
-    </div>
-  `).join('');
+function renderSugestoes(){
+  const el=document.getElementById('sugestoesList');
+  if(!el)return;
+  if(!sugestoes.length){el.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:16px">Ainda sem sugestões</div>';return;}
+  const cor={em_analise:'#F59E0B',aprovada:'#22C55E',implementada:'#3B82F6'};
+  const lbl={em_analise:'Em análise',aprovada:'Aprovada',implementada:'Implementada'};
+  el.innerHTML=sugestoes.map((s,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600;color:var(--text)">${s.nome}</span><span style="font-size:10px;font-weight:700;color:${cor[s.estado]||'#F59E0B'};background:${cor[s.estado]||'#F59E0B'}22;border-radius:6px;padding:2px 8px">${lbl[s.estado]||'Em análise'}</span></div><div style="font-size:13px;color:var(--muted);margin-bottom:4px;line-height:1.4">${s.texto}</div><div style="font-size:10px;color:var(--border)">${s.data}</div>${s.resposta?`<div style="background:rgba(255,107,0,0.06);border-left:3px solid var(--orange);border-radius:4px;padding:8px 10px;font-size:12px;color:var(--muted);line-height:1.4;margin-top:8px"><strong style="color:var(--orange)">Resposta:</strong> ${s.resposta}</div>`:''}</div>`).join('');
 }
 
-// ── SHARE / QR CODE ──
-function gerarQR() {
-  const el = document.getElementById('qrCode');
-  if (!el) return;
-  const url = 'https://manager9yc.github.io/sales-league/';
-  const size = 140;
-  el.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(url)}&bgcolor=161616&color=FF6B00&margin=2" width="${size}" height="${size}" style="border-radius:8px">`;
+function gerarQR(){
+  const el=document.getElementById('qrCode');
+  if(!el)return;
+  el.innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent('https://manager9yc.github.io/sales-league/')}&bgcolor=161616&color=FF6B00&margin=2" width="140" height="140" style="border-radius:8px">`;
 }
 
-function copiarLink() {
-  const url = 'https://manager9yc.github.io/sales-league/';
-  navigator.clipboard?.writeText(url).then(() => {
+function copiarLink(){
+  navigator.clipboard?.writeText('https://manager9yc.github.io/sales-league/').then(()=>{
     showToast('✓ Link copiado com sucesso!');
-    const btn = document.getElementById('copyBtn');
-    if (btn) { btn.textContent = '✓ Link copiado!'; setTimeout(() => btn.textContent = '📋 Copiar Link', 2000); }
-  }).catch(() => showToast('Copia o link: ' + url));
+    const btn=document.getElementById('copyBtn');
+    if(btn){btn.textContent='✓ Copiado!';setTimeout(()=>btn.textContent='📋 Copiar Link',2000);}
+  }).catch(()=>showToast('Link: manager9yc.github.io/sales-league/'));
 }
 
-function renderAdminSugestoes() {
-  const el = document.getElementById('adminSugestoesList');
-  if (!el) return;
-  if (!sugestoes.length) { el.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:12px">Sem sugestões</div>'; return; }
-  const estadoOpts = ['em_analise','aprovada','implementada'];
-  const estadoLabel = { em_analise:'Em análise', aprovada:'Aprovada', implementada:'Implementada' };
-  el.innerHTML = sugestoes.map((s,i) => `
-    <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px">
-      <div style="font-size:12px;font-weight:600;margin-bottom:4px">${s.nome} <span style="color:var(--muted);font-weight:400">· ${s.data}</span></div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">${s.texto}</div>
-      <select onchange="alterarEstadoSugestao(${i},this.value)" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:11px;outline:none;width:100%;margin-bottom:6px">
-        ${estadoOpts.map(o=>`<option value="${o}" ${s.estado===o?'selected':''}>${estadoLabel[o]}</option>`).join('')}
-      </select>
-      <div style="display:flex;gap:6px">
-        <input type="text" value="${s.resposta||''}" placeholder="Escreve uma resposta..." id="resp_${i}" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;outline:none;">
-        <button onclick="guardarRespostaSugestao(${i})" style="background:var(--orange);border:none;border-radius:6px;padding:6px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer">OK</button>
-      </div>
-    </div>
-  `).join('');
+// Admin sugestoes
+let premiosLog=[];
+try{premiosLog=JSON.parse(localStorage.getItem('premiosLog')||'[]');}catch(e){}
+
+function renderPremiosLog(){
+  const el=document.getElementById('premiosLogList');
+  if(!el)return;
+  if(!premiosLog.length){el.innerHTML='<div style="text-align:center;color:var(--muted);padding:16px;font-size:13px">Nenhum prémio registado ainda</div>';return;}
+  el.innerHTML=premiosLog.map((p,i)=>`<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:6px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">${p.icon}</span><div style="flex:1"><div style="font-size:13px;font-weight:600">${p.nome}</div><div style="font-size:11px;color:var(--muted)">${p.premio} · ${p.data}</div></div><button onclick="toggleEstadoPremio(${i})" style="background:${p.estado==='entregue'?'rgba(34,197,94,0.15)':'rgba(255,255,255,0.06)'};border:1px solid ${p.estado==='entregue'?'#22C55E':'var(--border)'};border-radius:8px;padding:5px 10px;font-size:11px;color:${p.estado==='entregue'?'#22C55E':'var(--muted)'};cursor:pointer">${p.estado==='entregue'?'✔ Entregue':'⬜ Por entregar'}</button></div>`).join('');
 }
 
-function alterarEstadoSugestao(i, estado) {
-  sugestoes[i].estado = estado;
-  try { localStorage.setItem('sugestoes', JSON.stringify(sugestoes)); } catch(e) {}
-  renderSugestoes();
+function toggleEstadoPremio(i){
+  premiosLog[i].estado=premiosLog[i].estado==='entregue'?'por_entregar':'entregue';
+  try{localStorage.setItem('premiosLog',JSON.stringify(premiosLog));}catch(e){}
+  renderPremiosLog();
 }
 
-function guardarRespostaSugestao(i) {
-  const input = document.getElementById('resp_' + i);
-  if (!input) return;
-  sugestoes[i].resposta = input.value.trim();
-  try { localStorage.setItem('sugestoes', JSON.stringify(sugestoes)); } catch(e) {}
-  renderSugestoes();
-  showToast('✓ Resposta guardada');
+function renderAdminSugestoes(){
+  const el=document.getElementById('adminSugestoesList');
+  if(!el)return;
+  if(!sugestoes.length){el.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:12px">Sem sugestões</div>';return;}
+  const estadoOpts=['em_analise','aprovada','implementada'];
+  const estadoLabel={em_analise:'Em análise',aprovada:'Aprovada',implementada:'Implementada'};
+  el.innerHTML=sugestoes.map((s,i)=>`<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px"><div style="font-size:12px;font-weight:600;margin-bottom:4px">${s.nome} <span style="color:var(--muted);font-weight:400">· ${s.data}</span></div><div style="font-size:12px;color:var(--muted);margin-bottom:8px">${s.texto}</div><select onchange="alterarEstadoSugestao(${i},this.value)" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:11px;outline:none;width:100%;margin-bottom:6px">${estadoOpts.map(o=>`<option value="${o}" ${s.estado===o?'selected':''}>${estadoLabel[o]}</option>`).join('')}</select><div style="display:flex;gap:6px"><input type="text" value="${s.resposta||''}" placeholder="Resposta..." id="resp_${i}" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;outline:none"><button onclick="guardarRespostaSugestao(${i})" style="background:var(--orange);border:none;border-radius:6px;padding:6px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer">OK</button></div></div>`).join('');
+}
+
+function alterarEstadoSugestao(i,estado){sugestoes[i].estado=estado;try{localStorage.setItem('sugestoes',JSON.stringify(sugestoes));}catch(e){}renderSugestoes();}
+function guardarRespostaSugestao(i){const input=document.getElementById('resp_'+i);if(!input)return;sugestoes[i].resposta=input.value.trim();try{localStorage.setItem('sugestoes',JSON.stringify(sugestoes));}catch(e){}renderSugestoes();showToast('✓ Resposta guardada');}
+
+const premios=[
+  {icon:'☕',nome:'Um café!',prob:0.20,cor:'#4A2C2A'},
+  {icon:'🍫',nome:'Um chocolate!',prob:0.25,cor:'#5C3317'},
+  {icon:'🥐',nome:'Um pastel de nata!',prob:0.10,cor:'#C8963E'},
+  {icon:'🍬',nome:'Um saco de gomas!',prob:0.15,cor:'#E91E8C'},
+  {icon:'⏰',nome:'Sair 30 min mais cedo!',prob:0.10,cor:'#1565C0'},
+  {icon:'🎰',nome:'Uma raspadinha!',prob:0.20,cor:'#2E7D32'},
+];
+let rNome='',rMedalha='',rOpened=false,rAngle=0,rSpinning=false,rPremio=null;
+
+function mostrarRoulette(nome,medalha){
+  const key='surpriseShown_'+nome+'_'+medalha;
+  try{if(localStorage.getItem(key))return;localStorage.setItem(key,'1');}catch(e){}
+  rNome=nome;rMedalha=medalha;rOpened=false;rAngle=0;rSpinning=false;rPremio=null;
+  document.getElementById('rouletteNome').textContent=nome+' · '+medalha;
+  document.getElementById('rouletteBoxSection').style.display='block';
+  document.getElementById('wheelSection').style.display='none';
+  document.getElementById('rouletteResult').style.display='none';
+  document.getElementById('rouletteLid').style.transform='';
+  document.getElementById('rouletteHint').style.visibility='visible';
+  document.getElementById('rouletteConfetti').innerHTML='';
+  if(document.getElementById('wheelSpinBtn'))document.getElementById('wheelSpinBtn').disabled=false;
+  desenharRoleta(0);
+  document.getElementById('rouletteOverlay').classList.add('open');
+  setTimeout(()=>{const w=document.getElementById('rouletteBoxWrap');w.style.animation='shakeBox 0.5s ease';setTimeout(()=>w.style.animation='',600);},1000);
+}
+
+function abrirRoulette(){
+  if(rOpened)return;rOpened=true;
+  document.getElementById('rouletteLid').style.transform='rotate(-65deg) translateY(-16px)';
+  document.getElementById('rouletteHint').style.visibility='hidden';
+  setTimeout(()=>{document.getElementById('rouletteBoxSection').style.display='none';document.getElementById('wheelSection').style.display='flex';desenharRoleta(0);},500);
+}
+
+function fecharRoulette(){
+  document.getElementById('rouletteOverlay').classList.remove('open');
+  if(rPremio&&rNome)salvarPremioConcedido(rNome,rPremio.nome,rPremio.icon);
+}
+
+function desenharRoleta(ang){
+  const canvas=document.getElementById('wheelCanvas');if(!canvas)return;
+  const ctx=canvas.getContext('2d'),cx=130,cy=130,r=126,n=premios.length,sa=(Math.PI*2)/n;
+  ctx.clearRect(0,0,260,260);
+  premios.forEach((p,i)=>{
+    const s=ang+i*sa-Math.PI/2,e=s+sa;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,s,e);ctx.closePath();
+    ctx.fillStyle=p.cor;ctx.fill();ctx.strokeStyle='rgba(0,0,0,0.3)';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(s+sa/2);ctx.textAlign='right';
+    ctx.font='bold 11px sans-serif';ctx.fillStyle='#fff';ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=3;
+    ctx.fillText(p.icon+' '+p.nome.split(' ').slice(0,3).join(' '),r-8,4);ctx.restore();
+  });
+  ctx.beginPath();ctx.arc(cx,cy,20,0,Math.PI*2);ctx.fillStyle='#111';ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.lineWidth=2;ctx.stroke();
+}
+
+function girarRoleta(){
+  if(rSpinning)return;rSpinning=true;
+  if(document.getElementById('wheelSpinBtn'))document.getElementById('wheelSpinBtn').disabled=true;
+  const rand=Math.random();let acc=0,wIdx=0;
+  for(let i=0;i<premios.length;i++){acc+=premios[i].prob;if(rand<=acc){wIdx=i;break;}}
+  rPremio=premios[wIdx];
+  const seg=(Math.PI*2)/premios.length,target=-(wIdx*seg+seg/2),total=(5+Math.random()*2)*Math.PI*2+target;
+  const dur=4500+Math.random()*1500,t0=performance.now(),a0=rAngle;
+  function anim(now){
+    const p=Math.min((now-t0)/dur,1),ease=1-Math.pow(1-p,4);
+    rAngle=a0+total*ease;desenharRoleta(rAngle);
+    if(p<1)requestAnimationFrame(anim);
+    else{rSpinning=false;setTimeout(()=>mostrarResultado(rPremio),200);}
+  }
+  requestAnimationFrame(anim);
+}
+
+function mostrarResultado(p){
+  iniciarAudio();tocarSomMedalha();
+  const wrap=document.getElementById('rouletteConfetti');
+  const cols=['#FF6B00','#FFD700','#FF4444','#44FF88','#4488FF','#FF88FF','#fff'];
+  for(let i=0;i<50;i++){const el=document.createElement('div');el.style.cssText=`position:absolute;width:${5+Math.random()*8}px;height:${5+Math.random()*8}px;border-radius:${Math.random()>.5?'50%':'2px'};background:${cols[Math.floor(Math.random()*cols.length)]};left:${Math.random()*100}%;top:-10px;animation:confettiFall ${1.5+Math.random()}s ease-out ${Math.random()}s forwards`;wrap.appendChild(el);}
+  setTimeout(()=>{
+    document.getElementById('wheelSection').style.display='none';
+    const res=document.getElementById('rouletteResult');res.style.display='flex';
+    document.getElementById('rouletteResultIcon').textContent=p.icon;
+    document.getElementById('rouletteResultNome').textContent=p.nome;
+  },300);
+}
+
+function salvarPremioConcedido(nome,premio,icon){
+  premiosLog.unshift({nome,premio,icon,data:new Date().toLocaleDateString('pt-PT'),estado:'por_entregar'});
+  try{localStorage.setItem('premiosLog',JSON.stringify(premiosLog));}catch(e){}
 }
 
 // ── INSTALL PROMPT ──
@@ -3222,77 +2999,48 @@ try {
   </div>
 </div>
 
-<!-- ROULETTE OVERLAY -->
-<div class="roulette-overlay" id="rouletteOverlay">
-  <div class="roulette-confetti-wrap" id="rouletteConfetti"></div>
-  <div class="roulette-pre">🏅 Medalha conquistada</div>
-  <div class="roulette-title">Parabéns!</div>
-  <div class="roulette-nome" id="rouletteNome"></div>
-
-  <!-- Gift box -->
-  <div id="rouletteBoxSection">
-    <div class="roulette-box-wrap" id="rouletteBoxWrap" onclick="abrirRoulette()">
-      <div class="roulette-box">
-        <div class="roulette-box-bottom">
-          <div class="roulette-box-ribbon-v"></div>
-          <div class="roulette-box-ribbon-h"></div>
+<div class="screen" id="screen-info">
+  <div style="background:var(--dark);position:relative;overflow:hidden">
+    <div style="padding:22px 20px 0;text-align:center;position:relative">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,8vw,48px);color:#fff;line-height:0.95;letter-spacing:2px">INFO</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-top:4px">Sales League · Vasco da Gama</div>
+    </div>
+    <div style="background:var(--orange);margin-top:12px;padding:7px 24px;display:flex;align-items:center;justify-content:center;gap:10px">
+      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div><span style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:4px;color:#fff">GUIA DA LIGA</span><div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
+    </div>
+  </div>
+  <div style="overflow-y:auto;flex:1">
+    <div style="padding:12px 16px 0" id="infoContent"></div>
+    <div style="padding:0 16px 20px">
+      <div style="margin-top:16px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">💬 Caixa de Sugestões</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px">
+          <select id="sugestaoNome" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;margin-bottom:8px"><option value="">Seleciona o teu nome...</option></select>
+          <textarea id="sugestaoTexto" placeholder="Escreve a tua sugestão..." style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;resize:none;height:80px;font-family:inherit"></textarea>
+          <button onclick="enviarSugestao()" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;margin-top:6px">Enviar →</button>
         </div>
-        <div class="roulette-box-lid" id="rouletteLid">
-          <div class="roulette-box-lid-ribbon"></div>
-          <div class="roulette-bow">🎀</div>
+        <div id="sugestoesList"></div>
+      </div>
+      <div style="margin-top:20px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">🔗 Partilhar App</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center">
+          <div id="qrCode" style="display:flex;justify-content:center;margin-bottom:12px"></div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:10px;word-break:break-all">https://manager9yc.github.io/sales-league/</div>
+          <button onclick="copiarLink()" style="width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer" id="copyBtn">📋 Copiar Link</button>
         </div>
       </div>
     </div>
-    <div class="roulette-hint" id="rouletteHint">Clica na caixa para girar a roleta! 🎁</div>
-  </div>
-
-  <!-- Wheel -->
-  <div class="wheel-container" id="wheelContainer">
-    <div class="wheel-wrap">
-      <canvas id="wheelCanvas" class="wheel-canvas" width="260" height="260"></canvas>
-      <div class="wheel-pointer"></div>
-    </div>
-    <button class="wheel-spin-btn" id="wheelSpinBtn" onclick="girarRoleta()">GIRAR ▶</button>
-  </div>
-
-  <!-- Result -->
-  <div class="roulette-result" id="rouletteResult">
-    <div class="roulette-result-icon" id="rouletteResultIcon">🍫</div>
-    <div class="roulette-result-ganhou">Ganhaste</div>
-    <div class="roulette-result-nome" id="rouletteResultNome">Um chocolate!</div>
-    <div class="roulette-solicita">Solicita a tua recompensa a um membro da equipa diretiva 🎯</div>
-    <button class="roulette-close" onclick="fecharRoulette()">← Continuar</button>
   </div>
 </div>
 
-
-<!-- INFO SCREEN -->
-<div class="screen" id="screen-info">
-  <div style="background:var(--dark);position:relative;overflow:hidden">
-    <div style="padding:24px 20px 0;text-align:center;position:relative">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,8vw,52px);color:#fff;line-height:0.95;letter-spacing:2px">INFO</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-top:4px">Sales League · Vasco da Gama</div>
-    </div>
-    <div style="background:var(--orange);margin-top:14px;padding:8px 24px;display:flex;align-items:center;justify-content:center;">
-      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:4px;color:#fff;margin:0 12px">GUIA DA LIGA</span>
-      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
-    </div>
-  </div>
-  <div style="padding:12px 16px;overflow-y:auto" id="infoContent"></div>
-</div>
-
-<!-- JOGOS SCREEN -->
 <div class="screen" id="screen-jogos">
   <div style="background:var(--dark);position:relative;overflow:hidden">
-    <div style="padding:24px 20px 0;text-align:center;position:relative">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,8vw,52px);color:#fff;line-height:0.95;letter-spacing:2px">JOGOS</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-top:4px">Desafios da equipa</div>
+    <div style="padding:22px 20px 0;text-align:center;position:relative">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,8vw,48px);color:#fff;line-height:0.95;letter-spacing:2px">JOGOS</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-top:4px">Desafios da equipa</div>
     </div>
-    <div style="background:var(--orange);margin-top:14px;padding:8px 24px;display:flex;align-items:center;justify-content:center;">
-      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:4px;color:#fff;margin:0 12px">EM BREVE</span>
-      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
+    <div style="background:var(--orange);margin-top:12px;padding:7px 24px;display:flex;align-items:center;justify-content:center;gap:10px">
+      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div><span style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:4px;color:#fff">EM BREVE</span><div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
     </div>
   </div>
   <div style="padding:20px 16px">
@@ -3300,39 +3048,44 @@ try {
       <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;opacity:0.7">
         <div style="font-size:40px;margin-bottom:8px">🃏</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#fff">CROMOS</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:1px">BREVEMENTE</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:1px">BREVEMENTE</div>
         <div style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:10px;color:var(--muted);margin-top:8px">🔒 Em desenvolvimento</div>
       </div>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;opacity:0.7">
         <div style="font-size:40px;margin-bottom:8px">🧠</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#fff">QUIZZ</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:1px">BREVEMENTE</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:1px">BREVEMENTE</div>
         <div style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:10px;color:var(--muted);margin-top:8px">🔒 Em desenvolvimento</div>
-      </div>
-    </div>
-    <!-- SUGESTÕES -->
-    <div style="margin-top:20px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">💬 Caixa de Sugestões</div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px">
-        <select id="sugestaoNome" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;margin-bottom:8px">
-          <option value="">Seleciona o teu nome...</option>
-        </select>
-        <textarea id="sugestaoTexto" placeholder="Escreve a tua sugestão..." style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;resize:none;height:80px;font-family:inherit"></textarea>
-        <button onclick="enviarSugestao()" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;margin-top:6px">Enviar Sugestão →</button>
-      </div>
-      <div id="sugestoesList"></div>
-    </div>
-    <!-- PARTILHA -->
-    <div style="margin-top:20px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">🔗 Partilhar App</div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center">
-        <div id="qrCode" style="display:flex;justify-content:center;margin-bottom:12px"></div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;word-break:break-all">https://manager9yc.github.io/sales-league/</div>
-        <button onclick="copiarLink()" style="width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer" id="copyBtn">📋 Copiar Link</button>
       </div>
     </div>
   </div>
 </div>
 
+<div class="roulette-overlay" id="rouletteOverlay">
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px">🏅 Medalha conquistada</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#fff;margin-bottom:2px">Parabéns!</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--orange);margin-bottom:16px;text-align:center" id="rouletteNome"></div>
+  <div id="rouletteBoxSection">
+    <div style="cursor:pointer;transition:transform 0.15s" id="rouletteBoxWrap" onclick="abrirRoulette()">
+      <div style="width:160px;height:160px;position:relative">
+        <div style="width:160px;height:110px;background:linear-gradient(135deg,var(--orange),#FF4500);border-radius:8px 8px 14px 14px;position:absolute;bottom:0;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(255,107,0,0.4)"><div style="position:absolute;width:22px;height:100%;background:rgba(255,255,255,0.22);left:50%;transform:translateX(-50%);border-radius:3px"></div><div style="position:absolute;width:100%;height:22px;background:rgba(255,255,255,0.22);top:50%;transform:translateY(-50%);border-radius:3px"></div></div>
+        <div id="rouletteLid" style="width:160px;height:50px;background:linear-gradient(135deg,#FF8C00,var(--orange));border-radius:10px;position:absolute;top:0;transform-origin:left center;transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1);display:flex;align-items:center;justify-content:center"><div style="width:22px;height:100%;background:rgba(255,255,255,0.28);border-radius:3px"></div><div style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:26px">🎀</div></div>
+      </div>
+    </div>
+    <div id="rouletteHint" style="font-size:13px;color:rgba(255,255,255,0.4);text-align:center;letter-spacing:1px;margin-top:10px">Clica na caixa para girar a roleta! 🎁</div>
+  </div>
+  <div id="wheelSection" style="display:none;flex-direction:column;align-items:center;width:100%;max-width:300px">
+    <div class="wheel-wrap"><canvas id="wheelCanvas" class="wheel-canvas" width="260" height="260"></canvas><div class="wheel-pointer"></div></div>
+    <button id="wheelSpinBtn" onclick="girarRoleta()" style="background:var(--orange);border:none;border-radius:12px;padding:12px 32px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;cursor:pointer;margin-top:8px">GIRAR ▶</button>
+  </div>
+  <div id="rouletteResult" style="display:none;flex-direction:column;align-items:center;text-align:center;padding:0 20px">
+    <div id="rouletteResultIcon" style="font-size:90px;margin-bottom:8px;animation:trophyBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards">🍫</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:#FFD700;letter-spacing:3px">Ganhaste</div>
+    <div id="rouletteResultNome" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;letter-spacing:2px;margin-bottom:10px">Um chocolate!</div>
+    <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:12px 20px;font-size:13px;color:rgba(255,255,255,0.7);line-height:1.5;max-width:300px;margin-bottom:16px">Solicita a tua recompensa a um membro da equipa diretiva 🎯</div>
+    <button onclick="fecharRoulette()" style="background:transparent;border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 28px;color:rgba(255,255,255,0.5);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer">← Continuar</button>
+  </div>
+  <div id="rouletteConfetti" style="position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:10001"></div>
+</div>
 </body>
 </html>
