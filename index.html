@@ -160,7 +160,8 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .rank-3 .td-pos::before { content:'🥉'; font-size:17px; }
 .rank-1 .td-pos, .rank-2 .td-pos, .rank-3 .td-pos { font-size:0; }
 
-.td-name { padding: 13px 10px; font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #ffffff; }
+.td-name:hover { color: var(--orange) !important; }
+.td-name { padding: 13px 10px; font-family: 'Barlow Condensed', sans-serif; font-size: 17px; cursor:pointer; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #ffffff; }
 .rank-1 .td-name { color: #fff; }
 
 .td-bar { padding: 13px 14px; width: 38%; }
@@ -558,6 +559,24 @@ body.theme-ucl .ucl-stars-banner{display:block}
 .wheel-wrap{position:relative;width:260px;height:260px;margin:0 auto 12px}
 .wheel-canvas{border-radius:50%;box-shadow:0 0 30px rgba(255,107,0,0.3)}
 .wheel-pointer{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-top:24px solid #fff;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))}
+
+/* ══ STANDARD BANNER ══ */
+.screen-banner { background: var(--dark); position: relative; overflow: hidden; }
+.screen-banner-inner { padding: 24px 24px 0; text-align: center; position: relative; }
+.screen-banner-inner::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--orange); }
+.screen-banner-inner::after { content:''; position:absolute; right:0; top:0; bottom:0; width:4px; background:var(--orange); }
+.screen-banner-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(40px,10vw,64px); color:#fff; line-height:0.95; letter-spacing:2px; position:relative; z-index:1; }
+.screen-banner-sub { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:rgba(255,255,255,0.35); margin-top:6px; position:relative; z-index:1; }
+.screen-banner-bar { background: var(--orange); margin-top:20px; padding:10px 24px; display:flex; align-items:center; justify-content:center; gap:16px; }
+.screen-banner-bar-line { height:1px; flex:1; background:rgba(255,255,255,0.3); }
+.screen-banner-bar span { font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:4px; color:#fff; }
+body.theme-ucl .screen-banner { background:#070F1F !important; }
+body.theme-ucl .screen-banner-inner::before,
+body.theme-ucl .screen-banner-inner::after { background:#C9A84C; }
+body.theme-ucl .screen-banner-bar { background:linear-gradient(90deg,#070F1F,#0C1B35,#070F1F) !important; border-top:1px solid #C9A84C; border-bottom:1px solid rgba(201,168,76,0.3); }
+body.theme-ucl .ucl-banner-img { display:block; }
+body.theme-ucl .ucl-stars-banner { display:block; }
+
 </style>
 </head>
 <body>
@@ -680,20 +699,19 @@ body.theme-ucl .ucl-stars-banner{display:block}
 
 <!-- RANKING -->
 <div class="screen" id="screen-ranking">
-  <div style="background:#0C0C0C;position:relative;overflow:hidden">
-    <div style="padding:28px 24px 0;text-align:center;position:relative">
-      <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#FF6B00"></div>
-      <div style="position:absolute;right:0;top:0;bottom:0;width:4px;background:#FF6B00"></div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,14vw,96px);font-weight:900;color:#fff;line-height:0.95;letter-spacing:2px">SALES<br>LEAGUE</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-top:6px">Vasco da Gama</div>
+  <div class="screen-banner">
+      <div class="screen-banner-inner">
+        <div class="ucl-stars-banner" style="display:none">★ ★ ★ ★ ★ ★ ★ ★</div>
+        <div class="screen-banner-title">SALES<br>LEAGUE</div>
+        <div class="screen-banner-sub">Vasco da Gama</div>
+      </div>
+      <div class="screen-banner-bar">
+        <div class="screen-banner-bar-line"></div>
+        <span id="mesAtualRanking"></span>
+        <span class="rank-countdown" id="rankCountdown"></span>
+        <div class="screen-banner-bar-line"></div>
+      </div>
     </div>
-    <div style="background:#FF6B00;margin-top:20px;padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
-      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;color:#fff;text-transform:uppercase" id="mesAtualRanking"></span>
-      <span class="rank-countdown" id="rankCountdown"></span>
-      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
-    </div>
-  </div>
 
   <div style="text-align:center;padding:4px 16px;font-size:11px;color:var(--muted);letter-spacing:1px" id="rankLastUpdate"></div>
   <div class="rank-main" id="rankMain"></div>
@@ -1078,7 +1096,7 @@ function buildRows(sorted, key) {
       : `<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--orange);align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#fff;margin-right:8px;flex-shrink:0;vertical-align:middle">${nome.split(' ').map(x=>x[0]).slice(0,2).join('')}</span>`;
     return `<tr class="rank-${i+1}">
       <td class="td-pos">${i+1}</td>
-      <td class="td-name" style="display:flex;align-items:center">${avatarHtml}${nome}</td>
+      <td class="td-name" style="display:flex;align-items:center;cursor:pointer" onclick="abrirDashDeRanking('${nome}')">${avatarHtml}${nome}</td>
       <td class="td-bar"><div class="bar-bg"><div class="bar-fg" data-pct="${pct}" style="width:0%"></div></div></td>
       <td class="td-score">${v[key]}</td>
     </tr>`;
@@ -2851,6 +2869,22 @@ function salvarPremioConcedido(nome,premio,icon){
   try{localStorage.setItem('premiosLog',JSON.stringify(premiosLog));}catch(e){}
 }
 
+function abrirDashDeRanking(nome) {
+  // Switch to dashboard tab
+  const dashBtn = Array.from(document.querySelectorAll('.nav-btn')).find(b => (b.getAttribute('onclick')||'').includes("'dash'"));
+  if (dashBtn) goTo('dash', dashBtn);
+  // Load that vendor's profile
+  setTimeout(() => {
+    vendedorAtual = nome;
+    if (dashAllDados.length) {
+      mostrarDash(nome);
+    } else {
+      // Load data first
+      carregarDashDados().then(() => mostrarDash(nome));
+    }
+  }, 150);
+}
+
 // ── INSTALL PROMPT ──
 let deferredPrompt = null;
 
@@ -2999,13 +3033,16 @@ try {
 </div>
 
 <div class="screen" id="screen-info">
-  <div style="background:var(--dark);position:relative;overflow:hidden">
-    <div style="padding:22px 20px 0;text-align:center;position:relative">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,8vw,48px);color:#fff;line-height:0.95;letter-spacing:2px">INFO</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-top:4px">Sales League · Vasco da Gama</div>
+  <div class="screen-banner">
+    <div class="screen-banner-inner">
+      <div class="ucl-stars-banner" style="display:none">★ ★ ★ ★ ★ ★ ★ ★</div>
+      <div class="screen-banner-title" style="font-size:clamp(36px,9vw,56px)">INFO</div>
+      <div class="screen-banner-sub">Sales League · Vasco da Gama</div>
     </div>
-    <div style="background:var(--orange);margin-top:12px;padding:7px 24px;display:flex;align-items:center;justify-content:center;gap:10px">
-      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div><span style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:4px;color:#fff">GUIA DA LIGA</span><div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
+    <div class="screen-banner-bar">
+      <div class="screen-banner-bar-line"></div>
+      <span>GUIA DA LIGA</span>
+      <div class="screen-banner-bar-line"></div>
     </div>
   </div>
   <div style="overflow-y:auto;flex:1">
@@ -3033,13 +3070,16 @@ try {
 </div>
 
 <div class="screen" id="screen-jogos">
-  <div style="background:var(--dark);position:relative;overflow:hidden">
-    <div style="padding:22px 20px 0;text-align:center;position:relative">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,8vw,48px);color:#fff;line-height:0.95;letter-spacing:2px">JOGOS</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-top:4px">Desafios da equipa</div>
+  <div class="screen-banner">
+    <div class="screen-banner-inner">
+      <div class="ucl-stars-banner" style="display:none">★ ★ ★ ★ ★ ★ ★ ★</div>
+      <div class="screen-banner-title" style="font-size:clamp(36px,9vw,56px)">JOGOS</div>
+      <div class="screen-banner-sub">Desafios da equipa</div>
     </div>
-    <div style="background:var(--orange);margin-top:12px;padding:7px 24px;display:flex;align-items:center;justify-content:center;gap:10px">
-      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div><span style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:4px;color:#fff">EM BREVE</span><div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
+    <div class="screen-banner-bar">
+      <div class="screen-banner-bar-line"></div>
+      <span>EM BREVE</span>
+      <div class="screen-banner-bar-line"></div>
     </div>
   </div>
   <div style="padding:20px 16px">
