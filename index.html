@@ -28,7 +28,7 @@ body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans
 
 /* NAV */
 .nav { display: flex; background: #0a0a0a; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 100; }
-.nav-btn { flex: 1; padding: 10px 4px 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); border: none; background: transparent; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.nav-btn { flex: 1; padding: 8px 2px 5px; font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted); border: none; background: transparent; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .nav-btn.active { color: #fff; border-bottom-color: var(--orange); }
 
 /* SCREENS */
@@ -539,6 +539,10 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 /* ══ THEMES ══ */
 body.theme-dark { --orange:#FF6B00; --orange2:#FF8C00; --dark:#0C0C0C; --card:#161616; --card2:#1e1e1e; --border:#2c2c2c; --muted:#999; --text:#f0f0f0; }
 body.theme-ucl  { --orange:#C9A84C; --orange2:#E8C97A; --dark:#070F1F; --card:#0C1B35; --card2:#132240; --border:#1C3460; --muted:#6B8EC4; --text:#EEF2FF; }
+body.theme-ucl .banner, body.theme-ucl .banner-top, body.theme-ucl [class*="banner"] { background:#070F1F !important; }
+body.theme-ucl .banner-bar, body.theme-ucl [style*="background:#FF6B00"], body.theme-ucl [style*="background: #FF6B00"] { background:linear-gradient(90deg,#070F1F,#0C1B35,#070F1F) !important; border-top:1px solid #C9A84C !important; border-bottom:1px solid rgba(201,168,76,0.3) !important; }
+body.theme-dark .ucl-banner-img { display:none !important; }
+body.theme-dark .ucl-stars-banner { display:none !important; }
 .ucl-banner-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.18; pointer-events:none; z-index:0; display:none; }
 body.theme-ucl .ucl-banner-img { display:block; }
 body.theme-ucl .nav { background:#070F1F !important; border-bottom:1px solid #C9A84C !important; }
@@ -552,6 +556,42 @@ body.theme-ucl .rank-1 .bar-fg { background:linear-gradient(90deg,#E8C97A,#C9A84
 .ucl-stars-banner { display:none; font-size:11px; letter-spacing:5px; color:#C9A84C; text-align:center; margin-bottom:6px; position:relative; z-index:2; }
 body.theme-ucl .ucl-stars-banner { display:block; }
 body.theme-ucl #splashUCLImg { display:block !important; opacity:0.12; position:absolute; inset:0; width:100%; height:100%; object-fit:cover; pointer-events:none; z-index:0; }
+
+/* ══ ROULETTE ══ */
+.roulette-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:10000; display:none; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
+.roulette-overlay.open { display:flex; animation:fadeIn 0.3s ease; }
+.roulette-pre { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:rgba(255,255,255,0.5); margin-bottom:6px; }
+.roulette-title { font-family:'Bebas Neue',sans-serif; font-size:34px; letter-spacing:3px; color:#fff; margin-bottom:4px; }
+.roulette-nome { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; color:var(--orange); margin-bottom:20px; text-align:center; }
+.roulette-box-wrap { cursor:pointer; margin-bottom:16px; transition:transform 0.15s; }
+.roulette-box-wrap:hover { transform:scale(1.05); }
+.roulette-box-wrap:active { transform:scale(0.97); }
+.roulette-box { width:160px; height:160px; position:relative; }
+.roulette-box-bottom { width:160px; height:110px; background:linear-gradient(135deg,var(--orange),#FF4500); border-radius:8px 8px 14px 14px; position:absolute; bottom:0; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 32px rgba(255,107,0,0.4); }
+.roulette-box-ribbon-v { position:absolute; width:22px; height:100%; background:rgba(255,255,255,0.22); left:50%; transform:translateX(-50%); border-radius:3px; }
+.roulette-box-ribbon-h { position:absolute; width:100%; height:22px; background:rgba(255,255,255,0.22); top:50%; transform:translateY(-50%); border-radius:3px; }
+.roulette-box-lid { width:160px; height:50px; background:linear-gradient(135deg,#FF8C00,var(--orange)); border-radius:10px; position:absolute; top:0; transform-origin:left center; transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 4px 16px rgba(255,107,0,0.4); display:flex; align-items:center; justify-content:center; }
+.roulette-box-lid.open { transform:rotate(-65deg) translateY(-16px); }
+.roulette-box-lid-ribbon { width:22px; height:100%; background:rgba(255,255,255,0.28); border-radius:3px; }
+.roulette-bow { position:absolute; top:-20px; left:50%; transform:translateX(-50%); font-size:28px; }
+.roulette-hint { font-size:13px; color:rgba(255,255,255,0.4); text-align:center; letter-spacing:1px; margin-top:10px; }
+.roulette-hint.hidden { visibility:hidden; }
+/* Wheel */
+.wheel-container { display:none; flex-direction:column; align-items:center; width:100%; max-width:340px; }
+.wheel-wrap { position:relative; width:260px; height:260px; margin:0 auto 12px; }
+.wheel-canvas { border-radius:50%; box-shadow:0 0 30px rgba(255,107,0,0.3); }
+.wheel-pointer { position:absolute; top:-12px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:12px solid transparent; border-right:12px solid transparent; border-top:24px solid #fff; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+.wheel-spin-btn { background:var(--orange); border:none; border-radius:12px; padding:14px 32px; color:#fff; font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:2px; cursor:pointer; margin-top:8px; transition:transform 0.1s; }
+.wheel-spin-btn:active { transform:scale(0.97); }
+.wheel-spin-btn:disabled { opacity:0.5; cursor:default; }
+.roulette-result { display:none; flex-direction:column; align-items:center; text-align:center; padding:0 20px; }
+.roulette-result-icon { font-size:90px; margin-bottom:8px; animation:trophyBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+.roulette-result-ganhou { font-family:'Bebas Neue',sans-serif; font-size:36px; color:#FFD700; letter-spacing:3px; }
+.roulette-result-nome { font-family:'Bebas Neue',sans-serif; font-size:26px; color:#fff; letter-spacing:2px; margin-bottom:8px; }
+.roulette-solicita { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:12px 20px; font-size:13px; color:rgba(255,255,255,0.7); line-height:1.5; max-width:300px; margin-bottom:16px; }
+.roulette-close { background:transparent; border:1.5px solid rgba(255,255,255,0.2); border-radius:10px; padding:10px 28px; color:rgba(255,255,255,0.5); font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:3px; text-transform:uppercase; cursor:pointer; }
+.roulette-confetti-wrap { position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:10001; }
+
 </style>
 </head>
 <body>
@@ -589,10 +629,12 @@ body.theme-ucl #splashUCLImg { display:block !important; opacity:0.12; position:
 </div>
 
 <div class="nav">
-  <button class="nav-btn active" onclick="goTo('form',this)"><span style="font-size:16px">📋</span><span>Registo</span></button>
-  <button class="nav-btn" onclick="goTo('ranking',this)"><span style="font-size:16px">🏆</span><span>Ranking</span></button>
-  <button class="nav-btn" onclick="goTo('dash',this)"><span style="font-size:16px">📊</span><span>Dashboard</span></button>
-  <button class="nav-btn" onclick="goTo('admin',this)"><span style="font-size:16px">⚙️</span><span>Admin</span></button>
+  <button class="nav-btn active" onclick="goTo('form',this)"><span style="font-size:15px">📋</span><span>Registo</span></button>
+  <button class="nav-btn" onclick="goTo('ranking',this)"><span style="font-size:15px">🏆</span><span>Ranking</span></button>
+  <button class="nav-btn" onclick="goTo('dash',this)"><span style="font-size:15px">📊</span><span>Dash</span></button>
+  <button class="nav-btn" onclick="goTo('info',this)"><span style="font-size:15px">ℹ️</span><span>Info</span></button>
+  <button class="nav-btn" onclick="goTo('jogos',this)"><span style="font-size:15px">🎮</span><span>Jogos</span></button>
+  <button class="nav-btn" onclick="goTo('admin',this)"><span style="font-size:15px">⚙️</span><span>Admin</span></button>
 </div>
 
 <!-- FORM -->
@@ -921,6 +963,15 @@ const equipas = [
   { id:'estagios',  label:'🎓 Estagiários', nomes:[] }
 ];
 
+// Restore equipas from localStorage
+try {
+  const saved = localStorage.getItem('equipasData');
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    parsed.forEach(s => { const e = equipas.find(eq=>eq.id===s.id); if(e) e.nomes = s.nomes; });
+  }
+} catch(e) {}
+
 const categorias = [
   { key:'onlines',   label:'Onlines',            emoji:'🖥️' },
   { key:'sprays',    label:'Sprays',              emoji:'🧴' },
@@ -943,17 +994,21 @@ document.getElementById('dataRegisto').value = `${hoje.getFullYear()}-${pad(hoje
 function goTo(screen, btn) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('screen-'+screen).classList.add('active');
+  const screenEl = document.getElementById('screen-'+screen);
+  if (screenEl) screenEl.classList.add('active');
+  else { document.getElementById('screen-form').classList.add('active'); return; }
   btn.classList.add('active');
   try { localStorage.setItem('lastTab', screen); } catch(e) {}
   document.getElementById('printBtn').style.display = screen === 'ranking' ? 'flex' : 'none';
+  if (screen === 'info') { renderInfo(); }
+  if (screen === 'jogos') { renderSugestoes(); populateSugestaoNomes(); gerarQR(); }
   if (screen === 'ranking') {
     // Show cached data immediately if available
     if (window._rankingCache) renderRanking(window._rankingCache);
     carregarRanking();
   }
   if (screen === 'dash') carregarDashboard();
-  if (screen === 'admin') {
+  if (screen === 'admin') { renderPremiosLog(); renderAdminSugestoes(); 
     if (!adminUnlocked) {
       pinBuffer = '';
       for (let i = 0; i < ADMIN_PIN.length; i++) {
@@ -1336,6 +1391,8 @@ function mostrarProgressoRegisto(nome, payload) {
 // ── SPLASH ──
 let splashProg = 0, splashIv = null;
 function iniciarSplash() {
+  // Load top3 data early
+  carregarSplashTop3();
   const pc = document.getElementById('spParticles');
   for(let i=0;i<25;i++){
     const p=document.createElement('div'); p.className='sp-particle';
@@ -1363,15 +1420,18 @@ let changeIv=null, changeTo=null;
 let touchStartY = 0;
 let touchMoved = false;
 
+let lastChangeTime = 0;
 function startChange(campo,delta,e){
   if(e && e.type === 'touchstart') {
     touchStartY = e.touches[0].clientY;
     touchMoved = false;
-    // Don't preventDefault here - allow scroll detection
   }
   if(e && e.type === 'mousedown') e.preventDefault();
+  const now = Date.now();
+  if (now - lastChangeTime < 150) return;
+  lastChangeTime = now;
   change(campo,delta);
-  changeTo=setTimeout(()=>{changeIv=setInterval(()=>change(campo,delta),80);},350);
+  changeTo=setTimeout(()=>{changeIv=setInterval(()=>{lastChangeTime=Date.now();change(campo,delta);},150);},400);
 }
 function stopChange(e){
   if(e && e.type === 'touchend' && touchMoved) {
@@ -1463,7 +1523,7 @@ function mostrarMedalPopup(emoji,nome,medalha){
     popup.classList.remove('show');
     // Show surprise box ONLY if this is the vendedor who just registered
     if (nome === nomeSel) {
-      setTimeout(()=>mostrarSurprise(nome, medalha), 300);
+      setTimeout(()=>mostrarRoulette(nome, medalha), 300);
     }
   },3000);
 }
@@ -2469,6 +2529,7 @@ function confirmarGestao() {
   fecharGestaoModal();
   renderGestaoLista();
   if (equipaAtiva) renderNames(equipaAtiva);
+  try { localStorage.setItem('equipasData', JSON.stringify(equipas.map(e=>({id:e.id,nomes:e.nomes})))); } catch(err) {}
   showToast('✓ ' + (gestaoAction==='add' ? 'Vendedor adicionado!' : 'Equipa alterada!'));
 }
 
@@ -2524,7 +2585,7 @@ const surprisePrizes = [
 
 let surpriseOpened = false;
 
-function mostrarSurprise(nome, medalha) {
+function mostrarRoulette(nome, medalha) {
   // Only show once per device per medal
   const key = 'surpriseShown_' + nome + '_' + medalha;
   try { if (localStorage.getItem(key)) return; localStorage.setItem(key, '1'); } catch(e) {}
@@ -2622,19 +2683,30 @@ function lancarConfettiSurprise() {
 // ── SPLASH TOP 3 ──
 async function carregarSplashTop3() {
   try {
+    // Try localStorage cache first (instant)
     let dados = null;
-    // Try localStorage cache first
     try {
       const cached = localStorage.getItem('rankingCache');
       if (cached) dados = JSON.parse(cached);
     } catch(e) {}
-    // If no cache, fetch
-    if (!dados) {
-      const res = await fetch(SHEETS_URL + '?action=getRanking', {cache:'no-store'})
-        .catch(() => fetch('https://corsproxy.io/?' + encodeURIComponent(SHEETS_URL + '?action=getRanking')));
-      dados = await res.json();
+
+    // If no cache, try fetching
+    if (!dados || !dados.length) {
+      try {
+        const res = await Promise.race([
+          fetch(SHEETS_URL + '?action=getRanking', {cache:'no-store'}),
+          fetch('https://corsproxy.io/?' + encodeURIComponent(SHEETS_URL + '?action=getRanking'), {cache:'no-store'}),
+          new Promise((_,rej) => setTimeout(()=>rej('timeout'), 4000))
+        ]);
+        dados = await res.json();
+        if (Array.isArray(dados) && dados.length) {
+          try { localStorage.setItem('rankingCache', JSON.stringify(dados)); } catch(e) {}
+        }
+      } catch(e) { return; }
     }
+
     if (!Array.isArray(dados) || !dados.length) return;
+
     const cats = [
       {key:'onlines',emoji:'🖥️',label:'Onlines'},
       {key:'sprays',emoji:'🧴',label:'Sprays'},
@@ -2647,17 +2719,360 @@ async function carregarSplashTop3() {
     const medals = ['🥇','🥈','🥉'];
     let html = '';
     cats.forEach(cat => {
-      const sorted = [...dados].filter(d=>(d[cat.key]||0)>0).sort((a,b)=>(b[cat.key]||0)-(a[cat.key]||0)).slice(0,3);
+      const sorted = [...dados]
+        .filter(d => (d[cat.key]||0) > 0)
+        .sort((a,b) => (b[cat.key]||0) - (a[cat.key]||0))
+        .slice(0,3);
       if (!sorted.length) return;
       html += `<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:8px 10px">
         <div style="font-size:10px;font-weight:700;margin-bottom:4px;color:var(--orange)">${cat.emoji} ${cat.label}</div>
-        ${sorted.map((v,i)=>`<div style="display:flex;align-items:center;gap:5px;margin-bottom:2px"><span style="font-size:11px">${medals[i]}</span><span style="font-size:11px;flex:1;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${v.nome.split(' ')[0]}</span><span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--orange)">${v[cat.key]}</span></div>`).join('')}
+        ${sorted.map((v,i) => `<div style="display:flex;align-items:center;gap:5px;margin-bottom:2px">
+          <span style="font-size:11px">${medals[i]}</span>
+          <span style="font-size:11px;flex:1;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${v.nome.split(' ')[0]}</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--orange)">${v[cat.key]||0}</span>
+        </div>`).join('')}
       </div>`;
     });
+
     if (!html) return;
-    document.getElementById('splashTop3Content').innerHTML = html;
-    document.getElementById('splashTop3').style.display = 'block';
+    const el = document.getElementById('splashTop3Content');
+    const wrap = document.getElementById('splashTop3');
+    if (el) el.innerHTML = html;
+    if (wrap) wrap.style.display = 'block';
   } catch(e) {}
+}
+
+// ══ ROULETTE SYSTEM ══
+const premios = [
+  { icon:'☕', nome:'Um café!',                prob:0.20, cor:'#4A2C2A' },
+  { icon:'🍫', nome:'Um chocolate!',           prob:0.25, cor:'#5C3317' },
+  { icon:'🥐', nome:'Um pastel de nata!',      prob:0.10, cor:'#C8963E' },
+  { icon:'🍬', nome:'Um saco de gomas!',       prob:0.15, cor:'#E91E8C' },
+  { icon:'⏰', nome:'Sair 30 min mais cedo!',  prob:0.10, cor:'#1565C0' },
+  { icon:'🎰', nome:'Uma raspadinha!',         prob:0.20, cor:'#2E7D32' },
+];
+
+let rouletteNomeAtual = '';
+let rouletteMedalhaAtual = '';
+let rouletteOpened = false;
+let roletaAngle = 0;
+let roletaSpinning = false;
+let premioGanho = null;
+
+function mostrarRoulette(nome, medalha) {
+  const key = 'surpriseShown_' + nome + '_' + medalha;
+  try { if (localStorage.getItem(key)) return; localStorage.setItem(key, '1'); } catch(e) {}
+  rouletteNomeAtual = nome;
+  rouletteMedalhaAtual = medalha;
+  rouletteOpened = false;
+  roletaAngle = 0;
+  roletaSpinning = false;
+  premioGanho = null;
+
+  document.getElementById('rouletteNome').textContent = nome + ' · ' + medalha;
+  document.getElementById('rouletteBoxSection').style.display = 'block';
+  document.getElementById('wheelContainer').style.display = 'none';
+  document.getElementById('rouletteResult').style.display = 'none';
+  document.getElementById('rouletteLid').classList.remove('open');
+  document.getElementById('rouletteHint').classList.remove('hidden');
+  document.getElementById('rouletteConfetti').innerHTML = '';
+  document.getElementById('wheelSpinBtn').disabled = false;
+
+  desenharRoleta(0);
+  document.getElementById('rouletteOverlay').classList.add('open');
+
+  // Shake box
+  setTimeout(() => {
+    const w = document.getElementById('rouletteBoxWrap');
+    w.style.animation = 'shakeBox 0.5s ease';
+    setTimeout(() => w.style.animation = '', 600);
+  }, 1000);
+}
+
+function abrirRoulette() {
+  if (rouletteOpened) return;
+  rouletteOpened = true;
+  document.getElementById('rouletteLid').classList.add('open');
+  document.getElementById('rouletteHint').classList.add('hidden');
+  setTimeout(() => {
+    document.getElementById('rouletteBoxSection').style.display = 'none';
+    document.getElementById('wheelContainer').style.display = 'flex';
+    desenharRoleta(0);
+  }, 500);
+}
+
+function fecharRoulette() {
+  document.getElementById('rouletteOverlay').classList.remove('open');
+  // Save to admin prizes log
+  if (premioGanho && rouletteNomeAtual) {
+    salvarPremioConcedido(rouletteNomeAtual, premioGanho.nome, premioGanho.icon);
+  }
+}
+
+function desenharRoleta(angOffset) {
+  const canvas = document.getElementById('wheelCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const cx = 130, cy = 130, r = 126;
+  const total = premios.length;
+  const segAngle = (Math.PI * 2) / total;
+  ctx.clearRect(0, 0, 260, 260);
+  premios.forEach((p, i) => {
+    const start = angOffset + i * segAngle - Math.PI / 2;
+    const end = start + segAngle;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, end);
+    ctx.closePath();
+    ctx.fillStyle = p.cor;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    // Text
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(start + segAngle / 2);
+    ctx.textAlign = 'right';
+    ctx.font = 'bold 11px sans-serif';
+    ctx.fillStyle = '#fff';
+    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+    ctx.shadowBlur = 3;
+    ctx.fillText(p.icon + ' ' + p.nome.split(' ').slice(0,3).join(' '), r - 8, 4);
+    ctx.restore();
+  });
+  // Center
+  ctx.beginPath();
+  ctx.arc(cx, cy, 20, 0, Math.PI*2);
+  ctx.fillStyle = '#111';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+function girarRoleta() {
+  if (roletaSpinning) return;
+  roletaSpinning = true;
+  document.getElementById('wheelSpinBtn').disabled = true;
+
+  // Pick winner based on probabilities
+  const rand = Math.random();
+  let acc = 0, winIdx = 0;
+  for (let i = 0; i < premios.length; i++) {
+    acc += premios[i].prob;
+    if (rand <= acc) { winIdx = i; break; }
+  }
+  premioGanho = premios[winIdx];
+
+  const segAngle = (Math.PI * 2) / premios.length;
+  const targetAngle = -(winIdx * segAngle + segAngle / 2); // land pointer on winner
+  const spins = 5 + Math.random() * 2;
+  const totalRot = spins * Math.PI * 2 + targetAngle;
+  const duration = 4500 + Math.random() * 1500;
+  const start = performance.now();
+  const startAngle = roletaAngle;
+
+  function animate(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 4);
+    roletaAngle = startAngle + totalRot * ease;
+    desenharRoleta(roletaAngle);
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      roletaSpinning = false;
+      mostrarResultadoRoleta(premioGanho);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+function mostrarResultadoRoleta(premio) {
+  iniciarAudio(); tocarSomMedalha(); lancarConfettiRoleta();
+  setTimeout(() => {
+    document.getElementById('wheelContainer').style.display = 'none';
+    const res = document.getElementById('rouletteResult');
+    res.style.display = 'flex';
+    document.getElementById('rouletteResultIcon').textContent = premio.icon;
+    document.getElementById('rouletteResultNome').textContent = premio.nome;
+  }, 300);
+}
+
+function lancarConfettiRoleta() {
+  const wrap = document.getElementById('rouletteConfetti');
+  const cols = ['#FF6B00','#FFD700','#FF4444','#44FF88','#4488FF','#FF88FF','#fff'];
+  for (let i = 0; i < 50; i++) {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${5+Math.random()*8}px;height:${5+Math.random()*8}px;border-radius:${Math.random()>0.5?'50%':'2px'};background:${cols[Math.floor(Math.random()*cols.length)]};left:${Math.random()*100}%;top:-10px;animation:confettiFall ${1.5+Math.random()}s ease-out ${Math.random()}s forwards;`;
+    wrap.appendChild(el);
+  }
+}
+
+// ── PRIZES LOG (admin) ──
+let premiosLog = [];
+try { premiosLog = JSON.parse(localStorage.getItem('premiosLog') || '[]'); } catch(e) {}
+
+function salvarPremioConcedido(nome, premio, icon) {
+  premiosLog.unshift({ nome, premio, icon, data: new Date().toLocaleDateString('pt-PT'), estado: 'por_entregar' });
+  try { localStorage.setItem('premiosLog', JSON.stringify(premiosLog)); } catch(e) {}
+}
+
+function renderPremiosLog() {
+  const el = document.getElementById('premiosLogList');
+  if (!el) return;
+  if (!premiosLog.length) { el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">Nenhum prémio registado ainda</div>'; return; }
+  el.innerHTML = premiosLog.map((p,i) => `
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:22px">${p.icon}</span>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${p.nome}</div>
+        <div style="font-size:11px;color:var(--muted)">${p.premio} · ${p.data}</div>
+      </div>
+      <button onclick="toggleEstadoPremio(${i})" style="background:${p.estado==='entregue'?'rgba(34,197,94,0.15)':'rgba(255,255,255,0.06)'};border:1px solid ${p.estado==='entregue'?'#22C55E':'var(--border)'};border-radius:8px;padding:5px 10px;font-size:11px;color:${p.estado==='entregue'?'#22C55E':'var(--muted)'};cursor:pointer">${p.estado==='entregue'?'✔ Entregue':'⬜ Por entregar'}</button>
+    </div>
+  `).join('');
+}
+
+function toggleEstadoPremio(i) {
+  premiosLog[i].estado = premiosLog[i].estado === 'entregue' ? 'por_entregar' : 'entregue';
+  try { localStorage.setItem('premiosLog', JSON.stringify(premiosLog)); } catch(e) {}
+  renderPremiosLog();
+}
+
+// ── INFO SCREEN ──
+const infoSections = [
+  { title:'🏆 O que é a Sales League', content:'A Sales League é uma competição interna de vendas da loja do Vasco da Gama, onde cada colaborador acumula pontos com base no seu desempenho diário. O objetivo é promover foco, consistência e espírito competitivo saudável dentro da equipa.' },
+  { title:'🎯 Objetivo da App', content:'Esta app permite acompanhar em tempo real o desempenho individual e da equipa. Podes consultar rankings, pontos, evolução e destacar os melhores resultados. A equipa de gestão acompanha o histórico para ter uma visão clara do desempenho de vendas e atendimento.' },
+  { title:'📊 Como ganhar pontos', content:'Os pontos são atribuídos com base no teu desempenho diário:\n• Unidades vendidas (onlines, sprays, palmilhas, camisolas, sacos, garrafas)\n• Elogios recebidos\nQuanto melhor o teu desempenho, mais pontos acumulas.' },
+  { title:'📈 Ranking e classificação', content:'O ranking é atualizado automaticamente e mostra a posição de cada elemento da equipa.\n• Os melhores destacam-se no topo\n• A classificação muda diariamente\n• Todos têm oportunidade de subir posições' },
+  { title:'🥇 Medalhas', content:'As medalhas são ajustadas consoante o tipo de horário (full-time e part-time) e equipa. Ao desbloquear uma medalha, ganhas acesso a uma gift box com prémio aleatório:\n• Sair 30 min mais cedo\n• Chocolate · Café · Pastel de nata\n• Saco de gomas · Raspadinha' },
+  { title:'⚙️ Como usar a app', content:'1. Consulta o teu desempenho diariamente\n2. Acompanha o ranking da equipa\n3. Define objetivos pessoais\n4. Foca-te nos indicadores com mais impacto\nA consistência diária faz a diferença.' },
+  { title:'📅 Períodos de competição', content:'A liga funciona por ciclos mensais.\nNo final de cada ciclo:\n• O ranking é fechado\n• São atribuídos os prémios ao longo do mês\n• Inicia-se uma nova competição' },
+  { title:'⚠️ Regras importantes', content:'• Apenas vendas válidas são contabilizadas\n• Todos os dados devem ser corretos\n• O objetivo é competição saudável\n• Fair play é obrigatório' },
+  { title:'💡 Dicas para subir no ranking', content:'• Foco nos produtos com maior impacto\n• Abordagem ativa ao cliente\n• Consistência diária\n• Acompanhamento regular dos resultados' },
+  { title:'❓ FAQ', content:'Quando atualiza o ranking? → Instantaneamente\nPosso recuperar posições? → Sim, o ranking é dinâmico\nComo sei quantos pontos tenho? → No Dashboard\nEnganei-me a lançar um registo, posso corrigir? → Solicita ajuste à chefia' },
+];
+
+let infoOpenIdx = -1;
+
+function renderInfo() {
+  const el = document.getElementById('infoContent');
+  if (!el) return;
+  el.innerHTML = infoSections.map((s,i) => `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden">
+      <div onclick="toggleInfo(${i})" style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+        <span style="font-size:14px;font-weight:600;color:var(--text)">${s.title}</span>
+        <span style="font-size:18px;color:var(--orange);transition:transform 0.3s;transform:rotate(${infoOpenIdx===i?'180':'0'}deg)">▾</span>
+      </div>
+      <div style="max-height:${infoOpenIdx===i?'400px':'0'};overflow:hidden;transition:max-height 0.3s ease">
+        <div style="padding:0 16px 14px;font-size:13px;color:var(--muted);line-height:1.6;white-space:pre-line">${s.content}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleInfo(i) {
+  infoOpenIdx = infoOpenIdx === i ? -1 : i;
+  renderInfo();
+}
+
+// ── SUGESTÕES ──
+let sugestoes = [];
+try { sugestoes = JSON.parse(localStorage.getItem('sugestoes') || '[]'); } catch(e) {}
+
+function populateSugestaoNomes() {
+  const sel = document.getElementById('sugestaoNome');
+  if (!sel) return;
+  const nomes = [...new Set(equipas.flatMap(e=>e.nomes))].sort();
+  sel.innerHTML = '<option value="">Seleciona o teu nome...</option>' + nomes.map(n=>`<option value="${n}">${n}</option>`).join('');
+}
+
+function enviarSugestao() {
+  const nome = document.getElementById('sugestaoNome')?.value;
+  const texto = document.getElementById('sugestaoTexto')?.value?.trim();
+  if (!nome) { showToast('⚠️ Seleciona o teu nome'); return; }
+  if (!texto || texto.length < 5) { showToast('⚠️ Escreve uma sugestão'); return; }
+  sugestoes.unshift({ nome, texto, data: new Date().toLocaleDateString('pt-PT'), estado:'em_analise', resposta:'' });
+  try { localStorage.setItem('sugestoes', JSON.stringify(sugestoes)); } catch(e) {}
+  document.getElementById('sugestaoTexto').value = '';
+  document.getElementById('sugestaoNome').value = '';
+  renderSugestoes();
+  showToast('✓ Sugestão enviada!');
+}
+
+function renderSugestoes() {
+  const el = document.getElementById('sugestoesList');
+  if (!el) return;
+  if (!sugestoes.length) { el.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:16px">Ainda sem sugestões</div>'; return; }
+  const estadoCor = { em_analise:'#F59E0B', aprovada:'#22C55E', implementada:'#3B82F6' };
+  const estadoLabel = { em_analise:'Em análise', aprovada:'Aprovada', implementada:'Implementada' };
+  el.innerHTML = sugestoes.map((s,i) => `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:13px;font-weight:600;color:var(--text)">${s.nome}</span>
+        <span style="font-size:10px;font-weight:700;color:${estadoCor[s.estado]||'#F59E0B'};background:${estadoCor[s.estado]||'#F59E0B'}22;border-radius:6px;padding:2px 8px">${estadoLabel[s.estado]||'Em análise'}</span>
+      </div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:6px;line-height:1.4">${s.texto}</div>
+      <div style="font-size:10px;color:var(--border);margin-bottom:${s.resposta?'8px':'0'}">${s.data}</div>
+      ${s.resposta ? `<div style="background:rgba(255,107,0,0.06);border-left:3px solid var(--orange);border-radius:4px;padding:8px 10px;font-size:12px;color:var(--muted);line-height:1.4"><strong style="color:var(--orange)">Resposta:</strong> ${s.resposta}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ── SHARE / QR CODE ──
+function gerarQR() {
+  const el = document.getElementById('qrCode');
+  if (!el) return;
+  const url = 'https://manager9yc.github.io/sales-league/';
+  const size = 140;
+  el.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(url)}&bgcolor=161616&color=FF6B00&margin=2" width="${size}" height="${size}" style="border-radius:8px">`;
+}
+
+function copiarLink() {
+  const url = 'https://manager9yc.github.io/sales-league/';
+  navigator.clipboard?.writeText(url).then(() => {
+    showToast('✓ Link copiado com sucesso!');
+    const btn = document.getElementById('copyBtn');
+    if (btn) { btn.textContent = '✓ Link copiado!'; setTimeout(() => btn.textContent = '📋 Copiar Link', 2000); }
+  }).catch(() => showToast('Copia o link: ' + url));
+}
+
+function renderAdminSugestoes() {
+  const el = document.getElementById('adminSugestoesList');
+  if (!el) return;
+  if (!sugestoes.length) { el.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:12px">Sem sugestões</div>'; return; }
+  const estadoOpts = ['em_analise','aprovada','implementada'];
+  const estadoLabel = { em_analise:'Em análise', aprovada:'Aprovada', implementada:'Implementada' };
+  el.innerHTML = sugestoes.map((s,i) => `
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:600;margin-bottom:4px">${s.nome} <span style="color:var(--muted);font-weight:400">· ${s.data}</span></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">${s.texto}</div>
+      <select onchange="alterarEstadoSugestao(${i},this.value)" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:11px;outline:none;width:100%;margin-bottom:6px">
+        ${estadoOpts.map(o=>`<option value="${o}" ${s.estado===o?'selected':''}>${estadoLabel[o]}</option>`).join('')}
+      </select>
+      <div style="display:flex;gap:6px">
+        <input type="text" value="${s.resposta||''}" placeholder="Escreve uma resposta..." id="resp_${i}" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;outline:none;">
+        <button onclick="guardarRespostaSugestao(${i})" style="background:var(--orange);border:none;border-radius:6px;padding:6px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer">OK</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function alterarEstadoSugestao(i, estado) {
+  sugestoes[i].estado = estado;
+  try { localStorage.setItem('sugestoes', JSON.stringify(sugestoes)); } catch(e) {}
+  renderSugestoes();
+}
+
+function guardarRespostaSugestao(i) {
+  const input = document.getElementById('resp_' + i);
+  if (!input) return;
+  sugestoes[i].resposta = input.value.trim();
+  try { localStorage.setItem('sugestoes', JSON.stringify(sugestoes)); } catch(e) {}
+  renderSugestoes();
+  showToast('✓ Resposta guardada');
 }
 
 // ── INSTALL PROMPT ──
@@ -2806,5 +3221,118 @@ try {
     <button class="surprise-close" id="surpriseCloseBtn" style="display:none" onclick="fecharSurprise()">← Continuar</button>
   </div>
 </div>
+
+<!-- ROULETTE OVERLAY -->
+<div class="roulette-overlay" id="rouletteOverlay">
+  <div class="roulette-confetti-wrap" id="rouletteConfetti"></div>
+  <div class="roulette-pre">🏅 Medalha conquistada</div>
+  <div class="roulette-title">Parabéns!</div>
+  <div class="roulette-nome" id="rouletteNome"></div>
+
+  <!-- Gift box -->
+  <div id="rouletteBoxSection">
+    <div class="roulette-box-wrap" id="rouletteBoxWrap" onclick="abrirRoulette()">
+      <div class="roulette-box">
+        <div class="roulette-box-bottom">
+          <div class="roulette-box-ribbon-v"></div>
+          <div class="roulette-box-ribbon-h"></div>
+        </div>
+        <div class="roulette-box-lid" id="rouletteLid">
+          <div class="roulette-box-lid-ribbon"></div>
+          <div class="roulette-bow">🎀</div>
+        </div>
+      </div>
+    </div>
+    <div class="roulette-hint" id="rouletteHint">Clica na caixa para girar a roleta! 🎁</div>
+  </div>
+
+  <!-- Wheel -->
+  <div class="wheel-container" id="wheelContainer">
+    <div class="wheel-wrap">
+      <canvas id="wheelCanvas" class="wheel-canvas" width="260" height="260"></canvas>
+      <div class="wheel-pointer"></div>
+    </div>
+    <button class="wheel-spin-btn" id="wheelSpinBtn" onclick="girarRoleta()">GIRAR ▶</button>
+  </div>
+
+  <!-- Result -->
+  <div class="roulette-result" id="rouletteResult">
+    <div class="roulette-result-icon" id="rouletteResultIcon">🍫</div>
+    <div class="roulette-result-ganhou">Ganhaste</div>
+    <div class="roulette-result-nome" id="rouletteResultNome">Um chocolate!</div>
+    <div class="roulette-solicita">Solicita a tua recompensa a um membro da equipa diretiva 🎯</div>
+    <button class="roulette-close" onclick="fecharRoulette()">← Continuar</button>
+  </div>
+</div>
+
+
+<!-- INFO SCREEN -->
+<div class="screen" id="screen-info">
+  <div style="background:var(--dark);position:relative;overflow:hidden">
+    <div style="padding:24px 20px 0;text-align:center;position:relative">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,8vw,52px);color:#fff;line-height:0.95;letter-spacing:2px">INFO</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-top:4px">Sales League · Vasco da Gama</div>
+    </div>
+    <div style="background:var(--orange);margin-top:14px;padding:8px 24px;display:flex;align-items:center;justify-content:center;">
+      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:4px;color:#fff;margin:0 12px">GUIA DA LIGA</span>
+      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
+    </div>
+  </div>
+  <div style="padding:12px 16px;overflow-y:auto" id="infoContent"></div>
+</div>
+
+<!-- JOGOS SCREEN -->
+<div class="screen" id="screen-jogos">
+  <div style="background:var(--dark);position:relative;overflow:hidden">
+    <div style="padding:24px 20px 0;text-align:center;position:relative">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,8vw,52px);color:#fff;line-height:0.95;letter-spacing:2px">JOGOS</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-top:4px">Desafios da equipa</div>
+    </div>
+    <div style="background:var(--orange);margin-top:14px;padding:8px 24px;display:flex;align-items:center;justify-content:center;">
+      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:4px;color:#fff;margin:0 12px">EM BREVE</span>
+      <div style="height:1px;flex:1;background:rgba(255,255,255,0.3)"></div>
+    </div>
+  </div>
+  <div style="padding:20px 16px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;opacity:0.7">
+        <div style="font-size:40px;margin-bottom:8px">🃏</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#fff">CROMOS</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:1px">BREVEMENTE</div>
+        <div style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:10px;color:var(--muted);margin-top:8px">🔒 Em desenvolvimento</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;opacity:0.7">
+        <div style="font-size:40px;margin-bottom:8px">🧠</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#fff">QUIZZ</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:1px">BREVEMENTE</div>
+        <div style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:10px;color:var(--muted);margin-top:8px">🔒 Em desenvolvimento</div>
+      </div>
+    </div>
+    <!-- SUGESTÕES -->
+    <div style="margin-top:20px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">💬 Caixa de Sugestões</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px">
+        <select id="sugestaoNome" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;margin-bottom:8px">
+          <option value="">Seleciona o teu nome...</option>
+        </select>
+        <textarea id="sugestaoTexto" placeholder="Escreve a tua sugestão..." style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;resize:none;height:80px;font-family:inherit"></textarea>
+        <button onclick="enviarSugestao()" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;margin-top:6px">Enviar Sugestão →</button>
+      </div>
+      <div id="sugestoesList"></div>
+    </div>
+    <!-- PARTILHA -->
+    <div style="margin-top:20px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">🔗 Partilhar App</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center">
+        <div id="qrCode" style="display:flex;justify-content:center;margin-bottom:12px"></div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;word-break:break-all">https://manager9yc.github.io/sales-league/</div>
+        <button onclick="copiarLink()" style="width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer" id="copyBtn">📋 Copiar Link</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
