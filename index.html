@@ -576,16 +576,13 @@ body.theme-ucl .ucl-stars-banner{display:block}
       <div class="sp-bar-wrap"><span id="mesAtualSplash"></span></div>
       <div class="sp-progress"><div class="sp-progress-fill" id="splashBar"></div></div>
     </div>
-    <div id="splashTop3" style="display:none;width:100%;max-width:400px;margin-bottom:10px">
-      <div style="font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);text-align:center;margin-bottom:8px">🏆 Top 3 de hoje</div>
-      <div id="splashTop3Content" style="display:grid;grid-template-columns:repeat(2,1fr);gap:5px"></div>
+    <div id="splashTop3" style="display:none;width:100%;max-width:400px;margin-bottom:6px">
+      <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange);text-align:center;margin-bottom:5px">🏆 Top 3 de ontem</div>
+      <div id="splashTop3Content" style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px"></div>
     </div>
     <div style="width:80%;max-width:360px;display:flex;flex-direction:column;gap:8px;margin-bottom:8px">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <button onclick="fecharSplash();setTimeout(()=>goTo('ranking',document.querySelectorAll('.nav-btn')[1]),50)" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:11px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer">🏆 RANKING</button>
-        <button onclick="fecharSplash();setTimeout(()=>goTo('form',document.querySelectorAll('.nav-btn')[0]),50)" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:11px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer">📋 REGISTAR</button>
-      </div>
-      <button onclick="fecharSplash()" class="sp-btn" style="width:100%;padding:12px;font-size:15px;">FECHAR →</button>
+      <button onclick="fecharSplash();setTimeout(()=>goTo('form',document.querySelectorAll('.nav-btn')[0]),50)" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:13px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer">📋 REGISTAR O MEU DIA →</button>
+      <button onclick="fecharSplash()" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:10px;color:rgba(255,255,255,0.5);font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;cursor:pointer">FECHAR</button>
     </div>
     <div style="font-size:10px;color:rgba(255,255,255,0.25);text-align:center;margin-top:4px">ⓘ Esta mensagem não voltará a ser exibida hoje</div>
   </div>
@@ -1624,7 +1621,7 @@ async function carregarSplashTop3(){
     cats.forEach(cat=>{
       const sorted=[...dados].filter(d=>(d[cat.key]||0)>0).sort((a,b)=>(b[cat.key]||0)-(a[cat.key]||0)).slice(0,3);
       if(!sorted.length)return;
-      html+=`<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:8px 10px"><div style="font-size:10px;font-weight:700;margin-bottom:4px;color:var(--orange)">${cat.emoji} ${cat.label}</div>${sorted.map((v,i)=>`<div style="display:flex;align-items:center;gap:5px;margin-bottom:2px"><span style="font-size:11px">${medals[i]}</span><span style="font-size:11px;flex:1;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${v.nome.split(' ')[0]}</span><span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--orange)">${v[cat.key]||0}</span></div>`).join('')}</div>`;
+      html+=`<div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 8px"><div style="font-size:9px;font-weight:700;margin-bottom:3px;color:var(--orange)">${cat.emoji} ${cat.label}</div>${sorted.map((v,i)=>`<div style="display:flex;align-items:center;gap:3px;margin-bottom:1px"><span style="font-size:9px">${medals[i]}</span><span style="font-size:9px;flex:1;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${v.nome.split(' ')[0]}</span><span style="font-family:'Bebas Neue',sans-serif;font-size:11px;color:var(--orange)">${v[cat.key]||0}</span></div>`).join('')}</div>`;
     });
     if(!html)return;
     const el=document.getElementById('splashTop3Content'),wrap=document.getElementById('splashTop3');
