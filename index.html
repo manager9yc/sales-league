@@ -65,7 +65,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 
 .name-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
 .name-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; min-height: 44px; }
-.name-btn { background: var(--card2); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
+.name-btn { background: var(--card2); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 10px 10px; text-align: left; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; display: flex; align-items: center; gap: 8px; width: 100%; }
 .name-btn.selected { background: var(--orange); border-color: var(--orange); color: #fff; }
 .name-empty { color: var(--muted); font-size: 13px; font-style: italic; grid-column: span 2; text-align: center; padding: 10px 0; }
 
@@ -429,15 +429,15 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .top3-score{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);}
 
 /* INSTALL POPUP */
-.install-popup { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 2px solid var(--orange); padding: 20px; z-index: 10000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.34,1.2,0.64,1); }
-.install-popup.show { transform: translateY(0); }
-.install-popup-inner { max-width: 500px; margin: 0 auto; }
-.install-popup-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: #fff; margin-bottom: 4px; }
-.install-popup-sub { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
-.install-popup-ios { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 13px; color: var(--text); line-height: 1.6; margin-bottom: 14px; }
-.install-popup-btns { display: flex; gap: 8px; }
-.install-popup-btn-main { flex: 1; background: var(--orange); border: none; border-radius: 10px; padding: 12px; color: #fff; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 2px; cursor: pointer; }
-.install-popup-btn-close { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; color: var(--muted); font-size: 13px; cursor: pointer; }
+
+
+
+
+
+
+
+
+
 
 /* GESTÃO VENDEDORES */
 .gestao-item{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;}
@@ -1023,9 +1023,14 @@ function renderTabs() {
 function selectTeam(id) {
   equipaAtiva = id; nomeSel = null;
   document.querySelectorAll('.team-tab').forEach((t,i) => t.classList.toggle('active', equipas[i].id === id));
-  document.getElementById('nameGrid').innerHTML = equipas.find(e=>e.id===id).nomes.map(n =>
-    `<button class="name-btn" onclick="selectName(this)">${n}</button>`
-  ).join('');
+  document.getElementById('nameGrid').innerHTML = equipas.find(e=>e.id===id).nomes.map(n => {
+    const foto = getFoto ? getFoto(n) : null;
+    const ini = n.split(' ').map(x=>x[0]).slice(0,2).join('');
+    const avatar = foto
+      ? `<img src="${foto}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0">`
+      : `<div style="width:30px;height:30px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">${ini}</div>`;
+    return `<button class="name-btn" onclick="selectName(this)" style="display:flex;align-items:center;gap:8px;text-align:left">${avatar}<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px">${n}</span></button>`;
+  }).join('');
 }
 
 function selectName(btn) {
@@ -3099,137 +3104,6 @@ try {
 } catch(e) {}
 
 </script>
-
-<!-- INSTALL POPUP -->
-<div class="install-popup" id="installPopup">
-  <div class="install-popup-inner">
-    <div class="install-popup-title">📲 Adicionar ao ecrã</div>
-    <div class="install-popup-sub">Guarda o Sales League como atalho para acesso rápido</div>
-    <div class="install-popup-ios" id="installInstructions"></div>
-    <div class="install-popup-btns">
-      <button class="install-popup-btn-main" id="installMainBtn">Instalar</button>
-      <button class="install-popup-btn-close" onclick="fecharInstall()">Agora não</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- GESTÃO VENDEDORES MODAL -->
-<div class="gestao-modal" id="gestaoModal">
-  <div class="gestao-modal-box">
-    <div class="gestao-modal-title" id="gestaoModalTitle">Adicionar Vendedor</div>
-    <input type="text" class="gestao-input" id="gestaoNomeInput" placeholder="Nome completo">
-    <select class="gestao-select" id="gestaoEquipaSelect"></select>
-    <div class="gestao-modal-btns">
-      <button class="gestao-confirm-btn" id="gestaoConfirmBtn">Confirmar</button>
-      <button class="gestao-cancel-btn" onclick="fecharGestaoModal()">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- CONFIRM MODAL -->
-<div class="confirm-modal" id="confirmModal">
-  <div class="confirm-box">
-    <span class="confirm-icon" id="confirmIcon">⚠️</span>
-    <div class="confirm-title" id="confirmTitle">Tens a certeza?</div>
-    <div class="confirm-msg" id="confirmMsg">Esta ação é irreversível.</div>
-    <div class="confirm-btns">
-      <button class="confirm-yes" id="confirmYesBtn">Confirmar</button>
-      <button class="confirm-no" onclick="fecharConfirm()">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- EDIT MODAL -->
-<div class="edit-modal" id="editModal">
-  <div class="edit-box">
-    <div class="edit-title">Editar Registo</div>
-    <div class="edit-sub" id="editSub"></div>
-    <div id="editFields"></div>
-    <div class="edit-btns">
-      <button class="edit-save" onclick="guardarEdicao()">Guardar</button>
-      <button class="edit-cancel" onclick="fecharEdit()">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- SURPRISE BOX -->
-<div class="surprise-overlay" id="surpriseOverlay">
-  <div class="surprise-confetti-wrap" id="surpriseConfetti"></div>
-
-  <div style="text-align:center;z-index:2;position:relative">
-    <div class="surprise-pre">🏅 Medalha conquistada</div>
-    <div class="surprise-title">Parabéns!</div>
-    <div class="surprise-nome" id="surpriseNome"></div>
-  </div>
-
-  <div style="display:flex;flex-direction:column;align-items:center;z-index:2;position:relative">
-    <div class="surprise-box-wrap" id="surpriseBoxWrap" onclick="abrirSurprise()">
-      <div class="surprise-box">
-        <div class="surprise-box-bottom">
-          <div class="surprise-box-ribbon-v"></div>
-          <div class="surprise-box-ribbon-h"></div>
-        </div>
-        <div class="surprise-box-lid" id="surpriseLid">
-          <div class="surprise-box-lid-ribbon"></div>
-          <div class="surprise-bow">🎀</div>
-        </div>
-      </div>
-    </div>
-    <div class="surprise-hint" id="surpriseHint">Clica na caixa para abrir! 🎁</div>
-  </div>
-
-  <div id="surprisePrizeArea" style="display:none;flex-direction:column;align-items:center;gap:8px;text-align:center;z-index:2;position:relative;padding:0 20px">
-    <span id="surpriseIcon" style="font-size:120px;line-height:1;display:block">🍫</span>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:#FFD700;letter-spacing:4px">Ganhaste</div>
-    <div id="surpriseContentText" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;letter-spacing:2px">Um chocolate!</div>
-  </div>
-
-  <div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;z-index:2;position:relative">
-    <div id="surpriseDirecao" style="display:none;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:14px 24px;text-align:center;width:100%;max-width:320px">
-      <div style="font-size:11px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px">Para resgatar o teu prémio</div>
-      <div style="font-size:14px;color:rgba(255,255,255,0.85);font-weight:500">Solicita a um membro da <strong style="color:var(--orange)">Direção</strong> 🎯</div>
-    </div>
-    <button class="surprise-close" id="surpriseCloseBtn" style="display:none" onclick="fecharSurprise()">← Continuar</button>
-  </div>
-</div>
-
-<div class="screen" id="screen-info">
-  <div class="screen-banner">
-    <div class="screen-banner-inner">
-      <div class="ucl-stars-banner" style="display:none">★ ★ ★ ★ ★ ★ ★ ★</div>
-      <div class="screen-banner-title">INFO</div>
-      <div class="screen-banner-sub">Sales League · Vasco da Gama</div>
-    </div>
-    <div class="screen-banner-bar">
-      <div class="screen-banner-bar-line"></div>
-      <span>GUIA DA LIGA</span>
-      <div class="screen-banner-bar-line"></div>
-    </div>
-  </div>
-  <div style="overflow-y:auto;flex:1">
-    <div style="padding:12px 16px 0" id="infoContent"></div>
-    <div style="padding:0 16px 20px">
-      <div style="margin-top:16px">
-        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">💬 Caixa de Sugestões</div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px">
-          <select id="sugestaoNome" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;margin-bottom:8px"><option value="">Seleciona o teu nome...</option></select>
-          <textarea id="sugestaoTexto" placeholder="Escreve a tua sugestão..." style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;resize:none;height:80px;font-family:inherit"></textarea>
-          <button onclick="enviarSugestao()" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;margin-top:6px">Enviar →</button>
-        </div>
-        <div id="sugestoesList"></div>
-      </div>
-      <div style="margin-top:20px">
-        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">🔗 Partilhar App</div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center">
-          <div id="qrCode" style="display:flex;justify-content:center;margin-bottom:12px"></div>
-          <div style="font-size:12px;color:var(--muted);margin-bottom:10px;word-break:break-all">https://manager9yc.github.io/sales-league/</div>
-          <button onclick="copiarLink()" style="width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer" id="copyBtn">📋 Copiar Link</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div class="screen" id="screen-jogos">
   <div class="screen-banner">
