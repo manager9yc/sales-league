@@ -1066,11 +1066,17 @@ ontem.setDate(ontem.getDate() - 1);
 const minDate = `${ontem.getFullYear()}-${pad(ontem.getMonth()+1)}-${pad(ontem.getDate())}`;
 const maxDate = `${hoje.getFullYear()}-${pad(hoje.getMonth()+1)}-${pad(hoje.getDate())}`;
 const dataInput = document.getElementById('dataRegisto');
-dataInput.min = minDate;
-dataInput.max = maxDate;
+dataInput.setAttribute('min', minDate);
+dataInput.setAttribute('max', maxDate);
 dataInput.value = maxDate;
 atualizarDataDisplay();
-dataInput.addEventListener('change', atualizarDataDisplay);
+dataInput.addEventListener('change', function() {
+  // Validate: reject dates outside range
+  const val = this.value;
+  if (val < minDate) { this.value = minDate; }
+  if (val > maxDate) { this.value = maxDate; }
+  atualizarDataDisplay();
+});
 
 function goTo(screen, btn) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1158,7 +1164,9 @@ function showToast(msg, duration) {
 
 async function submeter() {
   if (!nomeSel) { showToast('⚠️ Seleciona o teu nome primeiro'); return; }
-  if (!document.getElementById('dataRegisto').value) { showToast('⚠️ Escolhe a data'); return; }
+  const dataVal = document.getElementById('dataRegisto').value;
+  if (!dataVal) { showToast('⚠️ Escolhe a data'); return; }
+  if (dataVal < minDate || dataVal > maxDate) { showToast('⚠️ Data inválida'); document.getElementById('dataRegisto').value = maxDate; atualizarDataDisplay(); return; }
   iniciarAudio();
   const btn = document.getElementById('submitBtn');
   btn.textContent = '✓ A guardar...';
