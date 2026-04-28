@@ -608,25 +608,7 @@ body.theme-ucl .ucl-stars-banner { display:block; }
 button:active { transform: scale(0.96); transition: transform 0.1s; }
 .submit-btn { transition: transform 0.1s, background 0.2s; }
 
-/* VIDEO BACKGROUND SPLASH */
-.splash-video-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-  opacity: 0.35;
-  pointer-events: none;
-}
-.splash-video-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.7) 100%);
-  z-index: 1;
-  pointer-events: none;
-}
-.splash { position: fixed; inset: 0; z-index: 9999; background: #070F1F; overflow: hidden; }
+
 
 </style>
 </head>
@@ -634,12 +616,7 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
 
 <!-- SPLASH -->
 <div class="splash" id="splash">
-  <!-- Video background -->
-  <video class="splash-video-bg" id="splashVideo" autoplay muted loop playsinline preload="auto" crossorigin="anonymous">
-    <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" type="video/mp4">
-    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-  </video>
-  <div class="splash-video-overlay"></div>
+
   <div class="sp-particles" id="spParticles"></div>
   <div class="sp-slash ss1"></div><div class="sp-slash ss2"></div>
   <div class="sp-slash ss3"></div><div class="sp-slash ss4"></div>
@@ -728,7 +705,7 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
       </div>
       <div class="sec-label">Vendas do dia</div>
       <div class="card">
-        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🖥️</div><div><div class="prod-name">Onlines</div><div class="prod-hint">Vendas online registadas</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('onlines',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="onlines">0</div><button class="cbtn plus" onmousedown="startChange('onlines',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',1,event)" ontouchend="stopChange()">+</button></div></div>
+        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🖥️</div><div><div class="prod-name">Onlines</div><div class="prod-hint">Vendas online pagas</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('onlines',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="onlines">0</div><button class="cbtn plus" onmousedown="startChange('onlines',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',1,event)" ontouchend="stopChange()">+</button></div></div>
         <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🧴</div><div><div class="prod-name">Sprays</div><div class="prod-hint">Limpeza, Desodorizante e Impermeabilizante</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('sprays',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sprays',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="sprays">0</div><button class="cbtn plus" onmousedown="startChange('sprays',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sprays',1,event)" ontouchend="stopChange()">+</button></div></div>
         <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🦶</div><div><div class="prod-name">Palmilhas</div><div class="prod-hint">Excepto Fila</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('palmilhas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('palmilhas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="palmilhas">0</div><button class="cbtn plus" onmousedown="startChange('palmilhas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('palmilhas',1,event)" ontouchend="stopChange()">+</button></div></div>
         <div class="prod-row"><div class="prod-info"><div class="prod-emoji">👕</div><div><div class="prod-name">Camisolas Oficiais</div><div class="prod-hint">Futebol oficial</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('camisolas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('camisolas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="camisolas">0</div><button class="cbtn plus" onmousedown="startChange('camisolas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('camisolas',1,event)" ontouchend="stopChange()">+</button></div></div>
@@ -1460,16 +1437,6 @@ function mostrarProgressoRegisto(nome, payload) {
 
 // ── SPLASH ──
 let splashProg = 0, splashIv = null;
-// Splash video autoplay
-function iniciarVideoSplash() {
-  const v = document.getElementById('splashVideo');
-  if (!v) return;
-  v.play().catch(() => {
-    // Autoplay blocked - try on first touch
-    document.addEventListener('touchstart', () => v.play(), { once: true });
-  });
-}
-
 function iniciarSplash() {
 
   carregarSplashTop3();
@@ -3258,5 +3225,84 @@ try {
   </div>
   <div id="rouletteConfetti" style="position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:10001"></div>
 </div>
-</body>
-</html>
+<!-- GESTÃO VENDEDORES MODAL -->
+<div class="gestao-modal" id="gestaoModal">
+  <div class="gestao-modal-box">
+    <div class="gestao-modal-title" id="gestaoModalTitle">Adicionar Vendedor</div>
+    <input type="text" class="gestao-input" id="gestaoNomeInput" placeholder="Nome completo">
+    <select class="gestao-select" id="gestaoEquipaSelect"></select>
+    <div class="gestao-modal-btns">
+      <button class="gestao-confirm-btn" id="gestaoConfirmBtn">Confirmar</button>
+      <button class="gestao-cancel-btn" onclick="fecharGestaoModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="confirm-modal" id="confirmModal">
+  <div class="confirm-box">
+    <span class="confirm-icon" id="confirmIcon">⚠️</span>
+    <div class="confirm-title" id="confirmTitle">Tens a certeza?</div>
+    <div class="confirm-msg" id="confirmMsg">Esta ação é irreversível.</div>
+    <div class="confirm-btns">
+      <button class="confirm-yes" id="confirmYesBtn">Confirmar</button>
+      <button class="confirm-no" onclick="fecharConfirm()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="edit-modal" id="editModal">
+  <div class="edit-box">
+    <div class="edit-title">Editar Registo</div>
+    <div class="edit-sub" id="editSub"></div>
+    <div id="editFields"></div>
+    <div class="edit-btns">
+      <button class="edit-save" onclick="guardarEdicao()">Guardar</button>
+      <button class="edit-cancel" onclick="fecharEdit()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SURPRISE BOX -->
+<div class="surprise-overlay" id="surpriseOverlay">
+  <div class="surprise-confetti-wrap" id="surpriseConfetti"></div>
+
+  <div style="text-align:center;z-index:2;position:relative">
+    <div class="surprise-pre">🏅 Medalha conquistada</div>
+    <div class="surprise-title">Parabéns!</div>
+    <div class="surprise-nome" id="surpriseNome"></div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;align-items:center;z-index:2;position:relative">
+    <div class="surprise-box-wrap" id="surpriseBoxWrap" onclick="abrirSurprise()">
+      <div class="surprise-box">
+        <div class="surprise-box-bottom">
+          <div class="surprise-box-ribbon-v"></div>
+          <div class="surprise-box-ribbon-h"></div>
+        </div>
+        <div class="surprise-box-lid" id="surpriseLid">
+          <div class="surprise-box-lid-ribbon"></div>
+          <div class="surprise-bow">🎀</div>
+        </div>
+      </div>
+    </div>
+    <div class="surprise-hint" id="surpriseHint">Clica na caixa para abrir! 🎁</div>
+  </div>
+
+  <div id="surprisePrizeArea" style="display:none;flex-direction:column;align-items:center;gap:8px;text-align:center;z-index:2;position:relative;padding:0 20px">
+    <span id="surpriseIcon" style="font-size:120px;line-height:1;display:block">🍫</span>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:#FFD700;letter-spacing:4px">Ganhaste</div>
+    <div id="surpriseContentText" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;letter-spacing:2px">Um chocolate!</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;z-index:2;position:relative">
+    <div id="surpriseDirecao" style="display:none;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:14px 24px;text-align:center;width:100%;max-width:320px">
+      <div style="font-size:11px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px">Para resgatar o teu prémio</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.85);font-weight:500">Solicita a um membro da <strong style="color:var(--orange)">Direção</strong> 🎯</div>
+    </div>
+    <button class="surprise-close" id="surpriseCloseBtn" style="display:none" onclick="fecharSurprise()">← Continuar</button>
+  </div>
+</div>
+
+
