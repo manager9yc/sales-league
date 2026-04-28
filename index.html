@@ -1124,7 +1124,7 @@ function buildRows(sorted, key) {
       : `<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--orange);align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#fff;margin-right:8px;flex-shrink:0;vertical-align:middle">${nome.split(' ').map(x=>x[0]).slice(0,2).join('')}</span>`;
     return `<tr class="rank-${i+1}">
       <td class="td-pos">${i+1}</td>
-      <td class="td-name" style="display:flex;align-items:center;cursor:pointer" ondblclick="event.preventDefault();abrirDashDeRanking('${nome}')" title="Duplo clique para ver o dashboard">${avatarHtml}${nome}</td>
+      <td class="td-name" style="display:flex;align-items:center;cursor:pointer" onclick="abrirDashDeRanking('${nome}')" style="cursor:pointer">${avatarHtml}${nome}</td>
       <td class="td-bar"><div class="bar-bg"><div class="bar-fg" data-pct="${pct}" style="width:0%"></div></div></td>
       <td class="td-score">${v[key]}</td>
     </tr>`;
