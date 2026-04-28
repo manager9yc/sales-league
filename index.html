@@ -697,7 +697,7 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
       <div id="splashTop3Content" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px"></div>
     </div>
     <div style="width:80%;max-width:360px;display:flex;flex-direction:column;gap:8px;margin-bottom:8px">
-      <button onclick="fecharSplash()" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:15px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:6px">ENTRAR</button>
+      <button onclick="iniciarAudio();fecharSplash()" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:15px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:6px">ENTRAR</button>
     </div>
     <div style="font-size:10px;color:rgba(255,255,255,0.25);text-align:center;margin-top:4px"></div>
   </div>
@@ -1159,6 +1159,17 @@ function selectName(btn) {
 }
 
 function change(campo, delta) {
+  // Tick sound
+  iniciarAudio();
+  if (audioCtx) {
+    const _o=audioCtx.createOscillator(),_g=audioCtx.createGain();
+    _o.connect(_g);_g.connect(audioCtx.destination);
+    _o.type='sine';
+    _o.frequency.setValueAtTime(delta>0?900:500,audioCtx.currentTime);
+    _g.gain.setValueAtTime(0.07,audioCtx.currentTime);
+    _g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.05);
+    _o.start(audioCtx.currentTime);_o.stop(audioCtx.currentTime+0.06);
+  }
   vals[campo] = Math.max(0, vals[campo]+delta);
   const el = document.getElementById(campo);
   el.textContent = vals[campo];
@@ -1237,6 +1248,37 @@ async function submeter() {
   mostrarProgressoRegisto(nomeSel, payload);
 
   // Sem redirecionamento automático
+}
+
+function tocarAntemSplash() {
+  iniciarAudio();
+  if (!audioCtx) return;
+  // Champions League anthem - simplified main melody (Die Königlichen tones)
+  // Notes: A4=440, D5=587, F#5=740, A5=880, G5=784, E5=659, D5=587
+  const notas = [
+    [440,0,0.5],[440,0.55,0.5],[440,1.1,0.3],
+    [587,1.5,0.8],
+    [740,2.4,0.5],[784,2.95,0.5],
+    [880,3.5,1.0],
+    [784,4.6,0.4],[740,5.05,0.4],[659,5.5,0.4],
+    [587,5.95,1.2],
+    [494,7.2,0.4],[440,7.7,0.4],
+    [587,8.2,2.0],
+  ];
+  notas.forEach(([freq, t, dur]) => {
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    const reverb = audioCtx.createGain();
+    o.connect(g); g.connect(reverb); reverb.connect(audioCtx.destination);
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(freq, audioCtx.currentTime + t);
+    g.gain.setValueAtTime(0, audioCtx.currentTime + t);
+    g.gain.linearRampToValueAtTime(0.18, audioCtx.currentTime + t + 0.05);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + t + dur);
+    reverb.gain.setValueAtTime(0.9, audioCtx.currentTime);
+    o.start(audioCtx.currentTime + t);
+    o.stop(audioCtx.currentTime + t + dur + 0.1);
+  });
 }
 
 function tocarSomRegisto() {
@@ -2233,6 +2275,9 @@ function pinPress(key) {
         document.getElementById('pinOverlay').classList.add('hidden');
         document.getElementById('adminBody').style.display = 'block';
         renderDadosTab();
+        renderPremiosEditor();
+        renderPremiosLog();
+        renderAdminSugestoes();
         const hoje = new Date();
         const pad = n => String(n).padStart(2,'0');
         const adminDate = document.getElementById('adminDate');
@@ -3035,6 +3080,84 @@ try {
   const saved = localStorage.getItem('premiosConfig');
   if (saved) premios = JSON.parse(saved);
 } catch(e) {}
+// ══ SLOT MACHINE + ROULETTE ══
+let slotSpinning = false;
+
+function initSlot() {
+  for (let r = 0; r < 3; r++) {
+    const reel = document.getElementById('slotReel' + r);
+    if (!reel) continue;
+    let items = '';
+    for (let rep = 0; rep < 6; rep++) {
+      premios.forEach(p => { items += `<div class="slot-item">${p.icon}</div>`; });
+    }
+    reel.innerHTML = items;
+    reel.style.transition = 'none';
+    reel.style.transform = 'translateY(0)';
+  }
+}
+
+function girarSlot() {
+  if (slotSpinning) return;
+  slotSpinning = true;
+  const btn = document.getElementById('wheelSpinBtn');
+  if (btn) btn.disabled = true;
+
+  // Pick winner by probability
+  const rand = Math.random();
+  let acc = 0, wIdx = 0;
+  for (let i = 0; i < premios.length; i++) {
+    acc += premios[i].prob;
+    if (rand <= acc) { wIdx = i; break; }
+  }
+  rPremio = premios[wIdx];
+
+  iniciarAudio(); tocarSomCasino();
+
+  const itemH = 110;
+  const n = premios.length;
+  const targetRep = 3;
+  const durations = [4000, 4500, 5000];
+
+  for (let r = 0; r < 3; r++) {
+    const reel = document.getElementById('slotReel' + r);
+    if (!reel) continue;
+    reel.style.transition = 'none';
+    reel.style.transform = 'translateY(0)';
+    const targetY = -(targetRep * n * itemH + wIdx * itemH);
+    setTimeout((reelEl, dur, tY) => {
+      reelEl.style.transition = `transform ${dur}ms cubic-bezier(0.17,0.67,0.12,1.0)`;
+      reelEl.style.transform = `translateY(${tY}px)`;
+    }, r * 250, reel, durations[r], targetY);
+  }
+
+  setTimeout(() => {
+    slotSpinning = false;
+    pararSomCasino();
+    setTimeout(() => mostrarResultado(rPremio), 300);
+  }, durations[2] + 500);
+}
+
+function abrirRoulette() {
+  if (rOpened) return;
+  rOpened = true;
+  document.getElementById('rouletteLid').style.transform = 'rotate(-65deg) translateY(-16px)';
+  document.getElementById('rouletteHint').style.visibility = 'hidden';
+  setTimeout(() => {
+    document.getElementById('rouletteBoxSection').style.display = 'none';
+    const ws = document.getElementById('wheelSection');
+    ws.style.display = 'flex';
+    ws.style.opacity = '0';
+    ws.style.transform = 'scale(0.8)';
+    ws.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+    setTimeout(() => {
+      ws.style.opacity = '1';
+      ws.style.transform = 'scale(1)';
+    }, 30);
+    initSlot();
+  }, 900);
+}
+
 let rNome='',rMedalha='',rOpened=false,rAngle=0,rSpinning=false,rPremio=null;
 
 function mostrarRoulette(nome,medalha){
