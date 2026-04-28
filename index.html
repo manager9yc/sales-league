@@ -759,8 +759,8 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
             </div>
           </div>
           <div style="display:flex;gap:8px;width:100%">
+            <button id="btnOntem" onclick="selecionarData('ontem')" style="flex:0 0 22%;padding:10px 4px;border-radius:10px;border:2px solid var(--border);background:var(--card2);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.5px;cursor:pointer;transition:all 0.15s">Ontem</button>
             <button id="btnHoje" onclick="selecionarData('hoje')" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--card2);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.15s">Hoje</button>
-            <button id="btnOntem" onclick="selecionarData('ontem')" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--card2);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.15s">Ontem</button>
           </div>
           <input type="hidden" id="dataRegisto" />
         </div>
@@ -1110,14 +1110,24 @@ function renderTabs() {
 function selectTeam(id) {
   equipaAtiva = id; nomeSel = null;
   document.querySelectorAll('.team-tab').forEach((t,i) => t.classList.toggle('active', equipas[i].id === id));
-  const nomes = equipas.find(e=>e.id===id).nomes;
-  document.getElementById('nameGrid').innerHTML = nomes.map((n, idx) => {
-    const foto = typeof getFoto === 'function' ? getFoto(n) : null;
-    const ini = n.split(' ').map(x=>x[0]).slice(0,2).join('');
-    const avatar = foto
-      ? `<img src="${foto}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0">`
-      : `<div style="width:30px;height:30px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">${ini}</div>`;
-    return `<button class="name-btn" style="display:flex;align-items:center;gap:8px;text-align:left;animation-delay:${idx*0.04}s" onclick="selectName(this)">${avatar}<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px">${n}</span></button>`;
+  const equipa = equipas.find(e=>e.id===id);
+  if (!equipa || !equipa.nomes || !equipa.nomes.length) {
+    document.getElementById('nameGrid').innerHTML = '<div class="name-empty">Nenhum colaborador nesta equipa</div>';
+    return;
+  }
+  const nomes = equipa.nomes;
+  document.getElementById('nameGrid').innerHTML = nomes.map((n, i) => {
+    let avatarHtml = '';
+    try {
+      const foto = typeof getFoto === 'function' ? getFoto(n) : null;
+      const ini = n.split(' ').filter(Boolean).map(x=>x[0]).slice(0,2).join('').toUpperCase();
+      avatarHtml = foto
+        ? `<img src="${foto}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0">`
+        : `<div style="width:30px;height:30px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">${ini}</div>`;
+    } catch(e) {
+      avatarHtml = `<div style="width:30px;height:30px;border-radius:50%;background:var(--orange);flex-shrink:0"></div>`;
+    }
+    return `<button class="name-btn" style="display:flex;align-items:center;gap:8px;text-align:left;animation-delay:${i*0.04}s" onclick="selectName(this)">${avatarHtml}<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px">${n}</span></button>`;
   }).join('');
 }
 
