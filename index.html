@@ -750,14 +750,19 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
       <div class="last-reg-bar" id="lastRegBar" style="display:none"></div>
       <div class="sec-label">Dia</div>
       <div class="card">
-        <div class="date-row" style="position:relative;cursor:pointer">
-          <div class="date-icon">📅</div>
-          <div style="flex:1">
-            <div class="date-lbl">Data do registo</div>
-            <div id="dataDisplay" style="font-size:18px;font-weight:700;color:var(--text);margin-top:2px">—</div>
+        <div class="date-row" style="flex-direction:column;align-items:flex-start;gap:10px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="date-icon">📅</div>
+            <div>
+              <div class="date-lbl">Data do registo</div>
+              <div id="dataDisplay" style="font-size:18px;font-weight:700;color:var(--text);margin-top:2px">—</div>
+            </div>
           </div>
-          <div style="font-size:20px;color:var(--muted)">›</div>
-          <input type="date" id="dataRegisto" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:10" />
+          <div style="display:flex;gap:8px;width:100%">
+            <button id="btnHoje" onclick="selecionarData('hoje')" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--card2);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.15s">Hoje</button>
+            <button id="btnOntem" onclick="selecionarData('ontem')" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--card2);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.15s">Ontem</button>
+          </div>
+          <input type="hidden" id="dataRegisto" />
         </div>
       </div>
       <div class="sec-label">Quem és tu?</div>
@@ -1060,23 +1065,13 @@ let nomeSel = null, equipaAtiva = null;
 
 const hoje = new Date();
 const pad = n => String(n).padStart(2,'0');
-// Date limits: yesterday to today
+// Date buttons: hoje / ontem
 const ontem = new Date(hoje);
 ontem.setDate(ontem.getDate() - 1);
-const minDate = `${ontem.getFullYear()}-${pad(ontem.getMonth()+1)}-${pad(ontem.getDate())}`;
 const maxDate = `${hoje.getFullYear()}-${pad(hoje.getMonth()+1)}-${pad(hoje.getDate())}`;
-const dataInput = document.getElementById('dataRegisto');
-dataInput.setAttribute('min', minDate);
-dataInput.setAttribute('max', maxDate);
-dataInput.value = maxDate;
-atualizarDataDisplay();
-dataInput.addEventListener('change', function() {
-  // Validate: reject dates outside range
-  const val = this.value;
-  if (val < minDate) { this.value = minDate; }
-  if (val > maxDate) { this.value = maxDate; }
-  atualizarDataDisplay();
-});
+const minDate = `${ontem.getFullYear()}-${pad(ontem.getMonth()+1)}-${pad(ontem.getDate())}`;
+// Select today by default
+selecionarData('hoje');
 
 function goTo(screen, btn) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1166,7 +1161,15 @@ async function submeter() {
   if (!nomeSel) { showToast('⚠️ Seleciona o teu nome primeiro'); return; }
   const dataVal = document.getElementById('dataRegisto').value;
   if (!dataVal) { showToast('⚠️ Escolhe a data'); return; }
-  if (dataVal < minDate || dataVal > maxDate) { showToast('⚠️ Data inválida'); document.getElementById('dataRegisto').value = maxDate; atualizarDataDisplay(); return; }
+
+  // Block duplicate: 1 registration per vendor per day
+  const registoKey = 'registo_' + nomeSel + '_' + dataVal;
+  try {
+    if (localStorage.getItem(registoKey)) {
+      showToast('⚠️ ' + nomeSel.split(' ')[0] + ' já registou para este dia!');
+      return;
+    }
+  } catch(e) {}
   iniciarAudio();
   const btn = document.getElementById('submitBtn');
   btn.textContent = '✓ A guardar...';
@@ -1190,6 +1193,8 @@ async function submeter() {
   try {
     await fetch(SHEETS_URL, { method:'POST', body: JSON.stringify(payload), mode:'no-cors' });
   } catch(e) { console.error('Erro ao guardar:', e); }
+  // Mark this vendor+day as registered
+  try { localStorage.setItem('registo_' + nomeSel + '_' + document.getElementById('dataRegisto').value, '1'); } catch(e) {}
   tocarSomRegisto();
   document.getElementById('formMain').classList.add('hide');
   document.getElementById('successMsg').classList.add('show');
@@ -1219,6 +1224,26 @@ function tocarSomRegisto() {
     o.start(audioCtx.currentTime + t);
     o.stop(audioCtx.currentTime + t + 0.3);
   });
+}
+
+function selecionarData(opcao) {
+  const input = document.getElementById('dataRegisto');
+  const btnH = document.getElementById('btnHoje');
+  const btnO = document.getElementById('btnOntem');
+  const val = opcao === 'hoje' ? maxDate : minDate;
+  input.value = val;
+  // Highlight active button
+  if (btnH) {
+    btnH.style.background = opcao === 'hoje' ? 'var(--orange)' : 'var(--card2)';
+    btnH.style.borderColor = opcao === 'hoje' ? 'var(--orange)' : 'var(--border)';
+    btnH.style.color = opcao === 'hoje' ? '#fff' : 'var(--text)';
+  }
+  if (btnO) {
+    btnO.style.background = opcao === 'ontem' ? 'var(--orange)' : 'var(--card2)';
+    btnO.style.borderColor = opcao === 'ontem' ? 'var(--orange)' : 'var(--border)';
+    btnO.style.color = opcao === 'ontem' ? '#fff' : 'var(--text)';
+  }
+  atualizarDataDisplay();
 }
 
 function atualizarDataDisplay() {
