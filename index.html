@@ -2161,7 +2161,7 @@ function mostrarDash(nome) {
       ${compRank.map((item,i)=>{
         const hi=item.n===nome;
         const pct=Math.round(item.v/maxO*100);
-        return `<div class="d-crow">
+        return `<div class="d-crow${i<10?' rank-top10':''}">
           <div class="d-cpos ${hi?'hi':''}">${i+1}º</div>
           <div class="d-cnom ${hi?'hi':''}">${item.n.split(' ')[0]}</div>
           <div class="d-cbarwrap"><div class="d-cbarfill ${hi?'hi':''}" style="width:${pct}%"></div></div>
