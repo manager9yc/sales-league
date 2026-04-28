@@ -784,7 +784,7 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
       <div class="card">
         <div class="prod-row" style="padding:0"><div class="prod-info"><div class="prod-emoji">⭐</div><div><div class="prod-name">Elogios</div><div class="prod-hint">Escritos ou Google Reviews</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div></div>
       </div>
-      <button class="submit-btn" id="submitBtn" onclick="submeter()">Registar o meu dia</button>
+      <button class="submit-btn" id="submitBtn" onclick="clicarSubmit(this)">Registar o meu dia</button>
     </div>
     <div class="success" id="successMsg">
       <!-- HERO CONFIRMAÇÃO -->
@@ -1248,6 +1248,7 @@ async function submeter() {
   // Mark this vendor+day as registered
   try { localStorage.setItem('registo_' + nomeSel + '_' + document.getElementById('dataRegisto').value, '1'); } catch(e) {}
   tocarSomRegisto();
+  const sb=document.getElementById('submitBtn'); if(sb){sb.style.background='';}
   document.getElementById('formMain').classList.add('hide');
   document.getElementById('successMsg').classList.add('show');
   window.scrollTo({top: 0, behavior: 'smooth'});
@@ -1920,6 +1921,28 @@ async function carregarSplashTop3(){
     const el=document.getElementById('splashTop3Content'),wrap=document.getElementById('splashTop3');
     if(el)el.innerHTML=html;if(wrap)wrap.style.display='block';
   }catch(e){}
+}
+
+function clicarSubmit(btn) {
+  // Click sound
+  try {
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!audioCtx) audioCtx = new AudioContext();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type='sine'; o.frequency.value=660;
+    g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.12);
+    o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime+0.13);
+  } catch(e) {}
+  // Green flash
+  btn.style.background='#22C55E';
+  btn.style.transform='scale(0.97)';
+  setTimeout(() => {
+    btn.style.transform='scale(1)';
+    submeter();
+  }, 150);
 }
 
 renderTabs();
