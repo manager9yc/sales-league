@@ -556,7 +556,7 @@ body.theme-dark .ucl-stars-banner{display:none!important}
 .ucl-stars-banner{display:none;font-size:11px;letter-spacing:5px;color:#C9A84C;text-align:center;margin-bottom:6px;position:relative;z-index:2}
 body.theme-ucl .ucl-stars-banner{display:block}
 /* ══ ROULETTE ══ */
-.roulette-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:10000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center}
+.roulette-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:10000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center}
 .roulette-overlay.open{display:flex;animation:fadeIn 0.3s ease;align-items:center;justify-content:center}
 .wheel-wrap{position:relative;width:260px;height:260px;margin:0 auto 12px}
 .wheel-canvas{border-radius:50%;box-shadow:0 0 30px rgba(255,107,0,0.3)}
@@ -678,7 +678,7 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
 <body>
 
 <!-- SPLASH -->
-<div class="splash" id="splash">
+<div class="splash" id="splash" ontouchstart="if(!window._as){window._as=1;tocarAntemSplash()}" onclick="if(!window._as){window._as=1;tocarAntemSplash()}">
 
   <div class="sp-particles" id="spParticles"></div>
   <div class="sp-slash ss1"></div><div class="sp-slash ss2"></div>
@@ -1159,6 +1159,16 @@ function selectName(btn) {
 }
 
 function change(campo, delta) {
+  try {
+    if (!audioCtx) { window.AudioContext=window.AudioContext||window.webkitAudioContext; audioCtx=new AudioContext(); }
+    if (audioCtx.state==='suspended') audioCtx.resume();
+    const _o=audioCtx.createOscillator(),_g=audioCtx.createGain();
+    _o.connect(_g); _g.connect(audioCtx.destination);
+    _o.type='sine'; _o.frequency.value=delta>0?900:500;
+    _g.gain.setValueAtTime(0.08,audioCtx.currentTime);
+    _g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.06);
+    _o.start(audioCtx.currentTime); _o.stop(audioCtx.currentTime+0.07);
+  } catch(e) {}
   // Tick sound
   iniciarAudio();
   if (audioCtx) {
@@ -1251,33 +1261,28 @@ async function submeter() {
 }
 
 function tocarAntemSplash() {
-  iniciarAudio();
-  if (!audioCtx) return;
-  // Champions League anthem - simplified main melody (Die Königlichen tones)
-  // Notes: A4=440, D5=587, F#5=740, A5=880, G5=784, E5=659, D5=587
-  const notas = [
-    [440,0,0.5],[440,0.55,0.5],[440,1.1,0.3],
-    [587,1.5,0.8],
-    [740,2.4,0.5],[784,2.95,0.5],
-    [880,3.5,1.0],
-    [784,4.6,0.4],[740,5.05,0.4],[659,5.5,0.4],
-    [587,5.95,1.2],
-    [494,7.2,0.4],[440,7.7,0.4],
-    [587,8.2,2.0],
+  try {
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!audioCtx) audioCtx = new AudioContext();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  } catch(e) { return; }
+  // Champions League melody (simplified)
+  const n = [
+    [440,0,.35],[440,.42,.35],[440,.84,.35],[587,1.28,.65],
+    [740,2.08,.35],[784,2.5,.35],[880,2.92,.85],
+    [784,3.95,.3],[740,4.3,.3],[659,4.65,.3],[587,5.0,.7],
+    [494,5.9,.35],[440,6.3,.35],[587,6.7,1.2]
   ];
-  notas.forEach(([freq, t, dur]) => {
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    const reverb = audioCtx.createGain();
-    o.connect(g); g.connect(reverb); reverb.connect(audioCtx.destination);
-    o.type = 'triangle';
-    o.frequency.setValueAtTime(freq, audioCtx.currentTime + t);
-    g.gain.setValueAtTime(0, audioCtx.currentTime + t);
-    g.gain.linearRampToValueAtTime(0.18, audioCtx.currentTime + t + 0.05);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + t + dur);
-    reverb.gain.setValueAtTime(0.9, audioCtx.currentTime);
-    o.start(audioCtx.currentTime + t);
-    o.stop(audioCtx.currentTime + t + dur + 0.1);
+  n.forEach(([freq,t,dur]) => {
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type='triangle'; o.frequency.value=freq;
+    const s=audioCtx.currentTime+t;
+    g.gain.setValueAtTime(0,s);
+    g.gain.linearRampToValueAtTime(0.15,s+0.04);
+    g.gain.setValueAtTime(0.15,s+dur-0.04);
+    g.gain.linearRampToValueAtTime(0,s+dur);
+    o.start(s); o.stop(s+dur+0.05);
   });
 }
 
@@ -2278,6 +2283,9 @@ function pinPress(key) {
         renderPremiosEditor();
         renderPremiosLog();
         renderAdminSugestoes();
+        renderPremiosEditor();
+        renderPremiosLog();
+        renderAdminSugestoes();
         const hoje = new Date();
         const pad = n => String(n).padStart(2,'0');
         const adminDate = document.getElementById('adminDate');
@@ -3171,7 +3179,6 @@ function mostrarRoulette(nome,medalha){
   document.getElementById('rouletteHint').style.visibility='visible';
   document.getElementById('rouletteConfetti').innerHTML='';
   if(document.getElementById('wheelSpinBtn'))document.getElementById('wheelSpinBtn').disabled=false;
-  desenharRoleta(0);
   document.getElementById('rouletteOverlay').classList.add('open');
   setTimeout(()=>{const w=document.getElementById('rouletteBoxWrap');w.style.animation='shakeBox 0.5s ease';setTimeout(()=>w.style.animation='',600);},1000);
 }
@@ -3278,6 +3285,74 @@ try {
     if (btn) goTo(lastTab, btn);
   }
 } catch(e) {}
+
+// ══ PRÉMIOS EDITOR ══
+function renderPremiosEditor() {
+  const el = document.getElementById('premiosEditorList');
+  if (!el) return;
+  el.innerHTML = premios.map((p,i) => `
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px">
+      <div style="width:38px;height:38px;border-radius:8px;background:${p.cor};display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${p.icon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${p.nome}</div>
+        <div style="font-size:10px;color:var(--muted)">${Math.round(p.prob*100)}% prob.</div>
+      </div>
+      <div style="display:flex;gap:4px">
+        <button onclick="editarPremio(${i})" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent">✏️</button>
+        <button onclick="removerPremio(${i})" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:6px;padding:6px 10px;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;color:#EF4444">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function adicionarPremio() {
+  const icon = (document.getElementById('novoPremioIcon')?.value||'🎁').trim();
+  const nome = (document.getElementById('novoPremioNome')?.value||'').trim();
+  const cor  = document.getElementById('novoPremioColor')?.value||'#4A2C2A';
+  if (!nome) { showToast('⚠️ Escreve o nome'); return; }
+  premios.push({icon, nome, prob:0.1, cor});
+  normalizarProbs();
+  guardarPremios();
+  document.getElementById('novoPremioIcon').value='';
+  document.getElementById('novoPremioNome').value='';
+  renderPremiosEditor();
+  showToast('✓ Prémio adicionado!');
+}
+
+function removerPremio(i) {
+  if (premios.length<=2) { showToast('⚠️ Mínimo 2 prémios'); return; }
+  premios.splice(i,1);
+  normalizarProbs();
+  guardarPremios();
+  renderPremiosEditor();
+  showToast('✓ Removido');
+}
+
+function editarPremio(i) {
+  const p = premios[i];
+  const n = prompt('Nome:', p.nome); if(n===null)return;
+  const ic = prompt('Emoji:', p.icon); if(ic===null)return;
+  if(n.trim()) premios[i].nome=n.trim();
+  if(ic.trim()) premios[i].icon=ic.trim();
+  guardarPremios(); renderPremiosEditor(); showToast('✓ Atualizado');
+}
+
+function normalizarProbs() {
+  const base = parseFloat((1/premios.length).toFixed(3));
+  premios.forEach(p => p.prob = base);
+  const diff = parseFloat((1 - premios.reduce((s,p)=>s+p.prob,0)).toFixed(3));
+  premios[0].prob = parseFloat((premios[0].prob+diff).toFixed(3));
+}
+
+function guardarPremios() {
+  try { localStorage.setItem('premiosConfig', JSON.stringify(premios)); } catch(e) {}
+}
+
+function resetarPremios() {
+  if(!confirm('Repor prémios originais?')) return;
+  premios = premiosDefault.map(p=>({...p}));
+  try { localStorage.removeItem('premiosConfig'); } catch(e) {}
+  renderPremiosEditor(); showToast('✓ Repostos');
+}
 
 </script>
 
@@ -3487,6 +3562,5 @@ try {
     <button class="surprise-close" id="surpriseCloseBtn" style="display:none" onclick="fecharSurprise()">← Continuar</button>
   </div>
 </div>
-
 
 
