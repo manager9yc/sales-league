@@ -925,6 +925,26 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
     <div id="adminBody" style="display:none">
       <div style="padding:16px 16px 0"><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Tema Visual</div><div style="display:flex;gap:8px"><button onclick="aplicarTema('dark')" id="btnThemeDark" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">⚫ Preto</button><button onclick="aplicarTema('ucl')" id="btnThemeUCL" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">🏆 Champions</button></div></div>
       <div style="height:1px;background:var(--border);margin:12px 16px"></div>
+      <!-- PRÉMIOS EDITOR -->
+      <div style="padding:0 16px;margin-top:4px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:12px">🎁 Prémios da Roleta</div>
+        <div id="premiosEditorList"></div>
+        <!-- Add new -->
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:8px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:600;letter-spacing:1px">ADICIONAR PRÉMIO</div>
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <input id="novoPremioIcon" type="text" placeholder="🎁" maxlength="2" style="width:44px;text-align:center;font-size:20px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--text);outline:none">
+            <input id="novoPremioNome" type="text" placeholder="Nome do prémio..." style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--text);font-size:13px;outline:none">
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <label style="font-size:11px;color:var(--muted);white-space:nowrap">Cor:</label>
+            <input id="novoPremioColor" type="color" value="#4A2C2A" style="width:36px;height:32px;border:1px solid var(--border);border-radius:6px;background:var(--card);cursor:pointer;padding:2px">
+            <button onclick="adicionarPremio()" style="flex:1;background:var(--orange);border:none;border-radius:8px;padding:9px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer">+ Adicionar</button>
+          </div>
+        </div>
+        <button onclick="resetarPremios()" style="width:100%;margin-top:8px;background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--muted);font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer">↩ Repor prémios originais</button>
+      </div>
+      <div style="height:1px;background:var(--border);margin:12px 16px"></div>
       <!-- GESTÃO VENDEDORES -->
       <div style="padding:16px 16px 0">
         <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Gestão de Vendedores</div>
@@ -1551,8 +1571,13 @@ function mostrarProgressoRegisto(nome, payload) {
   prog.innerHTML = metasHtml;
 
   // Show medal popup for each earned medal
-  if (conquistadas.length > 0) {
-    conquistadas.forEach((m, i) => {
+  // Only show popup for NEWLY earned medals (compare before/after payload)
+  const dadosSemNovo = dashAllDados.filter(d => d.nome === nome && !(d.data === payload.data && d._isNew));
+  const medalhasAntes = calcularMedalhas(dadosSemNovo);
+  const novasMedalhas = conquistadas.filter(m => !medalhasAntes.find(ma => ma.name === m.name && ma.earned));
+
+  if (novasMedalhas.length > 0) {
+    novasMedalhas.forEach((m, i) => {
       setTimeout(() => mostrarMedalPopup(m.icon, nome, m.name), 800 + i*5500);
     });
   }
@@ -2997,7 +3022,7 @@ function renderAdminSugestoes(){
 function alterarEstadoSugestao(i,estado){sugestoes[i].estado=estado;try{localStorage.setItem('sugestoes',JSON.stringify(sugestoes));}catch(e){}renderSugestoes();}
 function guardarRespostaSugestao(i){const input=document.getElementById('resp_'+i);if(!input)return;sugestoes[i].resposta=input.value.trim();try{localStorage.setItem('sugestoes',JSON.stringify(sugestoes));}catch(e){}renderSugestoes();showToast('✓ Resposta guardada');}
 
-const premios=[
+const premiosDefault=[
   {icon:'☕',nome:'Um café!',prob:0.20,cor:'#4A2C2A'},
   {icon:'🍫',nome:'Um chocolate!',prob:0.25,cor:'#5C3317'},
   {icon:'🥐',nome:'Um pastel de nata!',prob:0.10,cor:'#C8963E'},
@@ -3005,11 +3030,15 @@ const premios=[
   {icon:'⏰',nome:'Sair 30 min mais cedo!',prob:0.10,cor:'#1565C0'},
   {icon:'🎰',nome:'Uma raspadinha!',prob:0.20,cor:'#2E7D32'},
 ];
+let premios = premiosDefault.map(p=>({...p}));
+try {
+  const saved = localStorage.getItem('premiosConfig');
+  if (saved) premios = JSON.parse(saved);
+} catch(e) {}
 let rNome='',rMedalha='',rOpened=false,rAngle=0,rSpinning=false,rPremio=null;
 
 function mostrarRoulette(nome,medalha){
-  const key='surpriseShown_'+nome+'_'+medalha;
-  try{if(localStorage.getItem(key))return;localStorage.setItem(key,'1');}catch(e){}
+  // Always show surprise box when medal is earned
   rNome=nome;rMedalha=medalha;rOpened=false;rAngle=0;rSpinning=false;rPremio=null;
   document.getElementById('rouletteNome').textContent=nome+' · '+medalha;
   document.getElementById('rouletteBoxSection').style.display='block';
