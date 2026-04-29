@@ -2596,7 +2596,7 @@ function limparCacheAdmin() {
   const toRemove = [];
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (k && (k.startsWith('medalhasShown_') || k.startsWith('surpriseShown_') || k.startsWith('mbShown_') || k.startsWith('registo_'))) toRemove.push(k);
+    if (k && (k.startsWith('medalhasShown_') || k.startsWith('surpriseShown_') || k.startsWith('mbShown_') || k.startsWith('registo_') || k.startsWith('slotDado_'))) toRemove.push(k);
   }
   toRemove.forEach(k => { try { localStorage.removeItem(k); } catch(e) {} });
   showToast('✓ Cache limpo com sucesso');
@@ -3590,59 +3590,46 @@ function slotFechar() {
 // DETEÇÃO DE MEDALHAS — ao registar o dia
 // ══════════════════════════════════════════════════
 function slotVerificarMedalhas(nome, payload) {
-  // Recolher histórico completo do vendedor
-  // (servidor + local, sem duplicados por data)
+  // Chave única por vendedor + mês para saber quais medalhas já foram premiadas
+  const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
+  const storageKey = 'slotDado_' + nome + '_' + mesKey;
+
+  let jaAtribuidas = [];
+  try { jaAtribuidas = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
+
+  // Calcular totais acumulados deste mês (servidor + local + payload de hoje)
   const dadosMapa = {};
 
-  // 1. Do servidor (se já carregados)
   if (dashAllDados.length) {
     dashAllDados.filter(d => d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
   }
-
-  // 2. Do localStorage (inclui registo que acabou de ser feito)
   try {
-    const local = JSON.parse(localStorage.getItem('historico_local') || '[]');
-    local.filter(d => d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
+    JSON.parse(localStorage.getItem('historico_local') || '[]')
+      .filter(d => d.nome === nome)
+      .forEach(d => { dadosMapa[d.data] = d; });
   } catch(e) {}
 
-  const todosOsDados = Object.values(dadosMapa);
+  // Garantir que o payload de hoje está incluído
+  dadosMapa[payload.data] = payload;
 
-  // Medalhas SEM o dia de hoje
-  const semHoje = todosOsDados.filter(d => d.data !== payload.data);
-  const antes = calcularMedalhas(semHoje);
+  const todos = Object.values(dadosMapa);
+  const mes = new Date().getMonth();
+  const ano = new Date().getFullYear();
+  const doMes = todos.filter(d => {
+    const dt = new Date((d.data || '') + 'T12:00:00');
+    return !isNaN(dt) && dt.getMonth() === mes && dt.getFullYear() === ano;
+  });
 
-  // Medalhas COM o dia de hoje (usar payload para garantir valores actuais)
-  const comHoje = [...semHoje, payload];
-  const depois = calcularMedalhas(comHoje);
-
-  // Quais são genuinamente novas?
-  const novas = depois.filter(m =>
-    m.earned && !antes.find(a => a.name === m.name && a.earned)
-  );
+  // Calcular medalhas com os dados acumulados
+  const medalhas = calcularMedalhas(doMes.length ? doMes : [payload]);
+  const novas = medalhas.filter(m => m.earned && !jaAtribuidas.includes(m.name));
 
   if (novas.length > 0) {
-    // Abrir slot após 1.5s (tempo para o utilizador ver a confirmação do registo)
+    // Marcar como atribuídas para não repetir
+    jaAtribuidas.push(...novas.map(m => m.name));
+    try { localStorage.setItem(storageKey, JSON.stringify(jaAtribuidas)); } catch(e) {}
+    // Abrir slot
     setTimeout(() => slotAbrir(nome, novas[0].name), 1500);
-    return;
-  }
-
-  // Fallback: se o servidor ainda não tinha dados, tentar de novo quando chegar resposta
-  if (!dashAllDados.length) {
-    fetch(SHEETS_URL + '?action=getTodos')
-      .then(r => r.json())
-      .then(td => {
-        if (!Array.isArray(td) || !td.length) return;
-        dashAllDados = td;
-        const srv = td.filter(d => d.nome === nome);
-        const semHoje2 = srv.filter(d => d.data !== payload.data);
-        const antes2 = calcularMedalhas(semHoje2);
-        const depois2 = calcularMedalhas([...semHoje2, payload]);
-        const novas2 = depois2.filter(m => m.earned && !antes2.find(a => a.name === m.name && a.earned));
-        if (novas2.length > 0) {
-          setTimeout(() => slotAbrir(nome, novas2[0].name), 600);
-        }
-      })
-      .catch(() => {});
   }
 }
 
