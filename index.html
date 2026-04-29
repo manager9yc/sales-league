@@ -1756,7 +1756,7 @@ function mostrarProgressoRegisto(nome, payload) {
 
   if (novasMedalhas.length > 0) {
     novasMedalhas.forEach((m, i) => {
-      setTimeout(() => mostrarMedalPopup(m.icon, nome, m.name), 800 + i*5500);
+      setTimeout(() => mostrarMedalPopup(m.icon, nome, m.name, true), 800 + i*5500);
     });
   }
 }
@@ -1855,7 +1855,7 @@ function calcCountdown(){
 
 // ── MEDAL POPUP ──
 let medalTimer=null;
-function mostrarMedalPopup(emoji,nome,medalha){
+function mostrarMedalPopup(emoji,nome,medalha,comSurprise){
   iniciarAudio();
   tocarSomMedalha();
   const popup=document.getElementById('medalPopup');
@@ -1894,8 +1894,8 @@ function mostrarMedalPopup(emoji,nome,medalha){
   clearTimeout(medalTimer);
   medalTimer=setTimeout(()=>{
     popup.classList.remove('show');
-    // Show surprise box after medal popup closes
-    setTimeout(()=>mostrarSurprise(nome, medalha), 300);
+    // Show surprise box ONLY when triggered from registration flow
+    if (comSurprise) setTimeout(()=>mostrarSurprise(nome, medalha), 300);
   },3000);
 }
 
