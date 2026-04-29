@@ -1249,7 +1249,11 @@ async function submeter() {
   const _sb=document.getElementById('submitBtn');if(_sb){_sb.style.background='#22C55E';_sb.style.color='#fff';}
   document.getElementById('formMain').classList.add('hide');
   document.getElementById('successMsg').classList.add('show');
-  // stay on page
+  // Scroll to success box
+  setTimeout(() => {
+    const el = document.getElementById('successMsg');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
 
   // Show progress and medals for this vendedor
   const snl = document.getElementById('successNomeLabel');
