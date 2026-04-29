@@ -546,7 +546,7 @@ body.theme-ucl{--orange:#C9A84C;--orange2:#E8C97A;--dark:#070F1F;--card:#0C1B35;
 body.theme-ucl .ucl-banner-img{display:block}
 body.theme-ucl .nav{background:#070F1F!important;border-bottom:1px solid #C9A84C!important}
 body.theme-ucl .nav-btn.active{color:#C9A84C!important;border-bottom-color:#C9A84C!important}
-body.theme-ucl .submit-btn{background:linear-gradient(90deg,#C9A84C,#E8C97A,#C9A84C)!important;color:#070F1F!important}
+
 body.theme-ucl .banner-bar{background:linear-gradient(90deg,#070F1F,#0C1B35,#070F1F)!important;border-top:1px solid #C9A84C!important}
 body.theme-ucl .banner-top,body.theme-ucl .banner{background:#070F1F!important}
 body.theme-ucl [style*="background:#0C0C0C"]{background:#070F1F!important}
@@ -674,8 +674,17 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
 /* Ranking item stagger */
 .d-crow { animation: fadeSlideUp 0.2s ease both; }
 
-body.theme-ucl .submit-btn { background: linear-gradient(135deg, #22C55E, #16A34A) !important; color: #fff !important; }
-body.theme-ucl .submit-btn:active { background: #16A34A !important; }
+
+
+
+
+
+body.theme-ucl .rank-card, body.theme-ucl [class*="rank-wrap"], body.theme-ucl .rank-list { background: rgba(7,15,31,0.6) !important; }
+body.theme-ucl .d-crow { border-bottom-color: rgba(201,168,76,0.15) !important; }
+body.theme-ucl .rank-top10 { background: rgba(12,27,60,0.9) !important; border-left-color: #C9A84C !important; }
+
+body.theme-ucl .submit-btn{background:linear-gradient(135deg,#C9A84C,#E8C97A)!important;color:#070F1F!important;font-weight:800}
+body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A34A)!important;color:#fff!important}
 </style>
 </head>
 <body>
@@ -772,7 +781,7 @@ body.theme-ucl .submit-btn:active { background: #16A34A !important; }
       <div class="card">
         <div class="team-tabs" id="teamTabs"></div>
         <div class="name-lbl">Seleciona o teu nome</div>
-        <div class="name-grid" id="nameGrid"><div class="name-empty">Escolhe a tua equipa primeiro</div></div>
+        <div class="name-grid" id="nameGrid"></div>
       </div>
       <div class="sec-label">Vendas do dia</div>
       <div class="card">
@@ -788,6 +797,7 @@ body.theme-ucl .submit-btn:active { background: #16A34A !important; }
         <div class="prod-row" style="padding:0"><div class="prod-info"><div class="prod-emoji">⭐</div><div><div class="prod-name">Elogios</div><div class="prod-hint">Escritos ou Google Reviews</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div></div>
       </div>
       <button class="submit-btn" id="submitBtn" onclick="clicarSubmit(this)">Registar o meu dia</button>
+    <div style="text-align:center;padding:14px 0 6px;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif">APP developed by Dário Santos</div>
     </div>
     <div class="success" id="successMsg">
       <!-- HERO CONFIRMAÇÃO -->
@@ -927,6 +937,13 @@ body.theme-ucl .submit-btn:active { background: #16A34A !important; }
     <!-- CONTEÚDO ADMIN -->
     <div id="adminBody" style="display:none">
       <div style="padding:16px 16px 0"><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Tema Visual</div><div style="display:flex;gap:8px"><button onclick="aplicarTema('dark')" id="btnThemeDark" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">⚫ Preto</button><button onclick="aplicarTema('ucl')" id="btnThemeUCL" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">🏆 Champions</button></div></div>
+      <div style="height:1px;background:var(--border);margin:12px 16px"></div>
+      <!-- HISTÓRICO DE MESES -->
+      <div style="padding:0 16px;margin-top:4px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">📅 Histórico de Meses</div>
+        <div id="historicoMesesList"></div>
+        <button onclick="guardarSnapshotMes()" style="width:100%;background:var(--card2);border:1.5px solid var(--orange);border-radius:10px;padding:11px;color:var(--orange);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;margin-top:6px">📸 Guardar snapshot do mês atual</button>
+      </div>
       <div style="height:1px;background:var(--border);margin:12px 16px"></div>
       <!-- PRÉMIOS EDITOR -->
       <div style="padding:0 16px;margin-top:4px">
@@ -1318,7 +1335,7 @@ function atualizarDataDisplay() {
 function resetForm() {
   nomeSel = null; equipaAtiva = null;
   document.querySelectorAll('.team-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('nameGrid').innerHTML = '<div class="name-empty">Escolhe a tua equipa primeiro</div>';
+  document.getElementById('nameGrid').innerHTML = '';
   Object.keys(vals).forEach(k => { vals[k]=0; const el=document.getElementById(k); el.textContent=0; el.classList.remove('nz'); });
   // Reset submit button
   const btn = document.getElementById('submitBtn');
@@ -1744,7 +1761,7 @@ function mostrarMedalPopup(emoji,nome,medalha){
     popup.classList.remove('show');
     // Show surprise box ONLY if this is the vendedor who just registered
     if (nome === nomeSel) {
-      setTimeout(()=>mostrarRoulette(nome, medalha), 300);
+      setTimeout(()=>mostrarSurprise(nome, medalha), 300);
     }
   },3000);
 }
@@ -1921,6 +1938,141 @@ function clicarSubmit(btn) {
     btn.style.transform='scale(1)';
     submeter();
   }, 150);
+}
+
+// ══ SURPRISE SLOT ══
+let sSpin = false;
+
+function initSurpriseSlot() {
+  for (let r = 0; r < 3; r++) {
+    const reel = document.getElementById('sReel' + r);
+    if (!reel) continue;
+    let items = '';
+    for (let rep = 0; rep < 6; rep++) {
+      premios.forEach(p => { items += `<div class="slot-item">${p.icon}</div>`; });
+    }
+    reel.innerHTML = items;
+    reel.style.transition = 'none';
+    reel.style.transform = 'translateY(0)';
+  }
+}
+
+function girarSurpriseSlot() {
+  if (sSpin) return;
+  sSpin = true;
+  const btn = document.getElementById('surpriseSpinBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ A girar...'; }
+
+  const rand = Math.random();
+  let acc = 0, wIdx = 0;
+  for (let i = 0; i < premios.length; i++) {
+    acc += premios[i].prob;
+    if (rand <= acc) { wIdx = i; break; }
+  }
+  const premio = premios[wIdx];
+
+  iniciarAudio(); tocarSomCasino();
+
+  const itemH = 90;
+  const n = premios.length;
+  const targetRep = 3;
+  const durations = [3800, 4300, 4800];
+
+  for (let r = 0; r < 3; r++) {
+    const reel = document.getElementById('sReel' + r);
+    if (!reel) continue;
+    const targetY = -(targetRep * n * itemH + wIdx * itemH);
+    const dur = durations[r];
+    const delay = r * 200;
+    setTimeout((el, d, ty) => {
+      el.style.transition = `transform ${d}ms cubic-bezier(0.17,0.67,0.12,1.0)`;
+      el.style.transform = `translateY(${ty}px)`;
+    }, delay, reel, dur, targetY);
+  }
+
+  setTimeout(() => {
+    sSpin = false;
+    pararSomCasino();
+    lancarConfettiSurprise();
+    setTimeout(() => {
+      document.getElementById('surpriseSlotArea').style.display = 'none';
+      const pa = document.getElementById('surprisePrizeArea');
+      pa.style.display = 'flex';
+      document.getElementById('surpriseIcon').textContent = premio.icon;
+      document.getElementById('surpriseContentText').textContent = premio.nome;
+      // Log prize
+      salvarPremioConcedido && salvarPremioConcedido(surpriseNomeAtual, premio.nome, premio.icon);
+      setTimeout(() => {
+        document.getElementById('surpriseDirecao').style.display = 'block';
+        document.getElementById('surpriseCloseBtn').style.display = 'block';
+      }, 600);
+    }, 400);
+  }, durations[2] + 400);
+}
+
+let surpriseNomeAtual = '';
+const _origMostrarSurprise = mostrarSurprise;
+
+// ══ HISTÓRICO DE MESES ══
+let historicoMeses = [];
+try { historicoMeses = JSON.parse(localStorage.getItem('historicoMeses') || '[]'); } catch(e) {}
+
+function guardarSnapshotMes() {
+  if (!dashAllDados || !dashAllDados.length) {
+    showToast('⚠️ Carrega o dashboard primeiro'); return;
+  }
+  const mes = new Date().toLocaleDateString('pt-PT', {month:'long', year:'numeric'});
+  const existing = historicoMeses.find(h => h.mes === mes);
+  if (existing) { if (!confirm('Já existe um snapshot para ' + mes + '. Substituir?')) return; historicoMeses = historicoMeses.filter(h => h.mes !== mes); }
+  // Build ranking from current data
+  const scores = {};
+  dashAllDados.forEach(d => {
+    if (!scores[d.nome]) scores[d.nome] = {nome:d.nome, total:0};
+    scores[d.nome].total += (d.onlines||0)+(d.sprays||0)+(d.palmilhas||0)+(d.camisolas||0)+(d.sacos||0)+(d.garrafas||0)+(d.elogios||0);
+  });
+  const ranking = Object.values(scores).sort((a,b)=>b.total-a.total);
+  historicoMeses.unshift({ mes, data: new Date().toLocaleDateString('pt-PT'), ranking });
+  try { localStorage.setItem('historicoMeses', JSON.stringify(historicoMeses)); } catch(e) {}
+  renderHistoricoMeses();
+  showToast('✓ Snapshot guardado: ' + mes);
+}
+
+function renderHistoricoMeses() {
+  const el = document.getElementById('historicoMesesList');
+  if (!el) return;
+  if (!historicoMeses.length) {
+    el.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:10px">Sem histórico ainda</div>';
+    return;
+  }
+  el.innerHTML = historicoMeses.map((h,i) => `
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px;margin-bottom:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);text-transform:capitalize">${h.mes}</div>
+          <div style="font-size:10px;color:var(--muted)">Guardado em ${h.data} · ${h.ranking.length} colaboradores</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button onclick="verHistoricoMes(${i})" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--text);cursor:pointer">👁 Ver</button>
+          <button onclick="apagarHistoricoMes(${i})" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:6px;padding:5px 10px;font-size:11px;color:#EF4444;cursor:pointer">🗑</button>
+        </div>
+      </div>
+      <div id="histDetail_${i}" style="display:none;margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+        ${h.ranking.slice(0,10).map((r,ri) => `<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--muted)"><span>${ri+1}. ${r.nome}</span><span style="color:var(--orange);font-weight:700">${r.total} pts</span></div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function verHistoricoMes(i) {
+  const el = document.getElementById('histDetail_' + i);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function apagarHistoricoMes(i) {
+  if (!confirm('Apagar este histórico?')) return;
+  historicoMeses.splice(i, 1);
+  try { localStorage.setItem('historicoMeses', JSON.stringify(historicoMeses)); } catch(e) {}
+  renderHistoricoMeses();
+  showToast('✓ Histórico apagado');
 }
 
 renderTabs();
@@ -2284,9 +2436,11 @@ function pinPress(key) {
         renderPremiosEditor();
         renderPremiosLog();
         renderAdminSugestoes();
+        renderHistoricoMeses();
         renderPremiosEditor();
         renderPremiosLog();
         renderAdminSugestoes();
+        renderHistoricoMeses();
         const hoje = new Date();
         const pad = n => String(n).padStart(2,'0');
         const adminDate = document.getElementById('adminDate');
@@ -2859,9 +3013,8 @@ const surprisePrizes = [
 let surpriseOpened = false;
 
 function mostrarSurprise(nome, medalha) {
-  // Only show once per device per medal
-  const key = 'surpriseShown_' + nome + '_' + medalha;
-  try { if (localStorage.getItem(key)) return; localStorage.setItem(key, '1'); } catch(e) {}
+  surpriseNomeAtual = nome;
+
   surpriseOpened = false;
   document.getElementById('surpriseNome').textContent = nome + ' · ' + medalha;
   document.getElementById('surpriseLid').classList.remove('open');
@@ -2895,28 +3048,21 @@ function abrirSurprise() {
   if (surpriseOpened) return;
   surpriseOpened = true;
 
-  // Open lid + launch confetti immediately
   document.getElementById('surpriseLid').classList.add('open');
   document.getElementById('surpriseHint').classList.add('hidden');
-  lancarConfettiSurprise();
   tocarSomSurprise();
 
-  // Show prize after lid opens
+  // Show slot machine after lid opens
   setTimeout(() => {
     document.getElementById('surpriseBoxWrap').style.display = 'none';
-    const pa = document.getElementById('surprisePrizeArea');
-    pa.style.display = 'flex';
-    const icon = document.getElementById('surpriseIcon');
-    icon.style.animation = 'none';
-    void icon.offsetWidth;
-    icon.style.animation = 'trophyBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards';
-  }, 500);
-
-  // Show solicita + close button
-  setTimeout(() => {
-    document.getElementById('surpriseDirecao').style.display = 'block';
-    document.getElementById('surpriseCloseBtn').style.display = 'block';
-  }, 1200);
+    const sa = document.getElementById('surpriseSlotArea');
+    sa.style.display = 'flex';
+    sa.style.opacity = '0';
+    sa.style.transform = 'scale(0.85)';
+    sa.style.transition = 'opacity 0.4s ease, transform 0.4s cubic-bezier(0.34,1.3,0.64,1)';
+    setTimeout(()=>{ sa.style.opacity='1'; sa.style.transform='scale(1)'; }, 30);
+    initSurpriseSlot();
+  }, 700);
 }
 
 function fecharSurprise() {
@@ -2969,7 +3115,7 @@ const faqItems=[
   {q:'Quando atualiza o ranking?',a:'O ranking atualiza automaticamente, cerca de 1 minuto após o registo.'},
   {q:'Posso recuperar posições?',a:'Sim! O ranking é dinâmico e muda diariamente. Basta melhorar o teu desempenho.'},
   {q:'Como sei quantos pontos tenho?',a:'Acede ao Dashboard e seleciona o teu nome para ver o teu perfil completo.'},
-  {q:'Enganei-me a lançar um registo, posso corrigir?',a:'Se inseriste a menos, cria um novo registo. Se inseriste a mais, solicita ajuste à chefia.'},
+  {q:'Enganei-me a lançar um registo, posso corrigir?',a:'Não, terás de solicitar a uma chefia para fazer a alteração na base de dados.'},
   {q:'Com que frequência devo registar?',a:'Diariamente! A consistência é o fator mais importante para a medalha "Consistente".'},
 ];
 let infoOpenIdx=-1,faqOpenIdx=-1;
@@ -2979,8 +3125,8 @@ function toggleFaq(i){faqOpenIdx=faqOpenIdx===i?-1:i;renderInfo();}
 function renderInfo(){
   const el=document.getElementById('infoContent');
   if(!el)return;
-  let html=infoSections.map((s,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden"><div onclick="toggleInfo(${i})" style="padding:13px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer"><span style="font-size:14px;font-weight:600;color:var(--text)">${s.title}</span><span style="font-size:16px;color:var(--orange);transition:transform 0.3s;transform:rotate(${infoOpenIdx===i?'180':'0'}deg)">▾</span></div><div style="max-height:${infoOpenIdx===i?'400px':'0'};overflow:hidden;transition:max-height 0.3s ease"><div style="padding:0 16px 13px;font-size:13px;color:var(--muted);line-height:1.6;white-space:pre-line">${s.content}</div></div></div>`).join('');
-  html+=`<div style="height:1px;background:var(--border);margin:14px 0"></div><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">❓ PERGUNTAS FREQUENTES</div>${faqItems.map((item,qi)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden"><div onclick="toggleFaq(${qi})" style="padding:13px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;cursor:pointer"><span style="font-size:13px;font-weight:600;color:var(--text);flex:1">${item.q}</span><span style="font-size:16px;color:var(--orange);flex-shrink:0;transition:transform 0.3s;transform:rotate(${faqOpenIdx===qi?'180':'0'}deg)">▾</span></div><div style="max-height:${faqOpenIdx===qi?'200px':'0'};overflow:hidden;transition:max-height 0.3s ease"><div style="padding:0 16px 13px;font-size:13px;color:var(--muted);line-height:1.6;border-top:1px solid var(--border)">${item.a}</div></div></div>`).join('')}`;
+  let html=infoSections.map((s,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden"><div onclick="toggleInfo(${i})" style="padding:13px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer"><span style="font-size:14px;font-weight:600;color:var(--text)">${s.title}</span><span style="font-size:16px;color:var(--orange);transition:transform 0.3s;transform:rotate(${infoOpenIdx===i?'180':'0'}deg)">▾</span></div><div style="max-height:${infoOpenIdx===i?'400px':'0'};overflow:hidden;transition:max-height 0.3s ease"><div style="padding:0 16px 13px;font-size:13px;color:var(--muted);line-height:1.6;white-space:pre-line;text-align:justify">${s.content}</div></div></div>`).join('');
+  html+=`<div style="height:1px;background:var(--border);margin:14px 0"></div><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">❓ PERGUNTAS FREQUENTES</div>${faqItems.map((item,qi)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden"><div onclick="toggleFaq(${qi})" style="padding:13px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;cursor:pointer"><span style="font-size:13px;font-weight:600;color:var(--text);flex:1">${item.q}</span><span style="font-size:16px;color:var(--orange);flex-shrink:0;transition:transform 0.3s;transform:rotate(${faqOpenIdx===qi?'180':'0'}deg)">▾</span></div><div style="max-height:${faqOpenIdx===qi?'200px':'0'};overflow:hidden;transition:max-height 0.3s ease"><div style="padding:0 16px 13px;font-size:13px;color:var(--muted);line-height:1.6;border-top:1px solid var(--border);text-align:justify">${item.a}</div></div></div>`).join('')}`;
   el.innerHTML=html;
 }
 
@@ -2991,7 +3137,7 @@ function populateSugestaoNomes(){
   const sel=document.getElementById('sugestaoNome');
   if(!sel)return;
   const nomes=[...new Set(equipas.flatMap(e=>e.nomes))].sort();
-  sel.innerHTML='<option value="">Seleciona o teu nome...</option>'+nomes.map(n=>`<option value="${n}">${n}</option>`).join('');
+  sel.innerHTML='<option value="">— Nome —</option>'+nomes.map(n=>`<option value="${n}">${n}</option>`).join('');
 }
 
 function enviarSugestao(){
@@ -3376,9 +3522,9 @@ function resetarPremios() {
       <div style="margin-top:16px">
         <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">💬 Caixa de Sugestões</div>
         <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px">
-          <select id="sugestaoNome" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;margin-bottom:8px"><option value="">Seleciona o teu nome...</option></select>
-          <textarea id="sugestaoTexto" placeholder="Escreve a tua sugestão..." style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;resize:none;height:80px;font-family:inherit"></textarea>
-          <button onclick="enviarSugestao()" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;margin-top:6px">Enviar →</button>
+          <select id="sugestaoNome" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;margin-bottom:8px"><option value="">— Nome —</option></select>
+          <textarea id="sugestaoTexto" placeholder="Escreve a tua sugestão..." style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;resize:none;height:130px;font-family:inherit"></textarea>
+          <button onclick="enviarSugestao()" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;margin-top:6px">Enviar</button>
         </div>
         <div id="sugestoesList"></div>
       </div>
@@ -3461,6 +3607,17 @@ function resetarPremios() {
     <div class="surprise-hint" id="surpriseHint">Clica na caixa para abrir! 🎁</div>
   </div>
 
+  <!-- SLOT MACHINE inside surprise -->
+  <div id="surpriseSlotArea" style="display:none;flex-direction:column;align-items:center;gap:12px;width:100%;z-index:2;position:relative;padding:0 10px">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--orange);letter-spacing:2px;text-align:center">🎉 Gira para descobrir o teu prémio!</div>
+    <div class="slot-machine" id="surpriseSlotMachine">
+      <div class="slot-reel-wrap"><div class="slot-highlight"></div><div class="slot-reel" id="sReel0"></div></div>
+      <div class="slot-reel-wrap"><div class="slot-highlight"></div><div class="slot-reel" id="sReel1"></div></div>
+      <div class="slot-reel-wrap"><div class="slot-highlight"></div><div class="slot-reel" id="sReel2"></div></div>
+    </div>
+    <button id="surpriseSpinBtn" onclick="girarSurpriseSlot()" style="background:linear-gradient(135deg,var(--orange),#FF4500);border:none;border-radius:14px;padding:14px 36px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;cursor:pointer;box-shadow:0 4px 20px rgba(255,107,0,0.4);-webkit-tap-highlight-color:transparent">GIRAR ▶</button>
+  </div>
+
   <div id="surprisePrizeArea" style="display:none;flex-direction:column;align-items:center;gap:8px;text-align:center;z-index:2;position:relative;padding:0 20px">
     <span id="surpriseIcon" style="font-size:120px;line-height:1;display:block">🍫</span>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:#FFD700;letter-spacing:4px">Ganhaste</div>
@@ -3472,7 +3629,7 @@ function resetarPremios() {
       <div style="font-size:11px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px">Para resgatar o teu prémio</div>
       <div style="font-size:14px;color:rgba(255,255,255,0.85);font-weight:500">Solicita a um membro da <strong style="color:var(--orange)">Direção</strong> 🎯</div>
     </div>
-    <button class="surprise-close" id="surpriseCloseBtn" style="display:none" onclick="fecharSurprise()">← Continuar</button>
+    <button class="surprise-close" id="surpriseCloseBtn" style="display:none" onclick="fecharSurprise()">Continuar</button>
   </div>
 </div>
 
