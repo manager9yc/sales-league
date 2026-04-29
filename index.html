@@ -498,7 +498,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 
 /* TICKER */
 .ticker-wrap { width: 100%; background: rgba(255,107,0,0.12); border-bottom: 1px solid rgba(255,107,0,0.2); overflow: hidden; padding: 8px 0; }
-.ticker { display: flex; white-space: nowrap; animation: ticker-scroll 18s linear infinite; }
+.ticker { display: flex; white-space: nowrap; animation: ticker-scroll 35s linear infinite; }
 .ticker:hover { animation-play-state: paused; }
 .ticker-item { display: inline-flex; align-items: center; gap: 8px; padding: 0 32px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,107,0,0.9); }
 .ticker-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--orange); flex-shrink: 0; }
@@ -535,7 +535,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 
 /* FORM TICKER */
 .form-ticker-wrap { background: #ffffff; border-bottom: 2px solid #e0e0e0; overflow: hidden; padding: 11px 0; width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; display: block; }
-.form-ticker { display: flex; white-space: nowrap; animation: ticker-scroll 10s linear infinite; }
+.form-ticker { display: flex; white-space: nowrap; animation: ticker-scroll 35s linear infinite; }
 .form-ticker-item { display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 900; letter-spacing: 6px; color: #111111; padding: 0 28px; text-transform: uppercase; }
 .form-ticker-sep { display: inline-block; color: var(--orange); font-size: 16px; font-weight: 900; padding: 0 8px; }
 
@@ -685,7 +685,24 @@ body.theme-ucl .rank-top10 { background: rgba(12,27,60,0.9) !important; border-l
 
 body.theme-ucl .submit-btn{background:linear-gradient(135deg,#C9A84C,#E8C97A)!important;color:#070F1F!important;font-weight:800}
 body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A34A)!important;color:#fff!important}
+
+/* Skeleton loader */
+@keyframes skelShimmer { 0%{opacity:0.4} 50%{opacity:0.8} 100%{opacity:0.4} }
+.skel-card { background:rgba(255,255,255,0.08);border-radius:10px;height:72px;animation:skelShimmer 1.4s ease infinite; }
+
+/* Uniform banner height */
+.screen-banner-inner { padding: 24px 24px 0 !important; min-height: 120px; }
+.screen-banner-bar { margin-top: 18px !important; padding: 10px 20px !important; }
+.screen-banner-title { font-size: clamp(40px,10vw,64px) !important; line-height: 0.95 !important; }
+.screen-banner-sub { font-size: 12px !important; letter-spacing: 3px !important; margin-top: 6px !important; }
+.banner-top { padding: 24px 24px 0 !important; }
 </style>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#FF6B00">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Sales League">
+  <link rel="apple-touch-icon" href="images/icon-192.png">
 </head>
 <body>
 
@@ -706,7 +723,11 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
     </div>
     <div id="splashTop3" style="display:none;width:100%;max-width:400px;margin-bottom:6px">
       <div style="font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);text-align:center;margin-top:14px;margin-bottom:8px">🏆 Top 3 de ontem</div>
-      <div id="splashTop3Content" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px"></div>
+      <div id="splashTop3Content" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
+        <div class="skel-card"></div><div class="skel-card"></div>
+        <div class="skel-card"></div><div class="skel-card"></div>
+        <div class="skel-card"></div><div class="skel-card"></div>
+      </div>
     </div>
     <div style="width:80%;max-width:360px;display:flex;flex-direction:column;gap:8px;margin-bottom:8px">
       <button onclick="iniciarAudio();fecharSplash()" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:15px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:6px">ENTRAR</button>
@@ -779,7 +800,10 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
       </div>
       <div class="sec-label">Quem és tu?</div>
       <div class="card">
+        <div style="position:relative">
         <div class="team-tabs" id="teamTabs"></div>
+        <div style="position:absolute;right:0;top:0;bottom:8px;width:24px;background:linear-gradient(90deg,transparent,var(--dark));pointer-events:none;border-radius:0 8px 8px 0" id="tabScrollHint"></div>
+      </div></div>
         <div class="name-lbl">Seleciona o teu nome</div>
         <div class="name-grid" id="nameGrid"></div>
       </div>
@@ -2074,6 +2098,45 @@ function apagarHistoricoMes(i) {
   renderHistoricoMeses();
   showToast('✓ Histórico apagado');
 }
+
+// ── PWA DAILY NOTIFICATION ──
+async function pedirPermissaoNotificacoes() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') {
+    agendarNotificacaoDiaria();
+    return;
+  }
+  if (Notification.permission !== 'denied') {
+    const perm = await Notification.requestPermission();
+    if (perm === 'granted') agendarNotificacaoDiaria();
+  }
+}
+
+function agendarNotificacaoDiaria() {
+  if (!('serviceWorker' in navigator)) {
+    // Fallback: use setTimeout to show notification at 18:00
+    const agora = new Date();
+    const alvo = new Date();
+    alvo.setHours(18, 0, 0, 0);
+    if (alvo <= agora) alvo.setDate(alvo.getDate() + 1);
+    const ms = alvo - agora;
+    setTimeout(() => {
+      if (Notification.permission === 'granted') {
+        new Notification('Sales League 🏆', {
+          body: 'Não te esqueças de registar as tuas vendas de hoje!',
+          icon: 'images/icon-192.png',
+          badge: 'images/icon-192.png'
+        });
+      }
+    }, ms);
+  }
+}
+
+// Request permission after first interaction
+document.addEventListener('click', function onFirstClick() {
+  pedirPermissaoNotificacoes();
+  document.removeEventListener('click', onFirstClick);
+}, { once: true });
 
 renderTabs();
 
