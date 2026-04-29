@@ -353,7 +353,12 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .pin-key.del { font-size:18px; color:var(--muted); }
 .pin-error { color:#FF4444; font-size:13px; margin-top:12px; min-height:18px; }
 
-/* SPLASH */
+/* ══ SLOT MACHINE ANIMATIONS ══ */
+@keyframes mbOverlayIn { from { opacity:0; } to { opacity:1; } }
+@keyframes lightsShift { 0%{background-position:0 0} 100%{background-position:200px 0} }
+@keyframes slotLand { 0%{transform:translateY(-12px);opacity:0.6} 60%{transform:translateY(4px)} 80%{transform:translateY(-2px)} 100%{transform:translateY(0);opacity:1} }
+@keyframes confettiFall { 0%{transform:translateY(-10px) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
+
 .splash{position:fixed;inset:0;z-index:9999;background:var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0;transition:opacity 0.6s ease;}
 .splash.out{opacity:0;pointer-events:none;}
 .splash.hidden{display:none;}
@@ -3161,30 +3166,125 @@ function salvarMbPremio(nome, prize) {
     localStorage.setItem('premiosLog', JSON.stringify(log.slice(0, 100)));
   } catch(e) {}
 }
+// ══ SLOT MACHINE ══
+let slotSpinning = false;
+let slotFinalPrize = null;
+
 function mostrarMysteryBox(nome, medalha) {
-  mbOpened = true;
+  slotSpinning = false;
+  slotFinalPrize = null;
 
-  // Escolher prémio aleatório
-  const prize = mbPrizes[Math.floor(Math.random() * mbPrizes.length)];
-
-  // Reset e ir direto para o prémio sem caixa intermédia
   const box = document.getElementById('mysteryBox');
   document.getElementById('mbNome').textContent = nome + ' · ' + medalha;
-  document.getElementById('mbBoxWrap').style.display = 'none';
-  document.getElementById('mbHint').style.opacity = '0';
-  document.getElementById('mbPrizeIcon').textContent = prize.icon;
-  document.getElementById('mbPrizeText').textContent = prize.text;
-  const prizeEl = document.getElementById('mbPrize');
-  prizeEl.style.display = 'flex';
-  prizeEl.style.animation = 'fadeInScale 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards';
+
+  // Reset UI: mostrar slot, esconder resultado
+  document.getElementById('slotMachineWrap').style.display = 'block';
+  document.getElementById('slotResultWrap').style.display = 'none';
+  document.getElementById('slotSpinBtn').disabled = false;
+  document.getElementById('slotSpinBtn').textContent = '🎰 GIRAR';
+  document.getElementById('mbCloseBtn').style.display = 'none';
+
+  // Inicializar slot com ícones estáticos
+  slotReset();
+
+  box.style.display = 'flex';
+  box.style.animation = 'mbOverlayIn 0.4s cubic-bezier(0.34,1.2,0.64,1) forwards';
+}
+
+function slotReset() {
+  const reels = ['slotReel0','slotReel1','slotReel2'];
+  reels.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = '❓'; el.style.animation = ''; el.style.filter = ''; }
+  });
+}
+
+function girarSlot() {
+  if (slotSpinning) return;
+  slotSpinning = true;
+  iniciarAudio();
+
+  const btn = document.getElementById('slotSpinBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ A girar...';
+
+  // Escolher prémio vencedor
+  slotFinalPrize = mbPrizes[Math.floor(Math.random() * mbPrizes.length)];
+
+  // Ícones "falsos" para as bobines girarem
+  const allIcons = mbPrizes.map(p => p.icon);
+  const reelIds = ['slotReel0','slotReel1','slotReel2'];
+  const delays  = [0, 600, 1200]; // cada bobine para em momentos diferentes
+  const spinDuration = [1600, 2200, 2800]; // duração de cada spin
+
+  // Som de casino
+  tocarSomCasino();
+
+  reelIds.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.animation = 'none';
+
+    // Animação de giro rápido
+    let frame = 0;
+    const interval = setInterval(() => {
+      el.textContent = allIcons[frame % allIcons.length];
+      el.style.filter = 'blur(1px)';
+      frame++;
+    }, 80);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      el.style.filter = '';
+      // Última bobine mostra o ícone vencedor, as outras podem mostrar qualquer
+      const finalIcon = i === 2 ? slotFinalPrize.icon : allIcons[Math.floor(Math.random() * allIcons.length)];
+      el.textContent = finalIcon;
+      el.style.animation = 'slotLand 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards';
+
+      // Quando a última bobine para
+      if (i === 2) {
+        pararSomCasino();
+        setTimeout(() => mostrarResultadoSlot(), 500);
+      }
+    }, spinDuration[i]);
+  });
+}
+
+function mostrarResultadoSlot() {
+  slotSpinning = false;
+  const p = slotFinalPrize;
+
+  // Som de vitória
+  tocarSomMedalha();
+
+  // Esconder slot, mostrar resultado
+  document.getElementById('slotMachineWrap').style.display = 'none';
+  const res = document.getElementById('slotResultWrap');
+  res.style.display = 'flex';
+  res.style.animation = 'fadeInScale 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards';
+
+  document.getElementById('slotResultIcon').textContent = p.icon;
+  document.getElementById('slotResultText').textContent = p.text;
   document.getElementById('mbCloseBtn').style.display = 'block';
 
-  // Guardar prémio
-  salvarMbPremio(nome, prize);
+  // Confetti
+  lancarConfettiSlot();
 
-  // Mostrar overlay
-  box.style.display = 'flex';
-  tocarSomMedalha();
+  // Guardar prémio
+  salvarMbPremio(document.getElementById('mbNome').textContent.split(' · ')[0], p);
+}
+
+function lancarConfettiSlot() {
+  const wrap = document.getElementById('slotConfetti');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const cols = ['#C9A84C','#FFD700','#fff','#FF6B00','#22C55E','#60a5fa'];
+  for (let i = 0; i < 80; i++) {
+    const el = document.createElement('div');
+    const size = 6 + Math.random() * 10;
+    el.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:${Math.random()>.5?'50%':'2px'};background:${cols[Math.floor(Math.random()*cols.length)]};left:${Math.random()*100}%;top:-10px;animation:confettiFall ${1.2+Math.random()*1.5}s ease-out ${Math.random()*0.6}s forwards;pointer-events:none`;
+    wrap.appendChild(el);
+  }
 }
 
 function abrirMysteryBox() {
@@ -3718,39 +3818,78 @@ function resetarPremios() {
 </div>
 
 <!-- MYSTERY BOX -->
-<div id="mysteryBox" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(7,15,31,0.97);z-index:99999;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;text-align:center">
-  <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px">🏅 Medalha conquistada</div>
-  <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:3px;color:#fff;margin-bottom:4px">Parabéns!</div>
-  <div id="mbNome" style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#C9A84C;margin-bottom:32px"></div>
+<!-- SLOT MACHINE OVERLAY -->
+<div id="mysteryBox" style="display:none;position:fixed;inset:0;background:rgba(4,10,22,0.98);z-index:99999;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;text-align:center;overflow:hidden">
 
-  <!-- Caixa -->
-  <div id="mbBoxWrap" style="cursor:pointer;margin-bottom:16px" onclick="abrirMysteryBox()">
-    <div style="position:relative;width:180px;height:180px;margin:0 auto">
-      <!-- Tampa -->
-      <div id="mbLid" style="width:180px;height:54px;background:linear-gradient(135deg,#FF8C00,#FF6B00);border-radius:10px;position:absolute;top:0;left:0;transform-origin:left center;transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 4px 20px rgba(255,107,0,0.4);display:flex;align-items:center;justify-content:center;z-index:2">
-        <div style="width:24px;height:100%;background:rgba(255,255,255,0.3);border-radius:4px"></div>
-        <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:32px">🎀</div>
+  <!-- Confetti container -->
+  <div id="slotConfetti" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0"></div>
+
+  <!-- Luzes decorativas topo -->
+  <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#C9A84C,#FFD700,#C9A84C,#FFD700,#C9A84C);animation:lightsShift 1.8s linear infinite;z-index:1"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#C9A84C,#FFD700,#C9A84C,#FFD700,#C9A84C);animation:lightsShift 1.8s linear infinite reverse;z-index:1"></div>
+
+  <!-- Conteúdo -->
+  <div style="position:relative;z-index:2;width:100%;max-width:380px">
+
+    <!-- Header -->
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:rgba(201,168,76,0.7);margin-bottom:4px">🏅 Medalha Conquistada</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:4px;color:#fff;line-height:1;text-shadow:0 0 30px rgba(201,168,76,0.5)">PRÉMIO!</div>
+    <div id="mbNome" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#C9A84C;margin-bottom:20px;min-height:24px"></div>
+
+    <!-- SLOT MACHINE -->
+    <div id="slotMachineWrap">
+
+      <!-- Máquina -->
+      <div style="background:linear-gradient(180deg,#1a2744,#0d1a35);border:2px solid #C9A84C;border-radius:20px;padding:20px 16px 24px;box-shadow:0 0 40px rgba(201,168,76,0.25),inset 0 1px 0 rgba(255,255,255,0.08);position:relative;margin-bottom:16px">
+
+        <!-- Letreiro top -->
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:6px;color:#C9A84C;margin-bottom:14px;text-shadow:0 0 10px rgba(201,168,76,0.6)">✦ SUPER LIGA ✦</div>
+
+        <!-- Bobines -->
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px">
+          <!-- Reel 0 -->
+          <div style="flex:1;max-width:90px;background:#070F1F;border:2px solid rgba(201,168,76,0.4);border-radius:12px;height:90px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 2px 8px rgba(0,0,0,0.6),0 0 10px rgba(201,168,76,0.1);position:relative">
+            <div style="position:absolute;top:0;left:0;right:0;height:20px;background:linear-gradient(180deg,#070F1F,transparent);z-index:2"></div>
+            <div style="position:absolute;bottom:0;left:0;right:0;height:20px;background:linear-gradient(0deg,#070F1F,transparent);z-index:2"></div>
+            <div id="slotReel0" style="font-size:44px;line-height:1;transition:filter 0.1s">❓</div>
+          </div>
+          <!-- Reel 1 -->
+          <div style="flex:1;max-width:90px;background:#070F1F;border:2px solid rgba(201,168,76,0.4);border-radius:12px;height:90px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 2px 8px rgba(0,0,0,0.6),0 0 10px rgba(201,168,76,0.1);position:relative">
+            <div style="position:absolute;top:0;left:0;right:0;height:20px;background:linear-gradient(180deg,#070F1F,transparent);z-index:2"></div>
+            <div style="position:absolute;bottom:0;left:0;right:0;height:20px;background:linear-gradient(0deg,#070F1F,transparent);z-index:2"></div>
+            <div id="slotReel1" style="font-size:44px;line-height:1;transition:filter 0.1s">❓</div>
+          </div>
+          <!-- Reel 2 -->
+          <div style="flex:1;max-width:90px;background:#070F1F;border:2px solid rgba(201,168,76,0.4);border-radius:12px;height:90px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 2px 8px rgba(0,0,0,0.6),0 0 10px rgba(201,168,76,0.1);position:relative">
+            <div style="position:absolute;top:0;left:0;right:0;height:20px;background:linear-gradient(180deg,#070F1F,transparent);z-index:2"></div>
+            <div style="position:absolute;bottom:0;left:0;right:0;height:20px;background:linear-gradient(0deg,#070F1F,transparent);z-index:2"></div>
+            <div id="slotReel2" style="font-size:44px;line-height:1;transition:filter 0.1s">❓</div>
+          </div>
+        </div>
+
+        <!-- Linha central -->
+        <div style="position:absolute;left:16px;right:16px;top:50%;margin-top:-5px;height:2px;background:rgba(201,168,76,0.3);pointer-events:none"></div>
+
+        <!-- Botão GIRAR -->
+        <button id="slotSpinBtn" onclick="girarSlot()" style="width:100%;background:linear-gradient(135deg,#C9A84C,#E8C97A,#C9A84C);border:none;border-radius:12px;padding:14px;color:#07101f;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4);transition:transform 0.1s,box-shadow 0.1s">🎰 GIRAR</button>
       </div>
-      <!-- Caixa base -->
-      <div style="width:180px;height:126px;background:linear-gradient(135deg,#FF6B00,#FF4500);border-radius:6px 6px 14px 14px;position:absolute;bottom:0;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(255,107,0,0.5)">
-        <div style="position:absolute;width:24px;height:100%;background:rgba(255,255,255,0.25);border-radius:4px"></div>
-        <div style="position:absolute;width:100%;height:24px;background:rgba(255,255,255,0.25);border-radius:4px"></div>
+
+      <div style="font-size:12px;color:rgba(255,255,255,0.3);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif">Carrega para revelar o teu prémio</div>
+    </div>
+
+    <!-- RESULTADO (escondido até revelar) -->
+    <div id="slotResultWrap" style="display:none;flex-direction:column;align-items:center;gap:10px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:6px;color:#C9A84C;text-shadow:0 0 20px rgba(201,168,76,0.6)">✦ GANHASTE ✦</div>
+      <div id="slotResultIcon" style="font-size:90px;line-height:1;animation:trophyBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards;filter:drop-shadow(0 0 20px rgba(201,168,76,0.5))">🎁</div>
+      <div id="slotResultText" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;letter-spacing:2px;margin-top:4px">-</div>
+      <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:12px 20px;margin-top:4px;max-width:300px">
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px">Para resgatar</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.85)">Fala com a <strong style="color:#C9A84C">Direção</strong> 🎯</div>
       </div>
     </div>
-    <div id="mbHint" style="margin-top:14px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.6)">TAP PARA ABRIR 🎁</div>
-  </div>
 
-  <!-- Prémio (escondido até abrir) -->
-  <div id="mbPrize" style="display:none;flex-direction:column;align-items:center;gap:12px">
-    <div id="mbPrizeIcon" style="font-size:100px;line-height:1;animation:trophyBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards">🎁</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:#FFD700;letter-spacing:4px">Ganhaste</div>
-    <div id="mbPrizeText" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;letter-spacing:2px">-</div>
-    <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:12px 20px;margin-top:8px">
-      <div style="font-size:10px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px">Para resgatar</div>
-      <div style="font-size:14px;color:rgba(255,255,255,0.85);font-weight:500">Fala com a <strong style="color:var(--orange)">Direção</strong> 🎯</div>
-    </div>
+    <!-- Botão continuar -->
+    <button onclick="fecharMysteryBox()" id="mbCloseBtn" style="display:none;margin-top:20px;width:100%;background:transparent;border:1.5px solid rgba(201,168,76,0.4);border-radius:10px;padding:12px 32px;color:rgba(255,255,255,0.7);font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:border-color 0.2s,color 0.2s">← Continuar</button>
   </div>
-
-  <button onclick="fecharMysteryBox()" id="mbCloseBtn" style="display:none;margin-top:24px;background:transparent;border:1.5px solid rgba(255,255,255,0.25);border-radius:10px;padding:12px 32px;color:rgba(255,255,255,0.7);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer">← Continuar</button>
 </div>
 
