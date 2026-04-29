@@ -1357,7 +1357,7 @@ function showToast(msg, duration) {
 
 async function submeter() {
   if (!nomeSel) { showToast('⚠️ Seleciona o teu nome primeiro'); return; }
-  const nomeAtual = nomeSel; // guardar antes de qualquer reset
+  const nomeAtual = nomeSel;
   const dataVal = document.getElementById('dataRegisto').value;
   if (!dataVal) { showToast('⚠️ Escolhe a data'); return; }
 
@@ -1369,17 +1369,17 @@ async function submeter() {
       return;
     }
   } catch(e) {}
+
   iniciarAudio();
   const btn = document.getElementById('submitBtn');
   btn.textContent = '✔ A guardar...';
   btn.style.background = '#00AA44';
   btn.style.boxShadow = '0 4px 20px rgba(0,170,68,0.4)';
   btn.disabled = true;
-  const sbtn = document.getElementById('submitBtn');
-  if (sbtn) { sbtn.classList.add('loading'); sbtn.textContent = '✔ A guardar...'; }
+
   const equipa = equipas.find(e=>e.id===equipaAtiva)?.label.replace(/^\S+\s/,'') || '';
   const payload = {
-    data: document.getElementById('dataRegisto').value,
+    data: dataVal,
     nome: nomeAtual, equipa,
     onlines:   vals.onlines,
     sprays:    vals.sprays,
@@ -1389,40 +1389,39 @@ async function submeter() {
     garrafas:  vals.garrafas,
     elogios:   vals.elogios
   };
+
+  // Guardar localmente PRIMEIRO (sem await - não bloqueia)
+  try { localStorage.setItem(registoKey, '1'); } catch(e) {}
   try {
-    await fetch(SHEETS_URL, { method:'POST', body: JSON.stringify(payload), mode:'no-cors' });
-  } catch(e) { console.error('Erro ao guardar:', e); }
-  // Mark this vendor+day as registered
-  try { localStorage.setItem('registo_' + nomeAtual + '_' + document.getElementById('dataRegisto').value, '1'); } catch(e) {}
-  // Guardar payload completo para histórico local
-  try {
-    const histKey = 'historico_local';
-    const hist = JSON.parse(localStorage.getItem(histKey) || '[]');
-    // Remove duplicate entry for same person+date if exists
+    const hist = JSON.parse(localStorage.getItem('historico_local') || '[]');
     const filtrado = hist.filter(r => !(r.nome === payload.nome && r.data === payload.data));
     filtrado.unshift(payload);
-    // Keep only last 60 entries
-    localStorage.setItem(histKey, JSON.stringify(filtrado.slice(0, 60)));
+    localStorage.setItem('historico_local', JSON.stringify(filtrado.slice(0, 60)));
   } catch(e) {}
+
+  // Enviar para o servidor em background (não bloqueia o resto)
+  fetch(SHEETS_URL, { method:'POST', body: JSON.stringify(payload), mode:'no-cors' })
+    .catch(e => console.error('Erro ao guardar:', e));
+
+  // Feedback visual imediato
   tocarSomRegisto();
-  const sb=document.getElementById('submitBtn'); if(sb){sb.style.background='';}
-  const _sb=document.getElementById('submitBtn');if(_sb){_sb.style.background='#22C55E';_sb.style.color='#fff';}
-  // Mudar botão para "Registado com sucesso" sem esconder o form
-  const _sb2 = document.getElementById('submitBtn');
-  if (_sb2) { _sb2.textContent = '✔ Registado com sucesso'; _sb2.style.background = '#22C55E'; _sb2.style.color = '#fff'; _sb2.disabled = true; }
-  // Confetti e haptic
+  btn.textContent = '✔ Registado com sucesso';
+  btn.style.background = '#22C55E';
+  btn.style.color = '#fff';
   lancarConfettiSucesso();
   try { navigator.vibrate && navigator.vibrate([30,10,30]); } catch(e) {}
-  // Mostrar progresso inline
+
+  // Mostrar progresso
   mostrarProgressoRegisto(nomeAtual, payload);
-  // Mini ranking update
   setTimeout(atualizarMiniRanking, 600);
-  // Restaurar botão após 3 segundos
+
+  // Restaurar botão após 3s
   setTimeout(() => {
     const r = document.getElementById('submitBtn');
     if (r) { r.textContent = 'Registar o meu dia'; r.style.background = ''; r.style.color = ''; r.disabled = false; r.classList.remove('loading'); }
   }, 3000);
-  // ★ SLOT MACHINE: verificar medalhas diretamente aqui, sem depender de outros elementos
+
+  // ★ SLOT MACHINE — chamar aqui, sem depender de nada
   slotVerificarMedalhas(nomeAtual, payload);
 }
 
