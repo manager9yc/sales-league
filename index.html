@@ -683,6 +683,78 @@ body.theme-ucl .medal-popup{background:linear-gradient(135deg,#070F1F,#0C1B35);b
 
 body.theme-ucl .submit-btn{background:linear-gradient(135deg,#C9A84C,#E8C97A)!important;color:#070F1F!important;font-weight:800}
 body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A34A)!important;color:#fff!important}
+
+/* ══ COUNTER CAROUSEL ══ */
+.counter-carousel-wrap { position:relative; width:100%; overflow:hidden; touch-action:pan-y; }
+.counter-carousel { display:flex; transition:transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94); will-change:transform; }
+.carousel-slide { flex:0 0 100%; width:100%; padding:0 20px; box-sizing:border-box; }
+.carousel-slide-inner { background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:28px 20px;text-align:center;position:relative; }
+.carousel-emoji { font-size:52px; margin-bottom:8px; display:block; }
+.carousel-label { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:2px; color:#fff; margin-bottom:4px; }
+.carousel-hint { font-size:12px; color:var(--muted); margin-bottom:20px; min-height:16px; }
+.carousel-val { font-family:'Bebas Neue',sans-serif; font-size:96px; line-height:1; color:var(--orange); display:block; transition:transform 0.12s cubic-bezier(0.34,1.56,0.64,1); }
+.carousel-val.bump { transform:scale(1.25); }
+.carousel-btns { display:flex; align-items:center; justify-content:center; gap:20px; margin-top:16px; }
+.carousel-btn { width:64px; height:64px; border-radius:50%; font-size:32px; font-weight:700; border:none; cursor:pointer; display:flex;align-items:center;justify-content:center; -webkit-tap-highlight-color:transparent; transition:transform 0.1s,box-shadow 0.1s; box-shadow:0 4px 14px rgba(0,0,0,0.3); }
+.carousel-btn.minus { background:var(--card2); color:#EF4444; border:2px solid rgba(239,68,68,0.4); }
+.carousel-btn.plus  { background:var(--orange); color:#fff; }
+.carousel-btn:active { transform:scale(0.9); }
+.carousel-dots { display:flex; gap:6px; justify-content:center; margin-top:12px; }
+.carousel-dot { width:7px;height:7px;border-radius:50%;background:var(--border);transition:all 0.2s; }
+.carousel-dot.active { background:var(--orange);transform:scale(1.3); }
+.carousel-nav { display:flex;justify-content:space-between;align-items:center;padding:10px 20px 0; }
+.carousel-nav-btn { background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent; }
+.carousel-nav-btn:disabled { opacity:0.3; cursor:default; }
+.carousel-progress { font-size:12px;color:var(--muted); }
+
+
+/* ══ SCREEN ANIMATIONS ══ */
+@keyframes cascadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+.screen.active > * { animation: cascadeIn 0.3s ease both; }
+.screen.active > *:nth-child(1){animation-delay:0.00s}
+.screen.active > *:nth-child(2){animation-delay:0.06s}
+.screen.active > *:nth-child(3){animation-delay:0.12s}
+.screen.active > *:nth-child(4){animation-delay:0.18s}
+.screen.active > *:nth-child(5){animation-delay:0.22s}
+.screen.active > *:nth-child(6){animation-delay:0.26s}
+
+
+/* ══ PODIUM ══ */
+.podium-wrap { display:flex; align-items:flex-end; justify-content:center; gap:6px; padding:16px 12px 0; margin-bottom:8px; }
+.podium-col { display:flex; flex-direction:column; align-items:center; gap:6px; flex:1; max-width:110px; }
+.podium-col.first { order:2; }
+.podium-col.second { order:1; }
+.podium-col.third { order:3; }
+.podium-avatar { width:52px;height:52px;border-radius:50%;object-fit:cover;border:3px solid; }
+.podium-col.first .podium-avatar { width:62px;height:62px;border-color:#FFD700;box-shadow:0 0 16px rgba(255,215,0,0.5); }
+.podium-col.second .podium-avatar { border-color:#C0C0C0; }
+.podium-col.third .podium-avatar { border-color:#CD7F32; }
+.podium-ini { border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-weight:700;color:#fff;flex-shrink:0; }
+.podium-name { font-size:11px;font-weight:700;color:var(--text);text-align:center;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.podium-score { font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--orange);letter-spacing:1px; }
+.podium-medal { font-size:22px;line-height:1; }
+.podium-bar { border-radius:8px 8px 0 0; width:100%; display:flex;align-items:center;justify-content:center; }
+.podium-col.first .podium-bar  { height:70px;background:linear-gradient(180deg,rgba(255,215,0,0.2),rgba(255,215,0,0.05));border:1px solid rgba(255,215,0,0.3); }
+.podium-col.second .podium-bar { height:50px;background:rgba(255,255,255,0.04);border:1px solid var(--border); }
+.podium-col.third .podium-bar  { height:36px;background:rgba(255,255,255,0.03);border:1px solid var(--border); }
+@keyframes podiumGlow { 0%,100%{box-shadow:0 0 16px rgba(255,215,0,0.4)} 50%{box-shadow:0 0 28px rgba(255,215,0,0.8)} }
+.podium-col.first .podium-avatar { animation:podiumGlow 2s ease infinite; }
+
+
+/* ══ SUCCESS SCREEN ══ */
+.success-confetti-wrap { position:fixed;inset:0;pointer-events:none;z-index:8000; }
+.success-rank-pill { background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:10px 16px;margin:8px 20px;display:flex;align-items:center;justify-content:space-between; }
+.success-rank-pill.highlight { border-color:var(--orange);background:rgba(255,107,0,0.08); }
+.success-pts-badge { background:linear-gradient(135deg,var(--orange),#FF4500);border-radius:12px;padding:14px 20px;margin:0 20px 12px;text-align:center; }
+
+
+body.theme-oled{--dark:#000;--card:#0a0a0a;--card2:#111;--border:#1a1a1a;--muted:#777;--text:#f0f0f0;--orange:#FF6B00}
+
+
+/* ══ TEAM DUEL ══ */
+.team-duel-bar{height:14px;border-radius:7px;overflow:hidden;background:var(--border);margin:6px 0}
+.team-duel-fill{height:100%;border-radius:7px;transition:width 0.8s ease}
+
 </style>
 </head>
 <body>
@@ -775,6 +847,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
           <input type="hidden" id="dataRegisto" />
         </div>
       </div>
+      <div id="streakHeader" style="display:none;align-items:center;gap:8px;background:rgba(255,107,0,0.08);border:1px solid rgba(255,107,0,0.2);border-radius:12px;padding:10px 14px;margin:0 0 4px"></div>
       <div class="sec-label">Quem és tu?</div>
       <div class="card">
         <div class="team-tabs" id="teamTabs"></div>
@@ -782,17 +855,99 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
         <div class="name-grid" id="nameGrid"><div class="name-empty">Escolhe a tua equipa primeiro</div></div>
       </div>
       <div class="sec-label">Vendas do dia</div>
-      <div class="card">
-        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🖥️</div><div><div class="prod-name">Onlines</div><div class="prod-hint">Vendas online pagas</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('onlines',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="onlines">0</div><button class="cbtn plus" onmousedown="startChange('onlines',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',1,event)" ontouchend="stopChange()">+</button></div></div>
-        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🧴</div><div><div class="prod-name">Sprays</div><div class="prod-hint">Limpeza, Desodorizante e Impermeabilizante</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('sprays',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sprays',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="sprays">0</div><button class="cbtn plus" onmousedown="startChange('sprays',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sprays',1,event)" ontouchend="stopChange()">+</button></div></div>
-        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🦶</div><div><div class="prod-name">Palmilhas</div><div class="prod-hint">Excepto Fila</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('palmilhas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('palmilhas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="palmilhas">0</div><button class="cbtn plus" onmousedown="startChange('palmilhas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('palmilhas',1,event)" ontouchend="stopChange()">+</button></div></div>
-        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">👕</div><div><div class="prod-name">Camisolas Oficiais</div><div class="prod-hint">Futebol oficial</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('camisolas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('camisolas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="camisolas">0</div><button class="cbtn plus" onmousedown="startChange('camisolas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('camisolas',1,event)" ontouchend="stopChange()">+</button></div></div>
-        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🛍️</div><div><div class="prod-name">Sacos Reutilizáveis</div><div class="prod-hint">Eco bags</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('sacos',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sacos',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="sacos">0</div><button class="cbtn plus" onmousedown="startChange('sacos',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sacos',1,event)" ontouchend="stopChange()">+</button></div></div>
-        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">💧</div><div><div class="prod-name">Garrafas</div><div class="prod-hint">Garrafas da liga de vendas</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('garrafas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="garrafas">0</div><button class="cbtn plus" onmousedown="startChange('garrafas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',1,event)" ontouchend="stopChange()">+</button></div></div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="counter-carousel-wrap" id="counterCarouselWrap">
+          <div class="counter-carousel" id="counterCarousel">
+            <div class="carousel-slide">
+              <div class="carousel-slide-inner">
+                <span class="carousel-emoji">🖥️</span>
+                <div class="carousel-label">Onlines</div>
+                <div class="carousel-hint">Vendas online pagas</div>
+                <span class="carousel-val" id="carousel_onlines">0</span>
+                <div class="carousel-btns">
+                  <button class="carousel-btn minus" ontouchstart="carouselChange('onlines',-1)" onclick="carouselChange('onlines',-1)">−</button>
+                  <button class="carousel-btn plus"  ontouchstart="carouselChange('onlines',1)"  onclick="carouselChange('onlines',1)">+</button>
+                </div>
+              </div>
+            </div>
+            <div class="carousel-slide">
+              <div class="carousel-slide-inner">
+                <span class="carousel-emoji">🧴</span>
+                <div class="carousel-label">Sprays</div>
+                <div class="carousel-hint">Limpeza, Desodorizante e Impermeabilizante</div>
+                <span class="carousel-val" id="carousel_sprays">0</span>
+                <div class="carousel-btns">
+                  <button class="carousel-btn minus" ontouchstart="carouselChange('sprays',-1)" onclick="carouselChange('sprays',-1)">−</button>
+                  <button class="carousel-btn plus"  ontouchstart="carouselChange('sprays',1)"  onclick="carouselChange('sprays',1)">+</button>
+                </div>
+              </div>
+            </div>
+            <div class="carousel-slide">
+              <div class="carousel-slide-inner">
+                <span class="carousel-emoji">🦶</span>
+                <div class="carousel-label">Palmilhas</div>
+                <div class="carousel-hint">Excepto Fila</div>
+                <span class="carousel-val" id="carousel_palmilhas">0</span>
+                <div class="carousel-btns">
+                  <button class="carousel-btn minus" ontouchstart="carouselChange('palmilhas',-1)" onclick="carouselChange('palmilhas',-1)">−</button>
+                  <button class="carousel-btn plus"  ontouchstart="carouselChange('palmilhas',1)"  onclick="carouselChange('palmilhas',1)">+</button>
+                </div>
+              </div>
+            </div>
+            <div class="carousel-slide">
+              <div class="carousel-slide-inner">
+                <span class="carousel-emoji">👕</span>
+                <div class="carousel-label">Camisolas</div>
+                <div class="carousel-hint">Futebol oficial</div>
+                <span class="carousel-val" id="carousel_camisolas">0</span>
+                <div class="carousel-btns">
+                  <button class="carousel-btn minus" ontouchstart="carouselChange('camisolas',-1)" onclick="carouselChange('camisolas',-1)">−</button>
+                  <button class="carousel-btn plus"  ontouchstart="carouselChange('camisolas',1)"  onclick="carouselChange('camisolas',1)">+</button>
+                </div>
+              </div>
+            </div>
+            <div class="carousel-slide">
+              <div class="carousel-slide-inner">
+                <span class="carousel-emoji">🛍️</span>
+                <div class="carousel-label">Sacos</div>
+                <div class="carousel-hint">Eco bags reutilizáveis</div>
+                <span class="carousel-val" id="carousel_sacos">0</span>
+                <div class="carousel-btns">
+                  <button class="carousel-btn minus" ontouchstart="carouselChange('sacos',-1)" onclick="carouselChange('sacos',-1)">−</button>
+                  <button class="carousel-btn plus"  ontouchstart="carouselChange('sacos',1)"  onclick="carouselChange('sacos',1)">+</button>
+                </div>
+              </div>
+            </div>
+            <div class="carousel-slide">
+              <div class="carousel-slide-inner">
+                <span class="carousel-emoji">💧</span>
+                <div class="carousel-label">Garrafas</div>
+                <div class="carousel-hint">Garrafas da liga de vendas</div>
+                <span class="carousel-val" id="carousel_garrafas">0</span>
+                <div class="carousel-btns">
+                  <button class="carousel-btn minus" ontouchstart="carouselChange('garrafas',-1)" onclick="carouselChange('garrafas',-1)">−</button>
+                  <button class="carousel-btn plus"  ontouchstart="carouselChange('garrafas',1)"  onclick="carouselChange('garrafas',1)">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-nav">
+          <button class="carousel-nav-btn" id="carouselPrev" onclick="carouselGo(-1)">← Anterior</button>
+          <div>
+            <div class="carousel-dots" id="carouselDots"></div>
+            <div class="carousel-progress" id="carouselProgress" style="text-align:center;margin-top:4px">1 / 6</div>
+          </div>
+          <button class="carousel-nav-btn" id="carouselNext" onclick="carouselGo(1)">Próximo →</button>
+        </div>
       </div>
       <div class="sec-label">Elogios recebidos</div>
       <div class="card">
-        <div class="prod-row" style="padding:0"><div class="prod-info"><div class="prod-emoji">⭐</div><div><div class="prod-name">Elogios</div><div class="prod-hint">Escritos ou Google Reviews</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div></div>
+        <div class="prod-row">
+          <div class="prod-icon">⭐</div>
+          <div class="prod-info"><div class="prod-name">Elogios</div><div class="prod-hint">Escritos ou Google Reviews</div></div>
+          <div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div>
+        </div>
       </div>
       <button class="submit-btn" id="submitBtn" onclick="clicarSubmit(this)">Registar o meu dia</button>
     </div>
@@ -933,7 +1088,8 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 
     <!-- CONTEÚDO ADMIN -->
     <div id="adminBody" style="display:none">
-      <div style="padding:16px 16px 0"><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Tema Visual</div><div style="display:flex;gap:8px"><button onclick="aplicarTema('dark')" id="btnThemeDark" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">⚫ Preto</button><button onclick="aplicarTema('ucl')" id="btnThemeUCL" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">🏆 Champions</button></div></div>
+      <div style="padding:16px 16px 0"><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Tema Visual</div><div style="display:flex;gap:8px"><button onclick="aplicarTema('dark')" id="btnThemeDark" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">⚫ Preto</button><button onclick="aplicarTema('oled')" id="btnThemeOLED" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">⚫ OLED</button>
+          <button onclick="aplicarTema('ucl')" id="btnThemeUCL" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">🏆 Champions</button></div></div>
       <div style="height:1px;background:var(--border);margin:12px 16px"></div>
       <!-- PRÉMIOS EDITOR -->
       <div style="padding:0 16px;margin-top:4px">
@@ -953,6 +1109,19 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
           </div>
         </div>
         <button onclick="resetarPremios()" style="width:100%;margin-top:8px;background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--muted);font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer">↩ Repor prémios originais</button>
+      </div>
+      <div style="height:1px;background:var(--border);margin:12px 16px"></div>
+      <!-- NOTIFICAÇÕES -->
+      <div style="padding:0 16px;margin-top:4px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">🔔 Lembrete Diário</div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px">
+          <div style="font-size:13px;color:var(--muted);margin-bottom:10px">Hora do lembrete para registar vendas:</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="time" id="notifTime" value="18:00" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:15px;outline:none">
+            <button onclick="guardarHoraNotif()" style="background:var(--orange);border:none;border-radius:8px;padding:10px 16px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer">Guardar</button>
+          </div>
+          <button onclick="pedirPermissaoNotificacoes()" style="width:100%;margin-top:8px;background:transparent;border:1px solid var(--border);border-radius:8px;padding:9px;color:var(--muted);font-size:12px;cursor:pointer">🔔 Ativar notificações</button>
+        </div>
       </div>
       <div style="height:1px;background:var(--border);margin:12px 16px"></div>
       <!-- GESTÃO VENDEDORES -->
@@ -1162,6 +1331,7 @@ function selectTeam(id) {
 }
 
 function selectName(btn) {
+  setTimeout(mostrarStreakHeader, 100);
   document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   nomeSel = btn.textContent;
@@ -1191,6 +1361,7 @@ function change(campo, delta) {
     _o.start(audioCtx.currentTime);_o.stop(audioCtx.currentTime+0.06);
   }
   vals[campo] = Math.max(0, vals[campo]+delta);
+  try{navigator.vibrate&&navigator.vibrate(12);}catch(e){}
   const el = document.getElementById(campo);
   el.textContent = vals[campo];
   el.classList.toggle('nz', vals[campo]>0);
@@ -1262,11 +1433,20 @@ async function submeter() {
   const _sb=document.getElementById('submitBtn');if(_sb){_sb.style.background='#22C55E';_sb.style.color='#fff';}
   document.getElementById('formMain').classList.add('hide');
   document.getElementById('successMsg').classList.add('show');
-  // scroll handled by scrollIntoView
+  setTimeout(() => {
+    const el = document.getElementById('successMsg');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 80);
 
   // Show progress and medals for this vendedor
   const snl = document.getElementById('successNomeLabel');
   if (snl) snl.textContent = nomeSel.toUpperCase();
+  // Confetti
+  lancarConfettiSucesso();
+  // Haptic
+  try { navigator.vibrate && navigator.vibrate([30,10,30]); } catch(e) {}
+  // Mini ranking update
+  setTimeout(atualizarMiniRanking, 600);
   mostrarProgressoRegisto(nomeSel, payload);
 
   // Sem redirecionamento automático
@@ -1471,6 +1651,34 @@ function renderRanking(dados) {
   let html = '';
   let d = 0.05;
 
+  // PODIUM top 3 global
+  const globalSorted = [...dados].sort((a,b)=>(b.total||0)-(a.total||0)).slice(0,3);
+  if (globalSorted.length >= 2) {
+    const medals = ['🥇','🥈','🥉'];
+    const cols = [1,0,2].filter(i=>globalSorted[i]); // order: 2nd, 1st, 3rd
+    html += `<div class="card" style="margin-bottom:12px;padding:0 0 12px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:3px;color:var(--orange);text-align:center;padding:14px 0 0;text-transform:uppercase">🏆 Pódio do Mês</div>
+      <div class="podium-wrap">
+        ${[1,0,2].map(i => {
+          const v = globalSorted[i];
+          if (!v) return '';
+          const foto = getFoto ? getFoto(v.nome) : null;
+          const ini = v.nome.split(' ').map(x=>x[0]).slice(0,2).join('');
+          const cls = ['first','second','third'][i];
+          const av = foto
+            ? `<img src="${foto}" class="podium-avatar" style="border-color:${['#FFD700','#C0C0C0','#CD7F32'][i]};${i===0?'width:62px;height:62px':'width:52px;height:52px'}">`
+            : `<div class="podium-ini" style="width:${i===0?62:52}px;height:${i===0?62:52}px;font-size:${i===0?22:18}px;background:var(--orange);border:3px solid ${['#FFD700','#C0C0C0','#CD7F32'][i]}">${ini}</div>`;
+          return `<div class="podium-col ${cls}">
+            <div class="podium-medal">${medals[i]}</div>
+            ${av}
+            <div class="podium-name">${v.nome.split(' ')[0]}</div>
+            <div class="podium-score">${v.total||0}</div>
+            <div class="podium-bar"></div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
   html += secDiv('🎯', 'Ranking por Produto');
   categorias.forEach(cat => {
     const sorted = [...dados].filter(v=>(v[cat.key]||0)>0).sort((a,b)=>b[cat.key]-a[cat.key]).slice(0,10);
@@ -1932,7 +2140,239 @@ function clicarSubmit(btn) {
   }, 150);
 }
 
+// ══ COUNTER CAROUSEL ══
+let carouselIdx = 0;
+const carouselKeys = ['onlines','sprays','palmilhas','camisolas','sacos','garrafas'];
+let carouselTouch = {x:0, y:0, dragging:false};
+let carouselLastChange = 0;
+
+function initCarousel() {
+  // Dots
+  const dots = document.getElementById('carouselDots');
+  if (dots) dots.innerHTML = carouselKeys.map((_,i) => `<div class="carousel-dot${i===0?' active':''}" id="cdot_${i}"></div>`).join('');
+  carouselGo(0, true);
+  // Touch swipe
+  const wrap = document.getElementById('counterCarouselWrap');
+  if (!wrap) return;
+  wrap.addEventListener('touchstart', e => { carouselTouch.x=e.touches[0].clientX; carouselTouch.y=e.touches[0].clientY; carouselTouch.dragging=true; }, {passive:true});
+  wrap.addEventListener('touchend', e => {
+    if (!carouselTouch.dragging) return;
+    const dx = e.changedTouches[0].clientX - carouselTouch.x;
+    const dy = Math.abs(e.changedTouches[0].clientY - carouselTouch.y);
+    if (Math.abs(dx) > 40 && dy < 60) carouselGo(dx < 0 ? 1 : -1);
+    carouselTouch.dragging = false;
+  }, {passive:true});
+}
+
+function carouselGo(dir, init) {
+  if (!init) carouselIdx = Math.max(0, Math.min(carouselKeys.length-1, carouselIdx + dir));
+  const carousel = document.getElementById('counterCarousel');
+  if (carousel) carousel.style.transform = `translateX(-${carouselIdx * 100}%)`;
+  // Dots
+  carouselKeys.forEach((_,i) => {
+    const dot = document.getElementById('cdot_'+i);
+    if (dot) dot.className = 'carousel-dot' + (i===carouselIdx?' active':'');
+  });
+  // Progress
+  const prog = document.getElementById('carouselProgress');
+  if (prog) prog.textContent = (carouselIdx+1) + ' / ' + carouselKeys.length;
+  // Nav buttons
+  const prev = document.getElementById('carouselPrev');
+  const next = document.getElementById('carouselNext');
+  if (prev) prev.disabled = carouselIdx===0;
+  if (next) next.disabled = carouselIdx===carouselKeys.length-1;
+  // Update display
+  carouselKeys.forEach(key => {
+    const el = document.getElementById('carousel_'+key);
+    if (el) el.textContent = vals[key] || 0;
+  });
+}
+
+function carouselChange(key, delta) {
+  const now = Date.now();
+  if (now - carouselLastChange < 120) return;
+  carouselLastChange = now;
+  vals[key] = Math.max(0, (vals[key]||0) + delta);
+  const el = document.getElementById('carousel_'+key);
+  if (el) {
+    el.textContent = vals[key];
+    el.classList.remove('bump');
+    void el.offsetWidth;
+    el.classList.add('bump');
+    setTimeout(()=>el.classList.remove('bump'),200);
+  }
+  // Also update hidden input for compatibility
+  const hiddenEl = document.getElementById(key);
+  if (hiddenEl) hiddenEl.textContent = vals[key];
+  // Sound
+  try {
+    window.AudioContext=window.AudioContext||window.webkitAudioContext;
+    if(!audioCtx)audioCtx=new AudioContext();
+    if(audioCtx.state==='suspended')audioCtx.resume();
+    const _o=audioCtx.createOscillator(),_g=audioCtx.createGain();
+    _o.connect(_g);_g.connect(audioCtx.destination);
+    _o.type='sine';_o.frequency.value=delta>0?900:500;
+    _g.gain.setValueAtTime(0.07,audioCtx.currentTime);
+    _g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.05);
+    _o.start(audioCtx.currentTime);_o.stop(audioCtx.currentTime+0.06);
+  } catch(e) {}
+  // Float particle
+  if(el) {
+    const p=document.createElement('div');
+    p.textContent=delta>0?'+1':'-1';
+    p.style.cssText=`position:fixed;font-family:'Bebas Neue',sans-serif;font-size:22px;font-weight:700;color:${delta>0?'#22C55E':'#EF4444'};pointer-events:none;z-index:9999;animation:floatUp 0.8s ease forwards`;
+    const rect=el.getBoundingClientRect();
+    p.style.left=(rect.left+rect.width/2-12)+'px';
+    p.style.top=(rect.top-10)+'px';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),800);
+  }
+  // Vibrate
+  try { navigator.vibrate && navigator.vibrate(15); } catch(e) {}
+}
+
+// Init carousel on form load
+document.addEventListener('DOMContentLoaded', initCarousel);
+
+function lancarConfettiSucesso() {
+  const wrap = document.createElement('div');
+  wrap.className = 'success-confetti-wrap';
+  document.body.appendChild(wrap);
+  const cols=['#FF6B00','#FFD700','#22C55E','#3B82F6','#EC4899','#fff'];
+  for(let i=0;i<60;i++){
+    const el=document.createElement('div');
+    el.style.cssText=`position:absolute;width:${5+Math.random()*9}px;height:${5+Math.random()*9}px;border-radius:${Math.random()>.5?'50%':'2px'};background:${cols[Math.floor(Math.random()*cols.length)]};left:${Math.random()*100}%;top:-10px;animation:confettiFall ${1.5+Math.random()*1.5}s ease-out ${Math.random()*0.6}s forwards`;
+    wrap.appendChild(el);
+  }
+  setTimeout(()=>wrap.remove(),4000);
+}
+
+function atualizarMiniRanking() {
+  const el = document.getElementById('miniRankingSection');
+  if (!el || !window._rankingCache) return;
+  try {
+    const dados = JSON.parse(window._rankingCache);
+    const sorted = [...dados].sort((a,b)=>(b.total||0)-(a.total||0));
+    const myIdx = sorted.findIndex(d=>d.nome===nomeSel);
+    if (myIdx < 0) return;
+    const start = Math.max(0, myIdx-1);
+    const slice = sorted.slice(start, myIdx+2);
+    const medals = ['🥇','🥈','🥉'];
+    el.innerHTML = '<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--orange);text-align:center;margin-bottom:8px">A TUA POSIÇÃO HOJE</div>' +
+      slice.map((v,i) => {
+        const pos = start+i+1;
+        const isMe = v.nome===nomeSel;
+        return `<div class="success-rank-pill${isMe?' highlight':''}">
+          <span style="font-size:12px;color:${isMe?'var(--orange)':'var(--muted)'};font-weight:${isMe?700:400}">${pos<=3?medals[pos-1]:pos+'º'} ${v.nome.split(' ')[0]}</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${isMe?'var(--orange)':'var(--muted)'}">${v.total||0} pts</span>
+        </div>`;
+      }).join('');
+  } catch(e) {}
+}
+
+function calcularStreak() {
+  const hoje = new Date().toDateString();
+  const ontem = new Date(Date.now()-86400000).toDateString();
+  let streak = 0;
+  let day = new Date();
+  for (let i=0; i<30; i++) {
+    const key = 'registo_' + nomeSel + '_' + day.toISOString().split('T')[0];
+    if (!localStorage.getItem(key) && i>0) break;
+    if (localStorage.getItem(key)) streak++;
+    day.setDate(day.getDate()-1);
+  }
+  return streak;
+}
+
+function mostrarStreakHeader() {
+  const el = document.getElementById('streakHeader');
+  if (!el || !nomeSel) return;
+  const s = calcularStreak();
+  if (s >= 2) {
+    el.style.display='flex';
+    el.innerHTML = `<span style="font-size:20px">🔥</span><span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--orange)">${s} DIAS SEGUIDOS!</span><span style="font-size:11px;color:var(--muted)">Mantém o ritmo 💪</span>`;
+  } else {
+    el.style.display='none';
+  }
+}
+
+let rankFiltro = 'todos';
+function filtrarRanking(modo) {
+  rankFiltro = modo;
+  document.querySelectorAll('[id^="rf"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('rf' + (modo==='todos'?'All':'Duel'))?.classList.add('active');
+  if (modo === 'duelo' && window._rankingCache) {
+    mostrarDueloEquipas(JSON.parse(window._rankingCache));
+  } else if (window._rankingCache) {
+    renderRanking(JSON.parse(window._rankingCache));
+  }
+}
+
+function mostrarDueloEquipas(dados) {
+  const rl = document.getElementById('rankList');
+  if (!rl) return;
+  const totals = {};
+  equipas.forEach(eq => {
+    totals[eq.label.replace(/^\S+\s/,'')] = { total:0, label:eq.label, count:0 };
+  });
+  dados.forEach(d => {
+    const eq = equipas.find(e => e.nomes.includes(d.nome));
+    if (eq) {
+      const key = eq.label.replace(/^\S+\s/,'');
+      if (totals[key]) { totals[key].total += d.total||0; totals[key].count++; }
+    }
+  });
+  const sorted = Object.entries(totals).sort((a,b)=>b[1].total-a[1].total);
+  const max = sorted[0]?.[1]?.total || 1;
+  rl.innerHTML = '<div class="card"><div style="font-size:10px;font-weight:700;letter-spacing:3px;color:var(--orange);margin-bottom:12px">⚔️ DUELO DE EQUIPAS</div>' +
+    sorted.map(([key,v],i) => `
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:4px">
+          <span>${['🥇','🥈','🥉'][i]||'  '} ${key}</span>
+          <span style="color:var(--orange);font-family:'Bebas Neue',sans-serif;font-size:16px">${v.total} pts</span>
+        </div>
+        <div class="team-duel-bar"><div class="team-duel-fill" style="width:${Math.round(v.total/max*100)}%;background:linear-gradient(90deg,var(--orange),#FF4500)"></div></div>
+        <div style="font-size:10px;color:var(--muted)">${v.count} colaboradores</div>
+      </div>`).join('') + '</div>';
+}
+
+function guardarHoraNotif() {
+  const t = document.getElementById('notifTime')?.value;
+  if (!t) return;
+  try { localStorage.setItem('notifTime', t); } catch(e) {}
+  agendarNotificacaoDiaria();
+  showToast('✓ Lembrete guardado para as ' + t);
+}
+
+function agendarNotificacaoDiaria() {
+  if (Notification?.permission !== 'granted') return;
+  let t = '18:00';
+  try { t = localStorage.getItem('notifTime') || '18:00'; } catch(e) {}
+  const [h,m] = t.split(':').map(Number);
+  const now = new Date();
+  const target = new Date();
+  target.setHours(h,m,0,0);
+  if (target <= now) target.setDate(target.getDate()+1);
+  const ms = target - now;
+  clearTimeout(window._notifTimeout);
+  window._notifTimeout = setTimeout(() => {
+    new Notification('Sales League 🏆', {
+      body: 'Não te esqueças de registar as tuas vendas de hoje!',
+      icon: 'images/icon-192.png'
+    });
+    agendarNotificacaoDiaria(); // reschedule for tomorrow
+  }, ms);
+}
+
+async function pedirPermissaoNotificacoes() {
+  if (!('Notification' in window)) { showToast('⚠️ Browser não suporta notificações'); return; }
+  const p = await Notification.requestPermission();
+  if (p === 'granted') { agendarNotificacaoDiaria(); showToast('✓ Notificações ativadas!'); }
+  else showToast('⚠️ Permissão negada');
+}
+
 renderTabs();
+initCarousel();
 
 // ══ DASHBOARD ══
 const nomeParaEquipaLabel = {};
