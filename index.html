@@ -556,7 +556,7 @@ body.theme-dark .ucl-stars-banner{display:none!important}
 .ucl-stars-banner{display:none;font-size:11px;letter-spacing:5px;color:#C9A84C;text-align:center;margin-bottom:6px;position:relative;z-index:2}
 body.theme-ucl .ucl-stars-banner{display:block}
 /* ══ ROULETTE ══ */
-.roulette-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:10000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center}
+.roulette-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:10000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center}
 .roulette-overlay.open{display:flex;animation:fadeIn 0.3s ease;align-items:center;justify-content:center}
 .wheel-wrap{position:relative;width:260px;height:260px;margin:0 auto 12px}
 .wheel-canvas{border-radius:50%;box-shadow:0 0 30px rgba(255,107,0,0.3)}
@@ -674,8 +674,10 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
 /* Ranking item stagger */
 .d-crow { animation: fadeSlideUp 0.2s ease both; }
 
-.medal-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-40%) scale(0.8);background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid var(--orange);border-radius:20px;padding:28px 24px;text-align:center;z-index:9998;min-width:260px;max-width:320px;box-shadow:0 20px 60px rgba(0,0,0,0.8);display:none;opacity:0}
-.medal-popup.show{display:block;animation:medalPopIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;opacity:1}
+
+
+.medal-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-40%) scale(0.8);background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid var(--orange);border-radius:20px;padding:28px 24px;text-align:center;z-index:9998;min-width:260px;max-width:320px;box-shadow:0 20px 60px rgba(0,0,0,0.8);display:none}
+.medal-popup.show{display:block;animation:medalPopIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards}
 body.theme-ucl .medal-popup{background:linear-gradient(135deg,#070F1F,#0C1B35);border-color:#C9A84C}
 .name-grid,.name-grid *{box-shadow:none!important}
 
@@ -725,7 +727,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
   <button class="nav-btn" onclick="goTo('ranking',this)"><span style="font-size:14px">🏆</span><span>Ranking</span></button>
   <button class="nav-btn" onclick="goTo('dash',this)"><span style="font-size:14px">📊</span><span>Dash</span></button>
   <button class="nav-btn" onclick="goTo('info',this)"><span style="font-size:14px">ℹ️</span><span>Info</span></button>
-  <button class="nav-btn" onclick="goTo('jogos',this)"><span style="font-size:14px">🎮</span><span>Jogos</span></button>
+  
   <button class="nav-btn" onclick="goTo('admin',this)"><span style="font-size:14px">⚙️</span><span>Admin</span></button>
 </div>
 
@@ -792,7 +794,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
       <div class="card">
         <div class="prod-row" style="padding:0"><div class="prod-info"><div class="prod-emoji">⭐</div><div><div class="prod-name">Elogios</div><div class="prod-hint">Escritos ou Google Reviews</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div></div>
       </div>
-      <button class="submit-btn" id="submitBtn" onclick="submeter()">Registar o meu dia</button>
+      <button class="submit-btn" id="submitBtn" onclick="clicarSubmit(this)">Registar o meu dia</button>
     </div>
     <div class="success" id="successMsg">
       <!-- HERO CONFIRMAÇÃO -->
@@ -1167,6 +1169,16 @@ function selectName(btn) {
 }
 
 function change(campo, delta) {
+  try {
+    if (!audioCtx) { window.AudioContext=window.AudioContext||window.webkitAudioContext; audioCtx=new AudioContext(); }
+    if (audioCtx.state==='suspended') audioCtx.resume();
+    const _o=audioCtx.createOscillator(),_g=audioCtx.createGain();
+    _o.connect(_g); _g.connect(audioCtx.destination);
+    _o.type='sine'; _o.frequency.value=delta>0?900:500;
+    _g.gain.setValueAtTime(0.08,audioCtx.currentTime);
+    _g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.06);
+    _o.start(audioCtx.currentTime); _o.stop(audioCtx.currentTime+0.07);
+  } catch(e) {}
   // Tick sound
   iniciarAudio();
   if (audioCtx) {
@@ -1246,14 +1258,11 @@ async function submeter() {
   // Mark this vendor+day as registered
   try { localStorage.setItem('registo_' + nomeSel + '_' + document.getElementById('dataRegisto').value, '1'); } catch(e) {}
   tocarSomRegisto();
+  const sb=document.getElementById('submitBtn'); if(sb){sb.style.background='';}
   const _sb=document.getElementById('submitBtn');if(_sb){_sb.style.background='#22C55E';_sb.style.color='#fff';}
   document.getElementById('formMain').classList.add('hide');
   document.getElementById('successMsg').classList.add('show');
-  // Scroll to success box
-  setTimeout(() => {
-    const el = document.getElementById('successMsg');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 100);
+  // scroll handled by scrollIntoView
 
   // Show progress and medals for this vendedor
   const snl = document.getElementById('successNomeLabel');
@@ -1263,36 +1272,6 @@ async function submeter() {
   // Sem redirecionamento automático
 }
 
-function tocarAntemSplash() {
-  iniciarAudio();
-  if (!audioCtx) return;
-  // Champions League anthem - simplified main melody (Die Königlichen tones)
-  // Notes: A4=440, D5=587, F#5=740, A5=880, G5=784, E5=659, D5=587
-  const notas = [
-    [440,0,0.5],[440,0.55,0.5],[440,1.1,0.3],
-    [587,1.5,0.8],
-    [740,2.4,0.5],[784,2.95,0.5],
-    [880,3.5,1.0],
-    [784,4.6,0.4],[740,5.05,0.4],[659,5.5,0.4],
-    [587,5.95,1.2],
-    [494,7.2,0.4],[440,7.7,0.4],
-    [587,8.2,2.0],
-  ];
-  notas.forEach(([freq, t, dur]) => {
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    const reverb = audioCtx.createGain();
-    o.connect(g); g.connect(reverb); reverb.connect(audioCtx.destination);
-    o.type = 'triangle';
-    o.frequency.setValueAtTime(freq, audioCtx.currentTime + t);
-    g.gain.setValueAtTime(0, audioCtx.currentTime + t);
-    g.gain.linearRampToValueAtTime(0.18, audioCtx.currentTime + t + 0.05);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + t + dur);
-    reverb.gain.setValueAtTime(0.9, audioCtx.currentTime);
-    o.start(audioCtx.currentTime + t);
-    o.stop(audioCtx.currentTime + t + dur + 0.1);
-  });
-}
 
 function tocarSomRegisto() {
   iniciarAudio();
@@ -1345,7 +1324,7 @@ function atualizarDataDisplay() {
 }
 
 function resetForm() {
-  const _s2=document.getElementById('submitBtn');if(_s2){_s2.style.background='';_s2.style.color='';}
+  const _s2=document.getElementById('submitBtn');if(_s2){_s2.style.background='';_s2.style.color='';delete _s2.dataset.pg;}
   nomeSel = null; equipaAtiva = null;
   document.querySelectorAll('.team-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('nameGrid').innerHTML = '<div class="name-empty">Escolhe a tua equipa primeiro</div>';
@@ -1931,6 +1910,28 @@ async function carregarSplashTop3(){
   }catch(e){}
 }
 
+function clicarSubmit(btn) {
+  // Click sound
+  try {
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!audioCtx) audioCtx = new AudioContext();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type='sine'; o.frequency.value=660;
+    g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.12);
+    o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime+0.13);
+  } catch(e) {}
+  // Green flash
+  btn.style.background='#22C55E';
+  btn.style.transform='scale(0.97)';
+  setTimeout(() => {
+    btn.style.transform='scale(1)';
+    submeter();
+  }, 150);
+}
+
 renderTabs();
 
 // ══ DASHBOARD ══
@@ -2169,7 +2170,7 @@ function mostrarDash(nome) {
       ${compRank.map((item,i)=>{
         const hi=item.n===nome;
         const pct=Math.round(item.v/maxO*100);
-        return `<div class="d-crow">
+        return `<div class="d-crow${i<10?' rank-top10':''}">
           <div class="d-cpos ${hi?'hi':''}">${i+1}º</div>
           <div class="d-cnom ${hi?'hi':''}">${item.n.split(' ')[0]}</div>
           <div class="d-cbarwrap"><div class="d-cbarfill ${hi?'hi':''}" style="width:${pct}%"></div></div>
@@ -2276,8 +2277,18 @@ let pinBuffer = '';
 let adminUnlocked = false;
 
 function pinPress(key) {
-  try{window.AudioContext=window.AudioContext||window.webkitAudioContext;if(!audioCtx)audioCtx=new AudioContext();if(audioCtx.state==='suspended')audioCtx.resume();const _po=audioCtx.createOscillator(),_pg=audioCtx.createGain();_po.connect(_pg);_pg.connect(audioCtx.destination);_po.type='sine';_po.frequency.value=key==='⌫'?300:500+(parseInt(key)||0)*25;_pg.gain.setValueAtTime(0.1,audioCtx.currentTime);_pg.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.08);_po.start(audioCtx.currentTime);_po.stop(audioCtx.currentTime+0.09);}catch(e){}
-
+  try{
+    window.AudioContext=window.AudioContext||window.webkitAudioContext;
+    if(!audioCtx)audioCtx=new AudioContext();
+    if(audioCtx.state==='suspended')audioCtx.resume();
+    const _po=audioCtx.createOscillator(),_pg=audioCtx.createGain();
+    _po.connect(_pg);_pg.connect(audioCtx.destination);
+    _po.type='sine';
+    _po.frequency.value=key==='⌫'?300:500+(parseInt(key)||0)*25;
+    _pg.gain.setValueAtTime(0.1,audioCtx.currentTime);
+    _pg.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.08);
+    _po.start(audioCtx.currentTime);_po.stop(audioCtx.currentTime+0.09);
+  }catch(e){}
   if (pinBuffer.length >= ADMIN_PIN.length) return;
   pinBuffer += key;
   for (let i = 0; i < ADMIN_PIN.length; i++) {
@@ -2291,6 +2302,9 @@ function pinPress(key) {
         document.getElementById('pinOverlay').classList.add('hidden');
         document.getElementById('adminBody').style.display = 'block';
         renderDadosTab();
+        renderPremiosEditor();
+        renderPremiosLog();
+        renderAdminSugestoes();
         renderPremiosEditor();
         renderPremiosLog();
         renderAdminSugestoes();
@@ -3187,7 +3201,6 @@ function mostrarRoulette(nome,medalha){
   document.getElementById('rouletteHint').style.visibility='visible';
   document.getElementById('rouletteConfetti').innerHTML='';
   if(document.getElementById('wheelSpinBtn'))document.getElementById('wheelSpinBtn').disabled=false;
-  desenharRoleta(0);
   document.getElementById('rouletteOverlay').classList.add('open');
   setTimeout(()=>{const w=document.getElementById('rouletteBoxWrap');w.style.animation='shakeBox 0.5s ease';setTimeout(()=>w.style.animation='',600);},1000);
 }
@@ -3295,6 +3308,74 @@ try {
   }
 } catch(e) {}
 
+// ══ PRÉMIOS EDITOR ══
+function renderPremiosEditor() {
+  const el = document.getElementById('premiosEditorList');
+  if (!el) return;
+  el.innerHTML = premios.map((p,i) => `
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px">
+      <div style="width:38px;height:38px;border-radius:8px;background:${p.cor};display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${p.icon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${p.nome}</div>
+        <div style="font-size:10px;color:var(--muted)">${Math.round(p.prob*100)}% prob.</div>
+      </div>
+      <div style="display:flex;gap:4px">
+        <button onclick="editarPremio(${i})" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent">✏️</button>
+        <button onclick="removerPremio(${i})" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:6px;padding:6px 10px;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;color:#EF4444">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function adicionarPremio() {
+  const icon = (document.getElementById('novoPremioIcon')?.value||'🎁').trim();
+  const nome = (document.getElementById('novoPremioNome')?.value||'').trim();
+  const cor  = document.getElementById('novoPremioColor')?.value||'#4A2C2A';
+  if (!nome) { showToast('⚠️ Escreve o nome'); return; }
+  premios.push({icon, nome, prob:0.1, cor});
+  normalizarProbs();
+  guardarPremios();
+  document.getElementById('novoPremioIcon').value='';
+  document.getElementById('novoPremioNome').value='';
+  renderPremiosEditor();
+  showToast('✓ Prémio adicionado!');
+}
+
+function removerPremio(i) {
+  if (premios.length<=2) { showToast('⚠️ Mínimo 2 prémios'); return; }
+  premios.splice(i,1);
+  normalizarProbs();
+  guardarPremios();
+  renderPremiosEditor();
+  showToast('✓ Removido');
+}
+
+function editarPremio(i) {
+  const p = premios[i];
+  const n = prompt('Nome:', p.nome); if(n===null)return;
+  const ic = prompt('Emoji:', p.icon); if(ic===null)return;
+  if(n.trim()) premios[i].nome=n.trim();
+  if(ic.trim()) premios[i].icon=ic.trim();
+  guardarPremios(); renderPremiosEditor(); showToast('✓ Atualizado');
+}
+
+function normalizarProbs() {
+  const base = parseFloat((1/premios.length).toFixed(3));
+  premios.forEach(p => p.prob = base);
+  const diff = parseFloat((1 - premios.reduce((s,p)=>s+p.prob,0)).toFixed(3));
+  premios[0].prob = parseFloat((premios[0].prob+diff).toFixed(3));
+}
+
+function guardarPremios() {
+  try { localStorage.setItem('premiosConfig', JSON.stringify(premios)); } catch(e) {}
+}
+
+function resetarPremios() {
+  if(!confirm('Repor prémios originais?')) return;
+  premios = premiosDefault.map(p=>({...p}));
+  try { localStorage.removeItem('premiosConfig'); } catch(e) {}
+  renderPremiosEditor(); showToast('✓ Repostos');
+}
+
 </script>
 
 <div class="screen" id="screen-info">
@@ -3335,95 +3416,7 @@ try {
 </div>
 
 
-<div class="screen" id="screen-jogos">
-  <div class="screen-banner">
-    <div class="screen-banner-inner">
-      <div class="ucl-stars-banner" style="display:none">★ ★ ★ ★ ★ ★ ★ ★</div>
-      <div class="screen-banner-title">JOGOS</div>
-      <div class="screen-banner-sub">Desafios da equipa</div>
-    </div>
-    <div class="screen-banner-bar">
-      <div class="screen-banner-bar-line"></div>
-      <span>EM BREVE</span>
-      <div class="screen-banner-bar-line"></div>
-    </div>
-  </div>
-  <div style="padding:20px 16px">
-    <!-- Texto de apresentação -->
-    <div style="text-align:center;padding:24px 12px 28px">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,9vw,52px);color:#fff;letter-spacing:3px;line-height:1;margin-bottom:10px">Jogos que te darão prémios</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:8px;text-transform:uppercase;color:var(--orange)">BREVEMENTE</div>
-    </div>
-    <!-- CROMOS CARD -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px">
-      <div style="padding:16px 16px 12px;display:flex;align-items:center;gap:12px">
-        <div style="font-size:36px">🃏</div>
-        <div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff">CADERNETA DE CROMOS</div>
-          <div style="background:var(--orange);border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;color:#fff;letter-spacing:1px;display:inline-block;margin-top:2px">BREVEMENTE</div>
-        </div>
-      </div>
-      <img src="images/img_53.jpg" style="width:100%;display:block;border-top:1px solid var(--border)">
-      <div style="padding:14px 16px">
-        <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px">
-          Caderneta de cromos por secção com jogadores do Mundial de Futebol.<br><br>
-          <strong style="color:var(--text)">Como desbloquear packs:</strong>
-        </div>
-        <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:12px;color:var(--muted);line-height:1.7">
-          🎯 A cada <strong style="color:var(--orange)">5 artigos vendidos</strong> por secção (exceto sacos), desbloqueia um<br>
-          📦 <strong style="color:var(--orange)">Pack de 3 cromos</strong> para preencher a tua caderneta!
-        </div>
-      </div>
-    </div>
 
-    <!-- QUIZZ CARD -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-        <div style="font-size:36px">🧠</div>
-        <div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff">QUIZZ</div>
-          <div style="background:var(--orange);border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;color:#fff;letter-spacing:1px;display:inline-block;margin-top:2px">BREVEMENTE</div>
-        </div>
-      </div>
-      <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:12px;color:var(--muted);line-height:1.7">
-        🏆 Acertar <strong style="color:var(--orange)">100%</strong> numa formação ganha o direito a rolar a roleta!<br>
-        🔄 Permitido repetir o Quizz <strong style="color:var(--orange)">2 vezes por mês</strong>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="roulette-overlay" id="rouletteOverlay" style="align-items:center;justify-content:center">
-  <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px">🏅 Medalha conquistada</div>
-  <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#fff;margin-bottom:2px">Parabéns!</div>
-  <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--orange);margin-bottom:16px;text-align:center" id="rouletteNome"></div>
-  <div id="rouletteBoxSection" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;text-align:center;margin:0 auto">
-    <div style="cursor:pointer;transition:transform 0.15s" id="rouletteBoxWrap" onclick="abrirRoulette()">
-      <div style="width:130px;height:130px;position:relative;margin:0 auto">
-        <div style="width:130px;height:90px;background:linear-gradient(135deg,var(--orange),#FF4500);border-radius:7px 7px 12px 12px;position:absolute;bottom:0;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(255,107,0,0.4)"><div style="position:absolute;width:22px;height:100%;background:rgba(255,255,255,0.22);left:50%;transform:translateX(-50%);border-radius:3px"></div><div style="position:absolute;width:100%;height:22px;background:rgba(255,255,255,0.22);top:50%;transform:translateY(-50%);border-radius:3px"></div></div>
-        <div id="rouletteLid" style="width:130px;height:40px;background:linear-gradient(135deg,#FF8C00,var(--orange));border-radius:8px;position:absolute;top:0;transform-origin:left center;transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1);display:flex;align-items:center;justify-content:center"><div style="width:22px;height:100%;background:rgba(255,255,255,0.28);border-radius:3px"></div><div style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:26px">🎀</div></div>
-      </div>
-    </div>
-    <div id="rouletteHint" style="font-size:13px;color:rgba(255,255,255,0.4);text-align:center;letter-spacing:1px;margin-top:10px">Clica na caixa para abrir o teu prémio! 🎁</div>
-  </div>
-  <div id="wheelSection" style="display:none;flex-direction:column;align-items:center;width:100%;max-width:380px;padding:0 10px">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--orange);letter-spacing:2px;margin-bottom:20px;text-align:center">🎉 O teu prémio é girar a roleta!</div>
-    <div class="slot-machine" id="slotMachine">
-      <div class="slot-reel-wrap"><div class="slot-highlight"></div><div class="slot-reel" id="slotReel0"></div></div>
-      <div class="slot-reel-wrap"><div class="slot-highlight"></div><div class="slot-reel" id="slotReel1"></div></div>
-      <div class="slot-reel-wrap"><div class="slot-highlight"></div><div class="slot-reel" id="slotReel2"></div></div>
-    </div>
-    <button id="wheelSpinBtn" class="slot-spin-btn" onclick="girarSlot()">GIRAR ▶</button>
-  </div>
-  <div id="rouletteResult" style="display:none;flex-direction:column;align-items:center;text-align:center;padding:0 20px">
-    <div id="rouletteResultIcon" style="font-size:90px;margin-bottom:8px;animation:trophyBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards">🍫</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:#FFD700;letter-spacing:3px">Ganhaste</div>
-    <div id="rouletteResultNome" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;letter-spacing:2px;margin-bottom:10px">Um chocolate!</div>
-    <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:12px 20px;font-size:13px;color:rgba(255,255,255,0.7);line-height:1.5;max-width:300px;margin-bottom:16px">Solicita a tua recompensa a um membro da equipa diretiva 🎯</div>
-    <button onclick="fecharRoulette()" style="background:transparent;border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 28px;color:rgba(255,255,255,0.5);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer">Continuar</button>
-  </div>
-  <div id="rouletteConfetti" style="position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:10001"></div>
-</div>
 <!-- GESTÃO VENDEDORES MODAL -->
 <div class="gestao-modal" id="gestaoModal">
   <div class="gestao-modal-box">
