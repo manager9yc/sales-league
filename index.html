@@ -51,7 +51,7 @@ body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans
 .form-wrap { max-width: 900px; margin: 0 auto; padding: 28px 40px 80px; }
 .sec-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--orange); margin-bottom: 10px; margin-top: 28px; }
 .sec-label:first-of-type { margin-top: 0; }
-.card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin-bottom: 8px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 10px; }
 
 .date-row { display: flex; align-items: center; gap: 12px; }
 .date-icon { width: 42px; height: 42px; background: var(--orange); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
@@ -378,8 +378,8 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 @keyframes particleFloat{0%{opacity:0;transform:translateY(100vh) scale(0)}10%{opacity:0.7}90%{opacity:0.3}100%{opacity:0;transform:translateY(-20px) scale(1)}}
 
 /* MEDAL POPUP */
-
-
+.medal-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-40%);background:linear-gradient(135deg,#FF6B00,#FF8C00);border-radius:20px;padding:24px 32px;text-align:center;z-index:8888;min-width:280px;max-width:90vw;opacity:0;pointer-events:none;transition:opacity 0.4s ease,transform 0.45s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 16px 50px rgba(255,107,0,0.6);}
+.medal-popup.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%);}
 .medal-popup-trophy{font-size:56px;display:block;margin-bottom:10px;}
 .medal-popup-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#fff;display:block;margin-bottom:6px;}
 .medal-popup-sub{font-size:14px;color:rgba(255,255,255,0.9);}
@@ -534,9 +534,9 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 @keyframes shakeBox { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-5deg)} 40%{transform:rotate(5deg)} 60%{transform:rotate(-4deg)} 80%{transform:rotate(4deg)} }
 
 /* FORM TICKER */
-.form-ticker-wrap { background: var(--dark); border-bottom: 1px solid var(--border); overflow: hidden; padding: 11px 0; width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; display: block; }
-.form-ticker { display: flex; white-space: nowrap; animation: ticker-scroll 35s linear infinite; }
-.form-ticker-item { display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 900; letter-spacing: 6px; color: rgba(255,255,255,0.5); padding: 0 28px; text-transform: uppercase; }
+.form-ticker-wrap { background: #ffffff; border-bottom: 2px solid #e0e0e0; overflow: hidden; padding: 11px 0; width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; display: block; }
+.form-ticker { display: flex; white-space: nowrap; animation: ticker-scroll 10s linear infinite; }
+.form-ticker-item { display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 900; letter-spacing: 6px; color: #111111; padding: 0 28px; text-transform: uppercase; }
 .form-ticker-sep { display: inline-block; color: var(--orange); font-size: 16px; font-weight: 900; padding: 0 8px; }
 
 /* ══ THEMES ══ */
@@ -546,7 +546,7 @@ body.theme-ucl{--orange:#C9A84C;--orange2:#E8C97A;--dark:#070F1F;--card:#0C1B35;
 body.theme-ucl .ucl-banner-img{display:block}
 body.theme-ucl .nav{background:#070F1F!important;border-bottom:1px solid #C9A84C!important}
 body.theme-ucl .nav-btn.active{color:#C9A84C!important;border-bottom-color:#C9A84C!important}
-
+body.theme-ucl .submit-btn{background:linear-gradient(90deg,#C9A84C,#E8C97A,#C9A84C)!important;color:#070F1F!important}
 body.theme-ucl .banner-bar{background:linear-gradient(90deg,#070F1F,#0C1B35,#070F1F)!important;border-top:1px solid #C9A84C!important}
 body.theme-ucl .banner-top,body.theme-ucl .banner{background:#070F1F!important}
 body.theme-ucl [style*="background:#0C0C0C"]{background:#070F1F!important}
@@ -674,43 +674,8 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
 /* Ranking item stagger */
 .d-crow { animation: fadeSlideUp 0.2s ease both; }
 
-
-
-.medal-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-40%) scale(0.8);background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid var(--orange);border-radius:20px;padding:28px 24px;text-align:center;z-index:9998;min-width:260px;max-width:320px;box-shadow:0 20px 60px rgba(0,0,0,0.8);display:none}
-.medal-popup.show{display:block;animation:medalPopIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards}
-body.theme-ucl .medal-popup{background:linear-gradient(135deg,#070F1F,#0C1B35);border-color:#C9A84C}
-.name-grid,.name-grid *{box-shadow:none!important}
-
-body.theme-ucl .submit-btn{background:linear-gradient(135deg,#C9A84C,#E8C97A)!important;color:#070F1F!important;font-weight:800}
-body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A34A)!important;color:#fff!important}
-
-
-/* ══ SCREEN ANIMATIONS ══ */
-@keyframes cascadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-.screen.active > * { animation: cascadeIn 0.3s ease both; }
-.screen.active > *:nth-child(1){animation-delay:0.00s}
-.screen.active > *:nth-child(2){animation-delay:0.06s}
-.screen.active > *:nth-child(3){animation-delay:0.12s}
-.screen.active > *:nth-child(4){animation-delay:0.18s}
-.screen.active > *:nth-child(5){animation-delay:0.22s}
-.screen.active > *:nth-child(6){animation-delay:0.26s}
-
-
-
-/* ══ SUCCESS SCREEN ══ */
-.success-confetti-wrap { position:fixed;inset:0;pointer-events:none;z-index:8000; }
-.success-rank-pill { background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:10px 16px;margin:8px 20px;display:flex;align-items:center;justify-content:space-between; }
-.success-rank-pill.highlight { border-color:var(--orange);background:rgba(255,107,0,0.08); }
-.success-pts-badge { background:linear-gradient(135deg,var(--orange),#FF4500);border-radius:12px;padding:14px 20px;margin:0 20px 12px;text-align:center; }
-
-
-body.theme-oled{--dark:#000;--card:#0a0a0a;--card2:#111;--border:#1a1a1a;--muted:#777;--text:#f0f0f0;--orange:#FF6B00}
-
-
-/* ══ TEAM DUEL ══ */
-.team-duel-bar{height:14px;border-radius:7px;overflow:hidden;background:var(--border);margin:6px 0}
-.team-duel-fill{height:100%;border-radius:7px;transition:width 0.8s ease}
-
+body.theme-ucl .submit-btn { background: linear-gradient(135deg, #22C55E, #16A34A) !important; color: #fff !important; }
+body.theme-ucl .submit-btn:active { background: #16A34A !important; }
 </style>
 </head>
 <body>
@@ -803,66 +768,26 @@ body.theme-oled{--dark:#000;--card:#0a0a0a;--card2:#111;--border:#1a1a1a;--muted
           <input type="hidden" id="dataRegisto" />
         </div>
       </div>
-      <div id="streakHeader" style="display:none;align-items:center;gap:8px;background:rgba(255,107,0,0.08);border:1px solid rgba(255,107,0,0.2);border-radius:12px;padding:10px 14px;margin:0 0 4px"></div>
       <div class="sec-label">Quem és tu?</div>
       <div class="card">
         <div class="team-tabs" id="teamTabs"></div>
-        
+        <div class="name-lbl">Seleciona o teu nome</div>
         <div class="name-grid" id="nameGrid"><div class="name-empty">Escolhe a tua equipa primeiro</div></div>
       </div>
       <div class="sec-label">Vendas do dia</div>
       <div class="card">
-        <div class="prod-row">
-          <div class="prod-icon">🖥️</div>
-          <div class="prod-info"><div class="prod-name">Onlines</div><div class="prod-hint">Vendas online pagas</div></div>
-          <div class="counter"><button class="cbtn minus" onmousedown="startChange('onlines',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="onlines">0</div><button class="cbtn plus" onmousedown="startChange('onlines',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',1,event)" ontouchend="stopChange()">+</button></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="prod-row">
-          <div class="prod-icon">🧴</div>
-          <div class="prod-info"><div class="prod-name">Sprays</div><div class="prod-hint">Limpeza, Desodorizante e Impermeabilizante</div></div>
-          <div class="counter"><button class="cbtn minus" onmousedown="startChange('sprays',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sprays',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="sprays">0</div><button class="cbtn plus" onmousedown="startChange('sprays',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sprays',1,event)" ontouchend="stopChange()">+</button></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="prod-row">
-          <div class="prod-icon">🦶</div>
-          <div class="prod-info"><div class="prod-name">Palmilhas</div><div class="prod-hint">Excepto Fila</div></div>
-          <div class="counter"><button class="cbtn minus" onmousedown="startChange('palmilhas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('palmilhas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="palmilhas">0</div><button class="cbtn plus" onmousedown="startChange('palmilhas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('palmilhas',1,event)" ontouchend="stopChange()">+</button></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="prod-row">
-          <div class="prod-icon">👕</div>
-          <div class="prod-info"><div class="prod-name">Camisolas Oficiais</div><div class="prod-hint">Futebol oficial</div></div>
-          <div class="counter"><button class="cbtn minus" onmousedown="startChange('camisolas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('camisolas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="camisolas">0</div><button class="cbtn plus" onmousedown="startChange('camisolas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('camisolas',1,event)" ontouchend="stopChange()">+</button></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="prod-row">
-          <div class="prod-icon">🛍️</div>
-          <div class="prod-info"><div class="prod-name">Sacos Reutilizáveis</div><div class="prod-hint">Eco bags</div></div>
-          <div class="counter"><button class="cbtn minus" onmousedown="startChange('sacos',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sacos',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="sacos">0</div><button class="cbtn plus" onmousedown="startChange('sacos',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sacos',1,event)" ontouchend="stopChange()">+</button></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="prod-row">
-          <div class="prod-icon">💧</div>
-          <div class="prod-info"><div class="prod-name">Garrafas</div><div class="prod-hint">Garrafas da liga de vendas</div></div>
-          <div class="counter"><button class="cbtn minus" onmousedown="startChange('garrafas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="garrafas">0</div><button class="cbtn plus" onmousedown="startChange('garrafas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',1,event)" ontouchend="stopChange()">+</button></div>
-        </div>
+        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🖥️</div><div><div class="prod-name">Onlines</div><div class="prod-hint">Vendas online pagas</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('onlines',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="onlines">0</div><button class="cbtn plus" onmousedown="startChange('onlines',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',1,event)" ontouchend="stopChange()">+</button></div></div>
+        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🧴</div><div><div class="prod-name">Sprays</div><div class="prod-hint">Limpeza, Desodorizante e Impermeabilizante</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('sprays',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sprays',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="sprays">0</div><button class="cbtn plus" onmousedown="startChange('sprays',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sprays',1,event)" ontouchend="stopChange()">+</button></div></div>
+        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🦶</div><div><div class="prod-name">Palmilhas</div><div class="prod-hint">Excepto Fila</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('palmilhas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('palmilhas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="palmilhas">0</div><button class="cbtn plus" onmousedown="startChange('palmilhas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('palmilhas',1,event)" ontouchend="stopChange()">+</button></div></div>
+        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">👕</div><div><div class="prod-name">Camisolas Oficiais</div><div class="prod-hint">Futebol oficial</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('camisolas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('camisolas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="camisolas">0</div><button class="cbtn plus" onmousedown="startChange('camisolas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('camisolas',1,event)" ontouchend="stopChange()">+</button></div></div>
+        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">🛍️</div><div><div class="prod-name">Sacos Reutilizáveis</div><div class="prod-hint">Eco bags</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('sacos',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sacos',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="sacos">0</div><button class="cbtn plus" onmousedown="startChange('sacos',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sacos',1,event)" ontouchend="stopChange()">+</button></div></div>
+        <div class="prod-row"><div class="prod-info"><div class="prod-emoji">💧</div><div><div class="prod-name">Garrafas</div><div class="prod-hint">Garrafas da liga de vendas</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('garrafas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="garrafas">0</div><button class="cbtn plus" onmousedown="startChange('garrafas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',1,event)" ontouchend="stopChange()">+</button></div></div>
       </div>
       <div class="sec-label">Elogios recebidos</div>
       <div class="card">
-        <div class="prod-row">
-          <div class="prod-icon">⭐</div>
-          <div class="prod-info"><div class="prod-name">Elogios</div><div class="prod-hint">Escritos ou Google Reviews</div></div>
-          <div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div>
-        </div>
+        <div class="prod-row" style="padding:0"><div class="prod-info"><div class="prod-emoji">⭐</div><div><div class="prod-name">Elogios</div><div class="prod-hint">Escritos ou Google Reviews</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div></div>
       </div>
       <button class="submit-btn" id="submitBtn" onclick="clicarSubmit(this)">Registar o meu dia</button>
-      <div style="text-align:center;padding:10px 0 4px;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif">APP developed by Dário Santos</div>
     </div>
     <div class="success" id="successMsg">
       <!-- HERO CONFIRMAÇÃO -->
@@ -1001,8 +926,7 @@ body.theme-oled{--dark:#000;--card:#0a0a0a;--card2:#111;--border:#1a1a1a;--muted
 
     <!-- CONTEÚDO ADMIN -->
     <div id="adminBody" style="display:none">
-      <div style="padding:16px 16px 0"><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Tema Visual</div><div style="display:flex;gap:8px"><button onclick="aplicarTema('dark')" id="btnThemeDark" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">⚫ Preto</button><button onclick="aplicarTema('oled')" id="btnThemeOLED" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">⚫ OLED</button>
-          <button onclick="aplicarTema('ucl')" id="btnThemeUCL" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">🏆 Champions</button></div></div>
+      <div style="padding:16px 16px 0"><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Tema Visual</div><div style="display:flex;gap:8px"><button onclick="aplicarTema('dark')" id="btnThemeDark" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">⚫ Preto</button><button onclick="aplicarTema('ucl')" id="btnThemeUCL" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">🏆 Champions</button></div></div>
       <div style="height:1px;background:var(--border);margin:12px 16px"></div>
       <!-- PRÉMIOS EDITOR -->
       <div style="padding:0 16px;margin-top:4px">
@@ -1022,19 +946,6 @@ body.theme-oled{--dark:#000;--card:#0a0a0a;--card2:#111;--border:#1a1a1a;--muted
           </div>
         </div>
         <button onclick="resetarPremios()" style="width:100%;margin-top:8px;background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--muted);font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer">↩ Repor prémios originais</button>
-      </div>
-      <div style="height:1px;background:var(--border);margin:12px 16px"></div>
-      <!-- NOTIFICAÇÕES -->
-      <div style="padding:0 16px;margin-top:4px">
-        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">🔔 Lembrete Diário</div>
-        <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px">
-          <div style="font-size:13px;color:var(--muted);margin-bottom:10px">Hora do lembrete para registar vendas:</div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input type="time" id="notifTime" value="18:00" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:15px;outline:none">
-            <button onclick="guardarHoraNotif()" style="background:var(--orange);border:none;border-radius:8px;padding:10px 16px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer">Guardar</button>
-          </div>
-          <button onclick="pedirPermissaoNotificacoes()" style="width:100%;margin-top:8px;background:transparent;border:1px solid var(--border);border-radius:8px;padding:9px;color:var(--muted);font-size:12px;cursor:pointer">🔔 Ativar notificações</button>
-        </div>
       </div>
       <div style="height:1px;background:var(--border);margin:12px 16px"></div>
       <!-- GESTÃO VENDEDORES -->
@@ -1244,7 +1155,6 @@ function selectTeam(id) {
 }
 
 function selectName(btn) {
-  setTimeout(mostrarStreakHeader, 100);
   document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   nomeSel = btn.textContent;
@@ -1274,7 +1184,6 @@ function change(campo, delta) {
     _o.start(audioCtx.currentTime);_o.stop(audioCtx.currentTime+0.06);
   }
   vals[campo] = Math.max(0, vals[campo]+delta);
-  try{navigator.vibrate&&navigator.vibrate(12);}catch(e){}
   const el = document.getElementById(campo);
   el.textContent = vals[campo];
   el.classList.toggle('nz', vals[campo]>0);
@@ -1343,23 +1252,13 @@ async function submeter() {
   try { localStorage.setItem('registo_' + nomeSel + '_' + document.getElementById('dataRegisto').value, '1'); } catch(e) {}
   tocarSomRegisto();
   const sb=document.getElementById('submitBtn'); if(sb){sb.style.background='';}
-  const _sb=document.getElementById('submitBtn');if(_sb){_sb.style.background='#22C55E';_sb.style.color='#fff';}
   document.getElementById('formMain').classList.add('hide');
   document.getElementById('successMsg').classList.add('show');
-  setTimeout(() => {
-    const el = document.getElementById('successMsg');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 80);
+  window.scrollTo({top: 0, behavior: 'smooth'});
 
   // Show progress and medals for this vendedor
   const snl = document.getElementById('successNomeLabel');
   if (snl) snl.textContent = nomeSel.toUpperCase();
-  // Confetti
-  lancarConfettiSucesso();
-  // Haptic
-  try { navigator.vibrate && navigator.vibrate([30,10,30]); } catch(e) {}
-  // Mini ranking update
-  setTimeout(atualizarMiniRanking, 600);
   mostrarProgressoRegisto(nomeSel, payload);
 
   // Sem redirecionamento automático
@@ -1417,7 +1316,6 @@ function atualizarDataDisplay() {
 }
 
 function resetForm() {
-  const _s2=document.getElementById('submitBtn');if(_s2){_s2.style.background='';_s2.style.color='';delete _s2.dataset.pg;}
   nomeSel = null; equipaAtiva = null;
   document.querySelectorAll('.team-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('nameGrid').innerHTML = '<div class="name-empty">Escolhe a tua equipa primeiro</div>';
@@ -1564,7 +1462,7 @@ function renderRanking(dados) {
   let html = '';
   let d = 0.05;
 
-    html += secDiv('🎯', 'Ranking por Produto');
+  html += secDiv('🎯', 'Ranking por Produto');
   categorias.forEach(cat => {
     const sorted = [...dados].filter(v=>(v[cat.key]||0)>0).sort((a,b)=>b[cat.key]-a[cat.key]).slice(0,10);
     html += catBlock(cat.emoji, cat.label, sorted.length ? buildRows(sorted, cat.key) : emptyRows(), agora, d);
@@ -2025,7 +1923,6 @@ function clicarSubmit(btn) {
   }, 150);
 }
 
-
 renderTabs();
 
 // ══ DASHBOARD ══
@@ -2371,18 +2268,6 @@ let pinBuffer = '';
 let adminUnlocked = false;
 
 function pinPress(key) {
-  try{
-    window.AudioContext=window.AudioContext||window.webkitAudioContext;
-    if(!audioCtx)audioCtx=new AudioContext();
-    if(audioCtx.state==='suspended')audioCtx.resume();
-    const _po=audioCtx.createOscillator(),_pg=audioCtx.createGain();
-    _po.connect(_pg);_pg.connect(audioCtx.destination);
-    _po.type='sine';
-    _po.frequency.value=key==='⌫'?300:500+(parseInt(key)||0)*25;
-    _pg.gain.setValueAtTime(0.1,audioCtx.currentTime);
-    _pg.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.08);
-    _po.start(audioCtx.currentTime);_po.stop(audioCtx.currentTime+0.09);
-  }catch(e){}
   if (pinBuffer.length >= ADMIN_PIN.length) return;
   pinBuffer += key;
   for (let i = 0; i < ADMIN_PIN.length; i++) {
