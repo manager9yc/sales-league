@@ -378,8 +378,8 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 @keyframes particleFloat{0%{opacity:0;transform:translateY(100vh) scale(0)}10%{opacity:0.7}90%{opacity:0.3}100%{opacity:0;transform:translateY(-20px) scale(1)}}
 
 /* MEDAL POPUP */
-.medal-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-40%);background:linear-gradient(135deg,#FF6B00,#FF8C00);border-radius:20px;padding:24px 32px;text-align:center;z-index:8888;min-width:280px;max-width:90vw;opacity:0;pointer-events:none;transition:opacity 0.4s ease,transform 0.45s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 16px 50px rgba(255,107,0,0.6);}
-.medal-popup.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%);}
+
+
 .medal-popup-trophy{font-size:56px;display:block;margin-bottom:10px;}
 .medal-popup-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#fff;display:block;margin-bottom:6px;}
 .medal-popup-sub{font-size:14px;color:rgba(255,255,255,0.9);}
@@ -498,7 +498,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 
 /* TICKER */
 .ticker-wrap { width: 100%; background: rgba(255,107,0,0.12); border-bottom: 1px solid rgba(255,107,0,0.2); overflow: hidden; padding: 8px 0; }
-.ticker { display: flex; white-space: nowrap; animation: ticker-scroll 35s linear infinite; }
+.ticker { display: flex; white-space: nowrap; animation: ticker-scroll 18s linear infinite; }
 .ticker:hover { animation-play-state: paused; }
 .ticker-item { display: inline-flex; align-items: center; gap: 8px; padding: 0 32px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,107,0,0.9); }
 .ticker-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--orange); flex-shrink: 0; }
@@ -535,7 +535,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 
 /* FORM TICKER */
 .form-ticker-wrap { background: #ffffff; border-bottom: 2px solid #e0e0e0; overflow: hidden; padding: 11px 0; width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; display: block; }
-.form-ticker { display: flex; white-space: nowrap; animation: ticker-scroll 35s linear infinite; }
+.form-ticker { display: flex; white-space: nowrap; animation: ticker-scroll 10s linear infinite; }
 .form-ticker-item { display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 900; letter-spacing: 6px; color: #111111; padding: 0 28px; text-transform: uppercase; }
 .form-ticker-sep { display: inline-block; color: var(--orange); font-size: 16px; font-weight: 900; padding: 0 8px; }
 
@@ -556,7 +556,7 @@ body.theme-dark .ucl-stars-banner{display:none!important}
 .ucl-stars-banner{display:none;font-size:11px;letter-spacing:5px;color:#C9A84C;text-align:center;margin-bottom:6px;position:relative;z-index:2}
 body.theme-ucl .ucl-stars-banner{display:block}
 /* ══ ROULETTE ══ */
-.roulette-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:10000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center}
+.roulette-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:10000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center}
 .roulette-overlay.open{display:flex;animation:fadeIn 0.3s ease;align-items:center;justify-content:center}
 .wheel-wrap{position:relative;width:260px;height:260px;margin:0 auto 12px}
 .wheel-canvas{border-radius:50%;box-shadow:0 0 30px rgba(255,107,0,0.3)}
@@ -674,35 +674,14 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
 /* Ranking item stagger */
 .d-crow { animation: fadeSlideUp 0.2s ease both; }
 
-
-
-
-
-
-body.theme-ucl .rank-card, body.theme-ucl [class*="rank-wrap"], body.theme-ucl .rank-list { background: rgba(7,15,31,0.6) !important; }
-body.theme-ucl .d-crow { border-bottom-color: rgba(201,168,76,0.15) !important; }
-body.theme-ucl .rank-top10 { background: rgba(12,27,60,0.9) !important; border-left-color: #C9A84C !important; }
+.medal-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-40%) scale(0.8);background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid var(--orange);border-radius:20px;padding:28px 24px;text-align:center;z-index:9998;min-width:260px;max-width:320px;box-shadow:0 20px 60px rgba(0,0,0,0.8);display:none;opacity:0}
+.medal-popup.show{display:block;animation:medalPopIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;opacity:1}
+body.theme-ucl .medal-popup{background:linear-gradient(135deg,#070F1F,#0C1B35);border-color:#C9A84C}
+.name-grid,.name-grid *{box-shadow:none!important}
 
 body.theme-ucl .submit-btn{background:linear-gradient(135deg,#C9A84C,#E8C97A)!important;color:#070F1F!important;font-weight:800}
 body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A34A)!important;color:#fff!important}
-
-/* Skeleton loader */
-@keyframes skelShimmer { 0%{opacity:0.4} 50%{opacity:0.8} 100%{opacity:0.4} }
-.skel-card { background:rgba(255,255,255,0.08);border-radius:10px;height:72px;animation:skelShimmer 1.4s ease infinite; }
-
-/* Uniform banner height */
-.screen-banner-inner { padding: 24px 24px 0 !important; min-height: 120px; }
-.screen-banner-bar { margin-top: 18px !important; padding: 10px 20px !important; }
-.screen-banner-title { font-size: clamp(40px,10vw,64px) !important; line-height: 0.95 !important; }
-.screen-banner-sub { font-size: 12px !important; letter-spacing: 3px !important; margin-top: 6px !important; }
-.banner-top { padding: 24px 24px 0 !important; }
 </style>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#FF6B00">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Sales League">
-  <link rel="apple-touch-icon" href="images/icon-192.png">
 </head>
 <body>
 
@@ -723,11 +702,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
     </div>
     <div id="splashTop3" style="display:none;width:100%;max-width:400px;margin-bottom:6px">
       <div style="font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);text-align:center;margin-top:14px;margin-bottom:8px">🏆 Top 3 de ontem</div>
-      <div id="splashTop3Content" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
-        <div class="skel-card"></div><div class="skel-card"></div>
-        <div class="skel-card"></div><div class="skel-card"></div>
-        <div class="skel-card"></div><div class="skel-card"></div>
-      </div>
+      <div id="splashTop3Content" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px"></div>
     </div>
     <div style="width:80%;max-width:360px;display:flex;flex-direction:column;gap:8px;margin-bottom:8px">
       <button onclick="iniciarAudio();fecharSplash()" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:15px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:6px">ENTRAR</button>
@@ -750,7 +725,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
   <button class="nav-btn" onclick="goTo('ranking',this)"><span style="font-size:14px">🏆</span><span>Ranking</span></button>
   <button class="nav-btn" onclick="goTo('dash',this)"><span style="font-size:14px">📊</span><span>Dash</span></button>
   <button class="nav-btn" onclick="goTo('info',this)"><span style="font-size:14px">ℹ️</span><span>Info</span></button>
-  
+  <button class="nav-btn" onclick="goTo('jogos',this)"><span style="font-size:14px">🎮</span><span>Jogos</span></button>
   <button class="nav-btn" onclick="goTo('admin',this)"><span style="font-size:14px">⚙️</span><span>Admin</span></button>
 </div>
 
@@ -800,12 +775,9 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
       </div>
       <div class="sec-label">Quem és tu?</div>
       <div class="card">
-        <div style="position:relative">
         <div class="team-tabs" id="teamTabs"></div>
-        <div style="position:absolute;right:0;top:0;bottom:8px;width:24px;background:linear-gradient(90deg,transparent,var(--dark));pointer-events:none;border-radius:0 8px 8px 0" id="tabScrollHint"></div>
-      </div></div>
-        <div class="name-lbl">Seleciona o teu nome</div>
-        <div class="name-grid" id="nameGrid"></div>
+        
+        <div class="name-grid" id="nameGrid"><div class="name-empty">Escolhe a tua equipa primeiro</div></div>
       </div>
       <div class="sec-label">Vendas do dia</div>
       <div class="card">
@@ -820,8 +792,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
       <div class="card">
         <div class="prod-row" style="padding:0"><div class="prod-info"><div class="prod-emoji">⭐</div><div><div class="prod-name">Elogios</div><div class="prod-hint">Escritos ou Google Reviews</div></div></div><div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div></div>
       </div>
-      <button class="submit-btn" id="submitBtn" onclick="clicarSubmit(this)">Registar o meu dia</button>
-    <div style="text-align:center;padding:14px 0 6px;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif">APP developed by Dário Santos</div>
+      <button class="submit-btn" id="submitBtn" onclick="submeter()">Registar o meu dia</button>
     </div>
     <div class="success" id="successMsg">
       <!-- HERO CONFIRMAÇÃO -->
@@ -961,13 +932,6 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
     <!-- CONTEÚDO ADMIN -->
     <div id="adminBody" style="display:none">
       <div style="padding:16px 16px 0"><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Tema Visual</div><div style="display:flex;gap:8px"><button onclick="aplicarTema('dark')" id="btnThemeDark" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">⚫ Preto</button><button onclick="aplicarTema('ucl')" id="btnThemeUCL" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">🏆 Champions</button></div></div>
-      <div style="height:1px;background:var(--border);margin:12px 16px"></div>
-      <!-- HISTÓRICO DE MESES -->
-      <div style="padding:0 16px;margin-top:4px">
-        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">📅 Histórico de Meses</div>
-        <div id="historicoMesesList"></div>
-        <button onclick="guardarSnapshotMes()" style="width:100%;background:var(--card2);border:1.5px solid var(--orange);border-radius:10px;padding:11px;color:var(--orange);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;margin-top:6px">📸 Guardar snapshot do mês atual</button>
-      </div>
       <div style="height:1px;background:var(--border);margin:12px 16px"></div>
       <!-- PRÉMIOS EDITOR -->
       <div style="padding:0 16px;margin-top:4px">
@@ -1203,16 +1167,6 @@ function selectName(btn) {
 }
 
 function change(campo, delta) {
-  try {
-    if (!audioCtx) { window.AudioContext=window.AudioContext||window.webkitAudioContext; audioCtx=new AudioContext(); }
-    if (audioCtx.state==='suspended') audioCtx.resume();
-    const _o=audioCtx.createOscillator(),_g=audioCtx.createGain();
-    _o.connect(_g); _g.connect(audioCtx.destination);
-    _o.type='sine'; _o.frequency.value=delta>0?900:500;
-    _g.gain.setValueAtTime(0.08,audioCtx.currentTime);
-    _g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.06);
-    _o.start(audioCtx.currentTime); _o.stop(audioCtx.currentTime+0.07);
-  } catch(e) {}
   // Tick sound
   iniciarAudio();
   if (audioCtx) {
@@ -1292,10 +1246,10 @@ async function submeter() {
   // Mark this vendor+day as registered
   try { localStorage.setItem('registo_' + nomeSel + '_' + document.getElementById('dataRegisto').value, '1'); } catch(e) {}
   tocarSomRegisto();
-  const sb=document.getElementById('submitBtn'); if(sb){sb.style.background='';}
+  const _sb=document.getElementById('submitBtn');if(_sb){_sb.style.background='#22C55E';_sb.style.color='#fff';}
   document.getElementById('formMain').classList.add('hide');
   document.getElementById('successMsg').classList.add('show');
-  window.scrollTo({top: 0, behavior: 'smooth'});
+  // stay on page
 
   // Show progress and medals for this vendedor
   const snl = document.getElementById('successNomeLabel');
@@ -1305,6 +1259,36 @@ async function submeter() {
   // Sem redirecionamento automático
 }
 
+function tocarAntemSplash() {
+  iniciarAudio();
+  if (!audioCtx) return;
+  // Champions League anthem - simplified main melody (Die Königlichen tones)
+  // Notes: A4=440, D5=587, F#5=740, A5=880, G5=784, E5=659, D5=587
+  const notas = [
+    [440,0,0.5],[440,0.55,0.5],[440,1.1,0.3],
+    [587,1.5,0.8],
+    [740,2.4,0.5],[784,2.95,0.5],
+    [880,3.5,1.0],
+    [784,4.6,0.4],[740,5.05,0.4],[659,5.5,0.4],
+    [587,5.95,1.2],
+    [494,7.2,0.4],[440,7.7,0.4],
+    [587,8.2,2.0],
+  ];
+  notas.forEach(([freq, t, dur]) => {
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    const reverb = audioCtx.createGain();
+    o.connect(g); g.connect(reverb); reverb.connect(audioCtx.destination);
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(freq, audioCtx.currentTime + t);
+    g.gain.setValueAtTime(0, audioCtx.currentTime + t);
+    g.gain.linearRampToValueAtTime(0.18, audioCtx.currentTime + t + 0.05);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + t + dur);
+    reverb.gain.setValueAtTime(0.9, audioCtx.currentTime);
+    o.start(audioCtx.currentTime + t);
+    o.stop(audioCtx.currentTime + t + dur + 0.1);
+  });
+}
 
 function tocarSomRegisto() {
   iniciarAudio();
@@ -1357,9 +1341,10 @@ function atualizarDataDisplay() {
 }
 
 function resetForm() {
+  const _s2=document.getElementById('submitBtn');if(_s2){_s2.style.background='';_s2.style.color='';}
   nomeSel = null; equipaAtiva = null;
   document.querySelectorAll('.team-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('nameGrid').innerHTML = '';
+  document.getElementById('nameGrid').innerHTML = '<div class="name-empty">Escolhe a tua equipa primeiro</div>';
   Object.keys(vals).forEach(k => { vals[k]=0; const el=document.getElementById(k); el.textContent=0; el.classList.remove('nz'); });
   // Reset submit button
   const btn = document.getElementById('submitBtn');
@@ -1785,7 +1770,7 @@ function mostrarMedalPopup(emoji,nome,medalha){
     popup.classList.remove('show');
     // Show surprise box ONLY if this is the vendedor who just registered
     if (nome === nomeSel) {
-      setTimeout(()=>mostrarSurprise(nome, medalha), 300);
+      setTimeout(()=>mostrarRoulette(nome, medalha), 300);
     }
   },3000);
 }
@@ -1941,202 +1926,6 @@ async function carregarSplashTop3(){
     if(el)el.innerHTML=html;if(wrap)wrap.style.display='block';
   }catch(e){}
 }
-
-function clicarSubmit(btn) {
-  // Click sound
-  try {
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!audioCtx) audioCtx = new AudioContext();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
-    o.connect(g); g.connect(audioCtx.destination);
-    o.type='sine'; o.frequency.value=660;
-    g.gain.setValueAtTime(0.15, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.12);
-    o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime+0.13);
-  } catch(e) {}
-  // Green flash
-  btn.style.background='#22C55E';
-  btn.style.transform='scale(0.97)';
-  setTimeout(() => {
-    btn.style.transform='scale(1)';
-    submeter();
-  }, 150);
-}
-
-// ══ SURPRISE SLOT ══
-let sSpin = false;
-
-function initSurpriseSlot() {
-  for (let r = 0; r < 3; r++) {
-    const reel = document.getElementById('sReel' + r);
-    if (!reel) continue;
-    let items = '';
-    for (let rep = 0; rep < 6; rep++) {
-      premios.forEach(p => { items += `<div class="slot-item">${p.icon}</div>`; });
-    }
-    reel.innerHTML = items;
-    reel.style.transition = 'none';
-    reel.style.transform = 'translateY(0)';
-  }
-}
-
-function girarSurpriseSlot() {
-  if (sSpin) return;
-  sSpin = true;
-  const btn = document.getElementById('surpriseSpinBtn');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ A girar...'; }
-
-  const rand = Math.random();
-  let acc = 0, wIdx = 0;
-  for (let i = 0; i < premios.length; i++) {
-    acc += premios[i].prob;
-    if (rand <= acc) { wIdx = i; break; }
-  }
-  const premio = premios[wIdx];
-
-  iniciarAudio(); tocarSomCasino();
-
-  const itemH = 90;
-  const n = premios.length;
-  const targetRep = 3;
-  const durations = [3800, 4300, 4800];
-
-  for (let r = 0; r < 3; r++) {
-    const reel = document.getElementById('sReel' + r);
-    if (!reel) continue;
-    const targetY = -(targetRep * n * itemH + wIdx * itemH);
-    const dur = durations[r];
-    const delay = r * 200;
-    setTimeout((el, d, ty) => {
-      el.style.transition = `transform ${d}ms cubic-bezier(0.17,0.67,0.12,1.0)`;
-      el.style.transform = `translateY(${ty}px)`;
-    }, delay, reel, dur, targetY);
-  }
-
-  setTimeout(() => {
-    sSpin = false;
-    pararSomCasino();
-    lancarConfettiSurprise();
-    setTimeout(() => {
-      document.getElementById('surpriseSlotArea').style.display = 'none';
-      const pa = document.getElementById('surprisePrizeArea');
-      pa.style.display = 'flex';
-      document.getElementById('surpriseIcon').textContent = premio.icon;
-      document.getElementById('surpriseContentText').textContent = premio.nome;
-      // Log prize
-      salvarPremioConcedido && salvarPremioConcedido(surpriseNomeAtual, premio.nome, premio.icon);
-      setTimeout(() => {
-        document.getElementById('surpriseDirecao').style.display = 'block';
-        document.getElementById('surpriseCloseBtn').style.display = 'block';
-      }, 600);
-    }, 400);
-  }, durations[2] + 400);
-}
-
-let surpriseNomeAtual = '';
-const _origMostrarSurprise = mostrarSurprise;
-
-// ══ HISTÓRICO DE MESES ══
-let historicoMeses = [];
-try { historicoMeses = JSON.parse(localStorage.getItem('historicoMeses') || '[]'); } catch(e) {}
-
-function guardarSnapshotMes() {
-  if (!dashAllDados || !dashAllDados.length) {
-    showToast('⚠️ Carrega o dashboard primeiro'); return;
-  }
-  const mes = new Date().toLocaleDateString('pt-PT', {month:'long', year:'numeric'});
-  const existing = historicoMeses.find(h => h.mes === mes);
-  if (existing) { if (!confirm('Já existe um snapshot para ' + mes + '. Substituir?')) return; historicoMeses = historicoMeses.filter(h => h.mes !== mes); }
-  // Build ranking from current data
-  const scores = {};
-  dashAllDados.forEach(d => {
-    if (!scores[d.nome]) scores[d.nome] = {nome:d.nome, total:0};
-    scores[d.nome].total += (d.onlines||0)+(d.sprays||0)+(d.palmilhas||0)+(d.camisolas||0)+(d.sacos||0)+(d.garrafas||0)+(d.elogios||0);
-  });
-  const ranking = Object.values(scores).sort((a,b)=>b.total-a.total);
-  historicoMeses.unshift({ mes, data: new Date().toLocaleDateString('pt-PT'), ranking });
-  try { localStorage.setItem('historicoMeses', JSON.stringify(historicoMeses)); } catch(e) {}
-  renderHistoricoMeses();
-  showToast('✓ Snapshot guardado: ' + mes);
-}
-
-function renderHistoricoMeses() {
-  const el = document.getElementById('historicoMesesList');
-  if (!el) return;
-  if (!historicoMeses.length) {
-    el.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:10px">Sem histórico ainda</div>';
-    return;
-  }
-  el.innerHTML = historicoMeses.map((h,i) => `
-    <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px;margin-bottom:6px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <div>
-          <div style="font-size:13px;font-weight:700;color:var(--text);text-transform:capitalize">${h.mes}</div>
-          <div style="font-size:10px;color:var(--muted)">Guardado em ${h.data} · ${h.ranking.length} colaboradores</div>
-        </div>
-        <div style="display:flex;gap:6px">
-          <button onclick="verHistoricoMes(${i})" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--text);cursor:pointer">👁 Ver</button>
-          <button onclick="apagarHistoricoMes(${i})" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:6px;padding:5px 10px;font-size:11px;color:#EF4444;cursor:pointer">🗑</button>
-        </div>
-      </div>
-      <div id="histDetail_${i}" style="display:none;margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
-        ${h.ranking.slice(0,10).map((r,ri) => `<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--muted)"><span>${ri+1}. ${r.nome}</span><span style="color:var(--orange);font-weight:700">${r.total} pts</span></div>`).join('')}
-      </div>
-    </div>`).join('');
-}
-
-function verHistoricoMes(i) {
-  const el = document.getElementById('histDetail_' + i);
-  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
-}
-
-function apagarHistoricoMes(i) {
-  if (!confirm('Apagar este histórico?')) return;
-  historicoMeses.splice(i, 1);
-  try { localStorage.setItem('historicoMeses', JSON.stringify(historicoMeses)); } catch(e) {}
-  renderHistoricoMeses();
-  showToast('✓ Histórico apagado');
-}
-
-// ── PWA DAILY NOTIFICATION ──
-async function pedirPermissaoNotificacoes() {
-  if (!('Notification' in window)) return;
-  if (Notification.permission === 'granted') {
-    agendarNotificacaoDiaria();
-    return;
-  }
-  if (Notification.permission !== 'denied') {
-    const perm = await Notification.requestPermission();
-    if (perm === 'granted') agendarNotificacaoDiaria();
-  }
-}
-
-function agendarNotificacaoDiaria() {
-  if (!('serviceWorker' in navigator)) {
-    // Fallback: use setTimeout to show notification at 18:00
-    const agora = new Date();
-    const alvo = new Date();
-    alvo.setHours(18, 0, 0, 0);
-    if (alvo <= agora) alvo.setDate(alvo.getDate() + 1);
-    const ms = alvo - agora;
-    setTimeout(() => {
-      if (Notification.permission === 'granted') {
-        new Notification('Sales League 🏆', {
-          body: 'Não te esqueças de registar as tuas vendas de hoje!',
-          icon: 'images/icon-192.png',
-          badge: 'images/icon-192.png'
-        });
-      }
-    }, ms);
-  }
-}
-
-// Request permission after first interaction
-document.addEventListener('click', function onFirstClick() {
-  pedirPermissaoNotificacoes();
-  document.removeEventListener('click', onFirstClick);
-}, { once: true });
 
 renderTabs();
 
@@ -2376,7 +2165,7 @@ function mostrarDash(nome) {
       ${compRank.map((item,i)=>{
         const hi=item.n===nome;
         const pct=Math.round(item.v/maxO*100);
-        return `<div class="d-crow${i<10?' rank-top10':''}">
+        return `<div class="d-crow">
           <div class="d-cpos ${hi?'hi':''}">${i+1}º</div>
           <div class="d-cnom ${hi?'hi':''}">${item.n.split(' ')[0]}</div>
           <div class="d-cbarwrap"><div class="d-cbarfill ${hi?'hi':''}" style="width:${pct}%"></div></div>
@@ -2483,6 +2272,8 @@ let pinBuffer = '';
 let adminUnlocked = false;
 
 function pinPress(key) {
+  try{window.AudioContext=window.AudioContext||window.webkitAudioContext;if(!audioCtx)audioCtx=new AudioContext();if(audioCtx.state==='suspended')audioCtx.resume();const _po=audioCtx.createOscillator(),_pg=audioCtx.createGain();_po.connect(_pg);_pg.connect(audioCtx.destination);_po.type='sine';_po.frequency.value=key==='⌫'?300:500+(parseInt(key)||0)*25;_pg.gain.setValueAtTime(0.1,audioCtx.currentTime);_pg.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.08);_po.start(audioCtx.currentTime);_po.stop(audioCtx.currentTime+0.09);}catch(e){}
+
   if (pinBuffer.length >= ADMIN_PIN.length) return;
   pinBuffer += key;
   for (let i = 0; i < ADMIN_PIN.length; i++) {
@@ -2499,11 +2290,6 @@ function pinPress(key) {
         renderPremiosEditor();
         renderPremiosLog();
         renderAdminSugestoes();
-        renderHistoricoMeses();
-        renderPremiosEditor();
-        renderPremiosLog();
-        renderAdminSugestoes();
-        renderHistoricoMeses();
         const hoje = new Date();
         const pad = n => String(n).padStart(2,'0');
         const adminDate = document.getElementById('adminDate');
@@ -3076,8 +2862,9 @@ const surprisePrizes = [
 let surpriseOpened = false;
 
 function mostrarSurprise(nome, medalha) {
-  surpriseNomeAtual = nome;
-
+  // Only show once per device per medal
+  const key = 'surpriseShown_' + nome + '_' + medalha;
+  try { if (localStorage.getItem(key)) return; localStorage.setItem(key, '1'); } catch(e) {}
   surpriseOpened = false;
   document.getElementById('surpriseNome').textContent = nome + ' · ' + medalha;
   document.getElementById('surpriseLid').classList.remove('open');
@@ -3111,21 +2898,28 @@ function abrirSurprise() {
   if (surpriseOpened) return;
   surpriseOpened = true;
 
+  // Open lid + launch confetti immediately
   document.getElementById('surpriseLid').classList.add('open');
   document.getElementById('surpriseHint').classList.add('hidden');
+  lancarConfettiSurprise();
   tocarSomSurprise();
 
-  // Show slot machine after lid opens
+  // Show prize after lid opens
   setTimeout(() => {
     document.getElementById('surpriseBoxWrap').style.display = 'none';
-    const sa = document.getElementById('surpriseSlotArea');
-    sa.style.display = 'flex';
-    sa.style.opacity = '0';
-    sa.style.transform = 'scale(0.85)';
-    sa.style.transition = 'opacity 0.4s ease, transform 0.4s cubic-bezier(0.34,1.3,0.64,1)';
-    setTimeout(()=>{ sa.style.opacity='1'; sa.style.transform='scale(1)'; }, 30);
-    initSurpriseSlot();
-  }, 700);
+    const pa = document.getElementById('surprisePrizeArea');
+    pa.style.display = 'flex';
+    const icon = document.getElementById('surpriseIcon');
+    icon.style.animation = 'none';
+    void icon.offsetWidth;
+    icon.style.animation = 'trophyBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards';
+  }, 500);
+
+  // Show solicita + close button
+  setTimeout(() => {
+    document.getElementById('surpriseDirecao').style.display = 'block';
+    document.getElementById('surpriseCloseBtn').style.display = 'block';
+  }, 1200);
 }
 
 function fecharSurprise() {
@@ -3178,7 +2972,7 @@ const faqItems=[
   {q:'Quando atualiza o ranking?',a:'O ranking atualiza automaticamente, cerca de 1 minuto após o registo.'},
   {q:'Posso recuperar posições?',a:'Sim! O ranking é dinâmico e muda diariamente. Basta melhorar o teu desempenho.'},
   {q:'Como sei quantos pontos tenho?',a:'Acede ao Dashboard e seleciona o teu nome para ver o teu perfil completo.'},
-  {q:'Enganei-me a lançar um registo, posso corrigir?',a:'Não, terás de solicitar a uma chefia para fazer a alteração na base de dados.'},
+  {q:'Enganei-me a lançar um registo, posso corrigir?',a:'Se inseriste a menos, cria um novo registo. Se inseriste a mais, solicita ajuste à chefia.'},
   {q:'Com que frequência devo registar?',a:'Diariamente! A consistência é o fator mais importante para a medalha "Consistente".'},
 ];
 let infoOpenIdx=-1,faqOpenIdx=-1;
@@ -3188,8 +2982,8 @@ function toggleFaq(i){faqOpenIdx=faqOpenIdx===i?-1:i;renderInfo();}
 function renderInfo(){
   const el=document.getElementById('infoContent');
   if(!el)return;
-  let html=infoSections.map((s,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden"><div onclick="toggleInfo(${i})" style="padding:13px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer"><span style="font-size:14px;font-weight:600;color:var(--text)">${s.title}</span><span style="font-size:16px;color:var(--orange);transition:transform 0.3s;transform:rotate(${infoOpenIdx===i?'180':'0'}deg)">▾</span></div><div style="max-height:${infoOpenIdx===i?'400px':'0'};overflow:hidden;transition:max-height 0.3s ease"><div style="padding:0 16px 13px;font-size:13px;color:var(--muted);line-height:1.6;white-space:pre-line;text-align:justify">${s.content}</div></div></div>`).join('');
-  html+=`<div style="height:1px;background:var(--border);margin:14px 0"></div><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">❓ PERGUNTAS FREQUENTES</div>${faqItems.map((item,qi)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden"><div onclick="toggleFaq(${qi})" style="padding:13px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;cursor:pointer"><span style="font-size:13px;font-weight:600;color:var(--text);flex:1">${item.q}</span><span style="font-size:16px;color:var(--orange);flex-shrink:0;transition:transform 0.3s;transform:rotate(${faqOpenIdx===qi?'180':'0'}deg)">▾</span></div><div style="max-height:${faqOpenIdx===qi?'200px':'0'};overflow:hidden;transition:max-height 0.3s ease"><div style="padding:0 16px 13px;font-size:13px;color:var(--muted);line-height:1.6;border-top:1px solid var(--border);text-align:justify">${item.a}</div></div></div>`).join('')}`;
+  let html=infoSections.map((s,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden"><div onclick="toggleInfo(${i})" style="padding:13px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer"><span style="font-size:14px;font-weight:600;color:var(--text)">${s.title}</span><span style="font-size:16px;color:var(--orange);transition:transform 0.3s;transform:rotate(${infoOpenIdx===i?'180':'0'}deg)">▾</span></div><div style="max-height:${infoOpenIdx===i?'400px':'0'};overflow:hidden;transition:max-height 0.3s ease"><div style="padding:0 16px 13px;font-size:13px;color:var(--muted);line-height:1.6;white-space:pre-line">${s.content}</div></div></div>`).join('');
+  html+=`<div style="height:1px;background:var(--border);margin:14px 0"></div><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">❓ PERGUNTAS FREQUENTES</div>${faqItems.map((item,qi)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden"><div onclick="toggleFaq(${qi})" style="padding:13px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;cursor:pointer"><span style="font-size:13px;font-weight:600;color:var(--text);flex:1">${item.q}</span><span style="font-size:16px;color:var(--orange);flex-shrink:0;transition:transform 0.3s;transform:rotate(${faqOpenIdx===qi?'180':'0'}deg)">▾</span></div><div style="max-height:${faqOpenIdx===qi?'200px':'0'};overflow:hidden;transition:max-height 0.3s ease"><div style="padding:0 16px 13px;font-size:13px;color:var(--muted);line-height:1.6;border-top:1px solid var(--border)">${item.a}</div></div></div>`).join('')}`;
   el.innerHTML=html;
 }
 
@@ -3200,7 +2994,7 @@ function populateSugestaoNomes(){
   const sel=document.getElementById('sugestaoNome');
   if(!sel)return;
   const nomes=[...new Set(equipas.flatMap(e=>e.nomes))].sort();
-  sel.innerHTML='<option value="">— Nome —</option>'+nomes.map(n=>`<option value="${n}">${n}</option>`).join('');
+  sel.innerHTML='<option value="">Seleciona o teu nome...</option>'+nomes.map(n=>`<option value="${n}">${n}</option>`).join('');
 }
 
 function enviarSugestao(){
@@ -3389,6 +3183,7 @@ function mostrarRoulette(nome,medalha){
   document.getElementById('rouletteHint').style.visibility='visible';
   document.getElementById('rouletteConfetti').innerHTML='';
   if(document.getElementById('wheelSpinBtn'))document.getElementById('wheelSpinBtn').disabled=false;
+  desenharRoleta(0);
   document.getElementById('rouletteOverlay').classList.add('open');
   setTimeout(()=>{const w=document.getElementById('rouletteBoxWrap');w.style.animation='shakeBox 0.5s ease';setTimeout(()=>w.style.animation='',600);},1000);
 }
@@ -3496,74 +3291,6 @@ try {
   }
 } catch(e) {}
 
-// ══ PRÉMIOS EDITOR ══
-function renderPremiosEditor() {
-  const el = document.getElementById('premiosEditorList');
-  if (!el) return;
-  el.innerHTML = premios.map((p,i) => `
-    <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px">
-      <div style="width:38px;height:38px;border-radius:8px;background:${p.cor};display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${p.icon}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:600;color:var(--text)">${p.nome}</div>
-        <div style="font-size:10px;color:var(--muted)">${Math.round(p.prob*100)}% prob.</div>
-      </div>
-      <div style="display:flex;gap:4px">
-        <button onclick="editarPremio(${i})" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent">✏️</button>
-        <button onclick="removerPremio(${i})" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:6px;padding:6px 10px;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;color:#EF4444">🗑</button>
-      </div>
-    </div>`).join('');
-}
-
-function adicionarPremio() {
-  const icon = (document.getElementById('novoPremioIcon')?.value||'🎁').trim();
-  const nome = (document.getElementById('novoPremioNome')?.value||'').trim();
-  const cor  = document.getElementById('novoPremioColor')?.value||'#4A2C2A';
-  if (!nome) { showToast('⚠️ Escreve o nome'); return; }
-  premios.push({icon, nome, prob:0.1, cor});
-  normalizarProbs();
-  guardarPremios();
-  document.getElementById('novoPremioIcon').value='';
-  document.getElementById('novoPremioNome').value='';
-  renderPremiosEditor();
-  showToast('✓ Prémio adicionado!');
-}
-
-function removerPremio(i) {
-  if (premios.length<=2) { showToast('⚠️ Mínimo 2 prémios'); return; }
-  premios.splice(i,1);
-  normalizarProbs();
-  guardarPremios();
-  renderPremiosEditor();
-  showToast('✓ Removido');
-}
-
-function editarPremio(i) {
-  const p = premios[i];
-  const n = prompt('Nome:', p.nome); if(n===null)return;
-  const ic = prompt('Emoji:', p.icon); if(ic===null)return;
-  if(n.trim()) premios[i].nome=n.trim();
-  if(ic.trim()) premios[i].icon=ic.trim();
-  guardarPremios(); renderPremiosEditor(); showToast('✓ Atualizado');
-}
-
-function normalizarProbs() {
-  const base = parseFloat((1/premios.length).toFixed(3));
-  premios.forEach(p => p.prob = base);
-  const diff = parseFloat((1 - premios.reduce((s,p)=>s+p.prob,0)).toFixed(3));
-  premios[0].prob = parseFloat((premios[0].prob+diff).toFixed(3));
-}
-
-function guardarPremios() {
-  try { localStorage.setItem('premiosConfig', JSON.stringify(premios)); } catch(e) {}
-}
-
-function resetarPremios() {
-  if(!confirm('Repor prémios originais?')) return;
-  premios = premiosDefault.map(p=>({...p}));
-  try { localStorage.removeItem('premiosConfig'); } catch(e) {}
-  renderPremiosEditor(); showToast('✓ Repostos');
-}
-
 </script>
 
 <div class="screen" id="screen-info">
@@ -3585,9 +3312,9 @@ function resetarPremios() {
       <div style="margin-top:16px">
         <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">💬 Caixa de Sugestões</div>
         <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px">
-          <select id="sugestaoNome" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;margin-bottom:8px"><option value="">— Nome —</option></select>
-          <textarea id="sugestaoTexto" placeholder="Escreve a tua sugestão..." style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;resize:none;height:130px;font-family:inherit"></textarea>
-          <button onclick="enviarSugestao()" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;margin-top:6px">Enviar</button>
+          <select id="sugestaoNome" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;margin-bottom:8px"><option value="">Seleciona o teu nome...</option></select>
+          <textarea id="sugestaoTexto" placeholder="Escreve a tua sugestão..." style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;resize:none;height:80px;font-family:inherit"></textarea>
+          <button onclick="enviarSugestao()" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;margin-top:6px">Enviar →</button>
         </div>
         <div id="sugestoesList"></div>
       </div>
@@ -3604,7 +3331,95 @@ function resetarPremios() {
 </div>
 
 
+<div class="screen" id="screen-jogos">
+  <div class="screen-banner">
+    <div class="screen-banner-inner">
+      <div class="ucl-stars-banner" style="display:none">★ ★ ★ ★ ★ ★ ★ ★</div>
+      <div class="screen-banner-title">JOGOS</div>
+      <div class="screen-banner-sub">Desafios da equipa</div>
+    </div>
+    <div class="screen-banner-bar">
+      <div class="screen-banner-bar-line"></div>
+      <span>EM BREVE</span>
+      <div class="screen-banner-bar-line"></div>
+    </div>
+  </div>
+  <div style="padding:20px 16px">
+    <!-- Texto de apresentação -->
+    <div style="text-align:center;padding:24px 12px 28px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,9vw,52px);color:#fff;letter-spacing:3px;line-height:1;margin-bottom:10px">Jogos que te darão prémios</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:8px;text-transform:uppercase;color:var(--orange)">BREVEMENTE</div>
+    </div>
+    <!-- CROMOS CARD -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px">
+      <div style="padding:16px 16px 12px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:36px">🃏</div>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff">CADERNETA DE CROMOS</div>
+          <div style="background:var(--orange);border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;color:#fff;letter-spacing:1px;display:inline-block;margin-top:2px">BREVEMENTE</div>
+        </div>
+      </div>
+      <img src="images/img_53.jpg" style="width:100%;display:block;border-top:1px solid var(--border)">
+      <div style="padding:14px 16px">
+        <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px">
+          Caderneta de cromos por secção com jogadores do Mundial de Futebol.<br><br>
+          <strong style="color:var(--text)">Como desbloquear packs:</strong>
+        </div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:12px;color:var(--muted);line-height:1.7">
+          🎯 A cada <strong style="color:var(--orange)">5 artigos vendidos</strong> por secção (exceto sacos), desbloqueia um<br>
+          📦 <strong style="color:var(--orange)">Pack de 3 cromos</strong> para preencher a tua caderneta!
+        </div>
+      </div>
+    </div>
 
+    <!-- QUIZZ CARD -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div style="font-size:36px">🧠</div>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff">QUIZZ</div>
+          <div style="background:var(--orange);border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;color:#fff;letter-spacing:1px;display:inline-block;margin-top:2px">BREVEMENTE</div>
+        </div>
+      </div>
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:12px;color:var(--muted);line-height:1.7">
+        🏆 Acertar <strong style="color:var(--orange)">100%</strong> numa formação ganha o direito a rolar a roleta!<br>
+        🔄 Permitido repetir o Quizz <strong style="color:var(--orange)">2 vezes por mês</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="roulette-overlay" id="rouletteOverlay" style="align-items:center;justify-content:center">
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px">🏅 Medalha conquistada</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:#fff;margin-bottom:2px">Parabéns!</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--orange);margin-bottom:16px;text-align:center" id="rouletteNome"></div>
+  <div id="rouletteBoxSection" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;text-align:center;margin:0 auto">
+    <div style="cursor:pointer;transition:transform 0.15s" id="rouletteBoxWrap" onclick="abrirRoulette()">
+      <div style="width:130px;height:130px;position:relative;margin:0 auto">
+        <div style="width:130px;height:90px;background:linear-gradient(135deg,var(--orange),#FF4500);border-radius:7px 7px 12px 12px;position:absolute;bottom:0;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(255,107,0,0.4)"><div style="position:absolute;width:22px;height:100%;background:rgba(255,255,255,0.22);left:50%;transform:translateX(-50%);border-radius:3px"></div><div style="position:absolute;width:100%;height:22px;background:rgba(255,255,255,0.22);top:50%;transform:translateY(-50%);border-radius:3px"></div></div>
+        <div id="rouletteLid" style="width:130px;height:40px;background:linear-gradient(135deg,#FF8C00,var(--orange));border-radius:8px;position:absolute;top:0;transform-origin:left center;transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1);display:flex;align-items:center;justify-content:center"><div style="width:22px;height:100%;background:rgba(255,255,255,0.28);border-radius:3px"></div><div style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:26px">🎀</div></div>
+      </div>
+    </div>
+    <div id="rouletteHint" style="font-size:13px;color:rgba(255,255,255,0.4);text-align:center;letter-spacing:1px;margin-top:10px">Clica na caixa para abrir o teu prémio! 🎁</div>
+  </div>
+  <div id="wheelSection" style="display:none;flex-direction:column;align-items:center;width:100%;max-width:380px;padding:0 10px">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--orange);letter-spacing:2px;margin-bottom:20px;text-align:center">🎉 O teu prémio é girar a roleta!</div>
+    <div class="slot-machine" id="slotMachine">
+      <div class="slot-reel-wrap"><div class="slot-highlight"></div><div class="slot-reel" id="slotReel0"></div></div>
+      <div class="slot-reel-wrap"><div class="slot-highlight"></div><div class="slot-reel" id="slotReel1"></div></div>
+      <div class="slot-reel-wrap"><div class="slot-highlight"></div><div class="slot-reel" id="slotReel2"></div></div>
+    </div>
+    <button id="wheelSpinBtn" class="slot-spin-btn" onclick="girarSlot()">GIRAR ▶</button>
+  </div>
+  <div id="rouletteResult" style="display:none;flex-direction:column;align-items:center;text-align:center;padding:0 20px">
+    <div id="rouletteResultIcon" style="font-size:90px;margin-bottom:8px;animation:trophyBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards">🍫</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:#FFD700;letter-spacing:3px">Ganhaste</div>
+    <div id="rouletteResultNome" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;letter-spacing:2px;margin-bottom:10px">Um chocolate!</div>
+    <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:12px 20px;font-size:13px;color:rgba(255,255,255,0.7);line-height:1.5;max-width:300px;margin-bottom:16px">Solicita a tua recompensa a um membro da equipa diretiva 🎯</div>
+    <button onclick="fecharRoulette()" style="background:transparent;border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 28px;color:rgba(255,255,255,0.5);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer">Continuar</button>
+  </div>
+  <div id="rouletteConfetti" style="position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:10001"></div>
+</div>
 <!-- GESTÃO VENDEDORES MODAL -->
 <div class="gestao-modal" id="gestaoModal">
   <div class="gestao-modal-box">
@@ -3670,17 +3485,6 @@ function resetarPremios() {
     <div class="surprise-hint" id="surpriseHint">Clica na caixa para abrir! 🎁</div>
   </div>
 
-  <!-- SLOT MACHINE inside surprise -->
-  <div id="surpriseSlotArea" style="display:none;flex-direction:column;align-items:center;gap:12px;width:100%;z-index:2;position:relative;padding:0 10px">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--orange);letter-spacing:2px;text-align:center">🎉 Gira para descobrir o teu prémio!</div>
-    <div class="slot-machine" id="surpriseSlotMachine">
-      <div class="slot-reel-wrap"><div class="slot-highlight"></div><div class="slot-reel" id="sReel0"></div></div>
-      <div class="slot-reel-wrap"><div class="slot-highlight"></div><div class="slot-reel" id="sReel1"></div></div>
-      <div class="slot-reel-wrap"><div class="slot-highlight"></div><div class="slot-reel" id="sReel2"></div></div>
-    </div>
-    <button id="surpriseSpinBtn" onclick="girarSurpriseSlot()" style="background:linear-gradient(135deg,var(--orange),#FF4500);border:none;border-radius:14px;padding:14px 36px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;cursor:pointer;box-shadow:0 4px 20px rgba(255,107,0,0.4);-webkit-tap-highlight-color:transparent">GIRAR ▶</button>
-  </div>
-
   <div id="surprisePrizeArea" style="display:none;flex-direction:column;align-items:center;gap:8px;text-align:center;z-index:2;position:relative;padding:0 20px">
     <span id="surpriseIcon" style="font-size:120px;line-height:1;display:block">🍫</span>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:#FFD700;letter-spacing:4px">Ganhaste</div>
@@ -3692,7 +3496,7 @@ function resetarPremios() {
       <div style="font-size:11px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px">Para resgatar o teu prémio</div>
       <div style="font-size:14px;color:rgba(255,255,255,0.85);font-weight:500">Solicita a um membro da <strong style="color:var(--orange)">Direção</strong> 🎯</div>
     </div>
-    <button class="surprise-close" id="surpriseCloseBtn" style="display:none" onclick="fecharSurprise()">Continuar</button>
+    <button class="surprise-close" id="surpriseCloseBtn" style="display:none" onclick="fecharSurprise()">← Continuar</button>
   </div>
 </div>
 
