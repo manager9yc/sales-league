@@ -1104,6 +1104,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
         <button onclick="carregarAdmin()" style="background:var(--orange);border:none;border-radius:10px;padding:10px 18px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer">Atualizar</button>
         <div id="adminSummary" style="font-size:12px;color:var(--muted)"></div>
         <button onclick="limparCacheAdmin()" style="background:var(--card);border:1px solid #7a2200;border-radius:10px;padding:10px 14px;color:#FF6644;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Cache</button>
+        <button onclick="slotAbrir('TESTE','Medalha Teste')" style="background:var(--card);border:1px solid #C9A84C;border-radius:10px;padding:10px 14px;color:#C9A84C;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🎰 Testar Slot</button>
         <button onclick="bloquearAdmin()" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-left:auto">🔒 Bloquear</button>
       </div>
       <div style="padding:0 16px" id="adminContent">
@@ -3590,16 +3591,13 @@ function slotFechar() {
 // DETEÇÃO DE MEDALHAS — ao registar o dia
 // ══════════════════════════════════════════════════
 function slotVerificarMedalhas(nome, payload) {
-  // Chave única por vendedor + mês para saber quais medalhas já foram premiadas
   const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
   const storageKey = 'slotDado_' + nome + '_' + mesKey;
 
   let jaAtribuidas = [];
   try { jaAtribuidas = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
 
-  // Calcular totais acumulados deste mês (servidor + local + payload de hoje)
   const dadosMapa = {};
-
   if (dashAllDados.length) {
     dashAllDados.filter(d => d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
   }
@@ -3609,7 +3607,6 @@ function slotVerificarMedalhas(nome, payload) {
       .forEach(d => { dadosMapa[d.data] = d; });
   } catch(e) {}
 
-  // Garantir que o payload de hoje está incluído
   dadosMapa[payload.data] = payload;
 
   const todos = Object.values(dadosMapa);
@@ -3620,15 +3617,17 @@ function slotVerificarMedalhas(nome, payload) {
     return !isNaN(dt) && dt.getMonth() === mes && dt.getFullYear() === ano;
   });
 
-  // Calcular medalhas com os dados acumulados
   const medalhas = calcularMedalhas(doMes.length ? doMes : [payload]);
-  const novas = medalhas.filter(m => m.earned && !jaAtribuidas.includes(m.name));
+  const earned = medalhas.filter(m => m.earned);
+  const novas = earned.filter(m => !jaAtribuidas.includes(m.name));
+
+  // Toast de debug para o utilizador ver o que está a acontecer
+  const dbg = `🎯 ${earned.length} medalhas earned, ${novas.length} novas, ${jaAtribuidas.length} já dadas`;
+  showToast(dbg, 4000);
 
   if (novas.length > 0) {
-    // Marcar como atribuídas para não repetir
     jaAtribuidas.push(...novas.map(m => m.name));
     try { localStorage.setItem(storageKey, JSON.stringify(jaAtribuidas)); } catch(e) {}
-    // Abrir slot
     setTimeout(() => slotAbrir(nome, novas[0].name), 1500);
   }
 }
