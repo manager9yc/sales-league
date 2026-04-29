@@ -1757,15 +1757,9 @@ function mostrarProgressoRegisto(nome, payload) {
   const novasMedalhas  = medalhasDepois.filter(m => m.earned && !medalhasAntes.find(ma => ma.name === m.name && ma.earned));
 
   if (novasMedalhas.length > 0) {
-    // Mostrar popup da medalha e depois abrir a mystery box directamente
-    novasMedalhas.forEach((m, i) => {
-      setTimeout(() => {
-        // 1) Popup da medalha
-        mostrarMedalPopup(m.icon, nome, m.name, false);
-        // 2) Mystery box abre logo após o popup fechar (3s + 300ms)
-        setTimeout(() => mostrarSurprise(nome, m.name), 3300);
-      }, i * 7000);
-    });
+    // Abrir mystery box directamente após 800ms
+    const m = novasMedalhas[0]; // mostrar só a primeira (mais importante)
+    setTimeout(() => mostrarMysteryBox(nome, m.name), 800);
   }
 }
 
@@ -3017,108 +3011,92 @@ function toggleGestaoLista() {
 }
 
 // ── SURPRISE BOX ──
-const surprisePrizes = [
+const mbPrizes = [
   { icon: '🍫', text: 'Um chocolate!' },
   { icon: '☕', text: 'Um café!' },
   { icon: '🍬', text: 'Um saco de gomas!' },
   { icon: '🧃', text: 'Um sumo!' },
   { icon: '🥐', text: 'Um pastel de nata!' },
-  { icon: '⏰', text: 'Sair 30 min mais cedo,\num dia a combinar!' },
+  { icon: '⏰', text: 'Sair 30 min mais cedo, um dia a combinar!' },
 ];
 
-let surpriseOpened = false;
+let mbOpened = false;
 
-function mostrarSurprise(nome, medalha) {
-  surpriseOpened = false;
-  document.getElementById('surpriseNome').textContent = nome + ' · ' + medalha;
-  document.getElementById('surpriseLid').classList.remove('open');
-  document.getElementById('surprisePrizeArea').style.display = 'none';
-  document.getElementById('surpriseBoxWrap').style.display = 'block';
-  document.getElementById('surpriseHint').classList.remove('hidden');
-  document.getElementById('surpriseCloseBtn').style.display = 'none';
-  document.getElementById('surpriseDirecao').style.display = 'none';
-  document.getElementById('surpriseConfetti').innerHTML = '';
+function mostrarMysteryBox(nome, medalha) {
+  mbOpened = false;
 
-  // Pick random prize
-  const prize = surprisePrizes[Math.floor(Math.random() * surprisePrizes.length)];
-  document.getElementById('surpriseIcon').textContent = prize.icon;
-  document.getElementById('surpriseContentText').textContent = prize.text;
+  // Reset estado
+  const box = document.getElementById('mysteryBox');
+  document.getElementById('mbNome').textContent = nome + ' · ' + medalha;
+  document.getElementById('mbLid').style.transform = '';
+  document.getElementById('mbBoxWrap').style.display = 'block';
+  document.getElementById('mbHint').style.opacity = '1';
+  document.getElementById('mbPrize').style.display = 'none';
+  document.getElementById('mbCloseBtn').style.display = 'none';
 
-  // Animate box in
-  document.getElementById('surpriseBoxWrap').style.animation = 'none';
-  void document.getElementById('surpriseBoxWrap').offsetWidth;
+  // Escolher prémio aleatório
+  const prize = mbPrizes[Math.floor(Math.random() * mbPrizes.length)];
+  document.getElementById('mbPrizeIcon').textContent = prize.icon;
+  document.getElementById('mbPrizeText').textContent = prize.text;
 
-  document.getElementById('surpriseOverlay').classList.add('open');
+  // Mostrar overlay com display flex direto
+  box.style.display = 'flex';
 
-  // Shake the box after 1s to hint
+  // Shake depois de 1s
   setTimeout(() => {
-    const box = document.getElementById('surpriseBoxWrap');
-    box.style.animation = 'shakeBox 0.5s ease';
-    setTimeout(() => box.style.animation = '', 600);
-  }, 1200);
+    const wrap = document.getElementById('mbBoxWrap');
+    wrap.style.animation = 'shakeBox 0.5s ease';
+    setTimeout(() => { wrap.style.animation = ''; }, 600);
+  }, 1000);
 }
 
-function abrirSurprise() {
-  if (surpriseOpened) return;
-  surpriseOpened = true;
+function abrirMysteryBox() {
+  if (mbOpened) return;
+  mbOpened = true;
 
-  // Open lid + launch confetti immediately
-  document.getElementById('surpriseLid').classList.add('open');
-  document.getElementById('surpriseHint').classList.add('hidden');
-  lancarConfettiSurprise();
-  tocarSomSurprise();
+  // Abrir tampa
+  document.getElementById('mbLid').style.transform = 'rotate(-65deg) translateY(-20px)';
+  document.getElementById('mbHint').style.opacity = '0';
 
-  // Show prize after lid opens
+  // Som
+  try {
+    iniciarAudio();
+    if (audioCtx) {
+      const seq = [{f:523,t:0},{f:659,t:0.15},{f:784,t:0.3},{f:1047,t:0.45}];
+      seq.forEach(n => {
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.connect(g); g.connect(audioCtx.destination);
+        o.type = 'sine'; o.frequency.value = n.f;
+        g.gain.setValueAtTime(0.15, audioCtx.currentTime + n.t);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + n.t + 0.25);
+        o.start(audioCtx.currentTime + n.t);
+        o.stop(audioCtx.currentTime + n.t + 0.3);
+      });
+    }
+  } catch(e) {}
+
+  // Mostrar prémio após 600ms
   setTimeout(() => {
-    document.getElementById('surpriseBoxWrap').style.display = 'none';
-    const pa = document.getElementById('surprisePrizeArea');
-    pa.style.display = 'flex';
-    const icon = document.getElementById('surpriseIcon');
-    icon.style.animation = 'none';
-    void icon.offsetWidth;
-    icon.style.animation = 'trophyBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards';
-  }, 500);
+    document.getElementById('mbBoxWrap').style.display = 'none';
+    const prize = document.getElementById('mbPrize');
+    prize.style.display = 'flex';
+  }, 600);
 
-  // Show solicita + close button
+  // Mostrar botão fechar após 1.5s
   setTimeout(() => {
-    document.getElementById('surpriseDirecao').style.display = 'block';
-    document.getElementById('surpriseCloseBtn').style.display = 'block';
-  }, 1200);
+    document.getElementById('mbCloseBtn').style.display = 'block';
+  }, 1500);
 }
 
-function fecharSurprise() {
-  document.getElementById('surpriseOverlay').classList.remove('open');
+function fecharMysteryBox() {
+  document.getElementById('mysteryBox').style.display = 'none';
 }
 
-function tocarSomSurprise() {
-  iniciarAudio();
-  if (!audioCtx) return;
-  // Jingle surprise sound
-  const seq = [
-    {f:523,d:0.12,t:0},{f:659,d:0.12,t:0.12},{f:784,d:0.12,t:0.24},
-    {f:1047,d:0.25,t:0.36},{f:880,d:0.12,t:0.65},{f:1047,d:0.4,t:0.8},
-  ];
-  seq.forEach(n => {
-    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
-    o.connect(g);g.connect(audioCtx.destination);
-    o.type='sine';
-    o.frequency.setValueAtTime(n.f,audioCtx.currentTime+n.t);
-    g.gain.setValueAtTime(0,audioCtx.currentTime+n.t);
-    g.gain.linearRampToValueAtTime(0.3,audioCtx.currentTime+n.t+0.02);
-    g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+n.t+n.d);
-    o.start(audioCtx.currentTime+n.t);o.stop(audioCtx.currentTime+n.t+n.d+0.05);
-  });
-}
+// Aliases para compatibilidade com código antigo
+function mostrarSurprise(nome, medalha) { mostrarMysteryBox(nome, medalha); }
+function fecharSurprise() { fecharMysteryBox(); }
+function abrirSurprise() { abrirMysteryBox(); }
 
-function lancarConfettiSurprise() {
-  const wrap = document.getElementById('surpriseConfetti');
-  const cols = ['#FF6B00','#FFD700','#FF4444','#44FF88','#4488FF','#FF88FF','#fff'];
-  for (let i=0; i<40; i++) {
-    const el = document.createElement('div');
-    el.style.cssText = `position:absolute;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>0.5?'50%':'2px'};background:${cols[Math.floor(Math.random()*cols.length)]};left:${Math.random()*100}%;top:-10px;animation:confettiFall ${1.5+Math.random()}s ease-out ${Math.random()*0.8}s forwards;`;
-    wrap.appendChild(el);
-  }
-}
 
 // ── INFO + SUGESTÕES + QR ──
 const infoSections=[
@@ -3602,45 +3580,40 @@ function resetarPremios() {
   </div>
 </div>
 
-<!-- SURPRISE BOX -->
-<div class="surprise-overlay" id="surpriseOverlay">
-  <div class="surprise-confetti-wrap" id="surpriseConfetti"></div>
+<!-- MYSTERY BOX -->
+<div id="mysteryBox" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:99999;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;text-align:center">
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px">🏅 Medalha conquistada</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:3px;color:#fff;margin-bottom:4px">Parabéns!</div>
+  <div id="mbNome" style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--orange);margin-bottom:32px"></div>
 
-  <div style="text-align:center;z-index:2;position:relative">
-    <div class="surprise-pre">🏅 Medalha conquistada</div>
-    <div class="surprise-title">Parabéns!</div>
-    <div class="surprise-nome" id="surpriseNome"></div>
-  </div>
-
-  <div style="display:flex;flex-direction:column;align-items:center;z-index:2;position:relative">
-    <div class="surprise-box-wrap" id="surpriseBoxWrap" onclick="abrirSurprise()">
-      <div class="surprise-box">
-        <div class="surprise-box-bottom">
-          <div class="surprise-box-ribbon-v"></div>
-          <div class="surprise-box-ribbon-h"></div>
-        </div>
-        <div class="surprise-box-lid" id="surpriseLid">
-          <div class="surprise-box-lid-ribbon"></div>
-          <div class="surprise-bow">🎀</div>
-        </div>
+  <!-- Caixa -->
+  <div id="mbBoxWrap" style="cursor:pointer;margin-bottom:16px" onclick="abrirMysteryBox()">
+    <div style="position:relative;width:180px;height:180px;margin:0 auto">
+      <!-- Tampa -->
+      <div id="mbLid" style="width:180px;height:54px;background:linear-gradient(135deg,#FF8C00,#FF6B00);border-radius:10px;position:absolute;top:0;left:0;transform-origin:left center;transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 4px 20px rgba(255,107,0,0.4);display:flex;align-items:center;justify-content:center;z-index:2">
+        <div style="width:24px;height:100%;background:rgba(255,255,255,0.3);border-radius:4px"></div>
+        <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:32px">🎀</div>
+      </div>
+      <!-- Caixa base -->
+      <div style="width:180px;height:126px;background:linear-gradient(135deg,#FF6B00,#FF4500);border-radius:6px 6px 14px 14px;position:absolute;bottom:0;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(255,107,0,0.5)">
+        <div style="position:absolute;width:24px;height:100%;background:rgba(255,255,255,0.25);border-radius:4px"></div>
+        <div style="position:absolute;width:100%;height:24px;background:rgba(255,255,255,0.25);border-radius:4px"></div>
       </div>
     </div>
-    <div class="surprise-hint" id="surpriseHint">Clica na caixa para abrir! 🎁</div>
+    <div id="mbHint" style="margin-top:14px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.6)">TAP PARA ABRIR 🎁</div>
   </div>
 
-  <div id="surprisePrizeArea" style="display:none;flex-direction:column;align-items:center;gap:8px;text-align:center;z-index:2;position:relative;padding:0 20px">
-    <span id="surpriseIcon" style="font-size:120px;line-height:1;display:block">🍫</span>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:#FFD700;letter-spacing:4px">Ganhaste</div>
-    <div id="surpriseContentText" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;letter-spacing:2px">Um chocolate!</div>
-  </div>
-
-  <div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;z-index:2;position:relative">
-    <div id="surpriseDirecao" style="display:none;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:14px 24px;text-align:center;width:100%;max-width:320px">
-      <div style="font-size:11px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px">Para resgatar o teu prémio</div>
-      <div style="font-size:14px;color:rgba(255,255,255,0.85);font-weight:500">Solicita a um membro da <strong style="color:var(--orange)">Direção</strong> 🎯</div>
+  <!-- Prémio (escondido até abrir) -->
+  <div id="mbPrize" style="display:none;flex-direction:column;align-items:center;gap:12px">
+    <div id="mbPrizeIcon" style="font-size:100px;line-height:1;animation:trophyBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards">🎁</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:#FFD700;letter-spacing:4px">Ganhaste</div>
+    <div id="mbPrizeText" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;letter-spacing:2px">-</div>
+    <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:12px 20px;margin-top:8px">
+      <div style="font-size:10px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px">Para resgatar</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.85);font-weight:500">Fala com a <strong style="color:var(--orange)">Direção</strong> 🎯</div>
     </div>
-    <button class="surprise-close" id="surpriseCloseBtn" style="display:none" onclick="fecharSurprise()">← Continuar</button>
   </div>
-</div>
 
+  <button onclick="fecharMysteryBox()" id="mbCloseBtn" style="display:none;margin-top:24px;background:transparent;border:1.5px solid rgba(255,255,255,0.25);border-radius:10px;padding:12px 32px;color:rgba(255,255,255,0.7);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer">← Continuar</button>
+</div>
 
