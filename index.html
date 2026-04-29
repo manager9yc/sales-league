@@ -729,6 +729,11 @@ body.theme-oled{--dark:#000;--card:#0a0a0a;--card2:#111;--border:#1a1a1a;--muted
 
 body.theme-ucl .submit-btn{background:linear-gradient(135deg,#C9A84C,#E8C97A)!important;color:#070F1F!important;font-weight:800}
 body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A34A)!important;color:#fff!important}
+
+/* ══ SLOT MACHINE CSS ══ */
+@keyframes slotLights { 0%{background-position:0 0} 100%{background-position:200px 0} }
+@keyframes slotConfettiFall { 0%{transform:translateY(-10px) rotate(0);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
+@keyframes slotResultIn { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
 </style>
 </head>
 <body>
@@ -1770,61 +1775,8 @@ function mostrarProgressoRegisto(nome, payload) {
     }).catch(()=>{});
   }
 
-  // ── MEDALHAS: detectar novas medalhas e abrir slot machine ──
-  function detectarEAbrirSlot() {
-    // 1. Recolher todos os dados acumulados deste vendedor
-    let dadosAcum = [];
-    if (dashAllDados.length) {
-      dadosAcum = dashAllDados.filter(d => d.nome === nome);
-    }
-    // Completar sempre com histórico local (inclui registos recentes não carregados do servidor)
-    try {
-      const local = JSON.parse(localStorage.getItem('historico_local') || '[]').filter(d => d.nome === nome);
-      // Juntar evitando duplicados por data
-      local.forEach(loc => {
-        if (!dadosAcum.find(d => d.data === loc.data && d.nome === loc.nome)) dadosAcum.push(loc);
-      });
-    } catch(e) {}
-
-    // 2. Calcular medalhas SEM o payload de hoje
-    const dadosSemHoje = dadosAcum.filter(d => d.data !== payload.data);
-    const medalhasAntes = calcularMedalhas(dadosSemHoje);
-
-    // 3. Calcular medalhas COM o payload de hoje
-    const dadosComHoje = [...dadosSemHoje, payload];
-    const medalhasDepois = calcularMedalhas(dadosComHoje);
-
-    // 4. Medalhas genuinamente novas (não tinham sido ganhas antes)
-    const novasMedalhas = medalhasDepois.filter(m =>
-      m.earned && !medalhasAntes.find(ma => ma.name === m.name && ma.earned)
-    );
-
-    if (novasMedalhas.length > 0) {
-      const m = novasMedalhas[0];
-      setTimeout(() => mostrarMysteryBox(nome, m.name), 1200);
-      return;
-    }
-
-    // 5. Fallback: se dashAllDados estava vazio, tentar de novo após carregar dados do servidor
-    if (!dashAllDados.length) {
-      fetch(SHEETS_URL + '?action=getTodos')
-        .then(r => r.json())
-        .then(td => {
-          if (!Array.isArray(td) || !td.length) return;
-          dashAllDados = td;
-          const dadosServidor = td.filter(d => d.nome === nome);
-          const semHoje2 = dadosServidor.filter(d => d.data !== payload.data);
-          const antes2   = calcularMedalhas(semHoje2);
-          const depois2  = calcularMedalhas([...semHoje2, payload]);
-          const novas2   = depois2.filter(m => m.earned && !antes2.find(ma => ma.name === m.name && ma.earned));
-          if (novas2.length > 0) {
-            setTimeout(() => mostrarMysteryBox(nome, novas2[0].name), 600);
-          }
-        })
-        .catch(() => {});
-    }
-  }
-  detectarEAbrirSlot();
+  // ── SLOT MACHINE: verificar medalhas novas ──
+  slotVerificarMedalhas(nome, payload);
 }
 
 
@@ -3197,94 +3149,7 @@ const mbPrizes = [
 
 let mbOpened = false;
 
-
-function salvarMbPremio(nome, prize) {
-  try {
-    const log = JSON.parse(localStorage.getItem('premiosLog') || '[]');
-    log.unshift({ nome, premio: prize.text, icon: prize.icon, data: new Date().toLocaleDateString('pt-PT'), estado: 'por_entregar' });
-    localStorage.setItem('premiosLog', JSON.stringify(log.slice(0, 100)));
-  } catch(e) {}
-}
-function mostrarMysteryBox(nome, medalha) {
-  // Reset estado da slot
-  slotSpinning = false;
-  rPremio = null;
-  rNome = nome;
-  rMedalha = medalha;
-
-  // Preencher nome
-  const nomeEl = document.getElementById('rouletteNome');
-  if (nomeEl) nomeEl.textContent = nome + ' · ' + medalha;
-
-  // Mostrar slot, esconder resultado
-  const ws = document.getElementById('wheelSection');
-  const res = document.getElementById('rouletteResult');
-  const conf = document.getElementById('rouletteConfetti');
-  if (ws) ws.style.display = 'block';
-  if (res) res.style.display = 'none';
-  if (conf) conf.innerHTML = '';
-
-  // Preparar bobines
-  const btn = document.getElementById('wheelSpinBtn');
-  if (btn) { btn.disabled = false; btn.textContent = '🎰 GIRAR'; }
-  initSlot();
-
-  // Mostrar overlay
-  const box = document.getElementById('mysteryBox');
-  if (box) { box.style.display = 'flex'; box.style.animation = 'fadeIn 0.3s ease'; }
-  iniciarAudio();
-}
-
-function abrirMysteryBox() {
-  if (mbOpened) return;
-  mbOpened = true;
-
-  // Abrir tampa
-  document.getElementById('mbLid').style.transform = 'rotate(-65deg) translateY(-20px)';
-  document.getElementById('mbHint').style.opacity = '0';
-
-  // Som
-  try {
-    iniciarAudio();
-    if (audioCtx) {
-      const seq = [{f:523,t:0},{f:659,t:0.15},{f:784,t:0.3},{f:1047,t:0.45}];
-      seq.forEach(n => {
-        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-        o.connect(g); g.connect(audioCtx.destination);
-        o.type = 'sine'; o.frequency.value = n.f;
-        g.gain.setValueAtTime(0.15, audioCtx.currentTime + n.t);
-        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + n.t + 0.25);
-        o.start(audioCtx.currentTime + n.t);
-        o.stop(audioCtx.currentTime + n.t + 0.3);
-      });
-    }
-  } catch(e) {}
-
-  // Mostrar prémio após 600ms
-  setTimeout(() => {
-    document.getElementById('mbBoxWrap').style.display = 'none';
-    const prize = document.getElementById('mbPrize');
-    prize.style.display = 'flex';
-  }, 600);
-
-  // Mostrar botão fechar após 1.5s
-  setTimeout(() => {
-    document.getElementById('mbCloseBtn').style.display = 'block';
-  }, 1500);
-}
-
-function fecharMysteryBox() {
-  const box = document.getElementById('mysteryBox');
-  if (box) box.style.display = 'none';
-  // Guardar prémio se houver
-  if (rPremio && rNome) salvarPremioConcedido(rNome, rPremio.nome, rPremio.icon);
-  rPremio = null; rNome = ''; rMedalha = '';
-}
-
 // Aliases para compatibilidade com código antigo
-function mostrarSurprise(nome, medalha) { mostrarMysteryBox(nome, medalha); }
-function fecharSurprise() { fecharMysteryBox(); }
-function abrirSurprise() { abrirMysteryBox(); }
 
 
 // ── INFO + SUGESTÕES + QR ──
@@ -3426,112 +3291,7 @@ try {
 // ══ SLOT MACHINE + ROULETTE ══
 let slotSpinning = false;
 
-function initSlot() {
-  for (let r = 0; r < 3; r++) {
-    const reel = document.getElementById('slotReel' + r);
-    if (!reel) continue;
-    let items = '';
-    for (let rep = 0; rep < 6; rep++) {
-      premios.forEach(p => { items += `<div class="slot-item">${p.icon}</div>`; });
-    }
-    reel.innerHTML = items;
-    reel.style.transition = 'none';
-    reel.style.transform = 'translateY(0)';
-  }
-}
-
-function girarSlot() {
-  if (slotSpinning) return;
-  slotSpinning = true;
-  const btn = document.getElementById('wheelSpinBtn');
-  if (btn) btn.disabled = true;
-
-  // Pick winner by probability
-  const rand = Math.random();
-  let acc = 0, wIdx = 0;
-  for (let i = 0; i < premios.length; i++) {
-    acc += premios[i].prob;
-    if (rand <= acc) { wIdx = i; break; }
-  }
-  rPremio = premios[wIdx];
-
-  iniciarAudio(); tocarSomCasino();
-
-  const itemH = 110;
-  const n = premios.length;
-  const targetRep = 3;
-  const durations = [4000, 4500, 5000];
-
-  for (let r = 0; r < 3; r++) {
-    const reel = document.getElementById('slotReel' + r);
-    if (!reel) continue;
-    reel.style.transition = 'none';
-    reel.style.transform = 'translateY(0)';
-    const targetY = -(targetRep * n * itemH + wIdx * itemH);
-    setTimeout((reelEl, dur, tY) => {
-      reelEl.style.transition = `transform ${dur}ms cubic-bezier(0.17,0.67,0.12,1.0)`;
-      reelEl.style.transform = `translateY(${tY}px)`;
-    }, r * 250, reel, durations[r], targetY);
-  }
-
-  setTimeout(() => {
-    slotSpinning = false;
-    pararSomCasino();
-    setTimeout(() => mostrarResultado(rPremio), 300);
-  }, durations[2] + 500);
-}
-
-function abrirRoulette() {
-  if (rOpened) return;
-  rOpened = true;
-  document.getElementById('rouletteLid').style.transform = 'rotate(-65deg) translateY(-16px)';
-  document.getElementById('rouletteHint').style.visibility = 'hidden';
-  setTimeout(() => {
-    document.getElementById('rouletteBoxSection').style.display = 'none';
-    const ws = document.getElementById('wheelSection');
-    ws.style.display = 'flex';
-    ws.style.opacity = '0';
-    ws.style.transform = 'scale(0.8)';
-    ws.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
-    setTimeout(() => {
-      ws.style.opacity = '1';
-      ws.style.transform = 'scale(1)';
-    }, 30);
-    initSlot();
-  }, 900);
-}
-
 let rNome='',rMedalha='',rOpened=false,rAngle=0,rSpinning=false,rPremio=null;
-
-function mostrarRoulette(nome,medalha){
-  // Redirecionar para a slot machine (mesmo overlay)
-  mostrarMysteryBox(nome, medalha);
-}
-
-
-function fecharRoulette(){
-  fecharMysteryBox();
-}
-
-
-
-function mostrarResultado(p){
-  pararSomCasino();iniciarAudio();tocarSomMedalha();
-  const wrap=document.getElementById('rouletteConfetti');
-  // Use prize color for confetti
-  const cols=[p.cor,'#FFD700','#fff',p.cor,'#FFD700'];
-  for(let i=0;i<60;i++){const el=document.createElement('div');el.style.cssText=`position:absolute;width:${5+Math.random()*10}px;height:${5+Math.random()*10}px;border-radius:${Math.random()>.5?'50%':'2px'};background:${cols[Math.floor(Math.random()*cols.length)]};left:${Math.random()*100}%;top:-10px;animation:confettiFall ${1.5+Math.random()*1.5}s ease-out ${Math.random()*0.5}s forwards`;wrap.appendChild(el);}
-  setTimeout(()=>{
-    document.getElementById('wheelSection').style.display='none';
-    const res=document.getElementById('rouletteResult');
-    res.style.display='flex';
-    res.style.animation='fadeInScale 0.5s ease forwards';
-    document.getElementById('rouletteResultIcon').textContent=p.icon;
-    document.getElementById('rouletteResultNome').textContent=p.nome;
-    // Color the result with prize color
-    document.getElementById('rouletteResultNome').style.color=p.cor==='#111'?'#fff':p.cor;
-  },400);
-}
 
 function salvarPremioConcedido(nome,premio,icon){
   premiosLog.unshift({nome,premio,icon,data:new Date().toLocaleDateString('pt-PT'),estado:'por_entregar'});
@@ -3678,6 +3438,219 @@ function resetarPremios() {
   renderPremiosEditor(); showToast('✓ Repostos');
 }
 
+
+
+// ══════════════════════════════════════════════════
+// SLOT MACHINE — CÓDIGO DE RAIZ (limpo, sem conflitos)
+// ══════════════════════════════════════════════════
+
+let _slotSpinning = false;
+let _slotPremio = null;
+let _slotNome = '';
+
+// Inicializar as bobines com os ícones dos prémios
+function slotInit() {
+  const icons = premios.map(p => p.icon);
+  for (let r = 0; r < 3; r++) {
+    const reel = document.getElementById('slotReel' + r);
+    if (!reel) continue;
+    let html = '';
+    // 8 repetições para ter scroll suficiente
+    for (let rep = 0; rep < 8; rep++) {
+      icons.forEach(ic => {
+        html += `<div style="width:90px;height:110px;display:flex;align-items:center;justify-content:center;font-size:50px;line-height:1;flex-shrink:0">${ic}</div>`;
+      });
+    }
+    reel.innerHTML = html;
+    reel.style.transition = 'none';
+    reel.style.transform = 'translateY(0)';
+  }
+}
+
+// Abrir a slot machine
+function slotAbrir(nome, medalha) {
+  _slotSpinning = false;
+  _slotPremio = null;
+  _slotNome = nome;
+
+  // Preencher nome
+  const nomeEl = document.getElementById('slotNome');
+  if (nomeEl) nomeEl.textContent = nome + ' · ' + medalha;
+
+  // Reset UI
+  const maquina = document.getElementById('slotMachine');
+  const resultado = document.getElementById('slotResultado');
+  const confetti = document.getElementById('slotConfettiWrap');
+  const btnGirar = document.getElementById('slotBtnGirar');
+  const btnFechar = document.getElementById('slotBtnFechar');
+
+  if (maquina) maquina.style.display = 'block';
+  if (resultado) resultado.style.display = 'none';
+  if (confetti) confetti.innerHTML = '';
+  if (btnFechar) btnFechar.style.display = 'none';
+  if (btnGirar) { btnGirar.disabled = false; btnGirar.textContent = '🎰 GIRAR'; }
+
+  // Inicializar bobines
+  slotInit();
+
+  // Mostrar overlay
+  const overlay = document.getElementById('slotOverlay');
+  if (overlay) { overlay.style.display = 'flex'; }
+  try { iniciarAudio(); } catch(e) {}
+}
+
+// Girar a slot
+function slotGirar() {
+  if (_slotSpinning) return;
+  _slotSpinning = true;
+
+  const btnGirar = document.getElementById('slotBtnGirar');
+  if (btnGirar) { btnGirar.disabled = true; btnGirar.textContent = '⏳ A girar...'; }
+
+  // Escolher prémio por probabilidade
+  const rand = Math.random();
+  let acc = 0, wIdx = 0;
+  for (let i = 0; i < premios.length; i++) {
+    acc += premios[i].prob;
+    if (rand <= acc) { wIdx = i; break; }
+  }
+  _slotPremio = premios[wIdx];
+
+  try { iniciarAudio(); tocarSomCasino(); } catch(e) {}
+
+  const itemH = 110;
+  const n = premios.length;
+  const targetRep = 4;
+  const durations = [3800, 4400, 5000];
+
+  for (let r = 0; r < 3; r++) {
+    const reel = document.getElementById('slotReel' + r);
+    if (!reel) continue;
+    reel.style.transition = 'none';
+    reel.style.transform = 'translateY(0)';
+    const targetY = -(targetRep * n * itemH + wIdx * itemH);
+    setTimeout((reelEl, dur, tY) => {
+      reelEl.style.transition = `transform ${dur}ms cubic-bezier(0.17,0.67,0.12,1.0)`;
+      reelEl.style.transform = `translateY(${tY}px)`;
+    }, r * 200, reel, durations[r], targetY);
+  }
+
+  setTimeout(() => {
+    _slotSpinning = false;
+    try { pararSomCasino(); } catch(e) {}
+    slotMostrarResultado(_slotPremio);
+  }, durations[2] + 600);
+}
+
+// Mostrar resultado
+function slotMostrarResultado(p) {
+  try { iniciarAudio(); tocarSomMedalha(); } catch(e) {}
+
+  // Confetti
+  const wrap = document.getElementById('slotConfettiWrap');
+  if (wrap) {
+    const cols = [p.cor || '#C9A84C', '#FFD700', '#fff', '#C9A84C'];
+    for (let i = 0; i < 70; i++) {
+      const el = document.createElement('div');
+      const size = 5 + Math.random() * 10;
+      el.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:${Math.random()>.5?'50%':'2px'};background:${cols[Math.floor(Math.random()*cols.length)]};left:${Math.random()*100}%;top:-12px;animation:slotConfettiFall ${1.3+Math.random()*1.5}s ease-out ${Math.random()*0.5}s forwards;pointer-events:none`;
+      wrap.appendChild(el);
+    }
+  }
+
+  // Esconder máquina, mostrar resultado
+  const maquina = document.getElementById('slotMachine');
+  const resultado = document.getElementById('slotResultado');
+  const iconEl = document.getElementById('slotResultIcon');
+  const textEl = document.getElementById('slotResultText');
+  const btnFechar = document.getElementById('slotBtnFechar');
+
+  if (maquina) maquina.style.display = 'none';
+  if (iconEl) iconEl.textContent = p.icon;
+  if (textEl) textEl.textContent = p.nome;
+  if (resultado) { resultado.style.display = 'flex'; resultado.style.animation = 'slotResultIn 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards'; }
+  if (btnFechar) btnFechar.style.display = 'block';
+
+  // Guardar no log de prémios
+  try {
+    const log = JSON.parse(localStorage.getItem('premiosLog') || '[]');
+    log.unshift({ nome: _slotNome, premio: p.nome, icon: p.icon, data: new Date().toLocaleDateString('pt-PT'), estado: 'por_entregar' });
+    localStorage.setItem('premiosLog', JSON.stringify(log.slice(0, 100)));
+  } catch(e) {}
+}
+
+// Fechar overlay
+function slotFechar() {
+  const overlay = document.getElementById('slotOverlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+// ══════════════════════════════════════════════════
+// DETEÇÃO DE MEDALHAS — ao registar o dia
+// ══════════════════════════════════════════════════
+function slotVerificarMedalhas(nome, payload) {
+  // Recolher histórico completo do vendedor
+  // (servidor + local, sem duplicados por data)
+  const dadosMapa = {};
+
+  // 1. Do servidor (se já carregados)
+  if (dashAllDados.length) {
+    dashAllDados.filter(d => d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
+  }
+
+  // 2. Do localStorage (inclui registo que acabou de ser feito)
+  try {
+    const local = JSON.parse(localStorage.getItem('historico_local') || '[]');
+    local.filter(d => d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
+  } catch(e) {}
+
+  const todosOsDados = Object.values(dadosMapa);
+
+  // Medalhas SEM o dia de hoje
+  const semHoje = todosOsDados.filter(d => d.data !== payload.data);
+  const antes = calcularMedalhas(semHoje);
+
+  // Medalhas COM o dia de hoje (usar payload para garantir valores actuais)
+  const comHoje = [...semHoje, payload];
+  const depois = calcularMedalhas(comHoje);
+
+  // Quais são genuinamente novas?
+  const novas = depois.filter(m =>
+    m.earned && !antes.find(a => a.name === m.name && a.earned)
+  );
+
+  if (novas.length > 0) {
+    // Abrir slot após 1.5s (tempo para o utilizador ver a confirmação do registo)
+    setTimeout(() => slotAbrir(nome, novas[0].name), 1500);
+    return;
+  }
+
+  // Fallback: se o servidor ainda não tinha dados, tentar de novo quando chegar resposta
+  if (!dashAllDados.length) {
+    fetch(SHEETS_URL + '?action=getTodos')
+      .then(r => r.json())
+      .then(td => {
+        if (!Array.isArray(td) || !td.length) return;
+        dashAllDados = td;
+        const srv = td.filter(d => d.nome === nome);
+        const semHoje2 = srv.filter(d => d.data !== payload.data);
+        const antes2 = calcularMedalhas(semHoje2);
+        const depois2 = calcularMedalhas([...semHoje2, payload]);
+        const novas2 = depois2.filter(m => m.earned && !antes2.find(a => a.name === m.name && a.earned));
+        if (novas2.length > 0) {
+          setTimeout(() => slotAbrir(nome, novas2[0].name), 600);
+        }
+      })
+      .catch(() => {});
+  }
+}
+
+// Aliases para compatibilidade com chamadas antigas no código
+function mostrarMysteryBox(n, m) { slotAbrir(n, m); }
+function fecharMysteryBox() { slotFechar(); }
+function mostrarRoulette(n, m) { slotAbrir(n, m); }
+function fecharRoulette() { slotFechar(); }
+
 </script>
 
 <div class="screen" id="screen-info">
@@ -3758,79 +3731,68 @@ function resetarPremios() {
   </div>
 </div>
 
-<!-- SLOT MACHINE OVERLAY -->
-<div id="mysteryBox" style="display:none;position:fixed;inset:0;background:rgba(4,10,22,0.98);z-index:99999;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;overflow:hidden">
+<!-- SLOT MACHINE -->
+<div id="slotOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(4,10,22,0.97);flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:hidden;text-align:center">
 
-  <!-- Confetti -->
-  <div id="rouletteConfetti" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0"></div>
+  <!-- Confetti layer -->
+  <div id="slotConfettiWrap" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0"></div>
 
-  <!-- Luzes animadas topo/fundo -->
-  <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#C9A84C,#FFD700,#fff,#C9A84C,#FFD700,#fff,#C9A84C);background-size:200px 100%;animation:lightsShift 1.6s linear infinite;z-index:1"></div>
-  <div style="position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#C9A84C,#FFD700,#fff,#C9A84C,#FFD700,#fff,#C9A84C);background-size:200px 100%;animation:lightsShift 1.6s linear infinite reverse;z-index:1"></div>
+  <!-- Barras de luz -->
+  <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#C9A84C,#FFD700,#fff,#C9A84C,#FFD700,#fff,#C9A84C);background-size:200px 100%;animation:slotLights 1.5s linear infinite;z-index:1"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#C9A84C,#FFD700,#fff,#C9A84C,#FFD700,#fff,#C9A84C);background-size:200px 100%;animation:slotLights 1.5s linear infinite reverse;z-index:1"></div>
 
   <div style="position:relative;z-index:2;width:100%;max-width:400px">
 
-    <!-- Topo -->
+    <!-- Header -->
     <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:rgba(201,168,76,0.7);margin-bottom:4px">🏅 Medalha Conquistada</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:4px;color:#fff;line-height:1;text-shadow:0 0 30px rgba(201,168,76,0.5)">PRÉMIO!</div>
-    <div id="rouletteNome" style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#C9A84C;margin-bottom:16px;min-height:22px"></div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:4px;color:#fff;line-height:1;text-shadow:0 0 30px rgba(201,168,76,0.4)">PRÉMIO!</div>
+    <div id="slotNome" style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#C9A84C;margin-bottom:18px;min-height:22px"></div>
 
-    <!-- SLOT MACHINE -->
-    <div id="wheelSection" style="display:block">
-
-      <!-- Máquina chassis -->
-      <div style="background:linear-gradient(180deg,#1a2744,#0d1a35);border:2px solid #C9A84C;border-radius:20px;padding:18px 14px 20px;box-shadow:0 0 40px rgba(201,168,76,0.2),inset 0 1px 0 rgba(255,255,255,0.07);position:relative;margin-bottom:14px">
-
-        <!-- Letreiro -->
+    <!-- Máquina slot -->
+    <div id="slotMachine" style="display:block">
+      <div style="background:linear-gradient(180deg,#1a2744,#0d1a35);border:2px solid #C9A84C;border-radius:18px;padding:18px 14px 20px;box-shadow:0 0 40px rgba(201,168,76,0.2);margin-bottom:14px;position:relative">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:6px;color:#C9A84C;margin-bottom:12px;text-shadow:0 0 10px rgba(201,168,76,0.5)">✦ SUPER LIGA ✦</div>
 
         <!-- Bobines -->
         <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;position:relative">
+          <div style="position:absolute;top:50%;left:0;right:0;height:2px;background:rgba(201,168,76,0.35);transform:translateY(-50%);z-index:4;pointer-events:none"></div>
 
-          <!-- Linha central (marcador) -->
-          <div style="position:absolute;top:50%;left:0;right:0;height:2px;background:rgba(201,168,76,0.4);transform:translateY(-50%);pointer-events:none;z-index:5"></div>
-
-          <!-- Reel 0 -->
-          <div style="flex:1;max-width:88px;height:110px;background:#070F1F;border:2px solid rgba(201,168,76,0.35);border-radius:10px;overflow:hidden;box-shadow:inset 0 2px 8px rgba(0,0,0,0.7);position:relative">
-            <div style="position:absolute;top:0;left:0;right:0;height:28px;background:linear-gradient(180deg,#070F1F,transparent);z-index:3;pointer-events:none"></div>
-            <div style="position:absolute;bottom:0;left:0;right:0;height:28px;background:linear-gradient(0deg,#070F1F,transparent);z-index:3;pointer-events:none"></div>
-            <div id="slotReel0" style="will-change:transform"></div>
+          <div style="flex:1;max-width:90px;height:110px;background:#070F1F;border:2px solid rgba(201,168,76,0.3);border-radius:10px;overflow:hidden;position:relative">
+            <div style="position:absolute;top:0;left:0;right:0;height:26px;background:linear-gradient(180deg,#070F1F,transparent);z-index:3;pointer-events:none"></div>
+            <div style="position:absolute;bottom:0;left:0;right:0;height:26px;background:linear-gradient(0deg,#070F1F,transparent);z-index:3;pointer-events:none"></div>
+            <div id="slotReel0" style="will-change:transform;transform:translateY(0)"></div>
           </div>
 
-          <!-- Reel 1 -->
-          <div style="flex:1;max-width:88px;height:110px;background:#070F1F;border:2px solid rgba(201,168,76,0.35);border-radius:10px;overflow:hidden;box-shadow:inset 0 2px 8px rgba(0,0,0,0.7);position:relative">
-            <div style="position:absolute;top:0;left:0;right:0;height:28px;background:linear-gradient(180deg,#070F1F,transparent);z-index:3;pointer-events:none"></div>
-            <div style="position:absolute;bottom:0;left:0;right:0;height:28px;background:linear-gradient(0deg,#070F1F,transparent);z-index:3;pointer-events:none"></div>
-            <div id="slotReel1" style="will-change:transform"></div>
+          <div style="flex:1;max-width:90px;height:110px;background:#070F1F;border:2px solid rgba(201,168,76,0.3);border-radius:10px;overflow:hidden;position:relative">
+            <div style="position:absolute;top:0;left:0;right:0;height:26px;background:linear-gradient(180deg,#070F1F,transparent);z-index:3;pointer-events:none"></div>
+            <div style="position:absolute;bottom:0;left:0;right:0;height:26px;background:linear-gradient(0deg,#070F1F,transparent);z-index:3;pointer-events:none"></div>
+            <div id="slotReel1" style="will-change:transform;transform:translateY(0)"></div>
           </div>
 
-          <!-- Reel 2 -->
-          <div style="flex:1;max-width:88px;height:110px;background:#070F1F;border:2px solid rgba(201,168,76,0.35);border-radius:10px;overflow:hidden;box-shadow:inset 0 2px 8px rgba(0,0,0,0.7);position:relative">
-            <div style="position:absolute;top:0;left:0;right:0;height:28px;background:linear-gradient(180deg,#070F1F,transparent);z-index:3;pointer-events:none"></div>
-            <div style="position:absolute;bottom:0;left:0;right:0;height:28px;background:linear-gradient(0deg,#070F1F,transparent);z-index:3;pointer-events:none"></div>
-            <div id="slotReel2" style="will-change:transform"></div>
+          <div style="flex:1;max-width:90px;height:110px;background:#070F1F;border:2px solid rgba(201,168,76,0.3);border-radius:10px;overflow:hidden;position:relative">
+            <div style="position:absolute;top:0;left:0;right:0;height:26px;background:linear-gradient(180deg,#070F1F,transparent);z-index:3;pointer-events:none"></div>
+            <div style="position:absolute;bottom:0;left:0;right:0;height:26px;background:linear-gradient(0deg,#070F1F,transparent);z-index:3;pointer-events:none"></div>
+            <div id="slotReel2" style="will-change:transform;transform:translateY(0)"></div>
           </div>
         </div>
 
-        <!-- Botão GIRAR -->
-        <button id="wheelSpinBtn" onclick="girarSlot()" style="width:100%;background:linear-gradient(135deg,#C9A84C,#E8C97A,#C9A84C);border:none;border-radius:12px;padding:14px;color:#07101f;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4)">🎰 GIRAR</button>
+        <button id="slotBtnGirar" onclick="slotGirar()" style="width:100%;background:linear-gradient(135deg,#C9A84C,#E8C97A,#C9A84C);border:none;border-radius:12px;padding:14px;color:#07101f;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4)">🎰 GIRAR</button>
       </div>
-
       <div style="font-size:12px;color:rgba(255,255,255,0.3);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif;font-weight:600">Carrega para revelar o teu prémio</div>
     </div>
 
-    <!-- RESULTADO -->
-    <div id="rouletteResult" style="display:none;flex-direction:column;align-items:center;gap:10px">
+    <!-- Resultado -->
+    <div id="slotResultado" style="display:none;flex-direction:column;align-items:center;gap:10px">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:6px;color:#C9A84C;text-shadow:0 0 20px rgba(201,168,76,0.6)">✦ GANHASTE ✦</div>
-      <div id="rouletteResultIcon" style="font-size:86px;line-height:1;animation:trophyBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards;filter:drop-shadow(0 0 20px rgba(201,168,76,0.5))">🎁</div>
-      <div id="rouletteResultNome" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;letter-spacing:2px;margin-top:4px">-</div>
-      <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:12px 20px;margin-top:4px;max-width:300px">
+      <div id="slotResultIcon" style="font-size:88px;line-height:1;animation:trophyBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards;filter:drop-shadow(0 0 20px rgba(201,168,76,0.4))">🎁</div>
+      <div id="slotResultText" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;letter-spacing:2px;margin-top:4px">-</div>
+      <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:12px 20px;max-width:300px">
         <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px">Para resgatar</div>
         <div style="font-size:14px;color:rgba(255,255,255,0.85)">Fala com a <strong style="color:#C9A84C">Direção</strong> 🎯</div>
       </div>
-      <button onclick="fecharRoulette()" style="margin-top:12px;background:transparent;border:1.5px solid rgba(201,168,76,0.4);border-radius:10px;padding:12px 32px;color:rgba(255,255,255,0.7);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer">← Continuar</button>
     </div>
 
+    <button id="slotBtnFechar" onclick="slotFechar()" style="display:none;margin-top:18px;width:100%;background:transparent;border:1.5px solid rgba(201,168,76,0.35);border-radius:10px;padding:12px;color:rgba(255,255,255,0.7);font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer">← Continuar</button>
   </div>
 </div>
 
