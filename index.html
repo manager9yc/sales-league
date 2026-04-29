@@ -679,7 +679,7 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
 
 .medal-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-40%) scale(0.8);background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid var(--orange);border-radius:20px;padding:28px 24px;text-align:center;z-index:9998;min-width:260px;max-width:320px;box-shadow:0 20px 60px rgba(0,0,0,0.8);display:none}
 .medal-popup.show{display:block;animation:medalPopIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards}
-@keyframes medalPopIn{from{opacity:0;transform:translate(-50%,-40%) scale(0.7)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes medalPopIn{from{opacity:0;transform:translate(-50%,-40%) scale(0.6)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 body.theme-ucl .medal-popup{background:linear-gradient(135deg,#070F1F,#0C1B35);border-color:#C9A84C}
 .name-grid,.name-grid *{box-shadow:none!important}
 
@@ -1772,15 +1772,29 @@ function mostrarProgressoRegisto(nome, payload) {
     }).catch(()=>{});
   }
 
-  // Show medal popup for each earned medal
-  // Only show popup for NEWLY earned medals (compare before/after payload)
-  const dadosSemNovo = dashAllDados.filter(d => d.nome === nome && !(d.data === payload.data && d._isNew));
-  const medalhasAntes = calcularMedalhas(dadosSemNovo);
-  const novasMedalhas = conquistadas.filter(m => !medalhasAntes.find(ma => ma.name === m.name && ma.earned));
+  // ── DETECÇÃO DE MEDALHAS ──
+  // Usar dashAllDados se disponível, senão historico_local do localStorage
+  function getDadosBase() {
+    if (dashAllDados.length) return dashAllDados.filter(d => d.nome === nome);
+    try {
+      const local = JSON.parse(localStorage.getItem('historico_local') || '[]');
+      return local.filter(d => d.nome === nome);
+    } catch(e) { return []; }
+  }
+
+  const dadosBase = getDadosBase();
+  // Dados COM o registo de hoje
+  const dadosComNovo = [...dadosBase.filter(d => d.data !== payload.data), payload];
+  // Dados SEM o registo de hoje (para comparar antes/depois)
+  const dadosSemNovo = dadosBase.filter(d => d.data !== payload.data);
+
+  const medalhasDepois = calcularMedalhas(dadosComNovo);
+  const medalhasAntes  = calcularMedalhas(dadosSemNovo);
+  const novasMedalhas  = medalhasDepois.filter(m => m.earned && !medalhasAntes.find(ma => ma.name === m.name && ma.earned));
 
   if (novasMedalhas.length > 0) {
     novasMedalhas.forEach((m, i) => {
-      setTimeout(() => mostrarMedalPopup(m.icon, nome, m.name, true), 800 + i*5500);
+      setTimeout(() => mostrarMedalPopup(m.icon, nome, m.name, true), 800 + i * 5500);
     });
   }
 }
