@@ -1408,6 +1408,7 @@ async function submeter() {
   btn.textContent = '✔ Registado com sucesso';
   btn.style.background = '#22C55E';
   btn.style.color = '#fff';
+  btn.style.boxShadow = '0 4px 20px rgba(34,197,94,0.4)';
   lancarConfettiSucesso();
   try { navigator.vibrate && navigator.vibrate([30,10,30]); } catch(e) {}
 
@@ -1415,11 +1416,22 @@ async function submeter() {
   mostrarProgressoRegisto(nomeAtual, payload);
   setTimeout(atualizarMiniRanking, 600);
 
-  // Restaurar botão após 3s
+  // Após 2.5s o botão vira "Novo Registo" e faz reset completo ao carregar
   setTimeout(() => {
     const r = document.getElementById('submitBtn');
-    if (r) { r.textContent = 'Registar o meu dia'; r.style.background = ''; r.style.color = ''; r.disabled = false; r.classList.remove('loading'); }
-  }, 3000);
+    if (!r) return;
+    r.textContent = '＋ Novo Registo';
+    r.style.background = 'var(--card)';
+    r.style.color = 'var(--orange)';
+    r.style.border = '2px solid var(--orange)';
+    r.style.boxShadow = 'none';
+    r.disabled = false;
+    r.classList.remove('loading');
+    r.onclick = function() {
+      resetForm();
+      r.onclick = function() { clicarSubmit(r); };
+    };
+  }, 2500);
 
   // ★ SLOT MACHINE — chamar aqui, sem depender de nada
   slotVerificarMedalhas(nomeAtual, payload);
@@ -1477,18 +1489,34 @@ function atualizarDataDisplay() {
 }
 
 function resetForm() {
-  const _s2=document.getElementById('submitBtn');if(_s2){_s2.style.background='';_s2.style.color='';delete _s2.dataset.pg;}
+  const _s2=document.getElementById('submitBtn');if(_s2){_s2.style.background='';_s2.style.color='';_s2.style.border='';_s2.style.boxShadow='';delete _s2.dataset.pg;}
   nomeSel = null; equipaAtiva = null;
   document.querySelectorAll('.team-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('nameGrid').innerHTML = '';
-  Object.keys(vals).forEach(k => { vals[k]=0; const el=document.getElementById(k); el.textContent=0; el.classList.remove('nz'); });
-  // Reset submit button
+  document.getElementById('nameGrid').innerHTML = '<div class="name-empty">Escolhe a tua equipa primeiro</div>';
+  Object.keys(vals).forEach(k => { vals[k]=0; const el=document.getElementById(k); if(el){el.textContent=0; el.classList.remove('nz');} });
+  // Limpar progresso
+  const prog = document.getElementById('successProgress');
+  if (prog) prog.innerHTML = '';
+  const hist = document.getElementById('histSection');
+  if (hist) hist.remove();
+  // Reset botão completamente
   const btn = document.getElementById('submitBtn');
-  if (btn) { btn.textContent = 'Registar o meu dia'; btn.style.background = ''; btn.style.boxShadow = ''; btn.disabled = false; }
+  if (btn) {
+    btn.textContent = 'Registar o meu dia';
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.style.border = '';
+    btn.style.boxShadow = '';
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    btn.onclick = function() { clicarSubmit(btn); };
+  }
   document.getElementById('formMain').classList.remove('hide');
   document.getElementById('successMsg').classList.remove('show');
-  const sbtn = document.getElementById('submitBtn');
-  if (sbtn) { sbtn.classList.remove('loading'); sbtn.textContent = 'Registar o meu dia'; }
+  // Scroll para o topo do form
+  const formEl = document.getElementById('screen-form');
+  if (formEl) formEl.scrollTop = 0;
+  window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
 // RANKING
