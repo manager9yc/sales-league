@@ -69,13 +69,14 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .name-btn.selected { background: var(--orange); border-color: var(--orange); color: #fff; }
 .name-empty { color: var(--muted); font-size: 13px; font-style: italic; grid-column: span 2; text-align: center; padding: 10px 0; }
 
-.prod-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border); }
+.prod-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border); gap: 10px; }
 .prod-row:last-child { border-bottom: none; padding-bottom: 0; }
 .prod-row:first-child { padding-top: 0; }
-.prod-info { display: flex; align-items: center; gap: 12px; }
+.prod-info { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
 .prod-emoji { font-size: 20px; width: 38px; height: 38px; background: var(--card2); border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.prod-name { font-size: 15px; font-weight: 600; }
-.prod-hint { font-size: 12px; color: var(--muted); margin-top: 1px; }
+.prod-text { display: flex; flex-direction: column; min-width: 0; }
+.prod-name { font-size: 14px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prod-hint { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.3; white-space: normal; }
 
 .counter { display: flex; align-items: center; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
 .cbtn { width: 46px; height: 46px; background: transparent; border: none; color: var(--text); font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.1s; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
@@ -534,7 +535,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 @keyframes shakeBox { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-5deg)} 40%{transform:rotate(5deg)} 60%{transform:rotate(-4deg)} 80%{transform:rotate(4deg)} }
 
 /* FORM TICKER */
-.form-ticker-wrap { background: var(--dark); border-bottom: 1px solid var(--border); overflow: hidden; padding: 11px 0; width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; display: block; }
+.form-ticker-wrap { background: var(--dark); border-bottom: 1px solid var(--border); overflow: hidden; padding: 11px 0; width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; display: flex; align-items: center; height: 44px; }
 .form-ticker { display: flex; white-space: nowrap; animation: ticker-scroll 35s linear infinite; }
 .form-ticker-item { display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 900; letter-spacing: 6px; color: rgba(255,255,255,0.5); padding: 0 28px; text-transform: uppercase; }
 .form-ticker-sep { display: inline-block; color: var(--orange); font-size: 16px; font-weight: 900; padding: 0 8px; }
@@ -824,51 +825,44 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
       <div class="sec-label">Vendas do dia</div>
       <div class="card">
         <div class="prod-row">
-          <div class="prod-icon">🖥️</div>
-          <div class="prod-info"><div class="prod-name">Onlines</div><div class="prod-hint">Vendas online pagas</div></div>
+          <div class="prod-info"><div class="prod-emoji">🖥️</div><div class="prod-text"><div class="prod-name">Onlines</div><div class="prod-hint">Vendas online pagas</div></div></div>
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('onlines',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="onlines">0</div><button class="cbtn plus" onmousedown="startChange('onlines',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
       <div class="card">
         <div class="prod-row">
-          <div class="prod-icon">🧴</div>
-          <div class="prod-info"><div class="prod-name">Sprays</div><div class="prod-hint">Limpeza, Desodorizante e Impermeabilizante</div></div>
+          <div class="prod-info"><div class="prod-emoji">🧴</div><div class="prod-text"><div class="prod-name">Sprays</div><div class="prod-hint">Limpeza, Desodorizante e Impermeabilizante</div></div></div>
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('sprays',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sprays',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="sprays">0</div><button class="cbtn plus" onmousedown="startChange('sprays',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sprays',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
       <div class="card">
         <div class="prod-row">
-          <div class="prod-icon">🦶</div>
-          <div class="prod-info"><div class="prod-name">Palmilhas</div><div class="prod-hint">Excepto Fila</div></div>
+          <div class="prod-info"><div class="prod-emoji">🦶</div><div class="prod-text"><div class="prod-name">Palmilhas</div><div class="prod-hint">Excepto Fila</div></div></div>
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('palmilhas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('palmilhas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="palmilhas">0</div><button class="cbtn plus" onmousedown="startChange('palmilhas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('palmilhas',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
       <div class="card">
         <div class="prod-row">
-          <div class="prod-icon">👕</div>
-          <div class="prod-info"><div class="prod-name">Camisolas Oficiais</div><div class="prod-hint">Futebol oficial</div></div>
+          <div class="prod-info"><div class="prod-emoji">👕</div><div class="prod-text"><div class="prod-name">Camisolas Oficiais</div><div class="prod-hint">Futebol oficial</div></div></div>
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('camisolas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('camisolas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="camisolas">0</div><button class="cbtn plus" onmousedown="startChange('camisolas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('camisolas',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
       <div class="card">
         <div class="prod-row">
-          <div class="prod-icon">🛍️</div>
-          <div class="prod-info"><div class="prod-name">Sacos Reutilizáveis</div><div class="prod-hint">Eco bags</div></div>
+          <div class="prod-info"><div class="prod-emoji">🛍️</div><div class="prod-text"><div class="prod-name">Sacos Reutilizáveis</div><div class="prod-hint">Eco bags</div></div></div>
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('sacos',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sacos',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="sacos">0</div><button class="cbtn plus" onmousedown="startChange('sacos',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sacos',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
       <div class="card">
         <div class="prod-row">
-          <div class="prod-icon">💧</div>
-          <div class="prod-info"><div class="prod-name">Garrafas</div><div class="prod-hint">Garrafas da liga de vendas</div></div>
+          <div class="prod-info"><div class="prod-emoji">💧</div><div class="prod-text"><div class="prod-name">Garrafas</div><div class="prod-hint">Garrafas da liga de vendas</div></div></div>
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('garrafas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="garrafas">0</div><button class="cbtn plus" onmousedown="startChange('garrafas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
       <div class="sec-label">Elogios recebidos</div>
       <div class="card">
         <div class="prod-row">
-          <div class="prod-icon">⭐</div>
-          <div class="prod-info"><div class="prod-name">Elogios</div><div class="prod-hint">Escritos ou Google Reviews</div></div>
+          <div class="prod-info"><div class="prod-emoji">⭐</div><div class="prod-text"><div class="prod-name">Elogios</div><div class="prod-hint">Escritos ou Google Reviews</div></div></div>
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
@@ -1328,14 +1322,15 @@ function showToast(msg, duration) {
 
 async function submeter() {
   if (!nomeSel) { showToast('⚠️ Seleciona o teu nome primeiro'); return; }
+  const nomeAtual = nomeSel; // guardar antes de qualquer reset
   const dataVal = document.getElementById('dataRegisto').value;
   if (!dataVal) { showToast('⚠️ Escolhe a data'); return; }
 
   // Block duplicate: 1 registration per vendor per day
-  const registoKey = 'registo_' + nomeSel + '_' + dataVal;
+  const registoKey = 'registo_' + nomeAtual + '_' + dataVal;
   try {
     if (localStorage.getItem(registoKey)) {
-      showToast('⚠️ ' + nomeSel.split(' ')[0] + ' já registou para este dia!');
+      showToast('⚠️ ' + nomeAtual.split(' ')[0] + ' já registou para este dia!');
       return;
     }
   } catch(e) {}
@@ -1350,7 +1345,7 @@ async function submeter() {
   const equipa = equipas.find(e=>e.id===equipaAtiva)?.label.replace(/^\S+\s/,'') || '';
   const payload = {
     data: document.getElementById('dataRegisto').value,
-    nome: nomeSel, equipa,
+    nome: nomeAtual, equipa,
     onlines:   vals.onlines,
     sprays:    vals.sprays,
     palmilhas: vals.palmilhas,
@@ -1363,7 +1358,7 @@ async function submeter() {
     await fetch(SHEETS_URL, { method:'POST', body: JSON.stringify(payload), mode:'no-cors' });
   } catch(e) { console.error('Erro ao guardar:', e); }
   // Mark this vendor+day as registered
-  try { localStorage.setItem('registo_' + nomeSel + '_' + document.getElementById('dataRegisto').value, '1'); } catch(e) {}
+  try { localStorage.setItem('registo_' + nomeAtual + '_' + document.getElementById('dataRegisto').value, '1'); } catch(e) {}
   tocarSomRegisto();
   const sb=document.getElementById('submitBtn'); if(sb){sb.style.background='';}
   const _sb=document.getElementById('submitBtn');if(_sb){_sb.style.background='#22C55E';_sb.style.color='#fff';}
@@ -1376,14 +1371,14 @@ async function submeter() {
 
   // Show progress and medals for this vendedor
   const snl = document.getElementById('successNomeLabel');
-  if (snl) snl.textContent = nomeSel.toUpperCase();
+  if (snl) snl.textContent = nomeAtual.toUpperCase();
   // Confetti
   lancarConfettiSucesso();
   // Haptic
   try { navigator.vibrate && navigator.vibrate([30,10,30]); } catch(e) {}
   // Mini ranking update
   setTimeout(atualizarMiniRanking, 600);
-  mostrarProgressoRegisto(nomeSel, payload);
+  mostrarProgressoRegisto(nomeAtual, payload);
 
   // Sem redirecionamento automático
 }
@@ -1721,6 +1716,38 @@ function mostrarProgressoRegisto(nome, payload) {
 
   prog.innerHTML = metasHtml;
 
+  // Histórico de registos deste vendedor
+  function renderHistorico() {
+    const allDados = dashAllDados.length ? dashAllDados : [];
+    const dadosNome = allDados.filter(d => d.nome === nome).sort((a,b) => new Date(b.data) - new Date(a.data));
+    // Include current payload as the first entry
+    const historico = [payload, ...dadosNome.filter(d => d.data !== payload.data)].slice(0, 7);
+    if (!historico.length) return;
+    const histHtml = `
+      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin:20px 0 10px">📋 Os teus últimos registos</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">
+        ${historico.map((d, i) => {
+          const dt = new Date((d.data||'') + 'T12:00:00');
+          const label = isNaN(dt) ? d.data : dt.toLocaleDateString('pt-PT', {weekday:'short', day:'numeric', month:'short'});
+          const vals2 = categorias.filter(c=>(d[c.key]||0)>0).map(c=>`<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(255,107,0,0.1);border-radius:6px;padding:2px 7px;font-size:11px;color:var(--orange)">${c.emoji} ${d[c.key]}</span>`).join('');
+          const isToday = i === 0;
+          return `<div style="display:flex;align-items:center;gap:10px;background:${isToday ? 'rgba(255,107,0,0.08)' : 'var(--card)'};border:1px solid ${isToday ? 'rgba(255,107,0,0.3)' : 'var(--border)'};border-radius:10px;padding:10px 12px">
+            <div style="font-size:12px;font-weight:700;color:${isToday ? 'var(--orange)' : 'var(--muted)'};min-width:72px;flex-shrink:0">${isToday ? '✅ Hoje' : label}</div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap">${vals2 || '<span style="font-size:11px;color:var(--muted);font-style:italic">Sem vendas</span>'}</div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    prog.innerHTML += histHtml;
+  }
+  renderHistorico();
+  // If dashAllDados was empty, try to reload and refresh history
+  if (!dashAllDados.length) {
+    carregarDashboard().then(() => {
+      const p2 = document.getElementById('successProgress');
+      if (p2) renderHistorico();
+    }).catch(()=>{});
+  }
+
   // Show medal popup for each earned medal
   // Only show popup for NEWLY earned medals (compare before/after payload)
   const dadosSemNovo = dashAllDados.filter(d => d.nome === nome && !(d.data === payload.data && d._isNew));
@@ -1867,10 +1894,8 @@ function mostrarMedalPopup(emoji,nome,medalha){
   clearTimeout(medalTimer);
   medalTimer=setTimeout(()=>{
     popup.classList.remove('show');
-    // Show surprise box ONLY if this is the vendedor who just registered
-    if (nome === nomeSel) {
-      setTimeout(()=>mostrarSurprise(nome, medalha), 300);
-    }
+    // Show surprise box after medal popup closes
+    setTimeout(()=>mostrarSurprise(nome, medalha), 300);
   },3000);
 }
 
