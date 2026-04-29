@@ -1412,7 +1412,7 @@ async function submeter() {
   // Confetti e haptic
   lancarConfettiSucesso();
   try { navigator.vibrate && navigator.vibrate([30,10,30]); } catch(e) {}
-  // Mostrar progresso e medalhas inline
+  // Mostrar progresso inline
   mostrarProgressoRegisto(nomeAtual, payload);
   // Mini ranking update
   setTimeout(atualizarMiniRanking, 600);
@@ -1421,6 +1421,8 @@ async function submeter() {
     const r = document.getElementById('submitBtn');
     if (r) { r.textContent = 'Registar o meu dia'; r.style.background = ''; r.style.color = ''; r.disabled = false; r.classList.remove('loading'); }
   }, 3000);
+  // ★ SLOT MACHINE: verificar medalhas diretamente aqui, sem depender de outros elementos
+  slotVerificarMedalhas(nomeAtual, payload);
 }
 
 
@@ -1775,8 +1777,7 @@ function mostrarProgressoRegisto(nome, payload) {
     }).catch(()=>{});
   }
 
-  // ── SLOT MACHINE: verificar medalhas novas ──
-  slotVerificarMedalhas(nome, payload);
+  // ── SLOT MACHINE: verificada diretamente em submeter() ──
 }
 
 
