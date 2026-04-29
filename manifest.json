@@ -1,0 +1,22 @@
+{
+  "name": "Sales League 2026",
+  "short_name": "Sales League",
+  "description": "Liga de Vendas - Sport Zone Vasco da Gama",
+  "start_url": "/sales-league/",
+  "display": "standalone",
+  "background_color": "#0C0C0C",
+  "theme_color": "#FF6B00",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
