@@ -27,13 +27,13 @@
 body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
 
 /* NAV */
-.nav { display: flex; background: #0a0a0a; position: relative; z-index: 500; touch-action: manipulation; position: relative; z-index: 100; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 100; }
-.nav-btn { flex: 1; padding: 12px 2px 10px; font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 800; letter-spacing: 0.5px; min-height: 60px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; cursor: pointer; -webkit-user-select: none; user-select: none; text-transform: uppercase; color: var(--muted); border: none; background: transparent; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.nav-btn.active { color: #fff; border-bottom-color: var(--orange); }
+.nav { display: flex; background: #0a0a0a; position: fixed; bottom: 0; left: 0; right: 0; z-index: 500; touch-action: manipulation; border-top: 2px solid var(--border); }
+.nav-btn { flex: 1; padding: 10px 2px 12px; font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 800; letter-spacing: 0.5px; min-height: 60px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; cursor: pointer; -webkit-user-select: none; user-select: none; text-transform: uppercase; color: var(--muted); border: none; background: transparent; cursor: pointer; border-top: 3px solid transparent; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.nav-btn.active { color: #fff; border-top-color: var(--orange); }
 
 /* SCREENS */
 .screen { display: none; }
-.screen.active { display: block; }
+.screen.active { display: block; padding-bottom: 72px; }
 
 /* ══ FORM HEADER ══ */
 .f-header { background: var(--orange); padding: 32px 20px 38px; text-align: center; position: relative; overflow: hidden; }
@@ -101,7 +101,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .success p { color: var(--muted); font-size: 15px; }
 .form-main.hide { display: none; }
 
-.toast { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 12px 20px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 30px rgba(0,0,0,0.4); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); z-index: 200; white-space: nowrap; }
+.toast { position: fixed; bottom: 82px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 12px 20px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 30px rgba(0,0,0,0.4); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); z-index: 200; white-space: nowrap; }
 .toast.show { transform: translateX(-50%) translateY(0); }
 
 /* ══ RANKING HERO ══ */
@@ -149,11 +149,11 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .cat-name { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; color: #ffffff; }
 .cat-sub { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
 
-.rank-table { width: 100%; border-collapse: collapse; position: relative; z-index: 1; touch-action: manipulation; background: #121212; border: 1px solid rgba(255,107,0,0.15); border-top: none; border-radius: 0 0 12px 12px; overflow: hidden; }
-.rank-table tbody tr { border-bottom: 1px solid #242424; transition: background 0.15s; }
+.rank-table { width: 100%; border-collapse: collapse; position: relative; z-index: 1; touch-action: manipulation; background: var(--card); border: 1px solid rgba(255,107,0,0.15); border-top: none; border-radius: 0 0 12px 12px; overflow: hidden; }
+.rank-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
 .rank-table tbody tr:last-child { border-bottom: none; }
-.rank-table tbody tr:hover { background: #1c1c1c; }
-.rank-1 { background: rgba(255,107,0,0.1) !important; }
+.rank-table tbody tr:hover { background: var(--card2); }
+.rank-1 { background: rgba(255,107,0,0.12) !important; }
 
 .td-pos { width: 48px; text-align: center; padding: 13px 6px; font-family: 'Bebas Neue', sans-serif; font-size: 17px; color: var(--muted); }
 .rank-1 .td-pos::before { content:'🥇'; font-size:18px; }
@@ -498,7 +498,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .edit-cancel { background: var(--card2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; color: var(--muted); font-size: 13px; cursor: pointer; }
 
 /* TICKER */
-.ticker-wrap { width: 100%; background: rgba(255,107,0,0.12); border-bottom: 1px solid rgba(255,107,0,0.2); overflow: hidden; padding: 8px 0; }
+.ticker-wrap { width: 100%; background: rgba(255,107,0,0.12); overflow: hidden; padding: 8px 0; }
 .ticker { display: flex; white-space: nowrap; animation: ticker-scroll 18s linear infinite; }
 .ticker:hover { animation-play-state: paused; }
 .ticker-item { display: inline-flex; align-items: center; gap: 8px; padding: 0 32px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,107,0,0.9); }
@@ -506,6 +506,13 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
 /* SURPRISE BOX */
+/* SLOT MACHINE */
+@keyframes reelSpin { 0%{transform:translateY(0)} 100%{transform:translateY(-400px)} }
+@keyframes reelStop { 0%{transform:translateY(-400px)} 60%{transform:translateY(8px)} 80%{transform:translateY(-4px)} 100%{transform:translateY(0)} }
+@keyframes fadeSlotPrize { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.slot-reel.spinning { animation: reelSpin 0.15s linear infinite; }
+.slot-reel.stopping { animation: reelStop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+/* keep old surprise css for compat */
 .surprise-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.92); z-index: 10000; display: none; align-items: center; justify-content: space-between; flex-direction: column; padding: 44px 20px 36px; }
 .surprise-overlay.open { display: flex; animation: fadeIn 0.4s ease; }
 .surprise-pre { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 8px; text-align: center; }
@@ -1006,12 +1013,12 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 
     <!-- CONTEÚDO ADMIN -->
     <div id="adminBody" style="display:none">
-      <div style="padding:16px 16px 0"><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Tema Visual</div><div style="display:flex;gap:8px"><button onclick="aplicarTema('dark')" id="btnThemeDark" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">⚫ Preto</button><button onclick="aplicarTema('oled')" id="btnThemeOLED" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">⚫ OLED</button>
-          <button onclick="aplicarTema('ucl')" id="btnThemeUCL" style="flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--text)">🏆 Champions</button></div></div>
+      <div style="padding:16px 16px 0"><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Tema Visual</div><div style="display:flex;gap:8px"><button onclick="aplicarTema('ucl')" id="btnThemeUCL" style="flex:1;background:var(--orange);border:1.5px solid var(--orange);border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:#fff">🏆 Champions</button></div></div>
       <div style="height:1px;background:var(--border);margin:12px 16px"></div>
       <!-- PRÉMIOS EDITOR -->
       <div style="padding:0 16px;margin-top:4px">
-        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:12px">🎁 Prémios da Roleta</div>
+        <button onclick="var d=document.getElementById('premiosEditorBody');var open=d.style.display!=='none';d.style.display=open?'none':'block';this.textContent=open?'▶ Prémios da Roleta (ver lista)':'▼ Prémios da Roleta (ocultar)'" style="background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--orange);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;cursor:pointer;margin-bottom:10px;display:block;width:100%;text-align:left">▶ Prémios da Roleta (ver lista)</button>
+        <div id="premiosEditorBody" style="display:none">
         <div id="premiosEditorList"></div>
         <!-- Add new -->
         <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:8px">
@@ -1027,6 +1034,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
           </div>
         </div>
         <button onclick="resetarPremios()" style="width:100%;margin-top:8px;background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--muted);font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer">↩ Repor prémios originais</button>
+        </div><!-- end premiosEditorBody -->
       </div>
       <div style="height:1px;background:var(--border);margin:12px 16px"></div>
       <!-- NOTIFICAÇÕES -->
@@ -1060,6 +1068,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
           <button class="dados-tab-btn active" onclick="switchDadosTab('mes',this)">Apagar mês</button>
           <button class="dados-tab-btn" onclick="switchDadosTab('colaborador',this)">Por colaborador</button>
           <button class="dados-tab-btn" onclick="switchDadosTab('editar',this)">Editar registos</button>
+          <button class="dados-tab-btn" onclick="switchDadosTab('metas',this)">🎯 Metas</button>
         </div>
         <div id="dadosTabContent"></div>
       </div>
@@ -1316,7 +1325,7 @@ function showToast(msg, duration) {
   void t.offsetWidth; // force reflow
   t.textContent = msg;
   t.classList.add('show');
-  toastTimeout = setTimeout(() => { t.classList.remove('show'); }, duration || 2500);
+  toastTimeout = setTimeout(() => { t.classList.remove('show'); }, duration || 3000);
 }
 
 async function submeter() {
@@ -1371,25 +1380,24 @@ async function submeter() {
   tocarSomRegisto();
   const sb=document.getElementById('submitBtn'); if(sb){sb.style.background='';}
   const _sb=document.getElementById('submitBtn');if(_sb){_sb.style.background='#22C55E';_sb.style.color='#fff';}
-  document.getElementById('formMain').classList.add('hide');
-  document.getElementById('successMsg').classList.add('show');
-  setTimeout(() => {
-    const el = document.getElementById('successMsg');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 80);
-
-  // Show progress and medals for this vendedor
-  const snl = document.getElementById('successNomeLabel');
-  if (snl) snl.textContent = nomeAtual.toUpperCase();
-  // Confetti
+  // Mostrar confirmação no botão sem navegar para outra página
+  const _confirmBtn = document.getElementById('submitBtn');
+  if (_confirmBtn) {
+    _confirmBtn.textContent = '✅ Registado com sucesso!';
+    _confirmBtn.style.background = '#22C55E';
+    _confirmBtn.style.color = '#fff';
+    _confirmBtn.style.boxShadow = '0 4px 20px rgba(34,197,94,0.4)';
+    _confirmBtn.disabled = true;
+  }
+  // Confetti + haptic
   lancarConfettiSucesso();
-  // Haptic
   try { navigator.vibrate && navigator.vibrate([30,10,30]); } catch(e) {}
+  // Scroll to button
+  setTimeout(() => { const b = document.getElementById('submitBtn'); if(b) b.scrollIntoView({behavior:'smooth', block:'center'}); }, 80);
   // Mini ranking update
   setTimeout(atualizarMiniRanking, 600);
-  mostrarProgressoRegisto(nomeAtual, payload);
-
-  // Sem redirecionamento automático
+  // Detectar medalhas e abrir mystery box/slot se necessário
+  detetarMedalhas(nomeAtual, payload);
 }
 
 
@@ -1456,6 +1464,21 @@ function resetForm() {
   document.getElementById('successMsg').classList.remove('show');
   const sbtn = document.getElementById('submitBtn');
   if (sbtn) { sbtn.classList.remove('loading'); sbtn.textContent = 'Registar o meu dia'; }
+}
+
+// ── DETECTAR MEDALHAS E ABRIR SLOT MACHINE ──
+function detetarMedalhas(nome, payload) {
+  let dadosAcum = [];
+  try { dadosAcum = JSON.parse(localStorage.getItem('historico_local') || '[]').filter(d => d.nome === nome); } catch(e) {}
+  if (dashAllDados.length) dadosAcum = dashAllDados.filter(d => d.nome === nome);
+  const dadosComHoje  = [...dadosAcum.filter(d => d.data !== payload.data), payload];
+  const dadosSemHoje  = dadosAcum.filter(d => d.data !== payload.data);
+  const medalhasDepois = calcularMedalhas(dadosComHoje);
+  const medalhasAntes  = calcularMedalhas(dadosSemHoje);
+  const novas = medalhasDepois.filter(m => m.earned && !medalhasAntes.find(ma => ma.name === m.name && ma.earned));
+  if (novas.length > 0) {
+    setTimeout(() => abrirSlotMachine(nome, novas[0].name), 1200);
+  }
 }
 
 // RANKING
@@ -2660,6 +2683,39 @@ let confirmCallback = null;
 let editingRegisto = null;
 let todosRegistos = [];
 
+function renderMetasAdmin() {
+  const el = document.getElementById('dadosContent') || document.getElementById('dadosTabContent');
+  if (!el) return;
+  const metasKeys = Object.keys(metas);
+  let html = '<div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:14px">🎯 Editar Metas Mensais</div>';
+  html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px">';
+  categorias.forEach(cat => {
+    const v = metas[cat.key] || 0;
+    html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">${cat.emoji}</span><span style="font-size:14px;font-weight:600">${cat.label}</span></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button onclick="ajustarMeta('${cat.key}',-1)" style="width:32px;height:32px;background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">−</button>
+        <span id="meta_val_${cat.key}" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--orange);min-width:32px;text-align:center">${v}</span>
+        <button onclick="ajustarMeta('${cat.key}',1)" style="width:32px;height:32px;background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--orange);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">+</button>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  html += '<button onclick="guardarMetas()" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:13px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;cursor:pointer">💾 Guardar metas</button>';
+  el.innerHTML = html;
+}
+
+function ajustarMeta(key, delta) {
+  metas[key] = Math.max(0, (metas[key] || 0) + delta);
+  const el = document.getElementById('meta_val_' + key);
+  if (el) el.textContent = metas[key];
+}
+
+function guardarMetas() {
+  try { localStorage.setItem('metas_custom', JSON.stringify(metas)); } catch(e) {}
+  showToast('✅ Metas guardadas!');
+}
+
 function switchDadosTab(tab, btn) {
   dadosTab = tab;
   document.querySelectorAll('.dados-tab-btn').forEach(b => b.classList.remove('active'));
@@ -2693,6 +2749,11 @@ function renderDadosTab() {
         <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px">⚠️ Apagar todos os registos de ${mesAtual}</div>
         <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Esta ação apaga permanentemente todos os dados do mês atual do Google Sheets.</div>
         <button onclick="confirmarApagarMes()" style="background:#CC0000;border:none;border-radius:8px;padding:10px 18px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;cursor:pointer;">Apagar mês atual</button>
+      </div>
+      <div style="background:rgba(255,107,0,0.06);border:1px solid rgba(255,107,0,0.2);border-radius:10px;padding:14px;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px">🔄 Limpar cache deste dispositivo</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Se o app diz "já registou" mas os dados foram apagados, usa este botão.</div>
+        <button onclick="limparCacheLocal()" style="background:var(--orange);border:none;border-radius:8px;padding:10px 18px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;cursor:pointer;">Limpar cache local</button>
       </div>`;
   } else if (dadosTab === 'colaborador') {
     const nomes = [...new Set(equipas.flatMap(e => e.nomes))].sort();
@@ -2711,6 +2772,9 @@ function renderDadosTab() {
         <input type="date" id="editarData" value="${hoje7}" onchange="renderRegistosEditar()" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;outline:none;margin-bottom:8px">
         <div id="registosEditar"><div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Seleciona uma data</div></div>
       </div>`;
+  } else if (dadosTab === 'metas') {
+    el.innerHTML = '<div id="dadosContent"></div>';
+    renderMetasAdmin();
   }
 }
 
@@ -2849,6 +2913,18 @@ async function guardarEdicao() {
     if (dadosTab === 'editar') renderRegistosEditar();
     if (dadosTab === 'colaborador') renderRegistosColaborador();
   } catch(e) { showToast('⚠️ Erro ao guardar'); }
+}
+
+function limparCacheLocal() {
+  try {
+    Object.keys(localStorage).filter(k => k.startsWith('registo_')).forEach(k => localStorage.removeItem(k));
+    localStorage.removeItem('historico_local');
+    localStorage.removeItem('rankingCache');
+    localStorage.removeItem('rankingCacheTime');
+    dashAllDados = [];
+    window._rankingCache = null;
+  } catch(e) {}
+  showToast('✅ Cache limpo. Podes registar de novo.');
 }
 
 async function executarApagarMes() {
@@ -3011,308 +3087,111 @@ function toggleGestaoLista() {
 }
 
 // ── SURPRISE BOX ──
-const mbPrizes = [
-  { icon: '🍫', text: 'Um chocolate!' },
-  { icon: '☕', text: 'Um café!' },
-  { icon: '🍬', text: 'Um saco de gomas!' },
-  { icon: '🧃', text: 'Um sumo!' },
-  { icon: '🥐', text: 'Um pastel de nata!' },
-  { icon: '⏰', text: 'Sair 30 min mais cedo, um dia a combinar!' },
+// ══ SLOT MACHINE ══
+const slotPrizes = [
+  { emoji: '🍫', text: 'Um chocolate!' },
+  { emoji: '☕', text: 'Um café!' },
+  { emoji: '🍬', text: 'Um saco de gomas!' },
+  { emoji: '🧃', text: 'Um sumo!' },
+  { emoji: '🥐', text: 'Um pastel de nata!' },
+  { emoji: '⏰', text: 'Sair 30min mais cedo,\num dia a combinar!' },
+  { emoji: '🎫', text: 'Um vale de desconto!' },
 ];
 
-let mbOpened = false;
-
-function mostrarMysteryBox(nome, medalha) {
-  mbOpened = false;
-
-  // Reset estado
-  const box = document.getElementById('mysteryBox');
-  document.getElementById('mbNome').textContent = nome + ' · ' + medalha;
-  document.getElementById('mbLid').style.transform = '';
-  document.getElementById('mbBoxWrap').style.display = 'block';
-  document.getElementById('mbHint').style.opacity = '1';
-  document.getElementById('mbPrize').style.display = 'none';
-  document.getElementById('mbCloseBtn').style.display = 'none';
-
-  // Escolher prémio aleatório
-  const prize = mbPrizes[Math.floor(Math.random() * mbPrizes.length)];
-  document.getElementById('mbPrizeIcon').textContent = prize.icon;
-  document.getElementById('mbPrizeText').textContent = prize.text;
-
-  // Mostrar overlay com display flex direto
-  box.style.display = 'flex';
-
-  // Shake depois de 1s
-  setTimeout(() => {
-    const wrap = document.getElementById('mbBoxWrap');
-    wrap.style.animation = 'shakeBox 0.5s ease';
-    setTimeout(() => { wrap.style.animation = ''; }, 600);
-  }, 1000);
-}
-
-function abrirMysteryBox() {
-  if (mbOpened) return;
-  mbOpened = true;
-
-  // Abrir tampa
-  document.getElementById('mbLid').style.transform = 'rotate(-65deg) translateY(-20px)';
-  document.getElementById('mbHint').style.opacity = '0';
-
-  // Som
-  try {
-    iniciarAudio();
-    if (audioCtx) {
-      const seq = [{f:523,t:0},{f:659,t:0.15},{f:784,t:0.3},{f:1047,t:0.45}];
-      seq.forEach(n => {
-        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-        o.connect(g); g.connect(audioCtx.destination);
-        o.type = 'sine'; o.frequency.value = n.f;
-        g.gain.setValueAtTime(0.15, audioCtx.currentTime + n.t);
-        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + n.t + 0.25);
-        o.start(audioCtx.currentTime + n.t);
-        o.stop(audioCtx.currentTime + n.t + 0.3);
-      });
-    }
-  } catch(e) {}
-
-  // Mostrar prémio após 600ms
-  setTimeout(() => {
-    document.getElementById('mbBoxWrap').style.display = 'none';
-    const prize = document.getElementById('mbPrize');
-    prize.style.display = 'flex';
-  }, 600);
-
-  // Mostrar botão fechar após 1.5s
-  setTimeout(() => {
-    document.getElementById('mbCloseBtn').style.display = 'block';
-  }, 1500);
-}
-
-function fecharMysteryBox() {
-  document.getElementById('mysteryBox').style.display = 'none';
-}
-
-// Aliases para compatibilidade com código antigo
-function mostrarSurprise(nome, medalha) { mostrarMysteryBox(nome, medalha); }
-function fecharSurprise() { fecharMysteryBox(); }
-function abrirSurprise() { abrirMysteryBox(); }
-
-
-// ── INFO + SUGESTÕES + QR ──
-const infoSections=[
-  {title:'🏆 O que é a Super Liga',content:'A Super Liga é uma competição interna de vendas da loja do Vasco da Gama, onde cada colaborador acumula pontos com base no seu desempenho diário.\nO objetivo é promover foco, consistência e espírito competitivo saudável dentro da equipa.'},
-  {title:'🎯 Objetivo da App',content:'Esta app permite acompanhar em tempo real o desempenho individual e da equipa.\nPodes consultar rankings, pontos, evolução e destacar os melhores resultados.'},
-  {title:'📊 Como ganhar pontos',content:'Os pontos são atribuídos com base no teu desempenho:\n• Unidades vendidas\n• Elogios recebidos\nQuanto melhor o teu desempenho, mais pontos acumulas.'},
-  {title:'📈 Ranking e classificação',content:'O ranking atualiza automaticamente.\n• Os melhores destacam-se no topo\n• A classificação muda diariamente\n• Todos têm oportunidade de subir posições'},
-  {title:'🥇 Medalhas',content:'As medalhas são ajustadas consoante o horário (full-time e part-time) e equipa.\nAo desbloquear uma medalha, ganhas acesso a uma gift box com prémio aleatório:\n• Sair 30 min mais cedo · Chocolate · Café · Pastel de nata · Gomas · Raspadinha'},
-  {title:'⚙️ Como usar a app',content:'1. Consulta o teu desempenho diariamente\n2. Acompanha o ranking da equipa\n3. Define objetivos pessoais\n4. Foca-te nos indicadores com mais impacto\nA consistência diária faz a diferença.'},
-  {title:'📅 Períodos de competição',content:'A liga funciona por ciclos mensais.\nNo final de cada ciclo:\n• O ranking é fechado\n• São atribuídos os prémios\n• Inicia-se uma nova competição'},
-  {title:'⚠️ Regras importantes',content:'• Apenas vendas válidas são contabilizadas\n• Todos os dados devem ser corretos\n• Competição saudável e fair play obrigatório'},
-  {title:'💡 Dicas para subir no ranking',content:'• Foco nos produtos com maior impacto\n• Abordagem ativa ao cliente\n• Consistência diária\n• Acompanhamento regular dos resultados'},
-];
-const faqItems=[
-  {q:'Quando atualiza o ranking?',a:'O ranking atualiza automaticamente, cerca de 1 minuto após o registo.'},
-  {q:'Posso recuperar posições?',a:'Sim! O ranking é dinâmico e muda diariamente. Basta melhorar o teu desempenho.'},
-  {q:'Como sei quantos pontos tenho?',a:'Acede ao Dashboard e seleciona o teu nome para ver o teu perfil completo.'},
-  {q:'Enganei-me a lançar um registo, posso corrigir?',a:'Se inseriste a menos, cria um novo registo. Se inseriste a mais, solicita ajuste à chefia.'},
-  {q:'Com que frequência devo registar?',a:'Diariamente! A consistência é o fator mais importante para a medalha "Consistente".'},
-];
-let infoOpenIdx=-1,faqOpenIdx=-1;
-function toggleInfo(i){infoOpenIdx=infoOpenIdx===i?-1:i;renderInfo();}
-function toggleFaq(i){faqOpenIdx=faqOpenIdx===i?-1:i;renderInfo();}
-
-function renderInfo(){
-  const el=document.getElementById('infoContent');
-  if(!el)return;
-  let html=infoSections.map((s,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden"><div onclick="toggleInfo(${i})" style="padding:13px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer"><span style="font-size:14px;font-weight:600;color:var(--text)">${s.title}</span><span style="font-size:16px;color:var(--orange);transition:transform 0.3s;transform:rotate(${infoOpenIdx===i?'180':'0'}deg)">▾</span></div><div style="max-height:${infoOpenIdx===i?'400px':'0'};overflow:hidden;transition:max-height 0.3s ease"><div style="padding:0 16px 13px;font-size:13px;color:var(--muted);line-height:1.6;white-space:pre-line">${s.content}</div></div></div>`).join('');
-  html+=`<div style="height:1px;background:var(--border);margin:14px 0"></div><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">❓ PERGUNTAS FREQUENTES</div>${faqItems.map((item,qi)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden"><div onclick="toggleFaq(${qi})" style="padding:13px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;cursor:pointer"><span style="font-size:13px;font-weight:600;color:var(--text);flex:1">${item.q}</span><span style="font-size:16px;color:var(--orange);flex-shrink:0;transition:transform 0.3s;transform:rotate(${faqOpenIdx===qi?'180':'0'}deg)">▾</span></div><div style="max-height:${faqOpenIdx===qi?'200px':'0'};overflow:hidden;transition:max-height 0.3s ease"><div style="padding:0 16px 13px;font-size:13px;color:var(--muted);line-height:1.6;border-top:1px solid var(--border)">${item.a}</div></div></div>`).join('')}`;
-  el.innerHTML=html;
-}
-
-let sugestoes=[];
-try{sugestoes=JSON.parse(localStorage.getItem('sugestoes')||'[]');}catch(e){}
-
-function populateSugestaoNomes(){
-  const sel=document.getElementById('sugestaoNome');
-  if(!sel)return;
-  const nomes=[...new Set(equipas.flatMap(e=>e.nomes))].sort();
-  sel.innerHTML='<option value="">— Nome —</option>'+nomes.map(n=>`<option value="${n}">${n}</option>`).join('');
-}
-
-function enviarSugestao(){
-  const nome=document.getElementById('sugestaoNome')?.value;
-  const texto=document.getElementById('sugestaoTexto')?.value?.trim();
-  if(!nome){showToast('⚠️ Seleciona o teu nome');return;}
-  if(!texto||texto.length<5){showToast('⚠️ Escreve uma sugestão');return;}
-  sugestoes.unshift({nome,texto,data:new Date().toLocaleDateString('pt-PT'),estado:'em_analise',resposta:''});
-  try{localStorage.setItem('sugestoes',JSON.stringify(sugestoes));}catch(e){}
-  document.getElementById('sugestaoTexto').value='';
-  document.getElementById('sugestaoNome').value='';
-  renderSugestoes();
-  showToast('✓ Sugestão enviada!');
-}
-
-function renderSugestoes(){
-  const el=document.getElementById('sugestoesList');
-  if(!el)return;
-  if(!sugestoes.length){el.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:16px">Ainda sem sugestões</div>';return;}
-  const cor={em_analise:'#F59E0B',aprovada:'#22C55E',implementada:'#22C55E',concluida:'#22C55E'};
-  const lbl={em_analise:'Em análise',aprovada:'Aprovada',implementada:'Concluída ✓',concluida:'Concluída ✓'};
-  el.innerHTML=sugestoes.map((s,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-      <span style="font-size:13px;font-weight:600;color:var(--text)">${s.nome}</span>
-      <span style="font-size:10px;font-weight:700;color:${cor[s.estado]||'#F59E0B'};background:${cor[s.estado]||'#F59E0B'}22;border-radius:6px;padding:2px 8px">${lbl[s.estado]||'Em análise'}</span>
-    </div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:4px;line-height:1.4">${s.texto}</div>
-    <div style="font-size:10px;color:var(--border);margin-bottom:8px">${s.data}</div>
-    ${s.resposta?`<div style="background:rgba(255,107,0,0.06);border-left:3px solid var(--orange);border-radius:4px;padding:8px 10px;font-size:12px;color:var(--muted);line-height:1.4;margin-bottom:8px"><strong style="color:var(--orange)">Resposta da Direção:</strong> ${s.resposta}</div>`:''}
-    <button onclick="mostrarRespostaInline(${i})" style="background:transparent;border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:11px;color:var(--muted);cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px">💬 Responder (PIN)</button>
-    <div id="respInline_${i}" style="display:none;margin-top:8px">
-      <input type="password" placeholder="PIN Admin..." id="respInlinePin_${i}" maxlength="3" style="width:80px;background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:13px;outline:none;margin-right:6px">
-      <input type="text" placeholder="Escreve a resposta..." id="respInlineTexto_${i}" style="width:calc(100% - 180px);background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;outline:none;margin-right:6px">
-      <button onclick="submeterRespostaInline(${i})" style="background:var(--orange);border:none;border-radius:6px;padding:6px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer">OK</button>
-    </div>
-  </div>`).join('');
-}
-
-function gerarQR(){
-  const el=document.getElementById('qrCode');
-  if(!el)return;
-  const isDarkTheme = !document.body.classList.contains('theme-ucl');
-  const qrColor = isDarkTheme ? 'FF6B00' : 'FFFFFF';
-  const qrBg = isDarkTheme ? '161616' : '0C1B35';
-  el.innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent('https://manager9yc.github.io/super-liga/')}&bgcolor=${qrBg}&color=${qrColor}&margin=2" width="140" height="140" style="border-radius:8px">`;
-}
-
-function copiarLink(){
-  navigator.clipboard?.writeText('https://manager9yc.github.io/super-liga/').then(()=>{
-    showToast('✓ Link copiado com sucesso!');
-    const btn=document.getElementById('copyBtn');
-    if(btn){btn.textContent='✓ Copiado!';setTimeout(()=>btn.textContent='📋 Copiar Link',2000);}
-  }).catch(()=>showToast('Link: manager9yc.github.io/super-liga/'));
-}
-
-// Admin sugestoes
-let premiosLog=[];
-try{premiosLog=JSON.parse(localStorage.getItem('premiosLog')||'[]');}catch(e){}
-
-function renderPremiosLog(){
-  const el=document.getElementById('premiosLogList');
-  if(!el)return;
-  if(!premiosLog.length){el.innerHTML='<div style="text-align:center;color:var(--muted);padding:16px;font-size:13px">Nenhum prémio registado ainda</div>';return;}
-  el.innerHTML=premiosLog.map((p,i)=>`<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:6px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">${p.icon}</span><div style="flex:1"><div style="font-size:13px;font-weight:600">${p.nome}</div><div style="font-size:11px;color:var(--muted)">${p.premio} · ${p.data}</div></div><button onclick="toggleEstadoPremio(${i})" style="background:${p.estado==='entregue'?'rgba(34,197,94,0.15)':'rgba(255,255,255,0.06)'};border:1px solid ${p.estado==='entregue'?'#22C55E':'var(--border)'};border-radius:8px;padding:5px 10px;font-size:11px;color:${p.estado==='entregue'?'#22C55E':'var(--muted)'};cursor:pointer">${p.estado==='entregue'?'✔ Entregue':'⬜ Por entregar'}</button></div>`).join('');
-}
-
-function toggleEstadoPremio(i){
-  premiosLog[i].estado=premiosLog[i].estado==='entregue'?'por_entregar':'entregue';
-  try{localStorage.setItem('premiosLog',JSON.stringify(premiosLog));}catch(e){}
-  renderPremiosLog();
-}
-
-function renderAdminSugestoes(){
-  const el=document.getElementById('adminSugestoesList');
-  if(!el)return;
-  if(!sugestoes.length){el.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:12px">Sem sugestões</div>';return;}
-  const estadoOpts=['em_analise','aprovada','implementada'];
-  const estadoLabel={em_analise:'Em análise',aprovada:'Aprovada',implementada:'Implementada'};
-  el.innerHTML=sugestoes.map((s,i)=>`<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px"><div style="font-size:12px;font-weight:600;margin-bottom:4px">${s.nome} <span style="color:var(--muted);font-weight:400">· ${s.data}</span></div><div style="font-size:12px;color:var(--muted);margin-bottom:8px">${s.texto}</div><select onchange="alterarEstadoSugestao(${i},this.value)" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:11px;outline:none;width:100%;margin-bottom:6px">${estadoOpts.map(o=>`<option value="${o}" ${s.estado===o?'selected':''}>${estadoLabel[o]}</option>`).join('')}</select><div style="display:flex;gap:6px"><input type="text" value="${s.resposta||''}" placeholder="Resposta..." id="resp_${i}" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;outline:none"><button onclick="guardarRespostaSugestao(${i})" style="background:var(--orange);border:none;border-radius:6px;padding:6px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer">OK</button></div></div>`).join('');
-}
-
-function alterarEstadoSugestao(i,estado){sugestoes[i].estado=estado;try{localStorage.setItem('sugestoes',JSON.stringify(sugestoes));}catch(e){}renderSugestoes();}
-function guardarRespostaSugestao(i){const input=document.getElementById('resp_'+i);if(!input)return;sugestoes[i].resposta=input.value.trim();try{localStorage.setItem('sugestoes',JSON.stringify(sugestoes));}catch(e){}renderSugestoes();showToast('✓ Resposta guardada');}
-
-const premiosDefault=[
-  {icon:'☕',nome:'Um café!',prob:0.20,cor:'#4A2C2A'},
-  {icon:'🍫',nome:'Um chocolate!',prob:0.25,cor:'#5C3317'},
-  {icon:'🥐',nome:'Um pastel de nata!',prob:0.10,cor:'#C8963E'},
-  {icon:'🍬',nome:'Um saco de gomas!',prob:0.15,cor:'#E91E8C'},
-  {icon:'⏰',nome:'Sair 30 min mais cedo!',prob:0.10,cor:'#1565C0'},
-  {icon:'🎰',nome:'Uma raspadinha!',prob:0.20,cor:'#2E7D32'},
-];
-let premios = premiosDefault.map(p=>({...p}));
-try {
-  const saved = localStorage.getItem('premiosConfig');
-  if (saved) premios = JSON.parse(saved);
-} catch(e) {}
-// ══ SLOT MACHINE + ROULETTE ══
+const reelEmojis = ['🍫','☕','🍬','🧃','🥐','⏰','🎫','⭐','🏆','🎯'];
+let slotPrize = null;
 let slotSpinning = false;
 
-function initSlot() {
-  for (let r = 0; r < 3; r++) {
-    const reel = document.getElementById('slotReel' + r);
-    if (!reel) continue;
-    let items = '';
-    for (let rep = 0; rep < 6; rep++) {
-      premios.forEach(p => { items += `<div class="slot-item">${p.icon}</div>`; });
-    }
-    reel.innerHTML = items;
-    reel.style.transition = 'none';
-    reel.style.transform = 'translateY(0)';
-  }
+function abrirSlotMachine(nome, medalha) {
+  slotSpinning = false;
+  slotPrize = slotPrizes[Math.floor(Math.random() * slotPrizes.length)];
+
+  document.getElementById('slotNome').textContent = nome + ' · ' + medalha;
+  document.getElementById('slotPrizeWrap').style.display = 'none';
+  document.getElementById('slotDirecao').style.display = 'none';
+  document.getElementById('slotCloseBtn').style.display = 'none';
+  document.getElementById('slotSpinBtn').style.display = 'block';
+  document.getElementById('slotSpinBtn').disabled = false;
+  document.getElementById('slotSpinBtn').textContent = '🎰 Girar';
+
+  // Reset reels
+  ['reel0','reel1','reel2'].forEach(id => {
+    const el = document.getElementById(id);
+    el.className = 'slot-reel';
+    el.textContent = '🎁';
+    el.style.animation = '';
+  });
+
+  const overlay = document.getElementById('slotOverlay');
+  overlay.style.display = 'flex';
 }
 
 function girarSlot() {
   if (slotSpinning) return;
   slotSpinning = true;
-  const btn = document.getElementById('wheelSpinBtn');
-  if (btn) btn.disabled = true;
+  const btn = document.getElementById('slotSpinBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ A girar...';
 
-  // Pick winner by probability
-  const rand = Math.random();
-  let acc = 0, wIdx = 0;
-  for (let i = 0; i < premios.length; i++) {
-    acc += premios[i].prob;
-    if (rand <= acc) { wIdx = i; break; }
-  }
-  rPremio = premios[wIdx];
+  try { iniciarAudio(); } catch(e) {}
 
-  iniciarAudio(); tocarSomCasino();
+  const reels = ['reel0','reel1','reel2'];
+  // Start all spinning
+  reels.forEach(id => {
+    const el = document.getElementById(id);
+    el.style.animation = 'reelSpin 0.12s linear infinite';
+  });
 
-  const itemH = 110;
-  const n = premios.length;
-  const targetRep = 3;
-  const durations = [4000, 4500, 5000];
-
-  for (let r = 0; r < 3; r++) {
-    const reel = document.getElementById('slotReel' + r);
-    if (!reel) continue;
-    reel.style.transition = 'none';
-    reel.style.transform = 'translateY(0)';
-    const targetY = -(targetRep * n * itemH + wIdx * itemH);
-    setTimeout((reelEl, dur, tY) => {
-      reelEl.style.transition = `transform ${dur}ms cubic-bezier(0.17,0.67,0.12,1.0)`;
-      reelEl.style.transform = `translateY(${tY}px)`;
-    }, r * 250, reel, durations[r], targetY);
-  }
-
-  setTimeout(() => {
-    slotSpinning = false;
-    pararSomCasino();
-    setTimeout(() => mostrarResultado(rPremio), 300);
-  }, durations[2] + 500);
-}
-
-function abrirRoulette() {
-  if (rOpened) return;
-  rOpened = true;
-  document.getElementById('rouletteLid').style.transform = 'rotate(-65deg) translateY(-16px)';
-  document.getElementById('rouletteHint').style.visibility = 'hidden';
-  setTimeout(() => {
-    document.getElementById('rouletteBoxSection').style.display = 'none';
-    const ws = document.getElementById('wheelSection');
-    ws.style.display = 'flex';
-    ws.style.opacity = '0';
-    ws.style.transform = 'scale(0.8)';
-    ws.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+  // Stop each reel with delay
+  reels.forEach((id, i) => {
     setTimeout(() => {
-      ws.style.opacity = '1';
-      ws.style.transform = 'scale(1)';
-    }, 30);
-    initSlot();
-  }, 900);
+      const el = document.getElementById(id);
+      el.style.animation = '';
+      el.style.animation = 'reelStop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards';
+      // Last reel - show prize
+      if (i === reels.length - 1) {
+        el.textContent = slotPrize.emoji;
+        setTimeout(() => {
+          // Show all reels with prize emoji
+          reels.forEach(rid => { document.getElementById(rid).textContent = slotPrize.emoji; });
+          // Show prize text
+          document.getElementById('slotPrizeText').textContent = slotPrize.text;
+          document.getElementById('slotPrizeWrap').style.display = 'block';
+          document.getElementById('slotDirecao').style.display = 'block';
+          document.getElementById('slotCloseBtn').style.display = 'block';
+          document.getElementById('slotSpinBtn').style.display = 'none';
+          // Play win sound
+          try {
+            if (audioCtx) {
+              [[523,0],[659,0.15],[784,0.3],[1047,0.45],[880,0.7],[1047,0.85]].forEach(([f,t]) => {
+                const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+                o.connect(g);g.connect(audioCtx.destination);
+                o.type='sine';o.frequency.value=f;
+                g.gain.setValueAtTime(0.18,audioCtx.currentTime+t);
+                g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+t+0.3);
+                o.start(audioCtx.currentTime+t);o.stop(audioCtx.currentTime+t+0.4);
+              });
+            }
+          } catch(e) {}
+        }, 500);
+      } else {
+        // Intermediate reels show random emoji
+        el.textContent = reelEmojis[Math.floor(Math.random() * reelEmojis.length)];
+      }
+    }, 600 + i * 500);
+  });
 }
 
-let rNome='',rMedalha='',rOpened=false,rAngle=0,rSpinning=false,rPremio=null;
+function fecharSlot() {
+  document.getElementById('slotOverlay').style.display = 'none';
+  slotSpinning = false;
+}
+
+// Aliases para compatibilidade
+function mostrarSurprise(nome, medalha) { abrirSlotMachine(nome, medalha); }
+function mostrarMysteryBox(nome, medalha) { abrirSlotMachine(nome, medalha); }
+function fecharSurprise() { fecharSlot(); }
+function fecharMysteryBox() { fecharSlot(); }
 
 function mostrarRoulette(nome,medalha){
   // Always show surprise box when medal is earned
@@ -3580,40 +3459,37 @@ function resetarPremios() {
   </div>
 </div>
 
-<!-- MYSTERY BOX -->
-<div id="mysteryBox" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:99999;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;text-align:center">
-  <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px">🏅 Medalha conquistada</div>
-  <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:3px;color:#fff;margin-bottom:4px">Parabéns!</div>
-  <div id="mbNome" style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--orange);margin-bottom:32px"></div>
+<!-- SLOT MACHINE -->
+<div id="slotOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,#0a0a0a 0%,#1a0a00 100%);z-index:99999;flex-direction:column;align-items:center;justify-content:flex-start;padding:48px 20px 30px;overflow-y:auto">
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:6px">🏅 Medalha desbloqueada</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:3px;color:#fff;margin-bottom:4px">Parabéns!</div>
+  <div id="slotNome" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--orange);margin-bottom:28px"></div>
 
-  <!-- Caixa -->
-  <div id="mbBoxWrap" style="cursor:pointer;margin-bottom:16px" onclick="abrirMysteryBox()">
-    <div style="position:relative;width:180px;height:180px;margin:0 auto">
-      <!-- Tampa -->
-      <div id="mbLid" style="width:180px;height:54px;background:linear-gradient(135deg,#FF8C00,#FF6B00);border-radius:10px;position:absolute;top:0;left:0;transform-origin:left center;transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 4px 20px rgba(255,107,0,0.4);display:flex;align-items:center;justify-content:center;z-index:2">
-        <div style="width:24px;height:100%;background:rgba(255,255,255,0.3);border-radius:4px"></div>
-        <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:32px">🎀</div>
-      </div>
-      <!-- Caixa base -->
-      <div style="width:180px;height:126px;background:linear-gradient(135deg,#FF6B00,#FF4500);border-radius:6px 6px 14px 14px;position:absolute;bottom:0;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(255,107,0,0.5)">
-        <div style="position:absolute;width:24px;height:100%;background:rgba(255,255,255,0.25);border-radius:4px"></div>
-        <div style="position:absolute;width:100%;height:24px;background:rgba(255,255,255,0.25);border-radius:4px"></div>
-      </div>
+  <!-- Slot machine display -->
+  <div style="background:#111;border:2px solid var(--orange);border-radius:16px;padding:20px;width:100%;max-width:320px;margin-bottom:20px;box-shadow:0 0 40px rgba(255,107,0,0.3)">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);text-align:center;margin-bottom:14px">🎰 O teu prémio</div>
+    <!-- Reels -->
+    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px">
+      <div class="slot-reel" id="reel0" style="width:80px;height:80px;background:#0a0a0a;border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:36px;overflow:hidden;position:relative">🎁</div>
+      <div class="slot-reel" id="reel1" style="width:80px;height:80px;background:#0a0a0a;border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:36px;overflow:hidden;position:relative">🎁</div>
+      <div class="slot-reel" id="reel2" style="width:80px;height:80px;background:#0a0a0a;border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:36px;overflow:hidden;position:relative">🎁</div>
     </div>
-    <div id="mbHint" style="margin-top:14px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.6)">TAP PARA ABRIR 🎁</div>
-  </div>
-
-  <!-- Prémio (escondido até abrir) -->
-  <div id="mbPrize" style="display:none;flex-direction:column;align-items:center;gap:12px">
-    <div id="mbPrizeIcon" style="font-size:100px;line-height:1;animation:trophyBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards">🎁</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:#FFD700;letter-spacing:4px">Ganhaste</div>
-    <div id="mbPrizeText" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;letter-spacing:2px">-</div>
-    <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:12px 20px;margin-top:8px">
-      <div style="font-size:10px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px">Para resgatar</div>
-      <div style="font-size:14px;color:rgba(255,255,255,0.85);font-weight:500">Fala com a <strong style="color:var(--orange)">Direção</strong> 🎯</div>
+    <!-- Prize text (hidden until spin done) -->
+    <div id="slotPrizeWrap" style="display:none;text-align:center;animation:fadeSlotPrize 0.5s ease forwards">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#FFD700;letter-spacing:3px;margin-bottom:4px">Ganhaste</div>
+      <div id="slotPrizeText" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;letter-spacing:2px"></div>
     </div>
   </div>
 
-  <button onclick="fecharMysteryBox()" id="mbCloseBtn" style="display:none;margin-top:24px;background:transparent;border:1.5px solid rgba(255,255,255,0.25);border-radius:10px;padding:12px 32px;color:rgba(255,255,255,0.7);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer">← Continuar</button>
+  <!-- Spin button -->
+  <button id="slotSpinBtn" onclick="girarSlot()" style="background:var(--orange);border:none;border-radius:14px;padding:16px 40px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;cursor:pointer;box-shadow:0 4px 20px rgba(255,107,0,0.5);margin-bottom:14px;transition:transform 0.1s,opacity 0.2s">🎰 Girar</button>
+
+  <!-- Direção info (hidden until done) -->
+  <div id="slotDirecao" style="display:none;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:12px 20px;text-align:center;width:100%;max-width:300px;margin-bottom:14px">
+    <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px">Para resgatar</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:500">Fala com a <strong style="color:var(--orange)">Direção</strong> 🎯</div>
+  </div>
+
+  <button onclick="fecharSlot()" id="slotCloseBtn" style="display:none;background:transparent;border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:12px 32px;color:rgba(255,255,255,0.6);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer">← Continuar</button>
 </div>
 
