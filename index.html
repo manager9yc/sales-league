@@ -1770,23 +1770,61 @@ function mostrarProgressoRegisto(nome, payload) {
     }).catch(()=>{});
   }
 
-  // ── MEDALHAS: usar localStorage como fallback quando dashAllDados está vazio ──
-  function getDadosAcumulados() {
-    if (dashAllDados.length) return dashAllDados.filter(d => d.nome === nome);
-    try { return JSON.parse(localStorage.getItem('historico_local') || '[]').filter(d => d.nome === nome); } catch(e) { return []; }
-  }
-  const dadosAcum    = getDadosAcumulados();
-  const dadosComHoje = [...dadosAcum.filter(d => d.data !== payload.data), payload];
-  const dadosSemHoje = dadosAcum.filter(d => d.data !== payload.data);
-  const medalhasDepois = calcularMedalhas(dadosComHoje);
-  const medalhasAntes  = calcularMedalhas(dadosSemHoje);
-  const novasMedalhas  = medalhasDepois.filter(m => m.earned && !medalhasAntes.find(ma => ma.name === m.name && ma.earned));
+  // ── MEDALHAS: detectar novas medalhas e abrir slot machine ──
+  function detectarEAbrirSlot() {
+    // 1. Recolher todos os dados acumulados deste vendedor
+    let dadosAcum = [];
+    if (dashAllDados.length) {
+      dadosAcum = dashAllDados.filter(d => d.nome === nome);
+    }
+    // Completar sempre com histórico local (inclui registos recentes não carregados do servidor)
+    try {
+      const local = JSON.parse(localStorage.getItem('historico_local') || '[]').filter(d => d.nome === nome);
+      // Juntar evitando duplicados por data
+      local.forEach(loc => {
+        if (!dadosAcum.find(d => d.data === loc.data && d.nome === loc.nome)) dadosAcum.push(loc);
+      });
+    } catch(e) {}
 
-  if (novasMedalhas.length > 0) {
-    // Abrir mystery box directamente após 800ms
-    const m = novasMedalhas[0]; // mostrar só a primeira (mais importante)
-    setTimeout(() => mostrarMysteryBox(nome, m.name), 800);
+    // 2. Calcular medalhas SEM o payload de hoje
+    const dadosSemHoje = dadosAcum.filter(d => d.data !== payload.data);
+    const medalhasAntes = calcularMedalhas(dadosSemHoje);
+
+    // 3. Calcular medalhas COM o payload de hoje
+    const dadosComHoje = [...dadosSemHoje, payload];
+    const medalhasDepois = calcularMedalhas(dadosComHoje);
+
+    // 4. Medalhas genuinamente novas (não tinham sido ganhas antes)
+    const novasMedalhas = medalhasDepois.filter(m =>
+      m.earned && !medalhasAntes.find(ma => ma.name === m.name && ma.earned)
+    );
+
+    if (novasMedalhas.length > 0) {
+      const m = novasMedalhas[0];
+      setTimeout(() => mostrarMysteryBox(nome, m.name), 1200);
+      return;
+    }
+
+    // 5. Fallback: se dashAllDados estava vazio, tentar de novo após carregar dados do servidor
+    if (!dashAllDados.length) {
+      fetch(SHEETS_URL + '?action=getTodos')
+        .then(r => r.json())
+        .then(td => {
+          if (!Array.isArray(td) || !td.length) return;
+          dashAllDados = td;
+          const dadosServidor = td.filter(d => d.nome === nome);
+          const semHoje2 = dadosServidor.filter(d => d.data !== payload.data);
+          const antes2   = calcularMedalhas(semHoje2);
+          const depois2  = calcularMedalhas([...semHoje2, payload]);
+          const novas2   = depois2.filter(m => m.earned && !antes2.find(ma => ma.name === m.name && ma.earned));
+          if (novas2.length > 0) {
+            setTimeout(() => mostrarMysteryBox(nome, novas2[0].name), 600);
+          }
+        })
+        .catch(() => {});
+    }
   }
+  detectarEAbrirSlot();
 }
 
 
@@ -3466,18 +3504,8 @@ function abrirRoulette() {
 let rNome='',rMedalha='',rOpened=false,rAngle=0,rSpinning=false,rPremio=null;
 
 function mostrarRoulette(nome,medalha){
-  // Always show surprise box when medal is earned
-  rNome=nome;rMedalha=medalha;rOpened=false;rAngle=0;rSpinning=false;rPremio=null;
-  document.getElementById('rouletteNome').textContent=nome+' · '+medalha;
-  document.getElementById('rouletteBoxSection').style.display='block';
-  document.getElementById('wheelSection').style.display='none';
-  document.getElementById('rouletteResult').style.display='none';
-  document.getElementById('rouletteLid').style.transform='';
-  document.getElementById('rouletteHint').style.visibility='visible';
-  document.getElementById('rouletteConfetti').innerHTML='';
-  if(document.getElementById('wheelSpinBtn'))document.getElementById('wheelSpinBtn').disabled=false;
-  document.getElementById('rouletteOverlay').classList.add('open');
-  setTimeout(()=>{const w=document.getElementById('rouletteBoxWrap');w.style.animation='shakeBox 0.5s ease';setTimeout(()=>w.style.animation='',600);},1000);
+  // Redirecionar para a slot machine (mesmo overlay)
+  mostrarMysteryBox(nome, medalha);
 }
 
 
