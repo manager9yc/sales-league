@@ -1235,7 +1235,7 @@ function selectTeam(id) {
   document.querySelectorAll('.team-tab').forEach((t,i) => t.classList.toggle('active', equipas[i].id === id));
   const equipa = equipas.find(e=>e.id===id);
   if (!equipa || !equipa.nomes || !equipa.nomes.length) {
-    document.getElementById('nameGrid').innerHTML = '<div class="name-empty">Nenhum colaborador nesta equipa</div>';
+    document.getElementById('nameGrid').innerHTML = '';
     return;
   }
   const nomes = equipa.nomes;
@@ -1245,21 +1245,33 @@ function selectTeam(id) {
       const foto = typeof getFoto === 'function' ? getFoto(n) : null;
       const ini = n.split(' ').filter(Boolean).map(x=>x[0]).slice(0,2).join('').toUpperCase();
       avatarHtml = foto
-        ? `<img src="${foto}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0">`
-        : `<div style="width:30px;height:30px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">${ini}</div>`;
+        ? `<img src="${foto}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;pointer-events:none">`
+        : `<div style="width:30px;height:30px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;pointer-events:none">${ini}</div>`;
     } catch(e) {
-      avatarHtml = `<div style="width:30px;height:30px;border-radius:50%;background:var(--orange);flex-shrink:0"></div>`;
+      avatarHtml = '';
     }
-    return `<button class="name-btn" data-nome="${n}" style="display:flex;align-items:center;gap:8px;text-align:left;animation-delay:${i*0.04}s" onclick="selectName(this)" ontouchend="event.preventDefault();selectName(this)">${avatarHtml}<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px">${n}</span></button>`;
+    return `<button class="name-btn" data-nome="${n}" style="display:flex;align-items:center;gap:8px;text-align:left" type="button">${avatarHtml}<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;pointer-events:none">${n}</span></button>`;
   }).join('');
+  // Attach events via JS (works on all platforms)
+  document.querySelectorAll('#nameGrid .name-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) { handleNameSelect(this); });
+    btn.addEventListener('touchend', function(e) { e.preventDefault(); handleNameSelect(this); });
+  });
+}
+
+function handleNameSelect(btn) {
+  const nome = btn.getAttribute('data-nome');
+  if (!nome) return;
+  document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  nomeSel = nome;
+  if (typeof mostrarUltimoRegisto === 'function') mostrarUltimoRegisto(nomeSel);
+  if (typeof mostrarStreakHeader === 'function') setTimeout(mostrarStreakHeader, 100);
 }
 
 function selectName(btn) {
-  setTimeout(mostrarStreakHeader, 100);
-  document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  nomeSel = btn.dataset.nome || btn.querySelector("span")?.textContent?.trim() || btn.textContent.trim();
-  mostrarUltimoRegisto(nomeSel);
+  const b = btn.closest ? btn.closest('[data-nome]') : btn;
+  if (b) handleNameSelect(b);
 }
 
 function change(campo, delta) {
