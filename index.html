@@ -1790,30 +1790,35 @@ function mostrarProgressoRegisto(nome, payload) {
 // ── SPLASH ──
 let splashProg = 0, splashIv = null;
 function iniciarSplash() {
-
-  const mesLabel=new Date().toLocaleDateString('pt-PT',{month:'long',year:'numeric'}).replace(/^./,s=>s.toUpperCase());
-  // Update sp-bar-wrap label if exists
-  const barSpans = document.querySelectorAll('.sp-bar-wrap span');
-  barSpans.forEach(el=>{ if(el.id==='mesAtualSplash') el.textContent=mesLabel; });
-  const pc = document.getElementById('spParticles');
-  for(let i=0;i<25;i++){
-    const p=document.createElement('div'); p.className='sp-particle';
-    const size = 4+Math.random()*10;
-    p.style.cssText=`left:${Math.random()*100}%;width:${size}px;height:${size}px;animation-duration:${4+Math.random()*7}s;animation-delay:${Math.random()*5}s;`;
-    pc.appendChild(p);
-  }
-  const bar=document.getElementById('splashBar');
-  if (!bar) { fecharSplash(); return; }
-  splashIv=setInterval(()=>{
-    splashProg+=100/30; bar.style.width=Math.min(splashProg,100)+'%';
-    if(splashProg>=100){clearInterval(splashIv);fecharSplash();}
-  },100);
+  try {
+    const pc = document.getElementById('spParticles');
+    if (pc) {
+      for(let i=0;i<25;i++){
+        const p=document.createElement('div'); p.className='sp-particle';
+        const size = 4+Math.random()*10;
+        p.style.cssText=`left:${Math.random()*100}%;width:${size}px;height:${size}px;animation-duration:${4+Math.random()*7}s;animation-delay:${Math.random()*5}s;`;
+        pc.appendChild(p);
+      }
+    }
+  } catch(e) {}
+  try {
+    const bar = document.getElementById('splashBar');
+    if (!bar) { fecharSplash(); return; }
+    splashIv = setInterval(() => {
+      splashProg += 100/30;
+      bar.style.width = Math.min(splashProg, 100) + '%';
+      if (splashProg >= 100) { clearInterval(splashIv); fecharSplash(); }
+    }, 100);
+  } catch(e) { fecharSplash(); }
 }
 function fecharSplash(){
-  clearInterval(splashIv);
-  const s=document.getElementById('splash');
-  s.classList.add('out');
-  setTimeout(()=>s.classList.add('hidden'),600);
+  try { clearInterval(splashIv); } catch(e) {}
+  try {
+    const s = document.getElementById('splash');
+    if (!s) return;
+    s.classList.add('out');
+    setTimeout(() => { s.style.display = 'none'; s.classList.add('hidden'); }, 600);
+  } catch(e) {}
 }
 iniciarSplash();
 atualizarMesLabels();
