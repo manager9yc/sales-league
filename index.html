@@ -3382,8 +3382,7 @@ const mbPrizes = [
   { icon: '🍬', text: 'Um saco de gomas!' },
   { icon: '🧃', text: 'Um sumo!' },
   { icon: '🥐', text: 'Um pastel de nata!' },
-  { icon: '⏰', text: 'Sair 30min ou 1h mais cedo, um dia a combinar!' },
-  { icon: '💣', text: 'Tiveste azar!' },
+  { icon: '⏰', text: 'Sair 30 min mais cedo, um dia a combinar!' },
 ];
 
 let mbOpened = false;
@@ -3397,7 +3396,7 @@ const infoSections=[
   {title:'🎯 Objetivo da App',content:'Esta app permite acompanhar em tempo real o desempenho individual e da equipa.\nPodes consultar rankings, pontos, evolução e destacar os melhores resultados.'},
   {title:'📊 Como ganhar pontos',content:'Os pontos são atribuídos com base no teu desempenho:\n• Unidades vendidas\n• Elogios recebidos\nQuanto melhor o teu desempenho, mais pontos acumulas.'},
   {title:'📈 Ranking e classificação',content:'O ranking atualiza automaticamente.\n• Os melhores destacam-se no topo\n• A classificação muda diariamente\n• Todos têm oportunidade de subir posições'},
-  {title:'🥇 Medalhas',content:'As medalhas são ajustadas consoante o horário (full-time e part-time) e equipa.\nAo desbloquear uma medalha, ganhas acesso a uma gift box com prémio aleatório:\n• Sair mais cedo · Chocolate · Café · Pastel de nata · Gomas · Raspadinha'},
+  {title:'🥇 Medalhas',content:'As medalhas são ajustadas consoante o horário (full-time e part-time) e equipa.\nAo desbloquear uma medalha, ganhas acesso a uma gift box com prémio aleatório:\n• Sair 30 min mais cedo · Chocolate · Café · Pastel de nata · Gomas · Raspadinha'},
   {title:'⚙️ Como usar a app',content:'1. Consulta o teu desempenho diariamente\n2. Acompanha o ranking da equipa\n3. Define objetivos pessoais\n4. Foca-te nos indicadores com mais impacto\nA consistência diária faz a diferença.'},
   {title:'📅 Períodos de competição',content:'A liga funciona por ciclos mensais.\nNo final de cada ciclo:\n• O ranking é fechado\n• São atribuídos os prémios\n• Inicia-se uma nova competição'},
   {title:'⚠️ Regras importantes',content:'• Apenas vendas válidas são contabilizadas\n• Todos os dados devem ser corretos\n• Competição saudável e fair play obrigatório'},
@@ -3407,7 +3406,7 @@ const faqItems=[
   {q:'Quando atualiza o ranking?',a:'O ranking atualiza automaticamente, cerca de 1 minuto após o registo.'},
   {q:'Posso recuperar posições?',a:'Sim! O ranking é dinâmico e muda diariamente. Basta melhorar o teu desempenho.'},
   {q:'Como sei quantos pontos tenho?',a:'Acede ao Dashboard e seleciona o teu nome para ver o teu perfil completo.'},
-  {q:'Enganei-me a lançar um registo, posso corrigir?',a:'Não, solicita ajuste à chefia.'},
+  {q:'Enganei-me a lançar um registo, posso corrigir?',a:'Se inseriste a menos, cria um novo registo. Se inseriste a mais, solicita ajuste à chefia.'},
   {q:'Com que frequência devo registar?',a:'Diariamente! A consistência é o fator mais importante para a medalha "Consistente".'},
 ];
 let infoOpenIdx=-1,faqOpenIdx=-1;
@@ -3516,12 +3515,11 @@ function guardarRespostaSugestao(i){const input=document.getElementById('resp_'+
 
 const premiosDefault=[
   {icon:'☕',nome:'Um café!',prob:0.20,cor:'#4A2C2A'},
-  {icon:'🍫',nome:'Um chocolate!',prob:0.10,cor:'#5C3317'},
+  {icon:'🍫',nome:'Um chocolate!',prob:0.25,cor:'#5C3317'},
   {icon:'🥐',nome:'Um pastel de nata!',prob:0.10,cor:'#C8963E'},
-  {icon:'🍬',nome:'Um saco de gomas!',prob:0.10,cor:'#E91E8C'},
-  {icon:'⏰',nome:'Sair 30m ou 1h mais cedo!',prob:0.10,cor:'#1565C0'},
+  {icon:'🍬',nome:'Um saco de gomas!',prob:0.15,cor:'#E91E8C'},
+  {icon:'⏰',nome:'Sair 30 min mais cedo!',prob:0.10,cor:'#1565C0'},
   {icon:'🎰',nome:'Uma raspadinha!',prob:0.20,cor:'#2E7D32'},
-  { icon: '💣', nome: 'Tiveste azar!',prob:0.20,cor:'#4A2C2A'}, },
 ];
 let premios = premiosDefault.map(p=>({...p}));
 try {
