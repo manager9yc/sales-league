@@ -1106,6 +1106,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
         <button onclick="carregarAdmin()" style="background:var(--orange);border:none;border-radius:10px;padding:10px 18px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer">Atualizar</button>
         <div id="adminSummary" style="font-size:12px;color:var(--muted)"></div>
         <button onclick="limparCacheAdmin()" style="background:var(--card);border:1px solid #7a2200;border-radius:10px;padding:10px 14px;color:#FF6644;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Cache</button>
+        <button onclick="resetSlotMes()" style="background:var(--card);border:1px solid #7a4400;border-radius:10px;padding:10px 14px;color:#FFa644;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🔄 Reset Slot</button>
         <button onclick="slotAbrir('TESTE','Medalha Teste')" style="background:var(--card);border:1px solid #C9A84C;border-radius:10px;padding:10px 14px;color:#C9A84C;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🎰 Testar Slot</button>
         <button onclick="bloquearAdmin()" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-left:auto">🔒 Bloquear</button>
       </div>
@@ -2626,6 +2627,16 @@ function togglePremiosEditor() {
 }
 
 // ══ LIMPAR CACHE ══
+function resetSlotMes() {
+  const toRemove = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('slotDado_')) toRemove.push(k);
+  }
+  toRemove.forEach(k => { try { localStorage.removeItem(k); } catch(e) {} });
+  showToast('✓ Slot reset — medalhas podem ser ganhas de novo', 3000);
+}
+
 function limparCacheAdmin() {
   if (!confirm('Limpar cache local? (ranking, splash, medalhas, histórico)\nOs dados no Google Sheets não são afetados.')) return;
   const fixedKeys = ['rankingCache','rankingCacheTime','splashDate','premiosLog','metasConfig','medalhasConfig','historico_local'];
@@ -3627,39 +3638,42 @@ function slotFechar() {
 // DETEÇÃO DE MEDALHAS — ao registar o dia
 // ══════════════════════════════════════════════════
 function slotVerificarMedalhas(nome, payload) {
+  // Chave: quais medalhas já foram premiadas este mês para este vendedor
   const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
   const storageKey = 'slotDado_' + nome + '_' + mesKey;
-
   let jaAtribuidas = [];
   try { jaAtribuidas = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
 
+  // Construir histórico acumulado do mês: servidor + localStorage + payload de hoje
   const dadosMapa = {};
-  if (dashAllDados.length) {
-    dashAllDados.filter(d => d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
+  if (Array.isArray(dashAllDados)) {
+    dashAllDados.filter(d => d && d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
   }
   try {
-    JSON.parse(localStorage.getItem('historico_local') || '[]')
-      .filter(d => d.nome === nome)
-      .forEach(d => { dadosMapa[d.data] = d; });
+    const local = JSON.parse(localStorage.getItem('historico_local') || '[]');
+    local.filter(d => d && d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
   } catch(e) {}
+  dadosMapa[payload.data] = payload; // garantir que hoje está incluído
 
-  dadosMapa[payload.data] = payload;
-
-  const todos = Object.values(dadosMapa);
   const mes = new Date().getMonth();
   const ano = new Date().getFullYear();
-  const doMes = todos.filter(d => {
-    const dt = new Date((d.data || '') + 'T12:00:00');
-    return !isNaN(dt) && dt.getMonth() === mes && dt.getFullYear() === ano;
+  const doMes = Object.values(dadosMapa).filter(d => {
+    try {
+      const dt = new Date(d.data + 'T12:00:00');
+      return dt.getMonth() === mes && dt.getFullYear() === ano;
+    } catch(e) { return false; }
   });
 
-  const medalhas = calcularMedalhas(doMes.length ? doMes : [payload]);
-  const earned = medalhas.filter(m => m.earned);
-  const novas = earned.filter(m => !jaAtribuidas.includes(m.name));
+  // Calcular com dados do mês (ou só o payload se não houver mais)
+  const dadosParaCalculo = doMes.length > 0 ? doMes : [payload];
+  const medalhas = calcularMedalhas(dadosParaCalculo);
+  const novas = medalhas.filter(m => m.earned && !jaAtribuidas.includes(m.name));
 
   if (novas.length > 0) {
-    jaAtribuidas.push(...novas.map(m => m.name));
-    try { localStorage.setItem(storageKey, JSON.stringify(jaAtribuidas)); } catch(e) {}
+    // Guardar como atribuídas ANTES de abrir (evita duplicados)
+    const novasNomes = novas.map(m => m.name);
+    try { localStorage.setItem(storageKey, JSON.stringify([...jaAtribuidas, ...novasNomes])); } catch(e) {}
+    // Abrir slot após animação de registo
     setTimeout(() => slotAbrir(nome, novas[0].name), 800);
   }
 }
