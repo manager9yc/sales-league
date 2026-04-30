@@ -1349,7 +1349,7 @@ const equipas = [
   { id:'textil',    label:'👕 Têxtil',    nomes:['Mariana Lourenço','Beatriz Carreiro','Catarina Cardoso','Lara Ferreira','Mariana Vieira','Catarina Tavares','Diana Bernardo','Ana Morais','Daniela Correia'] },
   { id:'logistica', label:'📦 Logística', nomes:['Palmira Camilo','Zezita Segunda','Tânia Coutinho','Tiago Pinto','Sana Branta','Elisabete Oliveira','Luís Pereira','Bruna Araújo'] },
   { id:'sup',       label:'🎯 Direção',   nomes:['Dário Santos','Carla Frade','Susana Morgado','André Louro','Sérgio Correia','Diogo Silva','Soraia Alves','Tânia Costa','Florisbela Tavares','Ana Ferreira'] },
-  { id:'estagios',  label:'🎓 Estagiários', nomes:[] }
+  { id:'estagios',  label:'🎓 Estagiários', nomes:['João Marques','Sara Freixo'] }
 ];
 try{const sv=localStorage.getItem('equipasData');if(sv){const p=JSON.parse(sv);p.forEach(s=>{const e=equipas.find(eq=>eq.id===s.id);if(e)e.nomes=s.nomes;});}}catch(e){}
 
