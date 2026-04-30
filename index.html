@@ -1192,7 +1192,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
             <button onclick="adicionarPremio()" style="flex:1;background:var(--orange);border:none;border-radius:8px;padding:9px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer">+ Adicionar</button>
           </div>
         </div>
-        <button onclick="resetarPremios()" style="width:100%;margin-top:8px;background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--muted);font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer">↩ Repor prémios originais</button>
+        
         </div><!-- /premiosEditorWrap -->
       </div>
       <div style="height:1px;background:var(--border);margin:12px 16px"></div>
@@ -1385,7 +1385,9 @@ function goTo(screen, btn) {
   btn.classList.add('active');
   try { localStorage.setItem('lastTab', screen); } catch(e) {}
   document.getElementById('printBtn').style.display = screen === 'ranking' ? 'flex' : 'none';
-  if(screen==='info'){renderInfo();renderSugestoes();populateSugestaoNomes();gerarQR();}
+  if(screen==='info'){renderInfo();renderSugestoes();populateSugestaoNomes();gerarQR();
+    const _st=document.getElementById('sugestaoTexto');if(_st)_st.value='';
+    const _sn=document.getElementById('sugestaoNome');if(_sn)_sn.selectedIndex=0;}
   if(screen==='admin'){renderPremiosLog();renderAdminSugestoes();}
   if (screen === 'ranking') {
     // Show cached data immediately if available
@@ -1568,22 +1570,11 @@ async function submeter() {
   mostrarProgressoRegisto(nomeAtual, payload);
   setTimeout(atualizarMiniRanking, 600);
 
-  // Após 2.5s o botão vira "Novo Registo"
-  setTimeout(() => {
-    const r = document.getElementById('submitBtn');
-    if (!r) return;
-    r.textContent = '＋ Novo Registo';
-    r.style.background = 'transparent';
-    r.style.color = 'var(--orange)';
-    r.style.border = '2px solid var(--orange)';
-    r.style.boxShadow = 'none';
-    r.disabled = false;
-    r.classList.remove('loading');
-    r.dataset.state = 'novo';
-  }, 2500);
-
-  // ★ SLOT MACHINE — chamar aqui, sem depender de nada
+  // ★ SLOT MACHINE — verificar medalhas
   slotVerificarMedalhas(nomeAtual, payload);
+
+  // Refresh após 3s para novo registo
+  setTimeout(() => { location.reload(); }, 3000);
 }
 
 
@@ -2784,7 +2775,7 @@ function limparCacheAdmin() {
   const toRemove = [];
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (k && (k.startsWith('medalhasShown_') || k.startsWith('surpriseShown_') || k.startsWith('mbShown_') || k.startsWith('registo_') || k.startsWith('slotDado_'))) toRemove.push(k);
+    if (k && (k.startsWith('medalhasShown_') || k.startsWith('surpriseShown_') || k.startsWith('mbShown_') || k.startsWith('registo_') || k.startsWith('slotDado_') || k.startsWith('slotDia_'))) toRemove.push(k);
   }
   toRemove.forEach(k => { try { localStorage.removeItem(k); } catch(e) {} });
   showToast('✓ Cache limpo com sucesso');
@@ -3617,7 +3608,7 @@ function normalizarProbs() {
 }
 
 function guardarPremios() {
-  try { localStorage.setItem('premiosConfig', JSON.stringify(premios)); } catch(e) {}
+  try { localStorage.setItem( JSON.stringify(premios)); } catch(e) {}
 }
 
 function resetarPremios() {
@@ -3778,40 +3769,54 @@ function slotFechar() {
 // DETEÇÃO DE MEDALHAS — ao registar o dia
 // ══════════════════════════════════════════════════
 function slotVerificarMedalhas(nome, payload) {
+  // ── Medalhas mensais ──
   const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
   const storageKey = 'slotDado_' + nome + '_' + mesKey;
-
   let jaAtribuidas = [];
   try { jaAtribuidas = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
 
   const dadosMapa = {};
-  if (dashAllDados.length) {
-    dashAllDados.filter(d => d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
+  if (Array.isArray(dashAllDados) && dashAllDados.length) {
+    dashAllDados.filter(d => d && d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
   }
   try {
     JSON.parse(localStorage.getItem('historico_local') || '[]')
-      .filter(d => d.nome === nome)
+      .filter(d => d && d.nome === nome)
       .forEach(d => { dadosMapa[d.data] = d; });
   } catch(e) {}
-
   dadosMapa[payload.data] = payload;
 
-  const todos = Object.values(dadosMapa);
-  const mes = new Date().getMonth();
-  const ano = new Date().getFullYear();
-  const doMes = todos.filter(d => {
-    const dt = new Date((d.data || '') + 'T12:00:00');
-    return !isNaN(dt) && dt.getMonth() === mes && dt.getFullYear() === ano;
+  const mes = new Date().getMonth(), ano = new Date().getFullYear();
+  const doMes = Object.values(dadosMapa).filter(d => {
+    try { const dt = new Date(d.data + 'T12:00:00'); return dt.getMonth()===mes && dt.getFullYear()===ano; } catch(e){ return false; }
   });
 
-  const medalhas = calcularMedalhas(doMes.length ? doMes : [payload]);
-  const earned = medalhas.filter(m => m.earned);
-  const novas = earned.filter(m => !jaAtribuidas.includes(m.name));
+  const medalhasMes = calcularMedalhas(doMes.length ? doMes : [payload]);
+  const novasMes = medalhasMes.filter(m => m.earned && !jaAtribuidas.includes(m.name));
 
-  if (novas.length > 0) {
-    jaAtribuidas.push(...novas.map(m => m.name));
-    try { localStorage.setItem(storageKey, JSON.stringify(jaAtribuidas)); } catch(e) {}
-    setTimeout(() => slotAbrir(nome, novas[0].name), 800);
+  // ── Medalhas diárias (sem restrição mensal) ──
+  const diaKey = 'slotDia_' + nome + '_' + payload.data;
+  let jaDiarias = [];
+  try { jaDiarias = JSON.parse(localStorage.getItem(diaKey) || '[]'); } catch(e) {}
+
+  const novasDiarias = [];
+  if ((payload.onlines || 0) >= 8 && !jaDiarias.includes('Super Online')) {
+    novasDiarias.push({ icon:'🌟', name:'Super Online', desc:'8 onlines num dia!' });
+  }
+  if ((payload.sprays || 0) >= 10 && !jaDiarias.includes('Spray Explosion')) {
+    novasDiarias.push({ icon:'💥', name:'Spray Explosion', desc:'10 sprays num dia!' });
+  }
+
+  const todasNovas = [...novasDiarias, ...novasMes];
+
+  if (todasNovas.length > 0) {
+    if (novasMes.length > 0) {
+      try { localStorage.setItem(storageKey, JSON.stringify([...jaAtribuidas, ...novasMes.map(m=>m.name)])); } catch(e) {}
+    }
+    if (novasDiarias.length > 0) {
+      try { localStorage.setItem(diaKey, JSON.stringify([...jaDiarias, ...novasDiarias.map(m=>m.name)])); } catch(e) {}
+    }
+    setTimeout(() => slotAbrir(nome, todasNovas[0].name), 800);
   }
 }
 
