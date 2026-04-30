@@ -1179,20 +1179,8 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
         </div>
         <div id="premiosEditorWrap" style="display:none">
         <div id="premiosEditorList"></div>
-        <!-- Add new -->
-        <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:8px">
-          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:600;letter-spacing:1px">ADICIONAR PRÉMIO</div>
-          <div style="display:flex;gap:6px;margin-bottom:8px">
-            <input id="novoPremioIcon" type="text" placeholder="🎁" maxlength="2" style="width:44px;text-align:center;font-size:20px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--text);outline:none">
-            <input id="novoPremioNome" type="text" placeholder="Nome do prémio..." style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--text);font-size:13px;outline:none">
-          </div>
-          <div style="display:flex;gap:6px;align-items:center">
-            <label style="font-size:11px;color:var(--muted);white-space:nowrap">Cor:</label>
-            <input id="novoPremioColor" type="color" value="#4A2C2A" style="width:36px;height:32px;border:1px solid var(--border);border-radius:6px;background:var(--card);cursor:pointer;padding:2px">
-            <button onclick="adicionarPremio()" style="flex:1;background:var(--orange);border:none;border-radius:8px;padding:9px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer">+ Adicionar</button>
-          </div>
-        </div>
-        
+
+        <button onclick="resetarPremios()" style="width:100%;margin-top:8px;background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--muted);font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer">↩ Repor prémios originais</button>
         </div><!-- /premiosEditorWrap -->
       </div>
       <div style="height:1px;background:var(--border);margin:12px 16px"></div>
@@ -2876,8 +2864,6 @@ function calcularMedalhas(dados) {
     { icon:'💧', name:'Hydration Boss',    desc:tGarrafas+' garrafas este mês',    earned: garrafasMes  >= tGarrafas },
     { icon:'⭐', name:'Favorito',          desc:'3 elogios este mês',              earned: elogiosMes   >= 3 },
     { icon:'📅', name:'Consistente',       desc:th.consistente+' registos este mês', earned: diasComRegisto >= th.consistente },
-    { icon:'🌟', name:'Super Online',      desc:'8 onlines num dia',                  earned: false }, // verificado separadamente
-    { icon:'💥', name:'Spray Explosion',   desc:'10 sprays num dia',                  earned: false }, // verificado separadamente
   ];
 }
 
@@ -2944,29 +2930,72 @@ async function carregarAdmin() {
     const url = encodeURIComponent(SHEETS_URL + '?action=getTodos');
     const res = await fetch(proxy + url);
     const todos = await res.json();
-    const doDia = Array.isArray(todos) ? todos.filter(d=>d.data===data) : [];
-    if (!doDia.length) {
-      content.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">📭</div><p>Sem registos para este dia</p></div>';
+    if (!Array.isArray(todos)) throw new Error('Resposta inválida');
+
+    // Calcular data de ontem
+    const dataOntem = (function() {
+      const d = new Date(data + 'T12:00:00');
+      d.setDate(d.getDate() - 1);
+      return d.toISOString().split('T')[0];
+    })();
+
+    const doDia    = todos.filter(d => d.data === data);
+    const deOntem  = todos.filter(d => d.data === dataOntem);
+    const ambos    = [...doDia, ...deOntem];
+
+    if (!ambos.length) {
+      content.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">📭</div><p>Sem registos para este dia nem para ontem</p></div>';
       document.getElementById('adminSummary').textContent = '';
       return;
     }
+
+    // Agrupar por vendedor (nome) — mostrar hoje e ontem por vendedor
+    const vendedores = [...new Set(ambos.map(d => d.nome))].sort();
+
     const totalDia = doDia.reduce((s,d)=>s+dashTot(d),0);
-    document.getElementById('adminSummary').textContent = doDia.length + ' registos · ' + totalDia + ' unidades no total';
-    const rows = doDia.map(d => {
+    document.getElementById('adminSummary').textContent = doDia.length + ' registos hoje · ' + totalDia + ' unidades';
+
+    function formatData(dataStr) {
+      return new Date(dataStr + 'T12:00:00').toLocaleDateString('pt-PT', {weekday:'short', day:'numeric', month:'short'});
+    }
+
+    function rowHtml(d, destaque) {
       const vals2 = categorias.map(cat => {
         const v = d[cat.key]||0;
         return `<span class="admin-val ${v>0?'nz':''}">${cat.emoji} ${v}</span>`;
       }).join('');
-      return `<div class="admin-day-row">
+      const bgColor = destaque ? 'rgba(201,168,76,0.07)' : 'transparent';
+      return `<div class="admin-day-row" style="background:${bgColor};border-radius:8px;padding:6px 4px;margin-bottom:2px">
         <div>
-          <div class="admin-nome">${d.nome}</div>
-          <div class="admin-equipa">${d.equipa||''}</div>
+          <div class="admin-nome" style="font-size:14px">${d.nome}</div>
+          <div class="admin-equipa" style="font-size:10px;display:flex;gap:6px;align-items:center">
+            <span>${d.equipa||''}</span>
+            <span style="background:${destaque?'rgba(201,168,76,0.2)':'rgba(255,255,255,0.07)'};color:${destaque?'#C9A84C':'var(--muted)'};border-radius:4px;padding:1px 6px;font-weight:700;letter-spacing:0.5px">${formatData(d.data)}</span>
+          </div>
         </div>
         <div class="admin-vals">${vals2}</div>
       </div>`;
-    }).join('');
+    }
+
+    // Construir linhas agrupadas por vendedor
+    let rows = '';
+    vendedores.forEach(nome => {
+      const regHoje  = doDia.find(d => d.nome === nome);
+      const regOntem = deOntem.find(d => d.nome === nome);
+      if (regHoje)  rows += rowHtml(regHoje, true);
+      if (regOntem) rows += rowHtml(regOntem, false);
+      if (regHoje || regOntem) rows += '<div style="height:1px;background:var(--border);margin:4px 0"></div>';
+    });
+
     const summaryHtml = renderAdminSummary(doDia);
-    content.innerHTML = summaryHtml + '<div class="slabel" style="margin-top:16px">Registos individuais</div><div class="d-card">' + rows + '</div>';
+    content.innerHTML = summaryHtml +
+      `<div class="slabel" style="margin-top:16px">Registos individuais
+        <span style="font-size:10px;color:var(--muted);font-weight:400;margin-left:8px">
+          <span style="display:inline-block;width:8px;height:8px;background:rgba(201,168,76,0.4);border-radius:2px;margin-right:3px"></span>hoje
+          <span style="display:inline-block;width:8px;height:8px;background:rgba(255,255,255,0.07);border-radius:2px;margin-left:6px;margin-right:3px"></span>ontem
+        </span>
+      </div>` +
+      '<div class="d-card">' + rows + '</div>';
   } catch(e) {
     content.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">⚠️ Erro ao carregar</div>';
   }
@@ -3416,7 +3445,6 @@ function renderSugestoes(){
       <input type="password" placeholder="PIN Admin..." id="respInlinePin_${i}" maxlength="3" style="width:80px;background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:13px;outline:none;margin-right:6px">
       <input type="text" placeholder="Escreve a resposta..." id="respInlineTexto_${i}" style="width:calc(100% - 180px);background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;outline:none;margin-right:6px">
       <button onclick="submeterRespostaInline(${i})" style="background:var(--orange);border:none;border-radius:6px;padding:6px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer">OK</button>
-      <button onclick="apagarSugestao(${i}, document.getElementById('respInlinePin_'+${i}).value)" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:6px;padding:6px 10px;color:#EF4444;font-size:13px;cursor:pointer;margin-left:4px" title="Apagar comentário">🗑</button>
     </div>
   </div>`).join('');
 }
@@ -3539,15 +3567,6 @@ function mostrarRespostaInline(i) {
   if (el) el.style.display = el.style.display === 'none' ? 'flex' : 'none';
 }
 
-function apagarSugestao(i, pin) {
-  if (pin !== ADMIN_PIN) { showToast('⚠️ PIN incorreto'); return; }
-  if (!confirm('Apagar este comentário? Não pode ser desfeito.')) return;
-  sugestoes.splice(i, 1);
-  try { localStorage.setItem('sugestoes', JSON.stringify(sugestoes)); } catch(e) {}
-  renderSugestoes();
-  showToast('✓ Comentário apagado');
-}
-
 function submeterRespostaInline(i) {
   const pin = document.getElementById('respInlinePin_' + i)?.value;
   const texto = document.getElementById('respInlineTexto_' + i)?.value?.trim();
@@ -3629,7 +3648,7 @@ function normalizarProbs() {
 }
 
 function guardarPremios() {
-  try { localStorage.setItem( JSON.stringify(premios)); } catch(e) {}
+  try { localStorage.setItem('premiosConfig', JSON.stringify(premios)); } catch(e) {}
 }
 
 function resetarPremios() {
@@ -3790,56 +3809,40 @@ function slotFechar() {
 // DETEÇÃO DE MEDALHAS — ao registar o dia
 // ══════════════════════════════════════════════════
 function slotVerificarMedalhas(nome, payload) {
-  // ── Medalhas mensais ──
   const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
   const storageKey = 'slotDado_' + nome + '_' + mesKey;
+
   let jaAtribuidas = [];
   try { jaAtribuidas = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
 
   const dadosMapa = {};
-  if (Array.isArray(dashAllDados) && dashAllDados.length) {
-    dashAllDados.filter(d => d && d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
+  if (dashAllDados.length) {
+    dashAllDados.filter(d => d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
   }
   try {
     JSON.parse(localStorage.getItem('historico_local') || '[]')
-      .filter(d => d && d.nome === nome)
+      .filter(d => d.nome === nome)
       .forEach(d => { dadosMapa[d.data] = d; });
   } catch(e) {}
+
   dadosMapa[payload.data] = payload;
 
-  const mes = new Date().getMonth(), ano = new Date().getFullYear();
-  const doMes = Object.values(dadosMapa).filter(d => {
-    try { const dt = new Date(d.data + 'T12:00:00'); return dt.getMonth()===mes && dt.getFullYear()===ano; } catch(e){ return false; }
+  const todos = Object.values(dadosMapa);
+  const mes = new Date().getMonth();
+  const ano = new Date().getFullYear();
+  const doMes = todos.filter(d => {
+    const dt = new Date((d.data || '') + 'T12:00:00');
+    return !isNaN(dt) && dt.getMonth() === mes && dt.getFullYear() === ano;
   });
 
-  // Medalhas mensais (excluir as diárias que têm earned:false fixo)
-  const medalhasMes = calcularMedalhas(doMes.length ? doMes : [payload])
-    .filter(m => m.name !== 'Super Online' && m.name !== 'Spray Explosion');
-  const novasMes = medalhasMes.filter(m => m.earned && !jaAtribuidas.includes(m.name));
+  const medalhas = calcularMedalhas(doMes.length ? doMes : [payload]);
+  const earned = medalhas.filter(m => m.earned);
+  const novas = earned.filter(m => !jaAtribuidas.includes(m.name));
 
-  // ── Medalhas diárias (sem restrição mensal — chave por dia) ──
-  const diaKey = 'slotDia_' + nome + '_' + payload.data;
-  let jaDiarias = [];
-  try { jaDiarias = JSON.parse(localStorage.getItem(diaKey) || '[]'); } catch(e) {}
-
-  const novasDiarias = [];
-  if ((payload.onlines || 0) >= 8 && !jaDiarias.includes('Super Online')) {
-    novasDiarias.push({ icon:'🌟', name:'Super Online', desc:'8 onlines num dia!' });
-  }
-  if ((payload.sprays || 0) >= 10 && !jaDiarias.includes('Spray Explosion')) {
-    novasDiarias.push({ icon:'💥', name:'Spray Explosion', desc:'10 sprays num dia!' });
-  }
-
-  const todasNovas = [...novasDiarias, ...novasMes];
-
-  if (todasNovas.length > 0) {
-    if (novasMes.length > 0) {
-      try { localStorage.setItem(storageKey, JSON.stringify([...jaAtribuidas, ...novasMes.map(m=>m.name)])); } catch(e) {}
-    }
-    if (novasDiarias.length > 0) {
-      try { localStorage.setItem(diaKey, JSON.stringify([...jaDiarias, ...novasDiarias.map(m=>m.name)])); } catch(e) {}
-    }
-    setTimeout(() => slotAbrir(nome, todasNovas[0].name), 800);
+  if (novas.length > 0) {
+    jaAtribuidas.push(...novas.map(m => m.name));
+    try { localStorage.setItem(storageKey, JSON.stringify(jaAtribuidas)); } catch(e) {}
+    setTimeout(() => slotAbrir(nome, novas[0].name), 800);
   }
 }
 
