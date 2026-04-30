@@ -2159,14 +2159,30 @@ function renderAdminSummary(doDia){
   if(!doDia.length) return '';
   const totals={};
   categorias.forEach(c=>{totals[c.key]=doDia.reduce((s,d)=>s+(d[c.key]||0),0);});
-  const top3=[...doDia].map(d=>({...d,tot:categorias.reduce((s,c)=>s+(d[c.key]||0),0)})).sort((a,b)=>b.tot-a.tot).slice(0,3);
-  const medals=['🥇','🥈','🥉'];
   let html='<div class="slabel">Resumo da loja</div><div class="admin-sum-grid">';
   categorias.forEach(c=>{html+=`<div class="admin-sum-card"><span style="font-size:18px;display:block;margin-bottom:4px">${c.emoji}</span><div class="admin-sum-val">${totals[c.key]}</div><div class="admin-sum-lbl">${c.label}</div></div>`;});
   html+='</div>';
-  if(top3.length){
-    html+='<div class="slabel" style="margin-top:16px">🏆 Top 3 do dia</div>';
-    top3.forEach((v,i)=>{html+=`<div class="top3-row"><span class="top3-pos">${medals[i]}</span><div class="top3-name">${v.nome}<div style="font-size:11px;color:var(--muted)">${v.equipa||''}</div></div><div class="top3-score">${v.tot}</div></div>`;});
+  // 1º de cada secção (ordenado por total de unidades no dia)
+  const seccoesOrdem = ['calcado','caixa','textil','logistica','sup','estagios'];
+  const secLabel = {calcado:'👟 Calçado', caixa:'🧾 Caixa', textil:'👕 Têxtil', logistica:'📦 Logística', sup:'🎯 Direção', estagios:'🎓 Estagiários'};
+  const tops = [];
+  seccoesOrdem.forEach(secId => {
+    const nomesSecao = (equipas.find(e=>e.id===secId)||{}).nomes || [];
+    const doSecao = doDia
+      .filter(d => nomesSecao.includes(d.nome))
+      .map(d => ({...d, tot: categorias.reduce((s,c)=>s+(d[c.key]||0),0)}))
+      .sort((a,b) => b.tot - a.tot);
+    if (doSecao.length) tops.push({ secLabel: secLabel[secId], vendedor: doSecao[0] });
+  });
+  if(tops.length){
+    html+='<div class="slabel" style="margin-top:16px">🏆 Destaque do dia por secção</div>';
+    tops.forEach(({secLabel, vendedor}) => {
+      html+=`<div class="top3-row">
+        <span class="top3-pos" style="font-size:11px;min-width:64px;text-align:center;white-space:nowrap;color:var(--muted)">${secLabel}</span>
+        <div class="top3-name">🥇 ${vendedor.nome}<div style="font-size:11px;color:var(--muted)">${vendedor.equipa||''}</div></div>
+        <div class="top3-score">${vendedor.tot}</div>
+      </div>`;
+    });
   }
   return html;
 }
@@ -2864,6 +2880,8 @@ function calcularMedalhas(dados) {
     { icon:'💧', name:'Hydration Boss',    desc:tGarrafas+' garrafas este mês',    earned: garrafasMes  >= tGarrafas },
     { icon:'⭐', name:'Favorito',          desc:'3 elogios este mês',              earned: elogiosMes   >= 3 },
     { icon:'📅', name:'Consistente',       desc:th.consistente+' registos este mês', earned: diasComRegisto >= th.consistente },
+    { icon:'🌟', name:'Super Online',      desc:'8 onlines num dia',                  earned: false }, // verificado em slotVerificarMedalhas
+    { icon:'💥', name:'Spray Explosion',   desc:'10 sprays num dia',                  earned: false }, // verificado em slotVerificarMedalhas
   ];
 }
 
@@ -3809,40 +3827,56 @@ function slotFechar() {
 // DETEÇÃO DE MEDALHAS — ao registar o dia
 // ══════════════════════════════════════════════════
 function slotVerificarMedalhas(nome, payload) {
+  // ── Medalhas mensais ──
   const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
   const storageKey = 'slotDado_' + nome + '_' + mesKey;
-
   let jaAtribuidas = [];
   try { jaAtribuidas = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
 
   const dadosMapa = {};
-  if (dashAllDados.length) {
-    dashAllDados.filter(d => d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
+  if (Array.isArray(dashAllDados) && dashAllDados.length) {
+    dashAllDados.filter(d => d && d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
   }
   try {
     JSON.parse(localStorage.getItem('historico_local') || '[]')
-      .filter(d => d.nome === nome)
+      .filter(d => d && d.nome === nome)
       .forEach(d => { dadosMapa[d.data] = d; });
   } catch(e) {}
-
   dadosMapa[payload.data] = payload;
 
-  const todos = Object.values(dadosMapa);
-  const mes = new Date().getMonth();
-  const ano = new Date().getFullYear();
-  const doMes = todos.filter(d => {
-    const dt = new Date((d.data || '') + 'T12:00:00');
-    return !isNaN(dt) && dt.getMonth() === mes && dt.getFullYear() === ano;
+  const mes = new Date().getMonth(), ano = new Date().getFullYear();
+  const doMes = Object.values(dadosMapa).filter(d => {
+    try { const dt = new Date(d.data + 'T12:00:00'); return dt.getMonth()===mes && dt.getFullYear()===ano; } catch(e){ return false; }
   });
 
-  const medalhas = calcularMedalhas(doMes.length ? doMes : [payload]);
-  const earned = medalhas.filter(m => m.earned);
-  const novas = earned.filter(m => !jaAtribuidas.includes(m.name));
+  // Medalhas mensais (excluir as diárias que têm earned:false fixo)
+  const medalhasMes = calcularMedalhas(doMes.length ? doMes : [payload])
+    .filter(m => m.name !== 'Super Online' && m.name !== 'Spray Explosion');
+  const novasMes = medalhasMes.filter(m => m.earned && !jaAtribuidas.includes(m.name));
 
-  if (novas.length > 0) {
-    jaAtribuidas.push(...novas.map(m => m.name));
-    try { localStorage.setItem(storageKey, JSON.stringify(jaAtribuidas)); } catch(e) {}
-    setTimeout(() => slotAbrir(nome, novas[0].name), 800);
+  // ── Medalhas diárias (sem restrição mensal — chave por dia) ──
+  const diaKey = 'slotDia_' + nome + '_' + payload.data;
+  let jaDiarias = [];
+  try { jaDiarias = JSON.parse(localStorage.getItem(diaKey) || '[]'); } catch(e) {}
+
+  const novasDiarias = [];
+  if ((payload.onlines || 0) >= 8 && !jaDiarias.includes('Super Online')) {
+    novasDiarias.push({ icon:'🌟', name:'Super Online', desc:'8 onlines num dia!' });
+  }
+  if ((payload.sprays || 0) >= 10 && !jaDiarias.includes('Spray Explosion')) {
+    novasDiarias.push({ icon:'💥', name:'Spray Explosion', desc:'10 sprays num dia!' });
+  }
+
+  const todasNovas = [...novasDiarias, ...novasMes];
+
+  if (todasNovas.length > 0) {
+    if (novasMes.length > 0) {
+      try { localStorage.setItem(storageKey, JSON.stringify([...jaAtribuidas, ...novasMes.map(m=>m.name)])); } catch(e) {}
+    }
+    if (novasDiarias.length > 0) {
+      try { localStorage.setItem(diaKey, JSON.stringify([...jaDiarias, ...novasDiarias.map(m=>m.name)])); } catch(e) {}
+    }
+    setTimeout(() => slotAbrir(nome, todasNovas[0].name), 800);
   }
 }
 
