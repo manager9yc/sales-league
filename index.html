@@ -2,8 +2,7 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTIiIGZpbGw9IiMwNzBGMUYiLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIyNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQzlBODRDIiBzdHJva2Utd2lkdGg9IjIuNSIvPjxwYXRoIGQ9Ik0yNCAxNmgxNmwtMyAxNEgyN3oiIGZpbGw9IiNDOUE4NEMiLz48cmVjdCB4PSIyNyIgeT0iMzAiIHdpZHRoPSIxMCIgaGVpZ2h0PSI5IiByeD0iMiIgZmlsbD0iI0M5QTg0QyIvPjxlbGxpcHNlIGN4PSIzMiIgY3k9IjMwIiByeD0iOSIgcnk9IjMiIGZpbGw9IiNDOUE4NEMiLz48cmVjdCB4PSIyNCIgeT0iMzkiIHdpZHRoPSIxNiIgaGVpZ2h0PSIzIiByeD0iMS41IiBmaWxsPSIjQzlBODRDIi8+PHJlY3QgeD0iMjgiIHk9IjQyIiB3aWR0aD0iOCIgaGVpZ2h0PSI0IiByeD0iMSIgZmlsbD0iI0M5QTg0QyIvPjxyZWN0IHg9IjIyIiB5PSI0NiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIuNSIgcng9IjEuMjUiIGZpbGw9IiNDOUE4NEMiLz48L3N2Zz4=">
-
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMwNzBGMUYiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIyOCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQzlBODRDIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8IS0tIFRhw6dhIENoYW1waW9ucyAtLT4KICA8cGF0aCBkPSJNMjIgMTQgaDIwIGwtNCAxOCBoLTEyIHoiIGZpbGw9IiNDOUE4NEMiLz4KICA8ZWxsaXBzZSBjeD0iMzIiIGN5PSIzMiIgcng9IjEwIiByeT0iNCIgZmlsbD0iI0M5QTg0QyIvPgogIDxyZWN0IHg9IjI2IiB5PSIzMiIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwIiByeD0iMiIgZmlsbD0iI0M5QTg0QyIvPgogIDxyZWN0IHg9IjIzIiB5PSI0MiIgd2lkdGg9IjE4IiBoZWlnaHQ9IjMiIHJ4PSIxLjUiIGZpbGw9IiNDOUE4NEMiLz4KICA8IS0tIGVzdHJlbGFzIC0tPgogIDx0ZXh0IHg9IjMyIiB5PSI1NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI4IiBmaWxsPSIjQzlBODRDIiBmb250LWZhbWlseT0iQXJpYWwiPuKYheKYheKYheKYheKYhTwvdGV4dD4KPC9zdmc+">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
 <title>Super Liga</title>
 <meta name="mobile-web-app-capable" content="yes">
@@ -361,6 +360,37 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 @keyframes lightsShift { 0%{background-position:0 0} 100%{background-position:200px 0} }
 @keyframes confettiFall { 0%{transform:translateY(-10px) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
 @keyframes slotResultIn { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
+
+/* ══ SWIPE TO CONFIRM ══ */
+.swipe-wrap {
+  position: relative; width: 100%; height: 60px;
+  background: rgba(201,168,76,0.12);
+  border: 1.5px solid rgba(201,168,76,0.35);
+  border-radius: 30px; margin-top: 28px;
+  overflow: hidden; user-select: none; -webkit-user-select: none;
+  touch-action: none;
+}
+.swipe-track {
+  position: absolute; inset: 0; display: flex;
+  align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: rgba(201,168,76,0.6);
+  pointer-events: none; transition: opacity 0.2s;
+}
+.swipe-handle {
+  position: absolute; left: 4px; top: 4px;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: linear-gradient(135deg, #C9A84C, #E8C97A);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; cursor: grab; box-shadow: 0 2px 12px rgba(201,168,76,0.5);
+  transition: transform 0.08s; will-change: transform; z-index: 2;
+}
+.swipe-handle:active { cursor: grabbing; }
+.swipe-handle.done { background: linear-gradient(135deg, #22C55E, #16a34a); }
+.swipe-wrap.confirmed .swipe-track { opacity: 0; }
+.swipe-wrap.confirmed { border-color: #22C55E; background: rgba(34,197,94,0.12); }
+
 /* SPLASH */
 .splash{position:fixed;inset:0;z-index:9999;background:var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0;transition:opacity 0.6s ease;}
 .splash.out{opacity:0;pointer-events:none;}
@@ -879,7 +909,10 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
-      <button class="submit-btn" id="submitBtn" onclick="handleSubmitBtn(this)">Registar o meu dia</button>
+      <div class="swipe-wrap" id="swipeWrap">
+        <div class="swipe-track" id="swipeTrack">desliza para registar  →</div>
+        <div class="swipe-handle" id="swipeHandle">→</div>
+      </div>
       <div style="text-align:center;padding:10px 0 4px;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif">APP developed by Dário Santos</div>
     </div>
     <div class="success" id="successMsg">
@@ -1106,7 +1139,6 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
         <button onclick="carregarAdmin()" style="background:var(--orange);border:none;border-radius:10px;padding:10px 18px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer">Atualizar</button>
         <div id="adminSummary" style="font-size:12px;color:var(--muted)"></div>
         <button onclick="limparCacheAdmin()" style="background:var(--card);border:1px solid #7a2200;border-radius:10px;padding:10px 14px;color:#FF6644;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Cache</button>
-        <button onclick="resetSlotMes()" style="background:var(--card);border:1px solid #7a4400;border-radius:10px;padding:10px 14px;color:#FFa644;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🔄 Reset Slot</button>
         <button onclick="slotAbrir('TESTE','Medalha Teste')" style="background:var(--card);border:1px solid #C9A84C;border-radius:10px;padding:10px 14px;color:#C9A84C;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🎰 Testar Slot</button>
         <button onclick="bloquearAdmin()" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-left:auto">🔒 Bloquear</button>
       </div>
@@ -1374,11 +1406,9 @@ async function submeter() {
   } catch(e) {}
 
   iniciarAudio();
-  const btn = document.getElementById('submitBtn');
-  btn.textContent = '✔ A guardar...';
-  btn.style.background = '#00AA44';
-  btn.style.boxShadow = '0 4px 20px rgba(0,170,68,0.4)';
-  btn.disabled = true;
+  // Feedback visual no swipe handle
+  const handle = document.getElementById('swipeHandle');
+  if (handle) { handle.textContent = '⏳'; handle.style.opacity = '0.7'; }
 
   const equipa = equipas.find(e=>e.id===equipaAtiva)?.label.replace(/^\S+\s/,'') || '';
   const payload = {
@@ -1408,10 +1438,8 @@ async function submeter() {
 
   // Feedback visual imediato
   tocarSomRegisto();
-  btn.textContent = '✔ Registado com sucesso';
-  btn.style.background = '#22C55E';
-  btn.style.color = '#fff';
-  btn.style.boxShadow = '0 4px 20px rgba(34,197,94,0.4)';
+  const handle2 = document.getElementById('swipeHandle');
+  if (handle2) { handle2.textContent = '✔'; handle2.style.opacity = '1'; }
   lancarConfettiSucesso();
   try { navigator.vibrate && navigator.vibrate([30,10,30]); } catch(e) {}
 
@@ -1419,22 +1447,11 @@ async function submeter() {
   mostrarProgressoRegisto(nomeAtual, payload);
   setTimeout(atualizarMiniRanking, 600);
 
-  // Após 2.5s o botão vira "Novo Registo"
-  setTimeout(() => {
-    const r = document.getElementById('submitBtn');
-    if (!r) return;
-    r.textContent = '＋ Novo Registo';
-    r.style.background = 'transparent';
-    r.style.color = 'var(--orange)';
-    r.style.border = '2px solid var(--orange)';
-    r.style.boxShadow = 'none';
-    r.disabled = false;
-    r.classList.remove('loading');
-    r.dataset.state = 'novo';
-  }, 2500);
-
   // ★ SLOT MACHINE — chamar aqui, sem depender de nada
   slotVerificarMedalhas(nomeAtual, payload);
+
+  // Após 2.5s: refresh da página para novo registo limpo
+  setTimeout(() => { location.reload(); }, 2500);
 }
 
 
@@ -1489,7 +1506,7 @@ function atualizarDataDisplay() {
 }
 
 function resetForm() {
-  const _s2=document.getElementById('submitBtn');if(_s2){_s2.style.background='';_s2.style.color='';_s2.style.border='';_s2.style.boxShadow='';delete _s2.dataset.pg;_s2.dataset.state='';}
+  const _s2=document.getElementById('submitBtn');if(_s2){_s2.style.background='';_s2.style.color='';_s2.style.border='';_s2.style.boxShadow='';delete _s2.dataset.pg;}
   nomeSel = null; equipaAtiva = null;
   document.querySelectorAll('.team-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('nameGrid').innerHTML = '<div class="name-empty">Escolhe a tua equipa primeiro</div>';
@@ -1509,7 +1526,7 @@ function resetForm() {
     btn.style.boxShadow = '';
     btn.disabled = false;
     btn.classList.remove('loading');
-    btn.dataset.state = '';
+    btn.onclick = function() { clicarSubmit(btn); };
   }
   document.getElementById('formMain').classList.remove('hide');
   document.getElementById('successMsg').classList.remove('show');
@@ -2096,16 +2113,6 @@ async function carregarSplashTop3(){
   }catch(e){}
 }
 
-
-// Handler unificado do botão submit
-function handleSubmitBtn(btn) {
-  if (btn.dataset.state === 'novo') {
-    btn.dataset.state = '';
-    resetForm();
-  } else {
-    clicarSubmit(btn);
-  }
-}
 function clicarSubmit(btn) {
   // Click sound
   try {
@@ -2627,16 +2634,6 @@ function togglePremiosEditor() {
 }
 
 // ══ LIMPAR CACHE ══
-function resetSlotMes() {
-  const toRemove = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (k && k.startsWith('slotDado_')) toRemove.push(k);
-  }
-  toRemove.forEach(k => { try { localStorage.removeItem(k); } catch(e) {} });
-  showToast('✓ Slot reset — medalhas podem ser ganhas de novo', 3000);
-}
-
 function limparCacheAdmin() {
   if (!confirm('Limpar cache local? (ranking, splash, medalhas, histórico)\nOs dados no Google Sheets não são afetados.')) return;
   const fixedKeys = ['rankingCache','rankingCacheTime','splashDate','premiosLog','metasConfig','medalhasConfig','historico_local'];
@@ -3638,43 +3635,44 @@ function slotFechar() {
 // DETEÇÃO DE MEDALHAS — ao registar o dia
 // ══════════════════════════════════════════════════
 function slotVerificarMedalhas(nome, payload) {
-  // Chave: quais medalhas já foram premiadas este mês para este vendedor
   const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
   const storageKey = 'slotDado_' + nome + '_' + mesKey;
+
   let jaAtribuidas = [];
   try { jaAtribuidas = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
 
-  // Construir histórico acumulado do mês: servidor + localStorage + payload de hoje
   const dadosMapa = {};
-  if (Array.isArray(dashAllDados)) {
-    dashAllDados.filter(d => d && d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
+  if (dashAllDados.length) {
+    dashAllDados.filter(d => d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
   }
   try {
-    const local = JSON.parse(localStorage.getItem('historico_local') || '[]');
-    local.filter(d => d && d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
+    JSON.parse(localStorage.getItem('historico_local') || '[]')
+      .filter(d => d.nome === nome)
+      .forEach(d => { dadosMapa[d.data] = d; });
   } catch(e) {}
-  dadosMapa[payload.data] = payload; // garantir que hoje está incluído
 
+  dadosMapa[payload.data] = payload;
+
+  const todos = Object.values(dadosMapa);
   const mes = new Date().getMonth();
   const ano = new Date().getFullYear();
-  const doMes = Object.values(dadosMapa).filter(d => {
-    try {
-      const dt = new Date(d.data + 'T12:00:00');
-      return dt.getMonth() === mes && dt.getFullYear() === ano;
-    } catch(e) { return false; }
+  const doMes = todos.filter(d => {
+    const dt = new Date((d.data || '') + 'T12:00:00');
+    return !isNaN(dt) && dt.getMonth() === mes && dt.getFullYear() === ano;
   });
 
-  // Calcular com dados do mês (ou só o payload se não houver mais)
-  const dadosParaCalculo = doMes.length > 0 ? doMes : [payload];
-  const medalhas = calcularMedalhas(dadosParaCalculo);
-  const novas = medalhas.filter(m => m.earned && !jaAtribuidas.includes(m.name));
+  const medalhas = calcularMedalhas(doMes.length ? doMes : [payload]);
+  const earned = medalhas.filter(m => m.earned);
+  const novas = earned.filter(m => !jaAtribuidas.includes(m.name));
+
+  // Toast de debug para o utilizador ver o que está a acontecer
+  const dbg = `🎯 ${earned.length} medalhas earned, ${novas.length} novas, ${jaAtribuidas.length} já dadas`;
+  showToast(dbg, 4000);
 
   if (novas.length > 0) {
-    // Guardar como atribuídas ANTES de abrir (evita duplicados)
-    const novasNomes = novas.map(m => m.name);
-    try { localStorage.setItem(storageKey, JSON.stringify([...jaAtribuidas, ...novasNomes])); } catch(e) {}
-    // Abrir slot após animação de registo
-    setTimeout(() => slotAbrir(nome, novas[0].name), 800);
+    jaAtribuidas.push(...novas.map(m => m.name));
+    try { localStorage.setItem(storageKey, JSON.stringify(jaAtribuidas)); } catch(e) {}
+    setTimeout(() => slotAbrir(nome, novas[0].name), 1500);
   }
 }
 
@@ -3683,6 +3681,94 @@ function mostrarMysteryBox(n, m) { slotAbrir(n, m); }
 function fecharMysteryBox() { slotFechar(); }
 function mostrarRoulette(n, m) { slotAbrir(n, m); }
 function fecharRoulette() { slotFechar(); }
+
+
+// ══ SWIPE TO CONFIRM ══
+(function() {
+  let dragging = false, startX = 0, curX = 0, maxX = 0;
+
+  function init() {
+    const wrap   = document.getElementById('swipeWrap');
+    const handle = document.getElementById('swipeHandle');
+    if (!wrap || !handle) return;
+
+    maxX = wrap.offsetWidth - handle.offsetWidth - 8;
+
+    function getX(e) {
+      return e.touches ? e.touches[0].clientX : e.clientX;
+    }
+
+    function onStart(e) {
+      if (wrap.classList.contains('confirmed')) return;
+      dragging = true;
+      startX = getX(e) - curX;
+      handle.style.transition = 'none';
+      e.preventDefault();
+    }
+
+    function onMove(e) {
+      if (!dragging) return;
+      const x = Math.max(0, Math.min(getX(e) - startX, maxX));
+      curX = x;
+      handle.style.transform = 'translateX(' + x + 'px)';
+      // fade out label
+      const pct = x / maxX;
+      document.getElementById('swipeTrack').style.opacity = 1 - pct * 1.5;
+      if (pct > 0.5) handle.textContent = '✔';
+      else handle.textContent = '→';
+      e.preventDefault();
+    }
+
+    function onEnd(e) {
+      if (!dragging) return;
+      dragging = false;
+      handle.style.transition = 'transform 0.3s cubic-bezier(0.34,1.56,0.64,1)';
+      if (curX >= maxX * 0.75) {
+        // CONFIRMADO
+        curX = maxX;
+        handle.style.transform = 'translateX(' + maxX + 'px)';
+        handle.classList.add('done');
+        handle.textContent = '✔';
+        wrap.classList.add('confirmed');
+        document.getElementById('swipeTrack').style.opacity = '0';
+        // Chamar submeter
+        submeter();
+      } else {
+        // Voltar ao início
+        curX = 0;
+        handle.style.transform = 'translateX(0)';
+        handle.textContent = '→';
+        document.getElementById('swipeTrack').style.opacity = '1';
+      }
+    }
+
+    handle.addEventListener('touchstart', onStart, { passive: false });
+    handle.addEventListener('mousedown',  onStart);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('touchend',  onEnd);
+    document.addEventListener('mouseup',   onEnd);
+  }
+
+  // Re-init quando o form é resetado
+  window.swipeInit = function() {
+    const wrap   = document.getElementById('swipeWrap');
+    const handle = document.getElementById('swipeHandle');
+    if (!wrap || !handle) return;
+    wrap.classList.remove('confirmed');
+    handle.classList.remove('done');
+    handle.style.transform = 'translateX(0)';
+    handle.style.transition = '';
+    handle.textContent = '→';
+    document.getElementById('swipeTrack').style.opacity = '1';
+    curX = 0;
+    maxX = wrap.offsetWidth - handle.offsetWidth - 8;
+  };
+
+  document.addEventListener('DOMContentLoaded', init);
+  // fallback se DOMContentLoaded já passou
+  if (document.readyState !== 'loading') setTimeout(init, 100);
+})();
 
 </script>
 
