@@ -8,7 +8,7 @@
 <title>Super Liga</title>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<link rel="apple-touch-icon" href="images/img_01.png">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTIiIGZpbGw9IiMwNzBGMUYiLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIyNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQzlBODRDIiBzdHJva2Utd2lkdGg9IjIuNSIvPjxwYXRoIGQ9Ik0yNCAxNmgxNmwtMyAxNEgyN3oiIGZpbGw9IiNDOUE4NEMiLz48cmVjdCB4PSIyNyIgeT0iMzAiIHdpZHRoPSIxMCIgaGVpZ2h0PSI5IiByeD0iMiIgZmlsbD0iI0M5QTg0QyIvPjxlbGxpcHNlIGN4PSIzMiIgY3k9IjMwIiByeD0iOSIgcnk9IjMiIGZpbGw9IiNDOUE4NEMiLz48cmVjdCB4PSIyNCIgeT0iMzkiIHdpZHRoPSIxNiIgaGVpZ2h0PSIzIiByeD0iMS41IiBmaWxsPSIjQzlBODRDIi8+PHJlY3QgeD0iMjgiIHk9IjQyIiB3aWR0aD0iOCIgaGVpZ2h0PSI0IiByeD0iMSIgZmlsbD0iI0M5QTg0QyIvPjxyZWN0IHg9IjIyIiB5PSI0NiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIuNSIgcng9IjEuMjUiIGZpbGw9IiNDOUE4NEMiLz48L3N2Zz4=">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Super Liga">
 <meta name="theme-color" content="#070F1F">
@@ -732,10 +732,149 @@ body.theme-oled{--dark:#000;--card:#0a0a0a;--card2:#111;--border:#1a1a1a;--muted
 body.theme-ucl .submit-btn{background:linear-gradient(135deg,#C9A84C,#E8C97A)!important;color:#070F1F!important;font-weight:800}
 body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A34A)!important;color:#fff!important}
 
-/* ══ SLOT MACHINE CSS ══ */
+/* ══ SWIPE BUTTON (mobile only) ══ */
+.swipe-btn-wrap {
+  position: relative;
+  width: 100%;
+  height: 58px;
+  background: rgba(255,107,0,0.12);
+  border: 1.5px solid rgba(255,107,0,0.35);
+  border-radius: 14px;
+  margin-top: 28px;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.swipe-track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.swipe-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: rgba(255,107,0,0.6);
+  transition: opacity 0.2s;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.swipe-arrows {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+.swipe-arrows span {
+  font-size: 14px;
+  color: rgba(255,107,0,0.4);
+  animation: swipeArrowPulse 1.2s ease-in-out infinite;
+}
+.swipe-arrows span:nth-child(2) { animation-delay: 0.15s; }
+.swipe-arrows span:nth-child(3) { animation-delay: 0.30s; }
+@keyframes swipeArrowPulse { 0%,100%{opacity:0.2} 50%{opacity:0.8} }
+.swipe-thumb {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  bottom: 4px;
+  width: 52px;
+  background: var(--orange);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: grab;
+  box-shadow: 0 2px 12px rgba(255,107,0,0.5);
+  transition: background 0.3s;
+  will-change: transform;
+  touch-action: none;
+}
+.swipe-btn-wrap.done .swipe-thumb { background: #22C55E; box-shadow: 0 2px 12px rgba(34,197,94,0.5); }
+.swipe-btn-wrap.done { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.4); }
+.swipe-btn-wrap.done .swipe-label { color: #22C55E; opacity: 1 !important; }
+/* On desktop: show normal button */
+@media (hover: hover) and (pointer: fine) {
+  .swipe-btn-wrap { display: none !important; }
+  .submit-btn-desktop { display: block !important; }
+}
+@media (hover: none), (pointer: coarse) {
+  .submit-btn-desktop { display: none !important; }
+  .swipe-btn-wrap { display: block; }
+}
+
 @keyframes slotLights { 0%{background-position:0 0} 100%{background-position:200px 0} }
 @keyframes slotConfettiFall { 0%{transform:translateY(-10px) rotate(0);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
 @keyframes slotResultIn { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
+
+/* ══ SWIPE BUTTON (mobile only) ══ */
+.swipe-btn-wrap {
+  position: relative;
+  width: 100%;
+  height: 58px;
+  background: rgba(255,107,0,0.12);
+  border: 1.5px solid rgba(255,107,0,0.35);
+  border-radius: 14px;
+  margin-top: 28px;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.swipe-track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.swipe-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: rgba(255,107,0,0.7);
+  transition: opacity 0.2s;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.swipe-arrows { display:flex; gap:3px; align-items:center; }
+.swipe-arrows span { font-size:14px; color:rgba(255,107,0,0.5); animation:swipeArrowPulse 1.2s ease-in-out infinite; }
+.swipe-arrows span:nth-child(2){animation-delay:.15s}
+.swipe-arrows span:nth-child(3){animation-delay:.30s}
+@keyframes swipeArrowPulse{0%,100%{opacity:0.2}50%{opacity:1}}
+.swipe-thumb {
+  position: absolute;
+  left: 4px; top: 4px; bottom: 4px;
+  width: 52px;
+  background: var(--orange);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  cursor: grab;
+  box-shadow: 0 2px 12px rgba(255,107,0,0.5);
+  will-change: transform;
+  touch-action: none;
+}
+.swipe-btn-wrap.done .swipe-thumb { background:#22C55E; box-shadow:0 2px 12px rgba(34,197,94,0.5); }
+.swipe-btn-wrap.done { background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.4); }
+/* On desktop: hide swipe, show normal button */
+@media (hover:hover) and (pointer:fine) {
+  .swipe-btn-wrap { display:none !important; }
+  .submit-btn-desktop { display:block !important; }
+}
+@media (hover:none),(pointer:coarse) {
+  .submit-btn-desktop { display:none !important; }
+  .swipe-btn-wrap { display:block; }
+}
 </style>
 </head>
 <body>
@@ -879,7 +1018,18 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
-      <button class="submit-btn" id="submitBtn" onclick="handleSubmitBtn(this)">Registar o meu dia</button>
+      <button class="submit-btn submit-btn-desktop" id="submitBtn" onclick="handleSubmitBtn(this)">Registar o meu dia</button>
+
+      <!-- SWIPE TO REGISTER (mobile only) -->
+      <div class="swipe-btn-wrap" id="swipeBtnWrap">
+        <div class="swipe-track">
+          <div class="swipe-label" id="swipeLabel">
+            <div class="swipe-arrows"><span>›</span><span>›</span><span>›</span></div>
+            DESLIZA PARA REGISTAR
+          </div>
+        </div>
+        <div class="swipe-thumb" id="swipeThumb">📋</div>
+      </div>
       <div style="text-align:center;padding:10px 0 4px;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif">APP developed by Dário Santos</div>
     </div>
     <div class="success" id="successMsg">
@@ -1516,6 +1666,7 @@ function resetForm() {
   const formEl = document.getElementById('screen-form');
   if (formEl) formEl.scrollTop = 0;
   window.scrollTo({top: 0, behavior: 'smooth'});
+  if (typeof window._resetSwipe === 'function') window._resetSwipe();
 }
 
 // RANKING
@@ -3670,6 +3821,174 @@ function fecharMysteryBox() { slotFechar(); }
 function mostrarRoulette(n, m) { slotAbrir(n, m); }
 function fecharRoulette() { slotFechar(); }
 
+// ══════════════════════════════════════════════════
+// MEDALHAS DIÁRIAS (8 onlines ou 10 sprays num único dia)
+// ══════════════════════════════════════════════════
+function calcularMedalhasDiarias(payload) {
+  const medalhas = [];
+  if ((payload.onlines || 0) >= 8) {
+    medalhas.push({ icon: '🌟', name: 'Super Online', desc: '8 onlines num único dia!', earned: true, daily: true });
+  }
+  if ((payload.sprays || 0) >= 10) {
+    medalhas.push({ icon: '💥', name: 'Spray Explosion', desc: '10 sprays num único dia!', earned: true, daily: true });
+  }
+  return medalhas;
+}
+
+// Patch slotVerificarMedalhas to also check daily medals
+const _origSlotVerificar = slotVerificarMedalhas;
+slotVerificarMedalhas = function(nome, payload) {
+  // First check normal medals (accumulative, only unlock once per month)
+  const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
+  const storageKey = 'slotDado_' + nome + '_' + mesKey;
+  let jaAtribuidas = [];
+  try { jaAtribuidas = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
+  const dadosMapa = {};
+  if (dashAllDados.length) {
+    dashAllDados.filter(d => d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
+  }
+  try {
+    JSON.parse(localStorage.getItem('historico_local') || '[]')
+      .filter(d => d.nome === nome)
+      .forEach(d => { dadosMapa[d.data] = d; });
+  } catch(e) {}
+  dadosMapa[payload.data] = payload;
+  const todos = Object.values(dadosMapa);
+  const mes = new Date().getMonth();
+  const ano = new Date().getFullYear();
+  const doMes = todos.filter(d => {
+    const dt = new Date((d.data || '') + 'T12:00:00');
+    return !isNaN(dt) && dt.getMonth() === mes && dt.getFullYear() === ano;
+  });
+  const medalhas = calcularMedalhas(doMes.length ? doMes : [payload]);
+  const earned = medalhas.filter(m => m.earned);
+  const novasNormais = earned.filter(m => !jaAtribuidas.includes(m.name));
+
+  // Daily medals — always unlock (infinite, no monthly restriction)
+  const diarias = calcularMedalhasDiarias(payload);
+
+  if (novasNormais.length > 0) {
+    jaAtribuidas.push(...novasNormais.map(m => m.name));
+    try { localStorage.setItem(storageKey, JSON.stringify(jaAtribuidas)); } catch(e) {}
+  }
+
+  // Combine: normal first, then daily
+  const todasNovas = [...novasNormais, ...diarias];
+
+  if (todasNovas.length > 0) {
+    setTimeout(() => slotAbrir(nome, todasNovas[0].name), 800);
+  }
+};
+
+// ══════════════════════════════════════════════════
+// SWIPE TO REGISTER
+// ══════════════════════════════════════════════════
+(function() {
+  let swipeStartX = 0, swiping = false, swipeDone = false;
+
+  function getWrap()  { return document.getElementById('swipeBtnWrap'); }
+  function getThumb() { return document.getElementById('swipeThumb'); }
+  function getLabel() { return document.getElementById('swipeLabel'); }
+
+  function swipeStart(clientX) {
+    if (swipeDone) return;
+    const wrap = getWrap(); if (!wrap || wrap.classList.contains('done')) return;
+    swiping = true;
+    swipeStartX = clientX;
+    const thumb = getThumb();
+    if (thumb) thumb.style.transition = 'none';
+  }
+
+  function swipeMove(clientX) {
+    if (!swiping || swipeDone) return;
+    const wrap = getWrap(); if (!wrap) return;
+    const thumb = getThumb();
+    const maxX = wrap.offsetWidth - (thumb ? thumb.offsetWidth : 52) - 8;
+    const dx = Math.max(0, Math.min(clientX - swipeStartX, maxX));
+    if (thumb) thumb.style.transform = 'translateX(' + dx + 'px)';
+    const label = getLabel();
+    if (label) label.style.opacity = Math.max(0, 1 - (dx / maxX) * 2);
+    if (dx / maxX >= 0.9) completeSwipe(maxX);
+  }
+
+  function swipeEnd() {
+    if (!swiping || swipeDone) { swiping = false; return; }
+    swiping = false;
+    const wrap = getWrap(); if (!wrap) return;
+    const thumb = getThumb();
+    if (!thumb) return;
+    const maxX = wrap.offsetWidth - thumb.offsetWidth - 8;
+    const m = (thumb.style.transform || '').match(/translateX\(([^p]+)px\)/);
+    const dx = m ? parseFloat(m[1]) : 0;
+    if (dx / maxX < 0.9) {
+      thumb.style.transition = 'transform 0.3s cubic-bezier(0.34,1.56,0.64,1)';
+      thumb.style.transform = 'translateX(0)';
+      const label = getLabel();
+      if (label) { label.style.transition = 'opacity 0.3s'; label.style.opacity = 1; }
+    }
+  }
+
+  function completeSwipe(maxX) {
+    if (swipeDone) return;
+    swipeDone = true;
+    swiping = false;
+    const wrap = getWrap();
+    const thumb = getThumb();
+    const label = getLabel();
+    if (thumb) { thumb.style.transform = 'translateX(' + maxX + 'px)'; thumb.textContent = '✓'; }
+
+    // Check if already submitted (novo registo state)
+    const submitBtn = document.getElementById('submitBtn');
+    if (submitBtn && submitBtn.dataset.state === 'novo') {
+      swipeDone = false;
+      resetForm();
+      return;
+    }
+
+    // Call the actual submit
+    clicarSubmit(submitBtn);
+
+    // Show green "Registo Efetuado"
+    setTimeout(() => {
+      if (!wrap) return;
+      wrap.classList.add('done');
+      if (thumb) { thumb.style.background = '#22C55E'; thumb.style.boxShadow = '0 2px 12px rgba(34,197,94,0.5)'; }
+      if (label) {
+        label.style.opacity = 1;
+        label.style.color = '#22C55E';
+        label.innerHTML = '✓ REGISTO EFETUADO';
+      }
+    }, 300);
+
+    // Auto-reset after 4s
+    setTimeout(() => {
+      swipeDone = false;
+      _resetSwipe();
+    }, 4500);
+  }
+
+  document.addEventListener('touchstart', e => {
+    if (e.target.closest && e.target.closest('#swipeBtnWrap')) { e.preventDefault(); swipeStart(e.touches[0].clientX); }
+  }, {passive: false});
+  document.addEventListener('touchmove', e => {
+    if (swiping) { e.preventDefault(); swipeMove(e.touches[0].clientX); }
+  }, {passive: false});
+  document.addEventListener('touchend', () => swipeEnd());
+  document.addEventListener('mousedown', e => { if (e.target.closest && e.target.closest('#swipeBtnWrap')) swipeStart(e.clientX); });
+  document.addEventListener('mousemove', e => { if (swiping) swipeMove(e.clientX); });
+  document.addEventListener('mouseup', () => swipeEnd());
+})();
+
+window._resetSwipe = function() {
+  const wrap = document.getElementById('swipeBtnWrap');
+  const thumb = document.getElementById('swipeThumb');
+  const label = document.getElementById('swipeLabel');
+  if (!wrap) return;
+  wrap.classList.remove('done');
+  if (thumb) { thumb.style.transition = 'none'; thumb.style.transform = 'translateX(0)'; thumb.textContent = '📋'; thumb.style.background = ''; thumb.style.boxShadow = ''; }
+  if (label) { label.style.opacity = 1; label.style.color = ''; label.innerHTML = '<div class="swipe-arrows"><span>›</span><span>›</span><span>›</span></div>DESLIZA PARA REGISTAR'; }
+};
+
 </script>
 
 <div class="screen" id="screen-info">
@@ -3697,14 +4016,7 @@ function fecharRoulette() { slotFechar(); }
         </div>
         <div id="sugestoesList"></div>
       </div>
-      <div style="margin-top:20px">
-        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">🔗 Partilhar App</div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center">
-          <div id="qrCode" style="display:flex;justify-content:center;margin-bottom:12px"></div>
-          <div style="font-size:12px;color:var(--muted);margin-bottom:10px;word-break:break-all">https://manager9yc.github.io/super-liga/</div>
-          <button onclick="copiarLink()" style="width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer" id="copyBtn">📋 Copiar Link</button>
-        </div>
-      </div>
+
     </div>
   </div>
 </div>
