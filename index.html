@@ -1385,9 +1385,7 @@ function goTo(screen, btn) {
   btn.classList.add('active');
   try { localStorage.setItem('lastTab', screen); } catch(e) {}
   document.getElementById('printBtn').style.display = screen === 'ranking' ? 'flex' : 'none';
-  if(screen==='info'){renderInfo();renderSugestoes();populateSugestaoNomes();gerarQR();
-    const _st=document.getElementById('sugestaoTexto');if(_st)_st.value='';
-    const _sn=document.getElementById('sugestaoNome');if(_sn)_sn.selectedIndex=0;}
+  if(screen==='info'){renderInfo();renderSugestoes();populateSugestaoNomes();gerarQR();}
   if(screen==='admin'){renderPremiosLog();renderAdminSugestoes();}
   if (screen === 'ranking') {
     // Show cached data immediately if available
@@ -1570,11 +1568,22 @@ async function submeter() {
   mostrarProgressoRegisto(nomeAtual, payload);
   setTimeout(atualizarMiniRanking, 600);
 
-  // ★ SLOT MACHINE — verificar medalhas
-  slotVerificarMedalhas(nomeAtual, payload);
+  // Após 2.5s o botão vira "Novo Registo"
+  setTimeout(() => {
+    const r = document.getElementById('submitBtn');
+    if (!r) return;
+    r.textContent = '＋ Novo Registo';
+    r.style.background = 'transparent';
+    r.style.color = 'var(--orange)';
+    r.style.border = '2px solid var(--orange)';
+    r.style.boxShadow = 'none';
+    r.disabled = false;
+    r.classList.remove('loading');
+    r.dataset.state = 'novo';
+  }, 2500);
 
-  // Refresh após 3s para novo registo
-  setTimeout(() => { location.reload(); }, 3000);
+  // ★ SLOT MACHINE — chamar aqui, sem depender de nada
+  slotVerificarMedalhas(nomeAtual, payload);
 }
 
 
@@ -2775,7 +2784,7 @@ function limparCacheAdmin() {
   const toRemove = [];
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (k && (k.startsWith('medalhasShown_') || k.startsWith('surpriseShown_') || k.startsWith('mbShown_') || k.startsWith('registo_') || k.startsWith('slotDado_') || k.startsWith('slotDia_'))) toRemove.push(k);
+    if (k && (k.startsWith('medalhasShown_') || k.startsWith('surpriseShown_') || k.startsWith('mbShown_') || k.startsWith('registo_') || k.startsWith('slotDado_'))) toRemove.push(k);
   }
   toRemove.forEach(k => { try { localStorage.removeItem(k); } catch(e) {} });
   showToast('✓ Cache limpo com sucesso');
@@ -2867,6 +2876,8 @@ function calcularMedalhas(dados) {
     { icon:'💧', name:'Hydration Boss',    desc:tGarrafas+' garrafas este mês',    earned: garrafasMes  >= tGarrafas },
     { icon:'⭐', name:'Favorito',          desc:'3 elogios este mês',              earned: elogiosMes   >= 3 },
     { icon:'📅', name:'Consistente',       desc:th.consistente+' registos este mês', earned: diasComRegisto >= th.consistente },
+    { icon:'🌟', name:'Super Online',      desc:'8 onlines num dia',                  earned: false }, // verificado separadamente
+    { icon:'💥', name:'Spray Explosion',   desc:'10 sprays num dia',                  earned: false }, // verificado separadamente
   ];
 }
 
@@ -3405,6 +3416,7 @@ function renderSugestoes(){
       <input type="password" placeholder="PIN Admin..." id="respInlinePin_${i}" maxlength="3" style="width:80px;background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:13px;outline:none;margin-right:6px">
       <input type="text" placeholder="Escreve a resposta..." id="respInlineTexto_${i}" style="width:calc(100% - 180px);background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;outline:none;margin-right:6px">
       <button onclick="submeterRespostaInline(${i})" style="background:var(--orange);border:none;border-radius:6px;padding:6px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer">OK</button>
+      <button onclick="apagarSugestao(${i}, document.getElementById('respInlinePin_'+${i}).value)" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:6px;padding:6px 10px;color:#EF4444;font-size:13px;cursor:pointer;margin-left:4px" title="Apagar comentário">🗑</button>
     </div>
   </div>`).join('');
 }
@@ -3525,6 +3537,15 @@ function pararSomCasino() {
 function mostrarRespostaInline(i) {
   const el = document.getElementById('respInline_' + i);
   if (el) el.style.display = el.style.display === 'none' ? 'flex' : 'none';
+}
+
+function apagarSugestao(i, pin) {
+  if (pin !== ADMIN_PIN) { showToast('⚠️ PIN incorreto'); return; }
+  if (!confirm('Apagar este comentário? Não pode ser desfeito.')) return;
+  sugestoes.splice(i, 1);
+  try { localStorage.setItem('sugestoes', JSON.stringify(sugestoes)); } catch(e) {}
+  renderSugestoes();
+  showToast('✓ Comentário apagado');
 }
 
 function submeterRespostaInline(i) {
@@ -3791,10 +3812,12 @@ function slotVerificarMedalhas(nome, payload) {
     try { const dt = new Date(d.data + 'T12:00:00'); return dt.getMonth()===mes && dt.getFullYear()===ano; } catch(e){ return false; }
   });
 
-  const medalhasMes = calcularMedalhas(doMes.length ? doMes : [payload]);
+  // Medalhas mensais (excluir as diárias que têm earned:false fixo)
+  const medalhasMes = calcularMedalhas(doMes.length ? doMes : [payload])
+    .filter(m => m.name !== 'Super Online' && m.name !== 'Spray Explosion');
   const novasMes = medalhasMes.filter(m => m.earned && !jaAtribuidas.includes(m.name));
 
-  // ── Medalhas diárias (sem restrição mensal) ──
+  // ── Medalhas diárias (sem restrição mensal — chave por dia) ──
   const diaKey = 'slotDia_' + nome + '_' + payload.data;
   let jaDiarias = [];
   try { jaDiarias = JSON.parse(localStorage.getItem(diaKey) || '[]'); } catch(e) {}
