@@ -2807,7 +2807,7 @@ function bloquearAdmin() {
 
 // ══ METAS MENSAIS ══
 // ══ METAS MENSAIS (editáveis via admin) ══
-const metasDefault = { onlines:30, sprays:30, palmilhas:20, camisolas:20, sacos:800, garrafas:20, elogios:3 };
+const metasDefault = { onlines:30, sprays:30, palmilhas:20, camisolas:20, sacos:800, garrafas:20, elogios:1 };
 let metas = Object.assign({}, metasDefault);
 try { const _mc=localStorage.getItem('metasConfig'); if(_mc){ const _p=JSON.parse(_mc); Object.keys(_p).forEach(k=>{ if(metas.hasOwnProperty(k)) metas[k]=Number(_p[k])||metas[k]; }); } } catch(e){}
 const metasMedalhas = metas;
@@ -2815,11 +2815,11 @@ const metasMedalhas = metas;
 // Limiares de medalhas editáveis
 const medalhasDefault = {
   tOnlines_calcado:30, tOnlines_normal:15,
-  tSprays_calcadoCaixa:30, tSprays_normal:15,
+  tSprays_calcadoCaixa:35, tSprays_normal:15,
   tPalmilhas_calcado:20, tPalmilhas_normal:10,
-  tCamisolas_calcadoCaixa:20, tCamisolas_normal:10,
-  tSacos_caixa:800, tSacos_normal:150,
-  tGarrafas_caixa:20, tGarrafas_normal:15, tElogios:3
+  tCamisolas_calcadoCaixa:25, tCamisolas_normal:12,
+  tSacos_caixa:1000, tSacos_normal:150,
+  tGarrafas_caixa:30, tGarrafas_normal:15, tElogios:3
 };
 let medalhasConfig = Object.assign({}, medalhasDefault);
 try { const _mmc=localStorage.getItem('medalhasConfig'); if(_mmc){ const _mp=JSON.parse(_mmc); Object.keys(_mp).forEach(k=>{ if(medalhasConfig.hasOwnProperty(k)) medalhasConfig[k]=Number(_mp[k])||medalhasConfig[k]; }); } } catch(e){}
@@ -2837,7 +2837,7 @@ function getThresholds(nome) {
   const isLogistica = equipaLogistica.includes(nome);
   const isCalcado = equipaCalcadoSneaker.includes(nome);
   return {
-    consistente: isPartTime ? (medalhasConfig.tRegistos_parttime||7) : (medalhasConfig.tRegistos_fulltime||17),
+    consistente: isPartTime ? (medalhasConfig.tRegistos_parttime||8) : (medalhasConfig.tRegistos_fulltime||20),
     onlines: isCalcado ? 30 : 20,
   };
 }
