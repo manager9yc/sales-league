@@ -2807,7 +2807,7 @@ function bloquearAdmin() {
 
 // ══ METAS MENSAIS ══
 // ══ METAS MENSAIS (editáveis via admin) ══
-const metasDefault = { onlines:30, sprays:30, palmilhas:20, camisolas:20, sacos:800, garrafas:20, elogios:1 };
+const metasDefault = { onlines:20, sprays:20, palmilhas:15, camisolas:20, sacos:800, garrafas:20, elogios:1 };
 let metas = Object.assign({}, metasDefault);
 try { const _mc=localStorage.getItem('metasConfig'); if(_mc){ const _p=JSON.parse(_mc); Object.keys(_p).forEach(k=>{ if(metas.hasOwnProperty(k)) metas[k]=Number(_p[k])||metas[k]; }); } } catch(e){}
 const metasMedalhas = metas;
@@ -2817,7 +2817,7 @@ const medalhasDefault = {
   tOnlines_calcado:30, tOnlines_normal:15,
   tSprays_calcadoCaixa:35, tSprays_normal:15,
   tPalmilhas_calcado:20, tPalmilhas_normal:10,
-  tCamisolas_calcadoCaixa:25, tCamisolas_normal:12,
+  tCamisolas_calcadoTextil:25, tCamisolas_normal:12,
   tSacos_caixa:1000, tSacos_normal:150,
   tGarrafas_caixa:30, tGarrafas_normal:15, tElogios:3
 };
