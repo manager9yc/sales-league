@@ -798,14 +798,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 .swipe-btn-wrap.done { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.4); }
 .swipe-btn-wrap.done .swipe-label { color: #22C55E; opacity: 1 !important; }
 /* On desktop: show normal button */
-@media (hover: hover) and (pointer: fine) {
-  .swipe-btn-wrap { display: none !important; }
-  .submit-btn-desktop { display: block !important; }
-}
-@media (hover: none), (pointer: coarse) {
-  .submit-btn-desktop { display: none !important; }
-  .swipe-btn-wrap { display: block; }
-}
+
 
 @keyframes slotLights { 0%{background-position:0 0} 100%{background-position:200px 0} }
 @keyframes slotConfettiFall { 0%{transform:translateY(-10px) rotate(0);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
@@ -865,14 +858,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 .swipe-btn-wrap.done .swipe-thumb { background:#22C55E; box-shadow:0 2px 12px rgba(34,197,94,0.5); }
 .swipe-btn-wrap.done { background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.4); }
 /* On desktop: hide swipe, show normal button */
-@media (hover:hover) and (pointer:fine) {
-  .swipe-btn-wrap { display:none !important; }
-  .submit-btn-desktop { display:block !important; }
-}
-@media (hover:none),(pointer:coarse) {
-  .submit-btn-desktop { display:none !important; }
-  .swipe-btn-wrap { display:block; }
-}
+
 </style>
 </head>
 <body>
@@ -1019,18 +1005,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
-      <button class="submit-btn submit-btn-desktop" id="submitBtn" onclick="handleSubmitBtn(this)">Registar o meu dia</button>
-
-      <!-- SWIPE TO REGISTER (mobile only) -->
-      <div class="swipe-btn-wrap" id="swipeBtnWrap">
-        <div class="swipe-track">
-          <div class="swipe-label" id="swipeLabel">
-            <div class="swipe-arrows"><span>❯</span><span>❯</span><span>❯</span></div>
-            DESLIZA PARA REGISTAR
-          </div>
-        </div>
-        <div class="swipe-thumb" id="swipeThumb">✔</div>
-      </div>
+      <button class="submit-btn" id="submitBtn" onclick="handleSubmitBtn(this)" style="display:block!important">REGISTAR O MEU DIA</button>
       <div style="text-align:center;padding:10px 0 4px;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif">APP developed by Dário Santos</div>
     </div>
     <div class="success" id="successMsg">
@@ -1552,7 +1527,7 @@ async function submeter() {
   setTimeout(() => {
     const r = document.getElementById('submitBtn');
     if (!r) return;
-    r.textContent = '＋ Novo Registo';
+    r.textContent = 'REGISTAR O MEU DIA';
     r.style.background = 'transparent';
     r.style.color = 'var(--orange)';
     r.style.border = '2px solid var(--orange)';
@@ -1656,7 +1631,7 @@ function resetForm() {
   const formEl = document.getElementById('screen-form');
   if (formEl) formEl.scrollTop = 0;
   window.scrollTo({top: 0, behavior: 'smooth'});
-  if (typeof window._resetSwipe === 'function') window._resetSwipe();
+  
   setTimeout(fecharFormOverlay, 300);
 }
 
@@ -4098,61 +4073,55 @@ function slotFechar() {
 // DETEÇÃO DE MEDALHAS — ao registar o dia
 // ══════════════════════════════════════════════════
 function slotVerificarMedalhas(nome, payload) {
-  const mesKey   = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
+  dbgLog('verificarMedalhas: '+nome+' onlines='+(payload.onlines||0)+' sprays='+(payload.sprays||0));
+
+  const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
   const storeKey = 'slotDado_' + nome + '_' + mesKey;
   let jaAtribuidas = [];
   try { jaAtribuidas = JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch(e) {}
+  dbgLog('jaAtrib: '+JSON.stringify(jaAtribuidas));
 
-  // Dados acumulados do mês: historico_local + payload atual
+  // Dados do mês
   const mapa = {};
-  try {
-    JSON.parse(localStorage.getItem('historico_local') || '[]')
-      .filter(d => d && d.nome === nome)
-      .forEach(d => { mapa[d.data] = d; });
-  } catch(e) {}
-  if (Array.isArray(dashAllDados) && dashAllDados.length) {
-    dashAllDados.filter(d => d && d.nome === nome).forEach(d => { mapa[d.data] = d; });
-  }
+  try { JSON.parse(localStorage.getItem('historico_local')||'[]').filter(d=>d&&d.nome===nome).forEach(d=>{mapa[d.data]=d;}); } catch(e){}
   mapa[payload.data] = payload;
+  const mes=new Date().getMonth(), ano=new Date().getFullYear();
+  const doMes=Object.values(mapa).filter(d=>{try{const dt=new Date(d.data+'T12:00:00');return dt.getMonth()===mes&&dt.getFullYear()===ano;}catch(e){return false;}});
+  dbgLog('doMes: '+doMes.length+' registos');
 
-  const mes = new Date().getMonth(), ano = new Date().getFullYear();
-  const doMes = Object.values(mapa).filter(d => {
-    try { const dt = new Date(d.data + 'T12:00:00'); return dt.getMonth()===mes && dt.getFullYear()===ano; } catch(e){ return false; }
-  });
-
-  // Fila de slots a abrir
   const fila = [];
 
-  // 1) Medalhas mensais
-  const medalhasMes = calcularMedalhas(doMes.length ? doMes : [payload])
-    .filter(m => m.name !== 'Super Online' && m.name !== 'Spray Explosion');
-  const novas = medalhasMes.filter(m => m.earned && !jaAtribuidas.includes(m.name));
-  if (novas.length > 0) {
-    try { localStorage.setItem(storeKey, JSON.stringify([...jaAtribuidas, ...novas.map(m=>m.name)])); } catch(e) {}
-    novas.forEach(m => fila.push({ name: m.name }));
+  // Medalhas mensais
+  const todas = calcularMedalhas(doMes.length ? doMes : [payload]).filter(m=>m.name!=='Super Online'&&m.name!=='Spray Explosion');
+  dbgLog('medalhas earned: '+todas.filter(m=>m.earned).map(m=>m.name).join(', '));
+  const novas = todas.filter(m=>m.earned&&!jaAtribuidas.includes(m.name));
+  dbgLog('novas: '+novas.map(m=>m.name).join(', '));
+  if (novas.length) {
+    try{localStorage.setItem(storeKey,JSON.stringify([...jaAtribuidas,...novas.map(m=>m.name)]));}catch(e){}
+    novas.forEach(m=>fila.push(m.name));
   }
 
-  // 2) Medalhas diárias
-  if ((payload.onlines || 0) >= 8) {
-    const k = 'slotDiario_' + nome + '_' + payload.data + '_SuperOnline';
-    if (!localStorage.getItem(k)) {
-      try { localStorage.setItem(k, '1'); } catch(e) {}
-      fila.push({ name: 'Super Online' });
-    }
+  // Medalhas diárias
+  if ((payload.onlines||0) >= 8) {
+    const k='slotDiario_'+nome+'_'+payload.data+'_SuperOnline';
+    const exists=!!localStorage.getItem(k);
+    dbgLog('SuperOnline: onlines='+(payload.onlines||0)+' key exists='+exists);
+    if (!exists) { try{localStorage.setItem(k,'1');}catch(e){} fila.push('Super Online'); }
   }
-  if ((payload.sprays || 0) >= 10) {
-    const k = 'slotDiario_' + nome + '_' + payload.data + '_SprayExplosion';
-    if (!localStorage.getItem(k)) {
-      try { localStorage.setItem(k, '1'); } catch(e) {}
-      fila.push({ name: 'Spray Explosion' });
-    }
+  if ((payload.sprays||0) >= 10) {
+    const k='slotDiario_'+nome+'_'+payload.data+'_SprayExplosion';
+    if (!localStorage.getItem(k)) { try{localStorage.setItem(k,'1');}catch(e){} fila.push('Spray Explosion'); }
   }
 
-  if (fila.length === 0) return;
+  dbgLog('fila: ['+fila.join(', ')+']');
+  if (fila.length === 0) { dbgLog('fila vazia — sem slot'); return; }
 
-  // Abrir slots em sequência (a mesma lógica do slot-test.html que funciona)
-  fila.forEach((m, idx) => {
-    setTimeout(() => slotAbrir(nome, m.name), idx * 100);
+  dbgLog('A abrir slot em 300ms...');
+  fila.forEach((medalha, idx) => {
+    setTimeout(() => {
+      dbgLog('>>> slotAbrir('+nome+', '+medalha+')');
+      slotAbrir(nome, medalha);
+    }, 300 + idx * 3000);
   });
 }
 
@@ -4476,7 +4445,7 @@ function renderDesafiosMedalhas() {
 </div>
 
 <!-- SLOT MACHINE -->
-<div id="slotOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(4,10,22,0.97);flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:hidden;text-align:center">
+<div id="slotOverlay" style="display:none;position:fixed;inset:0;z-index:2147483647;background:rgba(4,10,22,0.97);flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:hidden;text-align:center">
 
   <!-- Confetti layer -->
   <div id="slotConfettiWrap" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0"></div>
@@ -4540,3 +4509,56 @@ function renderDesafiosMedalhas() {
   </div>
 </div>
 
+
+<div id="dbgBox" style="position:fixed;bottom:80px;left:8px;right:8px;z-index:2147483646;background:rgba(0,0,0,0.9);color:#0f0;font-family:monospace;font-size:10px;padding:6px;border-radius:8px;max-height:30vh;overflow-y:auto;display:none;pointer-events:none;border:1px solid #333"></div>
+<script>
+var _dbgVisible = false;
+var _dbgTaps = 0;
+document.addEventListener('touchstart', function() {
+  _dbgTaps++;
+  setTimeout(function(){_dbgTaps=0;}, 600);
+  if (_dbgTaps >= 5) {
+    _dbgVisible = !_dbgVisible;
+    document.getElementById('dbgBox').style.display = _dbgVisible ? 'block' : 'none';
+    _dbgTaps = 0;
+  }
+}, {passive:true});
+
+function dbgLog(msg) {
+  var box = document.getElementById('dbgBox');
+  if (!box) return;
+  var t = new Date().toLocaleTimeString('pt-PT');
+  var line = document.createElement('div');
+  line.style.borderBottom = '1px solid #111';
+  line.style.padding = '1px 0';
+  var isImportant = msg.indexOf('slotAbrir') !== -1 || msg.indexOf('fila:') !== -1 || msg.indexOf('novas:') !== -1;
+  line.style.color = isImportant ? '#ff0' : '#0f0';
+  line.textContent = '['+t+'] '+msg;
+  box.insertBefore(line, box.firstChild);
+  while(box.children.length > 50) box.removeChild(box.lastChild);
+  // Auto-show on important events
+  if (isImportant) { box.style.display = 'block'; _dbgVisible = true; }
+}
+
+// Override submeter start to log
+window.addEventListener('load', function() {
+  var origSubmeter = window.submeter;
+  if (origSubmeter) {
+    window.submeter = function() {
+      dbgLog('submeter() chamado nomeSel='+window.nomeSel);
+      return origSubmeter.apply(this, arguments);
+    };
+  }
+  var origAbrir = window.slotAbrir;
+  if (origAbrir) {
+    window.slotAbrir = function(nome, medalha) {
+      dbgLog('slotAbrir('+nome+','+medalha+') overlay='+document.getElementById('slotOverlay').style.display);
+      origAbrir.apply(this, arguments);
+      setTimeout(function(){
+        dbgLog('overlay após 50ms: '+document.getElementById('slotOverlay').style.display);
+      }, 50);
+    };
+  }
+  dbgLog('Pronto. Faz 5 toques rapidos para ver log.');
+});
+</script>
