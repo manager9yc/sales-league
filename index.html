@@ -1161,9 +1161,9 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
         <button onclick="carregarAdmin()" style="background:var(--orange);border:none;border-radius:10px;padding:10px 18px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer">Atualizar</button>
         <div id="adminSummary" style="font-size:12px;color:var(--muted)"></div>
         <button onclick="limparCacheAdmin()" style="background:var(--card);border:1px solid #7a2200;border-radius:10px;padding:10px 14px;color:#FF6644;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Cache</button>
-        <button onclick="slotAbrir('TESTE','Medalha Teste')" style="background:var(--card);border:1px solid #C9A84C;border-radius:10px;padding:10px 14px;color:#C9A84C;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🎰 Testar Slot</button>
-        <button onclick="limparChavesSlot()" style="background:#1a0000;border:1px solid #ef4444;border-radius:10px;padding:10px 14px;color:#ef4444;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Reset Slot Keys</button>
+        <button onclick="limparChavesSlot()" style="background:#1a0000;border:1px solid #ef4444;border-radius:10px;padding:10px 14px;color:#ef4444;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Reset Slot</button>
         <button onclick="limparRegistosHoje()" style="background:#1a0000;border:1px solid #ef4444;border-radius:10px;padding:10px 14px;color:#ef4444;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Reset Hoje</button>
+        <button onclick="slotAbrir('TESTE','Medalha Teste')" style="background:var(--card);border:1px solid #C9A84C;border-radius:10px;padding:10px 14px;color:#C9A84C;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🎰 Testar Slot</button>
         <button onclick="bloquearAdmin()" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-left:auto">🔒 Bloquear</button>
       </div>
       <div style="padding:0 16px" id="adminContent">
@@ -1354,6 +1354,12 @@ function handleNameSelect(btn) {
   document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   nomeSel = nome;
+  // Update submit button to show who is registering
+  const sb = document.getElementById('submitBtn');
+  if (sb && sb.dataset.state !== 'novo') {
+    sb.textContent = 'REGISTAR — ' + nome.split(' ')[0].toUpperCase();
+    sb.style.background = 'linear-gradient(135deg, #FF6B00, #FF4500)';
+  }
   if (typeof mostrarUltimoRegisto === 'function') mostrarUltimoRegisto(nomeSel);
   if (typeof mostrarStreakHeader === 'function') setTimeout(mostrarStreakHeader, 100);
 }
@@ -1440,7 +1446,15 @@ function mostrarPopupDuplicado(nome, data) {
 let _submitEmCurso = false;
 
 async function submeter() {
-  if (!nomeSel) { showToast('⚠️ Seleciona o teu nome primeiro'); return; }
+  if (!nomeSel) {
+    // Scroll to name section and highlight it
+    const ng = document.getElementById('nameGrid');
+    if (ng) { ng.scrollIntoView({behavior:'smooth', block:'center'}); ng.style.outline='2px solid #FF6B00'; setTimeout(()=>{ ng.style.outline=''; },2000); }
+    const tt = document.getElementById('teamTabs');
+    if (tt) { tt.style.outline='2px solid #FF6B00'; setTimeout(()=>{ tt.style.outline=''; },2000); }
+    showToast('⚠️ Escolhe a tua equipa e nome primeiro!');
+    return;
+  }
   const nomeAtual = nomeSel;
   const dataVal = document.getElementById('dataRegisto').value;
   if (!dataVal) { showToast('⚠️ Escolhe a data'); return; }
@@ -1541,23 +1555,20 @@ async function submeter() {
     try { const tn=[...new Set(equipas.flatMap(e=>e.nomes))]; buildVgrid(tn.map(n=>({nome:n}))); if(equipaAtiva){document.querySelectorAll('.team-tab').forEach(t=>{if(t.dataset.id===equipaAtiva)t.click();});} } catch(e2){}
   }, 2500);
 
-  // Fechar form overlay
   setTimeout(() => fecharFormOverlay(), 400);
-  // SLOT MACHINE — primeiro, antes de qualquer outro popup
   setTimeout(() => slotVerificarMedalhas(nomeAtual, payload), 600);
-  // Recorde e ranking — depois e só se slot não estiver aberta
-  const _nc=nomeAtual, _pc=Object.assign({},payload);
+  const _nc=nomeAtual,_pc=Object.assign({},payload);
   setTimeout(()=>{
     const _ov=document.getElementById('slotOverlay');
-    if(_ov&&_ov.style.display==='flex'){
-      if(!window._deferred)window._deferred=[];
-      window._deferred.push(()=>verificarRecordeDiario(_nc,_pc));
-      window._deferred.push(()=>setTimeout(()=>verificarPosicaoRanking(_nc,_pc),800));
-    }else{
+    if(!_ov||_ov.style.display!=='flex'){
       verificarRecordeDiario(_nc,_pc);
       setTimeout(()=>verificarPosicaoRanking(_nc,_pc),800);
+    } else {
+      if(!window._def)window._def=[];
+      window._def.push(()=>verificarRecordeDiario(_nc,_pc));
+      window._def.push(()=>setTimeout(()=>verificarPosicaoRanking(_nc,_pc),800));
     }
-  },1200);
+  },1400);
 }
 
 
@@ -4076,7 +4087,7 @@ function slotMostrarResultado(p) {
 function slotFechar() {
   const overlay = document.getElementById('slotOverlay');
   if (overlay) overlay.style.display = 'none';
-  if(window._deferred&&window._deferred.length){window._deferred.forEach(fn=>{try{fn();}catch(e){}});window._deferred=[];}
+  if(window._def&&window._def.length){window._def.forEach(fn=>{try{fn();}catch(e){}});window._def=[];}
 }
 
 // ══════════════════════════════════════════════════
@@ -4088,7 +4099,6 @@ function slotVerificarMedalhas(nome, payload) {
   let jaAtribuidas = [];
   try { jaAtribuidas = JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch(e) {}
 
-  // Dados do mês
   const mapa = {};
   try { JSON.parse(localStorage.getItem('historico_local')||'[]').filter(d=>d&&d.nome===nome).forEach(d=>{mapa[d.data]=d;}); } catch(e){}
   mapa[payload.data] = payload;
@@ -4097,7 +4107,6 @@ function slotVerificarMedalhas(nome, payload) {
 
   const fila = [];
 
-  // Medalhas mensais
   const todas = calcularMedalhas(doMes.length ? doMes : [payload]).filter(m=>m.name!=='Super Online'&&m.name!=='Spray Explosion');
   const novas = todas.filter(m=>m.earned&&!jaAtribuidas.includes(m.name));
   if (novas.length) {
@@ -4105,7 +4114,6 @@ function slotVerificarMedalhas(nome, payload) {
     novas.forEach(m=>fila.push(m.name));
   }
 
-  // Medalhas diárias
   if ((payload.onlines||0) >= 8) {
     const k='slotDiario_'+nome+'_'+payload.data+'_SuperOnline';
     if (!localStorage.getItem(k)) { try{localStorage.setItem(k,'1');}catch(e){} fila.push('Super Online'); }
@@ -4508,72 +4516,6 @@ function renderDesafiosMedalhas() {
 
 
 <script>
-function limparChavesSlot() {
-  const keys=[];
-  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&(k.startsWith('slotDado_')||k.startsWith('slotDiario_')))keys.push(k);}
-  keys.forEach(k=>localStorage.removeItem(k));
-  showToast('✅ '+keys.length+' chaves slot removidas');
-}
-function limparRegistosHoje() {
-  const hoje=new Date().toISOString().split('T')[0];
-  const keys=[];
-  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('registo_')&&k.includes(hoje))keys.push(k);}
-  keys.forEach(k=>localStorage.removeItem(k));
-  try{
-    const h=JSON.parse(localStorage.getItem('historico_local')||'[]');
-    localStorage.setItem('historico_local',JSON.stringify(h.filter(d=>d.data!==hoje)));
-  }catch(e){}
-  showToast('✅ Registos de hoje removidos ('+keys.length+')');
-}
-</script>
-
-<div id="slotLog" style="position:fixed;bottom:80px;left:0;right:0;z-index:2147483646;background:rgba(0,0,0,0.93);color:#fff;font-family:monospace;font-size:12px;padding:10px 14px;display:none;max-height:50vh;overflow-y:auto;border-top:2px solid #C9A84C">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-    <span style="color:#C9A84C;font-weight:700;letter-spacing:2px;font-size:11px">SLOT DEBUG</span>
-    <button onclick="document.getElementById('slotLog').style.display='none'" style="background:#333;border:none;color:#fff;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px">✕</button>
-  </div>
-  <div id="slotLogLines"></div>
-</div>
-
-<script>
-function _slog(msg, color) {
-  var box = document.getElementById('slotLog');
-  var lines = document.getElementById('slotLogLines');
-  if (!lines) return;
-  var t = new Date().toLocaleTimeString('pt-PT');
-  var d = document.createElement('div');
-  d.style.cssText = 'padding:2px 0;border-bottom:1px solid #222;color:'+(color||'#aaa');
-  d.textContent = '['+t+'] '+msg;
-  lines.insertBefore(d, lines.firstChild);
-  while(lines.children.length > 60) lines.removeChild(lines.lastChild);
-  // Auto-show on slot events
-  if(color==='#ff0'||color==='#f80'||color==='#f00') box.style.display='block';
-}
-
-window.addEventListener('load', function() {
-  // Wrap submeter
-  var oS = window.submeter;
-  if(oS) window.submeter = function(){
-    _slog('submeter() nomeSel='+window.nomeSel, '#ff0');
-    return oS.apply(this,arguments);
-  };
-  // Wrap slotVerificarMedalhas
-  var oV = window.slotVerificarMedalhas;
-  if(oV) window.slotVerificarMedalhas = function(nome,payload){
-    _slog('verificarMedalhas: '+nome+' onlines='+(payload.onlines||0)+' sprays='+(payload.sprays||0),'#ff0');
-    return oV.apply(this,arguments);
-  };
-  // Wrap slotAbrir
-  var oA = window.slotAbrir;
-  if(oA) window.slotAbrir = function(nome,medalha){
-    _slog('>>> slotAbrir('+nome+', '+medalha+')','#f80');
-    var r = oA.apply(this,arguments);
-    setTimeout(function(){
-      var ov=document.getElementById('slotOverlay');
-      _slog('overlay.display after 50ms: '+(ov?ov.style.display:'NULL'),'#0f0');
-    },50);
-    return r;
-  };
-  _slog('Pronto', '#0f0');
-});
+function limparChavesSlot(){var k=[];for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(key&&(key.startsWith('slotDado_')||key.startsWith('slotDiario_')))k.push(key);}k.forEach(function(key){localStorage.removeItem(key);});showToast('✅ '+k.length+' chaves slot removidas');}
+function limparRegistosHoje(){var hoje=new Date().toISOString().split('T')[0];var k=[];for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(key&&key.startsWith('registo_')&&key.includes(hoje))k.push(key);}k.forEach(function(key){localStorage.removeItem(key);});try{var h=JSON.parse(localStorage.getItem('historico_local')||'[]');localStorage.setItem('historico_local',JSON.stringify(h.filter(function(d){return d.data!==hoje;})));}catch(e){}showToast('✅ Registos de hoje removidos ('+k.length+')');}
 </script>
