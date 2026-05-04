@@ -1003,7 +1003,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
-      <button class="submit-btn" id="submitBtn" onclick="handleSubmitBtn(this)" style="display:block!important;width:100%">REGISTAR O MEU DIA</button>
+      <button class="submit-btn" id="submitBtn" onclick="handleSubmitBtn(this)" style="display:block!important;width:100%">REGISTAR</button>
       <div style="text-align:center;padding:10px 0 4px;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif">APP developed by Dário Santos</div>
     </div>
     <div class="success" id="successMsg">
@@ -1161,8 +1161,6 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
         <button onclick="carregarAdmin()" style="background:var(--orange);border:none;border-radius:10px;padding:10px 18px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer">Atualizar</button>
         <div id="adminSummary" style="font-size:12px;color:var(--muted)"></div>
         <button onclick="limparCacheAdmin()" style="background:var(--card);border:1px solid #7a2200;border-radius:10px;padding:10px 14px;color:#FF6644;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Cache</button>
-        <button onclick="limparChavesSlot()" style="background:#1a0000;border:1px solid #ef4444;border-radius:10px;padding:10px 14px;color:#ef4444;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Reset Slot</button>
-        <button onclick="limparRegistosHoje()" style="background:#1a0000;border:1px solid #ef4444;border-radius:10px;padding:10px 14px;color:#ef4444;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Reset Hoje</button>
         <button onclick="slotAbrir('TESTE','Medalha Teste')" style="background:var(--card);border:1px solid #C9A84C;border-radius:10px;padding:10px 14px;color:#C9A84C;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🎰 Testar Slot</button>
         <button onclick="bloquearAdmin()" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-left:auto">🔒 Bloquear</button>
       </div>
@@ -1527,7 +1525,7 @@ async function submeter() {
   setTimeout(() => {
     const r = document.getElementById('submitBtn');
     if (!r) return;
-    r.textContent = 'REGISTAR O MEU DIA';
+    r.textContent = 'REGISTAR';
     r.style.background = 'transparent';
     r.style.color = 'var(--orange)';
     r.style.border = '2px solid var(--orange)';
@@ -1541,20 +1539,19 @@ async function submeter() {
     try { const tn=[...new Set(equipas.flatMap(e=>e.nomes))]; buildVgrid(tn.map(n=>({nome:n}))); if(equipaAtiva){document.querySelectorAll('.team-tab').forEach(t=>{if(t.dataset.id===equipaAtiva)t.click();});} } catch(e2){}
   }, 2500);
 
+  // Verificar recorde pessoal diário
+  setTimeout(() => verificarRecordeDiario(nomeAtual, payload), 1200);
+  // ★ Verificar posição no ranking
+  setTimeout(() => verificarPosicaoRanking(nomeAtual, payload), 2000);
   setTimeout(() => fecharFormOverlay(), 400);
-  setTimeout(() => slotVerificarMedalhas(nomeAtual, payload), 600);
-  const _nc=nomeAtual, _pc=Object.assign({},payload);
-  setTimeout(() => {
-    const _ov = document.getElementById('slotOverlay');
-    if (!_ov || _ov.style.display !== 'flex') {
-      verificarRecordeDiario(_nc, _pc);
-      setTimeout(() => verificarPosicaoRanking(_nc, _pc), 800);
-    } else {
-      if (!window._def) window._def = [];
-      window._def.push(() => verificarRecordeDiario(_nc, _pc));
-      window._def.push(() => setTimeout(() => verificarPosicaoRanking(_nc, _pc), 800));
+  // TESTE DIRETO — abre slot sempre após registo
+  const _nomeParaSlot = nomeAtual;
+  setTimeout(function() {
+    var ov = document.getElementById("slotOverlay");
+    if (ov) {
+      ov.style.display = "flex";
     }
-  }, 1400);
+  }, 800);
 }
 
 
@@ -4073,42 +4070,67 @@ function slotMostrarResultado(p) {
 function slotFechar() {
   const overlay = document.getElementById('slotOverlay');
   if (overlay) overlay.style.display = 'none';
-  if (window._def && window._def.length) { window._def.forEach(fn=>{try{fn();}catch(e){}}); window._def=[]; }
 }
 
 // ══════════════════════════════════════════════════
 // DETEÇÃO DE MEDALHAS — ao registar o dia
 // ══════════════════════════════════════════════════
 function slotVerificarMedalhas(nome, payload) {
-  const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
+  const mesKey   = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
   const storeKey = 'slotDado_' + nome + '_' + mesKey;
   let jaAtribuidas = [];
   try { jaAtribuidas = JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch(e) {}
 
+  // Dados acumulados do mês: historico_local + payload atual
   const mapa = {};
-  try { JSON.parse(localStorage.getItem('historico_local')||'[]').filter(d=>d&&d.nome===nome).forEach(d=>{mapa[d.data]=d;}); } catch(e){}
+  try {
+    JSON.parse(localStorage.getItem('historico_local') || '[]')
+      .filter(d => d && d.nome === nome)
+      .forEach(d => { mapa[d.data] = d; });
+  } catch(e) {}
+  if (Array.isArray(dashAllDados) && dashAllDados.length) {
+    dashAllDados.filter(d => d && d.nome === nome).forEach(d => { mapa[d.data] = d; });
+  }
   mapa[payload.data] = payload;
-  const mes=new Date().getMonth(), ano=new Date().getFullYear();
-  const doMes=Object.values(mapa).filter(d=>{try{const dt=new Date(d.data+'T12:00:00');return dt.getMonth()===mes&&dt.getFullYear()===ano;}catch(e){return false;}});
 
+  const mes = new Date().getMonth(), ano = new Date().getFullYear();
+  const doMes = Object.values(mapa).filter(d => {
+    try { const dt = new Date(d.data + 'T12:00:00'); return dt.getMonth()===mes && dt.getFullYear()===ano; } catch(e){ return false; }
+  });
+
+  // Fila de slots a abrir
   const fila = [];
-  const todas = calcularMedalhas(doMes.length ? doMes : [payload]).filter(m=>m.name!=='Super Online'&&m.name!=='Spray Explosion');
-  const novas = todas.filter(m=>m.earned&&!jaAtribuidas.includes(m.name));
-  if (novas.length) {
-    try{localStorage.setItem(storeKey,JSON.stringify([...jaAtribuidas,...novas.map(m=>m.name)]));}catch(e){}
-    novas.forEach(m=>fila.push(m.name));
+
+  // 1) Medalhas mensais
+  const medalhasMes = calcularMedalhas(doMes.length ? doMes : [payload])
+    .filter(m => m.name !== 'Super Online' && m.name !== 'Spray Explosion');
+  const novas = medalhasMes.filter(m => m.earned && !jaAtribuidas.includes(m.name));
+  if (novas.length > 0) {
+    try { localStorage.setItem(storeKey, JSON.stringify([...jaAtribuidas, ...novas.map(m=>m.name)])); } catch(e) {}
+    novas.forEach(m => fila.push({ name: m.name }));
   }
-  if ((payload.onlines||0) >= 8) {
-    const k='slotDiario_'+nome+'_'+payload.data+'_SuperOnline';
-    if (!localStorage.getItem(k)) { try{localStorage.setItem(k,'1');}catch(e){} fila.push('Super Online'); }
+
+  // 2) Medalhas diárias
+  if ((payload.onlines || 0) >= 8) {
+    const k = 'slotDiario_' + nome + '_' + payload.data + '_SuperOnline';
+    if (!localStorage.getItem(k)) {
+      try { localStorage.setItem(k, '1'); } catch(e) {}
+      fila.push({ name: 'Super Online' });
+    }
   }
-  if ((payload.sprays||0) >= 10) {
-    const k='slotDiario_'+nome+'_'+payload.data+'_SprayExplosion';
-    if (!localStorage.getItem(k)) { try{localStorage.setItem(k,'1');}catch(e){} fila.push('Spray Explosion'); }
+  if ((payload.sprays || 0) >= 10) {
+    const k = 'slotDiario_' + nome + '_' + payload.data + '_SprayExplosion';
+    if (!localStorage.getItem(k)) {
+      try { localStorage.setItem(k, '1'); } catch(e) {}
+      fila.push({ name: 'Spray Explosion' });
+    }
   }
+
   if (fila.length === 0) return;
-  fila.forEach((medalha, idx) => {
-    setTimeout(() => slotAbrir(nome, medalha), 300 + idx * 3000);
+
+  // Abrir slots em sequência (a mesma lógica do slot-test.html que funciona)
+  fila.forEach((m, idx) => {
+    setTimeout(() => slotAbrir(nome, m.name), idx * 100);
   });
 }
 
@@ -4432,7 +4454,7 @@ function renderDesafiosMedalhas() {
 </div>
 
 <!-- SLOT MACHINE -->
-<div id="slotOverlay" style="display:none;position:fixed;inset:0;z-index:2147483647;background:rgba(4,10,22,0.97);flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:hidden;text-align:center">
+<div id="slotOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(4,10,22,0.97);flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:hidden;text-align:center">
 
   <!-- Confetti layer -->
   <div id="slotConfettiWrap" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0"></div>
@@ -4496,8 +4518,3 @@ function renderDesafiosMedalhas() {
   </div>
 </div>
 
-
-<script>
-function limparChavesSlot(){var k=[];for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(key&&(key.startsWith('slotDado_')||key.startsWith('slotDiario_')))k.push(key);}k.forEach(function(key){localStorage.removeItem(key);});showToast('✅ '+k.length+' chaves slot removidas');}
-function limparRegistosHoje(){var hoje=new Date().toISOString().split('T')[0];var k=[];for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(key&&key.startsWith('registo_')&&key.includes(hoje))k.push(key);}k.forEach(function(key){localStorage.removeItem(key);});try{var h=JSON.parse(localStorage.getItem('historico_local')||'[]');localStorage.setItem('historico_local',JSON.stringify(h.filter(function(d){return d.data!==hoje;})));}catch(e){}showToast('✅ Registos de hoje removidos ('+k.length+')');}
-</script>
