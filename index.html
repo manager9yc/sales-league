@@ -1354,12 +1354,6 @@ function handleNameSelect(btn) {
   document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   nomeSel = nome;
-  // Update submit button to show who is registering
-  const sb = document.getElementById('submitBtn');
-  if (sb && sb.dataset.state !== 'novo') {
-    sb.textContent = 'REGISTAR — ' + nome.split(' ')[0].toUpperCase();
-    sb.style.background = 'linear-gradient(135deg, #FF6B00, #FF4500)';
-  }
   if (typeof mostrarUltimoRegisto === 'function') mostrarUltimoRegisto(nomeSel);
   if (typeof mostrarStreakHeader === 'function') setTimeout(mostrarStreakHeader, 100);
 }
@@ -1446,15 +1440,7 @@ function mostrarPopupDuplicado(nome, data) {
 let _submitEmCurso = false;
 
 async function submeter() {
-  if (!nomeSel) {
-    // Scroll to name section and highlight it
-    const ng = document.getElementById('nameGrid');
-    if (ng) { ng.scrollIntoView({behavior:'smooth', block:'center'}); ng.style.outline='2px solid #FF6B00'; setTimeout(()=>{ ng.style.outline=''; },2000); }
-    const tt = document.getElementById('teamTabs');
-    if (tt) { tt.style.outline='2px solid #FF6B00'; setTimeout(()=>{ tt.style.outline=''; },2000); }
-    showToast('⚠️ Escolhe a tua equipa e nome primeiro!');
-    return;
-  }
+  if (!nomeSel) { showToast('⚠️ Seleciona o teu nome primeiro'); return; }
   const nomeAtual = nomeSel;
   const dataVal = document.getElementById('dataRegisto').value;
   if (!dataVal) { showToast('⚠️ Escolhe a data'); return; }
@@ -1557,18 +1543,18 @@ async function submeter() {
 
   setTimeout(() => fecharFormOverlay(), 400);
   setTimeout(() => slotVerificarMedalhas(nomeAtual, payload), 600);
-  const _nc=nomeAtual,_pc=Object.assign({},payload);
-  setTimeout(()=>{
-    const _ov=document.getElementById('slotOverlay');
-    if(!_ov||_ov.style.display!=='flex'){
-      verificarRecordeDiario(_nc,_pc);
-      setTimeout(()=>verificarPosicaoRanking(_nc,_pc),800);
+  const _nc=nomeAtual, _pc=Object.assign({},payload);
+  setTimeout(() => {
+    const _ov = document.getElementById('slotOverlay');
+    if (!_ov || _ov.style.display !== 'flex') {
+      verificarRecordeDiario(_nc, _pc);
+      setTimeout(() => verificarPosicaoRanking(_nc, _pc), 800);
     } else {
-      if(!window._def)window._def=[];
-      window._def.push(()=>verificarRecordeDiario(_nc,_pc));
-      window._def.push(()=>setTimeout(()=>verificarPosicaoRanking(_nc,_pc),800));
+      if (!window._def) window._def = [];
+      window._def.push(() => verificarRecordeDiario(_nc, _pc));
+      window._def.push(() => setTimeout(() => verificarPosicaoRanking(_nc, _pc), 800));
     }
-  },1400);
+  }, 1400);
 }
 
 
@@ -4087,7 +4073,7 @@ function slotMostrarResultado(p) {
 function slotFechar() {
   const overlay = document.getElementById('slotOverlay');
   if (overlay) overlay.style.display = 'none';
-  if(window._def&&window._def.length){window._def.forEach(fn=>{try{fn();}catch(e){}});window._def=[];}
+  if (window._def && window._def.length) { window._def.forEach(fn=>{try{fn();}catch(e){}}); window._def=[]; }
 }
 
 // ══════════════════════════════════════════════════
@@ -4106,14 +4092,12 @@ function slotVerificarMedalhas(nome, payload) {
   const doMes=Object.values(mapa).filter(d=>{try{const dt=new Date(d.data+'T12:00:00');return dt.getMonth()===mes&&dt.getFullYear()===ano;}catch(e){return false;}});
 
   const fila = [];
-
   const todas = calcularMedalhas(doMes.length ? doMes : [payload]).filter(m=>m.name!=='Super Online'&&m.name!=='Spray Explosion');
   const novas = todas.filter(m=>m.earned&&!jaAtribuidas.includes(m.name));
   if (novas.length) {
     try{localStorage.setItem(storeKey,JSON.stringify([...jaAtribuidas,...novas.map(m=>m.name)]));}catch(e){}
     novas.forEach(m=>fila.push(m.name));
   }
-
   if ((payload.onlines||0) >= 8) {
     const k='slotDiario_'+nome+'_'+payload.data+'_SuperOnline';
     if (!localStorage.getItem(k)) { try{localStorage.setItem(k,'1');}catch(e){} fila.push('Super Online'); }
@@ -4122,9 +4106,7 @@ function slotVerificarMedalhas(nome, payload) {
     const k='slotDiario_'+nome+'_'+payload.data+'_SprayExplosion';
     if (!localStorage.getItem(k)) { try{localStorage.setItem(k,'1');}catch(e){} fila.push('Spray Explosion'); }
   }
-
   if (fila.length === 0) return;
-
   fila.forEach((medalha, idx) => {
     setTimeout(() => slotAbrir(nome, medalha), 300 + idx * 3000);
   });
