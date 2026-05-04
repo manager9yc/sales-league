@@ -1568,9 +1568,9 @@ async function submeter() {
   setTimeout(() => verificarRecordeDiario(nomeAtual, payload), 1200);
   // ★ Verificar posição no ranking
   setTimeout(() => verificarPosicaoRanking(nomeAtual, payload), 2000);
-  // ★ SLOT MACHINE
+  // ★ SLOT MACHINE — delay para garantir que historico_local e dashAllDados estão atualizados
   setTimeout(() => fecharFormOverlay(), 400);
-    slotVerificarMedalhas(nomeAtual, payload);
+  setTimeout(() => slotVerificarMedalhas(nomeAtual, payload), 3200);
 }
 
 
@@ -2449,11 +2449,32 @@ function mostrarDash(nome) {
     .sort((a,b)=>b.v-a.v).slice(0,8);
   const maxO = compRank[0]?.v||1;
 
+  // Medalhas ganhas para mostrar junto ao nome
+  const medalhasGanhas = calcularMedalhas(dadosVendedor).filter(m => m.earned);
+  const medalhasDiariasGanhas = (() => {
+    const ganhas = [];
+    const doMesDash = dadosVendedor.filter(d => {
+      const dt = new Date(d.data||''); return !isNaN(dt) && dt.getMonth()===new Date().getMonth() && dt.getFullYear()===new Date().getFullYear();
+    });
+    const maxOnlinesDia = Math.max(...doMesDash.map(d => d.onlines||0), 0);
+    const maxSpraysDia = Math.max(...doMesDash.map(d => d.sprays||0), 0);
+    if (maxOnlinesDia >= 8) ganhas.push({ icon:'🌟', name:'Super Online' });
+    if (maxSpraysDia >= 10) ganhas.push({ icon:'💥', name:'Spray Explosion' });
+    return ganhas;
+  })();
+  const todasMedalhasGanhas = [...medalhasGanhas, ...medalhasDiariasGanhas];
+  const medalhasHtmlInline = todasMedalhasGanhas.length
+    ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${todasMedalhasGanhas.map(m=>`<span title="${m.name}" style="font-size:18px;line-height:1;display:inline-block">${m.icon}</span>`).join('')}</div>`
+    : '';
+
   const html = `
     <div class="d-profile">
       ${renderAvatar(nome, 56, 22)}
       <div style="flex:1">
-        <div class="d-pname">${nome}</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div class="d-pname">${nome}</div>
+          ${todasMedalhasGanhas.length ? `<div style="display:flex;gap:3px;align-items:center">${todasMedalhasGanhas.map(m=>`<span title="${m.name}" style="font-size:20px;line-height:1">${m.icon}</span>`).join('')}</div>` : ''}
+        </div>
         <div class="d-pteam">${nomeParaEquipaLabel[nome]||'Loja'}</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
           <div class="d-badge">#${pos1}º Onlines</div>
@@ -4088,36 +4109,43 @@ function slotVerificarMedalhas(nome, payload) {
   // Find medals earned NOW that were NOT already given
   const novasMes = medalhasMes.filter(m => m.earned && !jaAtribuidas.includes(m.name));
 
-  if (novasMes.length > 0) {
-    // Save FIRST before opening (prevent double-trigger on fast re-render)
-    const novasNomes = novasMes.map(m => m.name);
-    try { localStorage.setItem(storageKey, JSON.stringify([...jaAtribuidas, ...novasNomes])); } catch(e) {}
-
-    // Close any blocking overlays
+  // Helper to fechar overlays bloqueantes antes de abrir slot
+  function limparOverlays() {
     ['recordePopupOverlay','duplicadoPopupOverlay','rankingPopupOverlay'].forEach(id => {
       const el = document.getElementById(id); if(el) el.remove();
     });
     const medalPopupEl = document.getElementById('medalPopup');
     if (medalPopupEl) medalPopupEl.classList.remove('show');
+  }
 
-    // Open slot after short delay to let registration animation finish
-    setTimeout(() => slotAbrir(nome, novasMes[0].name), 1800);
+  // Fila unificada de slots — evita sobreposição
+  const slotQueue = [];
+
+  if (novasMes.length > 0) {
+    const novasNomes = novasMes.map(m => m.name);
+    try { localStorage.setItem(storageKey, JSON.stringify([...jaAtribuidas, ...novasNomes])); } catch(e) {}
+    novasMes.forEach(m => slotQueue.push(m.name));
   }
 
   // Check daily medals (Super Online / Spray Explosion)
   const diarias = calcularMedalhasDiarias(payload);
-  diarias.forEach((m, idx) => {
+  diarias.forEach(m => {
     const diaKey = 'slotDiario_' + nome + '_' + payload.data + '_' + m.name;
     if (!localStorage.getItem(diaKey)) {
       try { localStorage.setItem(diaKey, '1'); } catch(e) {}
-      setTimeout(() => {
-        ['recordePopupOverlay','duplicadoPopupOverlay','rankingPopupOverlay'].forEach(id => {
-          const el = document.getElementById(id); if(el) el.remove();
-        });
-        slotAbrir(nome, m.name);
-      }, 1400 + (idx * 500));
+      slotQueue.push(m.name);
     }
   });
+
+  // Abrir slots em sequencia com 2.5s entre cada um
+  if (slotQueue.length > 0) {
+    slotQueue.forEach((medalha, idx) => {
+      setTimeout(() => {
+        limparOverlays();
+        slotAbrir(nome, medalha);
+      }, 1400 + (idx * 2500));
+    });
+  }
 }
 
 // Aliases para compatibilidade com chamadas antigas no código
