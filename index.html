@@ -29,9 +29,11 @@
 body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
 
 /* NAV */
-.nav { display: flex; background: #0a0a0a; touch-action: manipulation; position: fixed; bottom: 0; left: 0; right: 0; z-index: 500; border-top: 2px solid var(--border); border-bottom: none; padding-bottom: env(safe-area-inset-bottom, 0px); }
-.nav-btn { flex: 1; padding: 12px 2px 10px; font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 800; letter-spacing: 0.5px; min-height: 60px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; cursor: pointer; -webkit-user-select: none; user-select: none; text-transform: uppercase; color: var(--muted); border: none; background: transparent; cursor: pointer; border-top: 3px solid transparent; border-bottom: none; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.nav-btn.active { color: #fff; border-top-color: var(--orange); }
+.nav { display: flex; background: linear-gradient(180deg, #0d1b3e, #070F1F); border: 1px solid rgba(201,168,76,0.35); border-radius: 50px; position: fixed; bottom: 18px; left: 12px; right: 12px; z-index: 500; align-items: center; height: 64px; padding: 0 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(201,168,76,0.08); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.nav-btn { flex: 1; height: 100%; border: none; background: transparent; color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: color 0.2s; }
+.nav-btn.active { color: #C9A84C; }
+.nav-center-btn { width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(145deg, #F5D87E, #C9A84C); border: none; font-size: 28px; font-weight: 900; color: #070F1F; cursor: pointer; box-shadow: 0 0 24px rgba(201,168,76,0.65), 0 4px 16px rgba(0,0,0,0.6), 0 -2px 8px rgba(255,220,100,0.3); position: relative; top: -16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, box-shadow 0.2s; line-height: 1; }
+.nav-center-btn:active, .nav-center-btn.form-active { background: linear-gradient(145deg, #ff8a3d, #FF6B00); box-shadow: 0 0 24px rgba(255,107,0,0.65), 0 4px 16px rgba(0,0,0,0.6); transform: scale(0.94); }
 
 /* SCREENS */
 .screen { display: none; }
@@ -152,7 +154,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .cat-sub { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
 
 .rank-table { width: 100%; border-collapse: collapse; position: relative; z-index: 1; touch-action: manipulation; background: var(--card); border: 1px solid rgba(201,168,76,0.2); border-top: none; border-radius: 0 0 12px 12px; overflow: hidden; }
-.rank-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+.rank-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; contain: layout style; }
 .rank-table tbody tr:last-child { border-bottom: none; }
 .rank-table tbody tr:hover { background: var(--card2); }
 .rank-1 { background: rgba(201,168,76,0.12) !important; }
@@ -553,8 +555,8 @@ body.theme-dark{--orange:#FF6B00;--orange2:#FF8C00;--dark:#0C0C0C;--card:#161616
 body.theme-ucl{--orange:#C9A84C;--orange2:#E8C97A;--dark:#070F1F;--card:#0C1B35;--card2:#132240;--border:#1C3460;--muted:#6B8EC4;--text:#EEF2FF}
 .ucl-banner-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.18;pointer-events:none;z-index:0;display:none}
 body.theme-ucl .ucl-banner-img{display:block}
-body.theme-ucl .nav{background:#070F1F!important;border-top:1px solid #C9A84C!important;border-bottom:none!important}
-body.theme-ucl .nav-btn.active{color:#C9A84C!important;border-bottom-color:#C9A84C!important}
+body.theme-ucl .nav{background:linear-gradient(180deg,#0d1b3e,#070F1F)!important;border:1px solid rgba(201,168,76,0.35)!important}
+body.theme-ucl .nav-btn.active{color:#C9A84C!important}
 
 body.theme-ucl .banner-bar{background:linear-gradient(90deg,#070F1F,#0C1B35,#070F1F)!important;border-top:1px solid #C9A84C!important}
 body.theme-ucl .banner-top,body.theme-ucl .banner{background:#070F1F!important}
@@ -675,7 +677,7 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
 
 /* Nav btn active */
 .nav-btn.active { position: relative; }
-.nav-btn.active::after { content:''; position:absolute; bottom:0; left:20%; right:20%; height:2px; background:var(--orange); border-radius:2px; animation: fadeSlideIn 0.2s ease; }
+.nav-btn.active::after { content:''; position:absolute; bottom:4px; left:30%; right:30%; height:2px; background:#C9A84C; border-radius:2px; animation: fadeSlideIn 0.2s ease; }
 
 /* Team tab slide */
 .team-tab { transition: background 0.15s, color 0.15s, border-color 0.15s; }
@@ -736,9 +738,9 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 .swipe-btn-wrap {
   position: relative;
   width: 100%;
-  height: 58px;
-  background: rgba(255,107,0,0.12);
-  border: 1.5px solid rgba(255,107,0,0.35);
+  height: 62px;
+  background: rgba(255,107,0,0.15);
+  border: 2px solid rgba(255,107,0,0.5);
   border-radius: 14px;
   margin-top: 28px;
   overflow: hidden;
@@ -817,9 +819,9 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 .swipe-btn-wrap {
   position: relative;
   width: 100%;
-  height: 58px;
-  background: rgba(255,107,0,0.12);
-  border: 1.5px solid rgba(255,107,0,0.35);
+  height: 62px;
+  background: rgba(255,107,0,0.15);
+  border: 2px solid rgba(255,107,0,0.5);
   border-radius: 14px;
   margin-top: 28px;
   overflow: hidden;
@@ -839,7 +841,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
   font-family: 'Bebas Neue', sans-serif;
   font-size: 18px;
   letter-spacing: 2px;
-  color: rgba(255,107,0,0.7);
+  color: rgba(255,107,0,0.85);
   transition: opacity 0.2s;
   pointer-events: none;
   display: flex;
@@ -847,7 +849,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
   gap: 8px;
 }
 .swipe-arrows { display:flex; gap:3px; align-items:center; }
-.swipe-arrows span { font-size:14px; color:rgba(255,107,0,0.5); animation:swipeArrowPulse 1.2s ease-in-out infinite; }
+.swipe-arrows span { font-size:18px; color:rgba(255,107,0,0.75); animation:swipeArrowPulse 1.2s ease-in-out infinite; }
 .swipe-arrows span:nth-child(2){animation-delay:.15s}
 .swipe-arrows span:nth-child(3){animation-delay:.30s}
 @keyframes swipeArrowPulse{0%,100%{opacity:0.2}50%{opacity:1}}
@@ -881,27 +883,25 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 
 <!-- SPLASH -->
 <div class="splash" id="splash">
-
-  <div class="sp-particles" id="spParticles"></div>
-  <div class="sp-slash ss1"></div><div class="sp-slash ss2"></div>
-  <div class="sp-slash ss3"></div><div class="sp-slash ss4"></div>
-  <div class="sp-slash ss5"></div>
-  <div class="sp-inner" style="display:flex;flex-direction:column;align-items:center;height:100%;justify-content:space-between;padding:40px 0 60px">
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
-      <div class="sp-pre">Sport Zone · Vasco da Gama</div>
-      <div class="sp-title">SUPER<br>LIGA</div>
-      <div class="sp-sub">Liga Vasco da Gama · 2026</div>
-      
-      <div class="sp-progress"><div class="sp-progress-fill" id="splashBar"></div></div>
+  <div class="sp-bg-overlay"></div>
+  <div class="sp-inner" style="display:flex;flex-direction:column;align-items:center;height:100%;justify-content:space-between;padding:48px 20px 52px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+      <div style="background:#FF6B00;padding:5px 12px;border-radius:5px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;color:#fff;text-transform:uppercase">SPORT ZONE</div>
     </div>
-    <div id="splashTop3" style="display:none !important;width:100%;max-width:400px;margin-bottom:6px">
-      <div style="font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);text-align:center;margin-top:14px;margin-bottom:8px">🏆 Top 3 de ontem</div>
-      <div id="splashTop3Content" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px"></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+      <div style="font-size:100px;line-height:1;filter:drop-shadow(0 0 40px rgba(201,168,76,0.8)) drop-shadow(0 8px 20px rgba(0,0,0,0.8));animation:trophyGlow 3s ease-in-out infinite;margin-bottom:8px">🏆</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(201,168,76,0.7);margin-bottom:-4px">LIGA VASCO DA GAMA</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(72px,22vw,100px);line-height:0.88;color:#fff;text-shadow:0 4px 0 rgba(0,0,0,0.4),0 0 60px rgba(255,255,255,0.08);letter-spacing:2px;text-align:center">SUPER<br>LIGA</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:6px;text-transform:uppercase;color:#C9A84C;margin-top:8px">2026</div>
     </div>
-    <div style="width:80%;max-width:360px;display:flex;flex-direction:column;gap:8px;margin-bottom:8px">
-      <button onclick="iniciarAudio();fecharSplash()" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:15px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:6px">ENTRAR</button>
+    <div style="width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;gap:10px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4)" id="splashStatusText">A preparar a competição...</div>
+      <div style="width:100%;background:rgba(255,255,255,0.1);border-radius:100px;height:6px;overflow:hidden;position:relative">
+        <div id="splashBar" style="height:100%;width:0%;background:linear-gradient(90deg,#C9A84C,#F5D87E);border-radius:100px;transition:width 0.12s linear"></div>
+      </div>
+      <div id="splashPct" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#C9A84C;letter-spacing:2px">0%</div>
+      <button onclick="iniciarAudio();fecharSplash()" style="width:100%;background:linear-gradient(135deg,#C9A84C,#F5D87E);border:none;border-radius:12px;padding:16px;color:#070F1F;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4);margin-top:4px">ENTRAR</button>
     </div>
-    <div style="font-size:10px;color:rgba(255,255,255,0.25);text-align:center;margin-top:4px"></div>
   </div>
 </div>
 
@@ -914,17 +914,22 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
   <div class="medal-popup-sub" id="medalSub"></div>
 </div>
 
-<div class="nav">
-  <button class="nav-btn active" onclick="goTo('form',this)"><span style="font-size:14px">📋</span><span>Registo</span></button>
-  <button class="nav-btn" onclick="goTo('ranking',this)"><span style="font-size:14px">🏆</span><span>Ranking</span></button>
-  <button class="nav-btn" onclick="goTo('dash',this)"><span style="font-size:14px">📊</span><span>Dash</span></button>
-  <button class="nav-btn" onclick="goTo('info',this)"><span style="font-size:14px">ℹ️</span><span>Info</span></button>
-  
-  <button class="nav-btn" onclick="goTo('admin',this)"><span style="font-size:14px">⚙️</span><span>Admin</span></button>
+<!-- FORM BACKDROP -->
+<div id="formOverlayBackdrop" onclick="fecharFormOverlay()" style="display:none;position:fixed;inset:0;z-index:449;background:rgba(0,0,0,0.65);backdrop-filter:blur(2px)"></div>
+
+<div class="nav" id="mainNav">
+  <button class="nav-btn active" id="navBtnRanking" onclick="goTo('ranking',this)"><span style="font-size:18px">🏆</span><span>Ranking</span></button>
+  <button class="nav-btn" id="navBtnDash" onclick="goTo('dash',this)"><span style="font-size:18px">📊</span><span>Dashboard</span></button>
+  <div style="position:relative;width:72px;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+    <button class="nav-center-btn" id="navCenterBtn" onclick="toggleFormOverlay()">+</button>
+  </div>
+  <button class="nav-btn" id="navBtnDesafios" onclick="goTo('desafios',this)"><span style="font-size:18px">🎯</span><span>Desafios</span></button>
+  <button class="nav-btn" id="navBtnInfo" onclick="goTo('info',this)"><span style="font-size:18px">ℹ️</span><span>Info</span></button>
 </div>
 
 <!-- FORM -->
-<div class="screen active" id="screen-form">
+<div class="screen" id="screen-form" style="position:fixed;bottom:0;left:0;right:0;z-index:450;border-radius:24px 24px 0 0;max-height:93vh;overflow-y:auto;transform:translateY(110%);transition:transform 0.45s cubic-bezier(0.34,1.56,0.64,1);display:block!important;box-shadow:0 -8px 48px rgba(0,0,0,0.8);background:var(--dark)">
+  <div style="display:flex;justify-content:center;padding:10px 0 2px"><div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.2)"></div></div>
   <div class="screen-banner">
     <div class="screen-banner-inner">
       <div class="ucl-stars-banner" style="display:none">★ ★ ★ ★ ★ ★ ★ ★</div>
@@ -1024,11 +1029,11 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
       <div class="swipe-btn-wrap" id="swipeBtnWrap">
         <div class="swipe-track">
           <div class="swipe-label" id="swipeLabel">
-            <div class="swipe-arrows"><span>›</span><span>›</span><span>›</span></div>
+            <div class="swipe-arrows"><span>❯</span><span>❯</span><span>❯</span></div>
             DESLIZA PARA REGISTAR
           </div>
         </div>
-        <div class="swipe-thumb" id="swipeThumb">📋</div>
+        <div class="swipe-thumb" id="swipeThumb">✔</div>
       </div>
       <div style="text-align:center;padding:10px 0 4px;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif">APP developed by Dário Santos</div>
     </div>
@@ -1050,7 +1055,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 </div>
 
 <!-- RANKING -->
-<div class="screen" id="screen-ranking">
+<div class="screen active" id="screen-ranking">
   <div class="screen-banner">
       <div class="screen-banner-inner">
         <div class="ucl-stars-banner" style="display:none">★ ★ ★ ★ ★ ★ ★ ★</div>
@@ -1169,64 +1174,6 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 
     <!-- CONTEÚDO ADMIN -->
     <div id="adminBody" style="display:none">
-      <div style="padding:16px 16px 0"><div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Tema Visual</div><div style="display:flex;gap:8px"><button onclick="aplicarTema('ucl')" id="btnThemeUCL" style="flex:1;background:rgba(201,168,76,0.15);border:1.5px solid #C9A84C;border-radius:12px;padding:12px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:#C9A84C">🏆 Champions (ativo)</button></div></div>
-      <div style="height:1px;background:var(--border);margin:12px 16px"></div>
-      <!-- PRÉMIOS EDITOR -->
-      <div style="padding:0 16px;margin-top:4px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange)">🎁 Prémios da Roleta</div>
-          <button onclick="togglePremiosEditor()" id="premiosEditorToggleBtn" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Ver lista</button>
-        </div>
-        <div id="premiosEditorWrap" style="display:none">
-        <div id="premiosEditorList"></div>
-
-        <button onclick="resetarPremios()" style="width:100%;margin-top:8px;background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--muted);font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;cursor:pointer">↩ Repor prémios originais</button>
-        </div><!-- /premiosEditorWrap -->
-      </div>
-      <div style="height:1px;background:var(--border);margin:12px 16px"></div>
-      <!-- NOTIFICAÇÕES -->
-      <div style="padding:0 16px;margin-top:4px">
-        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">🔔 Lembrete Diário</div>
-        <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px">
-          <div style="font-size:13px;color:var(--muted);margin-bottom:10px">Hora do lembrete para registar vendas:</div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input type="time" id="notifTime" value="18:00" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:15px;outline:none">
-            <button onclick="guardarHoraNotif()" style="background:var(--orange);border:none;border-radius:8px;padding:10px 16px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer">Guardar</button>
-          </div>
-          <button onclick="pedirPermissaoNotificacoes()" style="width:100%;margin-top:8px;background:transparent;border:1px solid var(--border);border-radius:8px;padding:9px;color:var(--muted);font-size:12px;cursor:pointer">🔔 Ativar notificações</button>
-        </div>
-      </div>
-      <div style="height:1px;background:var(--border);margin:12px 16px"></div>
-      <!-- GESTÃO VENDEDORES -->
-      <div style="padding:16px 16px 0">
-        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Gestão de Vendedores</div>
-        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-          <button onclick="abrirAdicionarVendedor()" style="background:var(--orange);border:none;border-radius:8px;padding:10px 16px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;cursor:pointer;">+ Adicionar</button>
-          <button onclick="toggleGestaoLista()" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;cursor:pointer;" id="gestaoToggleBtn">Ver lista</button>
-        </div>
-        <div id="gestaoLista" style="display:none"></div>
-      </div>
-      <div style="height:1px;background:var(--border);margin:12px 0"></div>
-
-      <!-- EDIÇÃO METAS E MEDALHAS -->
-      <div style="padding:0 16px 16px">
-        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Metas &amp; Medalhas</div>
-        <button onclick="toggleMetasEditor()" id="metasToggleBtn" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;margin-bottom:10px">Ver / Editar</button>
-        <div id="metasEditor" style="display:none">
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px">
-            <div style="font-size:11px;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:1px">Metas de progresso</div>
-            <div id="metasFieldsWrap"></div>
-            <button onclick="guardarMetas()" style="width:100%;background:var(--orange);border:none;border-radius:8px;padding:10px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:8px">Guardar Metas</button>
-          </div>
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px">
-            <div style="font-size:11px;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:1px">Limiares de Medalhas</div>
-            <div id="medalhasFieldsWrap"></div>
-            <button onclick="guardarMedalhas()" style="width:100%;background:var(--orange);border:none;border-radius:8px;padding:10px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:8px">Guardar Medalhas</button>
-          </div>
-        </div>
-      </div>
-      <div style="height:1px;background:var(--border);margin:0 16px 12px"></div>
-
       <!-- GESTÃO DE DADOS -->
       <div style="padding:0 16px 16px">
         <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Gestão de Dados</div>
@@ -1367,12 +1314,13 @@ const minDate = `${ontem.getFullYear()}-${pad(ontem.getMonth()+1)}-${pad(ontem.g
 selecionarData('hoje');
 
 function goTo(screen, btn) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(s => { if(s.id !== 'screen-form') s.classList.remove('active'); });
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   const _se=document.getElementById('screen-'+screen); if(_se) _se.classList.add('active'); else return;
-  btn.classList.add('active');
+  if(btn && btn.classList) btn.classList.add('active');
   try { localStorage.setItem('lastTab', screen); } catch(e) {}
   document.getElementById('printBtn').style.display = screen === 'ranking' ? 'flex' : 'none';
+  if(screen==='desafios'){ renderDesafiosMedalhas(); }
   if(screen==='info'){renderInfo();renderSugestoes();populateSugestaoNomes();gerarQR();}
   if(screen==='admin'){renderPremiosLog();renderAdminSugestoes();}
   if (screen === 'ranking') {
@@ -1570,6 +1518,8 @@ async function submeter() {
     r.dataset.state = 'novo';
   }, 2500);
 
+  // Verificar recorde pessoal diário
+  setTimeout(() => verificarRecordeDiario(nomeAtual, payload), 1200);
   // ★ SLOT MACHINE — chamar aqui, sem depender de nada
   slotVerificarMedalhas(nomeAtual, payload);
 }
@@ -1655,6 +1605,7 @@ function resetForm() {
   if (formEl) formEl.scrollTop = 0;
   window.scrollTo({top: 0, behavior: 'smooth'});
   if (typeof window._resetSwipe === 'function') window._resetSwipe();
+  setTimeout(fecharFormOverlay, 300);
 }
 
 // RANKING
@@ -1671,9 +1622,10 @@ function buildRows(sorted, key) {
     const avatarHtml = foto
       ? `<img src="${foto}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;margin-right:8px;flex-shrink:0;vertical-align:middle">`
       : `<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--orange);align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#fff;margin-right:8px;flex-shrink:0;vertical-align:middle">${nome.split(' ').map(x=>x[0]).slice(0,2).join('')}</span>`;
+    const secaoVendedor = (()=>{ for(const e of equipas){ if(e.nomes&&e.nomes.includes(nome)) return e.label.replace(/^\S+\s/,''); } return ''; })();
     return `<tr class="rank-${i+1}">
       <td class="td-pos">${i+1}</td>
-      <td class="td-name" style="display:flex;align-items:center;cursor:pointer" onclick="abrirDashDeRanking('${nome}')" style="cursor:pointer">${avatarHtml}${nome}</td>
+      <td class="td-name" style="display:flex;align-items:center;cursor:pointer" onclick="abrirDashDeRanking('${nome}')" style="cursor:pointer">${avatarHtml}<div><div>${nome}</div>${secaoVendedor?`<div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:1px">${secaoVendedor}</div>`:''}</div></td>
       <td class="td-bar"><div class="bar-bg"><div class="bar-fg" data-pct="${pct}" style="width:0%"></div></div></td>
       <td class="td-score">${v[key]}</td>
     </tr>`;
@@ -1964,15 +1916,27 @@ function iniciarSplash() {
   }
   const bar=document.getElementById('splashBar');
   splashIv=setInterval(()=>{
-    splashProg+=100/80; bar.style.width=Math.min(splashProg,100)+'%';
-    if(splashProg>=100){clearInterval(splashIv);fecharSplash();}
+    splashProg+=100/80;
+    const pct = Math.min(Math.round(splashProg),100);
+    bar.style.width=pct+'%';
+    const pctEl = document.getElementById('splashPct');
+    if(pctEl) pctEl.textContent = pct + '%';
+    if(splashProg>=100){clearInterval(splashIv);}
   },100);
 }
 function fecharSplash(){
   clearInterval(splashIv);
+  const bar=document.getElementById('splashBar');
+  if(bar){bar.style.width='100%';}
+  const pctEl=document.getElementById('splashPct');
+  if(pctEl)pctEl.textContent='100%';
   const s=document.getElementById('splash');
   s.classList.add('out');
-  setTimeout(()=>s.classList.add('hidden'),600);
+  setTimeout(()=>{
+    s.classList.add('hidden');
+    const rankBtn = document.getElementById('navBtnRanking');
+    if(rankBtn && !document.querySelector('.screen.active:not(#screen-form)')) goTo('ranking', rankBtn);
+  },600);
 }
 iniciarSplash();
 atualizarMesLabels();
@@ -1984,11 +1948,18 @@ let touchMoved = false;
 
 let lastChangeTime=0;
 function startChange(campo,delta,e){
-  if(e&&e.type==='touchstart'){touchStartY=e.touches[0].clientY;touchMoved=false;}
+  if(e&&e.type==='touchstart'){
+    touchStartY=e.touches[0].clientY;
+    touchMoved=false;
+    const tm = (ev)=>{ if(Math.abs(ev.touches[0].clientY-touchStartY)>8){touchMoved=true;stopChange();document.removeEventListener('touchmove',tm);} };
+    document.addEventListener('touchmove',tm,{passive:true});
+    setTimeout(()=>document.removeEventListener('touchmove',tm),600);
+  }
   if(e&&e.type==='mousedown')e.preventDefault();
-  const now=Date.now(); if(now-lastChangeTime<150)return; lastChangeTime=now;
+  const now=Date.now(); if(now-lastChangeTime<200)return; lastChangeTime=now;
+  if(touchMoved)return;
   change(campo,delta);
-  changeTo=setTimeout(()=>{changeIv=setInterval(()=>{lastChangeTime=Date.now();change(campo,delta);},150);},400);
+  changeTo=setTimeout(()=>{changeIv=setInterval(()=>{if(touchMoved){stopChange();return;}lastChangeTime=Date.now();change(campo,delta);},150);},500);
 }
 function stopChange(e){
   if(e && e.type === 'touchend' && touchMoved) {
@@ -2510,7 +2481,7 @@ function mostrarDash(nome) {
             <div class="d-cbar ${i===semanas.length-1?'hi':''}" style="height:${Math.round(v/maxSem*88)}px"></div>
           </div>`).join('')}
         <div style="position:absolute;bottom:0;left:0;right:0;display:flex;gap:10px">
-          ${(()=>{const hoje=new Date();const startC=new Date(hoje.getFullYear(),1,1);const wn=Math.max(1,Math.ceil(Math.floor((hoje-startC)/86400000)/7));return [wn-3,wn-2,wn-1,wn].map((w,i)=>`<div style="flex:1;font-size:10px;color:var(--muted);text-align:center">Sem ${w>0?w:1}${i===3?' ▶':''}</div>`).join('');})()}
+          ${(()=>{const hoje=new Date();const startY=new Date(hoje.getFullYear(),1,1);const wn=Math.max(1,Math.ceil((hoje-startY)/(7*86400000)));return [wn-3,wn-2,wn-1,wn].map((w,i)=>`<div style="flex:1;font-size:10px;color:var(--muted);text-align:center">Sem ${Math.max(1,w)}${i===3?' ▶':''}</div>`).join('');})()}
         </div>
       </div>
     </div>
@@ -2592,7 +2563,11 @@ async function carregarDashboard() {
 
 function renderDashDefault() {
   const el = document.getElementById('dashDefaultStats');
-  if (!el || !dashAllDados.length) return;
+  if (!el) return;
+  if (!dashAllDados.length) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;font-style:italic">A carregar dados...</div>';
+    return;
+  }
   const mesAtual = new Date().getMonth();
   const anoAtual = new Date().getFullYear();
   const dadosMes = dashAllDados.filter(d => {
@@ -2606,18 +2581,67 @@ function renderDashDefault() {
     categorias.forEach(cat => { agg[d.nome][cat.key] += (d[cat.key]||0); });
   });
   const vendedores = Object.values(agg);
-  let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">';
+  const hoje5 = new Date().toISOString().split('T')[0];
+  const hojeCount = dadosMes.filter(d=>d.data===hoje5).length;
+  const totalUnidades = dadosMes.reduce((s,d)=>s+categorias.reduce((ss,c)=>ss+(d[c.key]||0),0),0);
+  const totalVendedores = new Set(dadosMes.map(d=>d.nome)).size;
+
+  let html = `
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
+    <div style="background:var(--card);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:14px;text-align:center;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#C9A84C,#F5D87E)"></div>
+      <div style="font-size:26px;margin-bottom:2px">📋</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#C9A84C;line-height:1">${hojeCount}</div>
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Hoje</div>
+    </div>
+    <div style="background:var(--card);border:1px solid rgba(255,107,0,0.3);border-radius:12px;padding:14px;text-align:center;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#FF6B00,#ffaa55)"></div>
+      <div style="font-size:26px;margin-bottom:2px">📦</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--orange);line-height:1">${totalUnidades}</div>
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Unidades</div>
+    </div>
+    <div style="background:var(--card);border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:14px;text-align:center;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#22C55E,#4ade80)"></div>
+      <div style="font-size:26px;margin-bottom:2px">👥</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#22C55E;line-height:1">${totalVendedores}</div>
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Ativos</div>
+    </div>
+  </div>
+  <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Líderes por categoria</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">`;
+
   categorias.forEach(cat => {
     const top = [...vendedores].sort((a,b)=>b[cat.key]-a[cat.key])[0];
     if (!top || top[cat.key]===0) return;
-    html += `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;position:relative;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--orange)"></div><div style="font-size:18px;margin-bottom:4px">${cat.emoji}</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">${cat.label}</div><div style="font-size:13px;font-weight:600;color:#fff">${top.nome.split(' ')[0]}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--orange)">${top[cat.key]}</div></div>`;
+    const pct = top[cat.key];
+    html += `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--orange)"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="font-size:20px">${cat.emoji}</span>
+        <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">${cat.label}</span>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:2px">${top.nome.split(' ')[0]}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--orange);line-height:1">${pct}</div>
+    </div>`;
   });
-  html += '</div>';
-  const hoje5 = new Date().toISOString().split('T')[0];
-  const hojeCount = dadosMes.filter(d=>d.data===hoje5).length;
-  if (hojeCount > 0) {
-    html += `<div style="background:rgba(255,107,0,0.06);border:1px solid rgba(255,107,0,0.2);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px"><span style="font-size:28px">📋</span><div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--orange);line-height:1">${hojeCount}</div><div style="font-size:12px;color:var(--muted)">registo${hojeCount>1?'s':''} hoje</div></div></div>`;
+
+  html += `</div>`;
+
+  const topGeral = [...vendedores].map(v=>({...v, total: categorias.reduce((s,c)=>s+(v[c.key]||0),0)})).sort((a,b)=>b.total-a.total).slice(0,3);
+  if(topGeral.length){
+    html += `<div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;margin-top:4px">Top 3 geral este mês</div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px">`;
+    const medals = ['🥇','🥈','🥉'];
+    topGeral.forEach((v,i)=>{
+      html += `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px">
+        <span style="font-size:24px">${medals[i]}</span>
+        <div style="flex:1"><div style="font-size:15px;font-weight:700;color:#fff">${v.nome}</div></div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--orange)">${v.total}</div>
+      </div>`;
+    });
+    html += `</div>`;
   }
+
   el.innerHTML = html;
 }
 
@@ -2865,10 +2889,12 @@ function calcularMedalhas(dados) {
   const caixaNomes = equipas.find(e=>e.id==='caixa')?.nomes||[];
   const isCaixa = caixaNomes.includes(nome);
   const isCalcadoSneaker2 = equipaCalcadoSneaker.includes(nome);
+  const textilNomes = equipas.find(e=>e.id==='textil')?.nomes||[];
+  const isTextil = textilNomes.includes(nome);
   const tOnlines    = isCalcadoSneaker2 ? medalhasConfig.tOnlines_calcado : medalhasConfig.tOnlines_normal;
   const tSprays     = (isCalcadoSneaker2 || isCaixa) ? medalhasConfig.tSprays_calcadoCaixa : medalhasConfig.tSprays_normal;
   const tPalmilhas  = isCalcadoSneaker2 ? medalhasConfig.tPalmilhas_calcado : medalhasConfig.tPalmilhas_normal;
-  const tCamisolas  = (isCalcadoSneaker2 || isCaixa) ? medalhasConfig.tCamisolas_calcadoCaixa : medalhasConfig.tCamisolas_normal;
+  const tCamisolas  = (isCalcadoSneaker2 || isCaixa || isTextil) ? (medalhasConfig.tCamisolas_calcadotextil||25) : (medalhasConfig.tCamisolas_normal||12);
   const tSacos      = isCaixa ? medalhasConfig.tSacos_caixa : medalhasConfig.tSacos_normal;
   const tGarrafas   = isCaixa ? medalhasConfig.tGarrafas_caixa : medalhasConfig.tGarrafas_normal;
   return [
@@ -2885,18 +2911,72 @@ function calcularMedalhas(dados) {
   ];
 }
 
-// ══ NOTIFICAÇÃO DE RECORDE ══
-function verificarRecorde(nome, payload) {
-  if (!dashAllDados.length) return;
-  const dadosAnteriores = dashAllDados.filter(d=>d.nome===nome);
+// ══ NOTIFICAÇÃO DE RECORDE PESSOAL DIÁRIO ══
+function verificarRecordeDiario(nome, payload) {
+  // Aggregate data from API + local history, excluding today's date
+  const dataHoje = payload.data;
+  const dadosAnteriores = [
+    ...(Array.isArray(dashAllDados) ? dashAllDados : []),
+    ...(()=>{ try { return JSON.parse(localStorage.getItem('historico_local')||'[]'); } catch(e){ return []; } })()
+  ].filter(d => d && d.nome === nome && d.data !== dataHoje);
+
+  if (!dadosAnteriores.length) return;
+
+  // Check total daily score (sum of all categories in a single day)
+  const totalHoje = categorias.reduce((s,c) => s + (payload[c.key]||0), 0);
+  const maxDiaAnterior = dadosAnteriores.reduce((maxV, d) => {
+    const tot = categorias.reduce((s,c) => s + (d[c.key]||0), 0);
+    return Math.max(maxV, tot);
+  }, 0);
+
+  if (totalHoje > maxDiaAnterior && maxDiaAnterior > 0) {
+    mostrarRecordePopup(nome, totalHoje, maxDiaAnterior);
+    return;
+  }
+
+  // Also check per-category records
   categorias.forEach(cat => {
-    if ((payload[cat.key]||0) === 0) return;
-    const maxAnterior = dadosAnteriores.reduce((m,d)=>Math.max(m,d[cat.key]||0),0);
-    if ((payload[cat.key]||0) > maxAnterior && maxAnterior > 0) {
-      showRecordToast('🏆 Novo recorde pessoal!', cat.emoji + '  ' + nome + ' — ' + cat.label + ': ' + payload[cat.key]);
+    const val = payload[cat.key]||0;
+    if (val === 0) return;
+    const maxCat = dadosAnteriores.reduce((m,d) => Math.max(m, d[cat.key]||0), 0);
+    if (val > maxCat && maxCat > 0) {
+      setTimeout(() => mostrarRecordePopup(nome, val, maxCat, cat), 400);
     }
   });
 }
+
+function mostrarRecordePopup(nome, novo, anterior, cat) {
+  // Remove existing record popup if any
+  const existing = document.getElementById('recordePopupOverlay');
+  if (existing) existing.remove();
+
+  const primeiroNome = nome.split(' ')[0];
+  const titulo = cat ? `${cat.emoji} Recorde em ${cat.label}!` : '🏆 Novo Recorde Diário!';
+  const desc = cat
+    ? `${novo} ${cat.label.toLowerCase()} num único dia! (anterior: ${anterior})`
+    : `${novo} unidades hoje! (anterior: ${anterior})`;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'recordePopupOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.7);animation:fadeSlideIn 0.3s ease';
+  overlay.innerHTML = `
+    <div style="background:linear-gradient(135deg,#0d1b3e,#070F1F);border:2px solid #C9A84C;border-radius:24px;padding:32px 28px;text-align:center;max-width:340px;width:100%;box-shadow:0 0 60px rgba(201,168,76,0.4),0 20px 60px rgba(0,0,0,0.8);animation:bounceIn 0.5s cubic-bezier(0.34,1.56,0.64,1)">
+      <div style="font-size:60px;margin-bottom:8px;animation:trophyGlow 2s ease-in-out infinite">🏆</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(201,168,76,0.7);margin-bottom:4px">RECORDE PESSOAL</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#fff;letter-spacing:2px;line-height:1.1;margin-bottom:4px">${titulo}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#C9A84C;margin-bottom:12px">${primeiroNome}</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:20px">${desc}</div>
+      <button onclick="document.getElementById('recordePopupOverlay').remove()" style="background:linear-gradient(135deg,#C9A84C,#F5D87E);border:none;border-radius:12px;padding:12px 32px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#070F1F;cursor:pointer">CONTINUAR</button>
+    </div>`;
+  overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+  // Play medal sound
+  try { tocarSomMedalha && tocarSomMedalha(); } catch(e) {}
+}
+
+// Legacy alias
+function verificarRecorde(nome, payload) { verificarRecordeDiario(nome, payload); }
+function showRecordToast(titulo, msg) { mostrarMedalPopup('🏆', titulo, msg); }
 
 
 let audioCtx = null;
@@ -3602,9 +3682,10 @@ function submeterRespostaInline(i) {
 // Restore last active tab on page load
 try {
   const lastTab = localStorage.getItem('lastTab');
-  if (lastTab && document.getElementById('screen-'+lastTab)) {
-    const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => (b.getAttribute('onclick')||'').includes("'"+lastTab+"'"));
+  if (lastTab && lastTab !== 'form' && document.getElementById('screen-'+lastTab)) {
+    const btn = document.getElementById('navBtn'+lastTab.charAt(0).toUpperCase()+lastTab.slice(1));
     if (btn) goTo(lastTab, btn);
+    else goTo(lastTab, {classList:{add:()=>{},remove:()=>{}}});
   }
 } catch(e) {}
 
@@ -3827,12 +3908,10 @@ function slotFechar() {
 // DETEÇÃO DE MEDALHAS — ao registar o dia
 // ══════════════════════════════════════════════════
 function slotVerificarMedalhas(nome, payload) {
-  // ── Medalhas mensais ──
   const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
   const storageKey = 'slotDado_' + nome + '_' + mesKey;
   let jaAtribuidas = [];
   try { jaAtribuidas = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
-
   const dadosMapa = {};
   if (Array.isArray(dashAllDados) && dashAllDados.length) {
     dashAllDados.filter(d => d && d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
@@ -3843,41 +3922,17 @@ function slotVerificarMedalhas(nome, payload) {
       .forEach(d => { dadosMapa[d.data] = d; });
   } catch(e) {}
   dadosMapa[payload.data] = payload;
-
   const mes = new Date().getMonth(), ano = new Date().getFullYear();
   const doMes = Object.values(dadosMapa).filter(d => {
     try { const dt = new Date(d.data + 'T12:00:00'); return dt.getMonth()===mes && dt.getFullYear()===ano; } catch(e){ return false; }
   });
-
-  // Medalhas mensais (excluir as diárias que têm earned:false fixo)
   const medalhasMes = calcularMedalhas(doMes.length ? doMes : [payload])
     .filter(m => m.name !== 'Super Online' && m.name !== 'Spray Explosion');
   const novasMes = medalhasMes.filter(m => m.earned && !jaAtribuidas.includes(m.name));
-
-  // ── Medalhas diárias (sem restrição mensal — chave por dia) ──
-  const diaKey = 'slotDia_' + nome + '_' + payload.data;
-  let jaDiarias = [];
-  try { jaDiarias = JSON.parse(localStorage.getItem(diaKey) || '[]'); } catch(e) {}
-
-  const novasDiarias = [];
-  if ((payload.onlines || 0) >= 8 && !jaDiarias.includes('Super Online')) {
-    novasDiarias.push({ icon:'🌟', name:'Super Online', desc:'8 onlines num dia!' });
+  if (novasMes.length > 0) {
+    try { localStorage.setItem(storageKey, JSON.stringify([...jaAtribuidas, ...novasMes.map(m=>m.name)])); } catch(e) {}
   }
-  if ((payload.sprays || 0) >= 10 && !jaDiarias.includes('Spray Explosion')) {
-    novasDiarias.push({ icon:'💥', name:'Spray Explosion', desc:'10 sprays num dia!' });
-  }
-
-  const todasNovas = [...novasDiarias, ...novasMes];
-
-  if (todasNovas.length > 0) {
-    if (novasMes.length > 0) {
-      try { localStorage.setItem(storageKey, JSON.stringify([...jaAtribuidas, ...novasMes.map(m=>m.name)])); } catch(e) {}
-    }
-    if (novasDiarias.length > 0) {
-      try { localStorage.setItem(diaKey, JSON.stringify([...jaDiarias, ...novasDiarias.map(m=>m.name)])); } catch(e) {}
-    }
-    setTimeout(() => slotAbrir(nome, todasNovas[0].name), 800);
-  }
+  // Slot machine auto-open removed — will be reimplemented separately
 }
 
 // Aliases para compatibilidade com chamadas antigas no código
@@ -3900,50 +3955,6 @@ function calcularMedalhasDiarias(payload) {
   return medalhas;
 }
 
-// Patch slotVerificarMedalhas to also check daily medals
-const _origSlotVerificar = slotVerificarMedalhas;
-slotVerificarMedalhas = function(nome, payload) {
-  // First check normal medals (accumulative, only unlock once per month)
-  const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
-  const storageKey = 'slotDado_' + nome + '_' + mesKey;
-  let jaAtribuidas = [];
-  try { jaAtribuidas = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
-  const dadosMapa = {};
-  if (dashAllDados.length) {
-    dashAllDados.filter(d => d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
-  }
-  try {
-    JSON.parse(localStorage.getItem('historico_local') || '[]')
-      .filter(d => d.nome === nome)
-      .forEach(d => { dadosMapa[d.data] = d; });
-  } catch(e) {}
-  dadosMapa[payload.data] = payload;
-  const todos = Object.values(dadosMapa);
-  const mes = new Date().getMonth();
-  const ano = new Date().getFullYear();
-  const doMes = todos.filter(d => {
-    const dt = new Date((d.data || '') + 'T12:00:00');
-    return !isNaN(dt) && dt.getMonth() === mes && dt.getFullYear() === ano;
-  });
-  const medalhas = calcularMedalhas(doMes.length ? doMes : [payload]);
-  const earned = medalhas.filter(m => m.earned);
-  const novasNormais = earned.filter(m => !jaAtribuidas.includes(m.name));
-
-  // Daily medals — always unlock (infinite, no monthly restriction)
-  const diarias = calcularMedalhasDiarias(payload);
-
-  if (novasNormais.length > 0) {
-    jaAtribuidas.push(...novasNormais.map(m => m.name));
-    try { localStorage.setItem(storageKey, JSON.stringify(jaAtribuidas)); } catch(e) {}
-  }
-
-  // Combine: normal first, then daily
-  const todasNovas = [...novasNormais, ...diarias];
-
-  if (todasNovas.length > 0) {
-    setTimeout(() => slotAbrir(nome, todasNovas[0].name), 800);
-  }
-};
 
 // ══════════════════════════════════════════════════
 // SWIPE TO REGISTER
@@ -4050,11 +4061,123 @@ window._resetSwipe = function() {
   const label = document.getElementById('swipeLabel');
   if (!wrap) return;
   wrap.classList.remove('done');
-  if (thumb) { thumb.style.transition = 'none'; thumb.style.transform = 'translateX(0)'; thumb.textContent = '📋'; thumb.style.background = ''; thumb.style.boxShadow = ''; }
-  if (label) { label.style.opacity = 1; label.style.color = ''; label.innerHTML = '<div class="swipe-arrows"><span>›</span><span>›</span><span>›</span></div>DESLIZA PARA REGISTAR'; }
+  if (thumb) { thumb.style.transition = 'none'; thumb.style.transform = 'translateX(0)'; thumb.textContent = '✔'; thumb.style.background = ''; thumb.style.boxShadow = ''; }
+  if (label) { label.style.opacity = 1; label.style.color = ''; label.innerHTML = '<div class="swipe-arrows"><span>❯</span><span>❯</span><span>❯</span></div>DESLIZA PARA REGISTAR'; }
 };
 
+// ── FORM OVERLAY ──
+let formOverlayOpen = false;
+function toggleFormOverlay() {
+  formOverlayOpen ? fecharFormOverlay() : abrirFormOverlay();
+}
+function abrirFormOverlay() {
+  formOverlayOpen = true;
+  const el = document.getElementById('screen-form');
+  const bd = document.getElementById('formOverlayBackdrop');
+  const btn = document.getElementById('navCenterBtn');
+  if(el) el.style.transform = 'translateY(0)';
+  if(bd) bd.style.display = 'block';
+  if(btn) btn.classList.add('form-active');
+}
+function fecharFormOverlay() {
+  formOverlayOpen = false;
+  const el = document.getElementById('screen-form');
+  const bd = document.getElementById('formOverlayBackdrop');
+  const btn = document.getElementById('navCenterBtn');
+  if(el) el.style.transform = 'translateY(110%)';
+  if(bd) bd.style.display = 'none';
+  if(btn) btn.classList.remove('form-active');
+}
+
+// ── DESAFIOS ──
+function renderDesafiosMedalhas() {
+  const el = document.getElementById('desafiosMedalhasLista');
+  if (!el) return;
+  const todas = [
+    { icon:'🖥️', name:'Rei dos Onlines', desc:'Onlines acumulados no mês', thresholds:[{label:'Calçado',val:30},{label:'Outros',val:15}] },
+    { icon:'🧴', name:'Spray King', desc:'Sprays acumulados no mês', thresholds:[{label:'Calçado/Caixa',val:35},{label:'Outros',val:15}] },
+    { icon:'🦶', name:'Palmilhas Master', desc:'Palmilhas acumuladas no mês', thresholds:[{label:'Calçado',val:20},{label:'Outros',val:10}] },
+    { icon:'👕', name:'Camisolas Pro', desc:'Camisolas oficiais no mês', thresholds:[{label:'Calçado/Têxtil/Caixa',val:25},{label:'Outros',val:12}] },
+    { icon:'🛍️', name:'Eco Champion', desc:'Sacos reutilizáveis no mês', thresholds:[{label:'Caixa',val:1000},{label:'Outros',val:150}] },
+    { icon:'💧', name:'Hydration Boss', desc:'Garrafas vendidas no mês', thresholds:[{label:'Caixa',val:30},{label:'Outros',val:15}] },
+    { icon:'⭐', name:'Favorito', desc:'Elogios escritos ou Google Reviews', thresholds:[{label:'Todos',val:3}] },
+    { icon:'📅', name:'Consistente', desc:'Registos no mês (dias diferentes)', thresholds:[{label:'Full-time',val:20},{label:'Part-time',val:8}] },
+    { icon:'🌟', name:'Super Online', desc:'Onlines num único dia', thresholds:[{label:'Qualquer',val:8}] },
+    { icon:'💥', name:'Spray Explosion', desc:'Sprays num único dia', thresholds:[{label:'Qualquer',val:10}] },
+  ];
+  el.innerHTML = `
+  <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:14px">Medalhas disponíveis</div>
+  ${todas.map(m=>`
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:10px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:linear-gradient(180deg,#C9A84C,rgba(201,168,76,0.3))"></div>
+    <div style="display:flex;align-items:flex-start;gap:14px;margin-left:8px">
+      <div style="font-size:36px;flex-shrink:0;filter:drop-shadow(0 2px 8px rgba(201,168,76,0.4))">${m.icon}</div>
+      <div style="flex:1">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff;line-height:1.1">${m.name}</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;margin-top:2px">${m.desc}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          ${m.thresholds.map(t=>`<div style="background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:#C9A84C;display:flex;align-items:center;gap:4px"><span>${t.label}</span><span style="font-family:'Bebas Neue',sans-serif;font-size:16px">${t.val}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`).join('')}`;
+}
+
+// ── LONG PRESS + BUTTON FOR ADMIN ──
+(function(){
+  const btn = document.getElementById('navCenterBtn');
+  if(!btn) return;
+  let lp = null;
+  btn.addEventListener('touchstart', e => {
+    lp = setTimeout(() => {
+      lp = null;
+      fecharFormOverlay();
+      const adminBtnFake = { classList: { add: ()=>{}, remove: ()=>{} } };
+      goTo('admin', adminBtnFake);
+    }, 2000);
+  }, {passive:true});
+  btn.addEventListener('touchend', () => { if(lp){clearTimeout(lp);lp=null;} });
+  btn.addEventListener('touchmove', () => { if(lp){clearTimeout(lp);lp=null;} });
+  btn.addEventListener('mousedown', e => {
+    lp = setTimeout(() => {
+      lp = null;
+      fecharFormOverlay();
+      const adminBtnFake = { classList: { add: ()=>{}, remove: ()=>{} } };
+      goTo('admin', adminBtnFake);
+    }, 2000);
+  });
+  btn.addEventListener('mouseup', () => { if(lp){clearTimeout(lp);lp=null;} });
+  btn.addEventListener('mouseleave', () => { if(lp){clearTimeout(lp);lp=null;} });
+})();
+
 </script>
+
+<!-- DESAFIOS -->
+<div class="screen" id="screen-desafios">
+  <div class="screen-banner">
+    <div class="screen-banner-inner">
+      <div class="ucl-stars-banner" style="display:none">★ ★ ★ ★ ★ ★ ★ ★</div>
+      <div class="screen-banner-title">DESAFIOS</div>
+      <div class="screen-banner-sub">Medalhas &amp; Objetivos</div>
+    </div>
+    <div class="screen-banner-bar">
+      <div class="screen-banner-bar-line"></div>
+      <span>SUPER LIGA 2026</span>
+      <div class="screen-banner-bar-line"></div>
+    </div>
+  </div>
+  <div style="overflow-y:auto;flex:1;padding:16px 16px 100px;max-width:700px;margin:0 auto">
+    <div id="desafiosMedalhasLista"></div>
+    <div style="margin-top:28px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:12px">🎰 Máquina de Prémios</div>
+      <div style="background:var(--card);border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:20px;text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#C9A84C;letter-spacing:3px;margin-bottom:8px">MODO DEMONSTRAÇÃO</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:16px">A máquina de prémios é desbloqueada ao conquistar uma medalha. Experimenta a sorte!</div>
+        <button onclick="slotAbrir('Demonstração','Medalha Demo')" style="background:linear-gradient(135deg,#C9A84C,#F5D87E);border:none;border-radius:12px;padding:14px 32px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#070F1F;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4)">🎰 GIRAR</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="screen" id="screen-info">
   <div class="screen-banner">
