@@ -1541,14 +1541,14 @@ async function submeter() {
     try { const tn=[...new Set(equipas.flatMap(e=>e.nomes))]; buildVgrid(tn.map(n=>({nome:n}))); if(equipaAtiva){document.querySelectorAll('.team-tab').forEach(t=>{if(t.dataset.id===equipaAtiva)t.click();});} } catch(e2){}
   }, 2500);
 
+  // Verificar recorde pessoal diário
+  setTimeout(() => verificarRecordeDiario(nomeAtual, payload), 1200);
+  // ★ Verificar posição no ranking
+  setTimeout(() => verificarPosicaoRanking(nomeAtual, payload), 2000);
+  // Fechar form overlay
   setTimeout(() => fecharFormOverlay(), 400);
-  setTimeout(() => slotVerificarMedalhas(nomeAtual, payload), 800);
-  const _nc=nomeAtual,_pc=Object.assign({},payload);
-  setTimeout(()=>{
-    const _ov=document.getElementById("slotOverlay");
-    if(!_ov||_ov.style.display!=="flex"){verificarRecordeDiario(_nc,_pc);setTimeout(()=>verificarPosicaoRanking(_nc,_pc),800);}
-    else{if(!window._def)window._def=[];window._def.push(()=>verificarRecordeDiario(_nc,_pc));window._def.push(()=>setTimeout(()=>verificarPosicaoRanking(_nc,_pc),800));}
-  },1400);
+  // SLOT MACHINE — dentro do setTimeout para garantir que os dados estão guardados
+  setTimeout(() => slotVerificarMedalhas(nomeAtual, payload), 600);
 }
 
 
@@ -1852,6 +1852,22 @@ function mostrarProgressoRegisto(nome, payload) {
   const conquistadas = medalhas.filter(m => m.earned);
   const porConquistar = medalhas.filter(m => !m.earned);
 
+  // Detetar medalhas NOVAS (não atribuídas ainda)
+  const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
+  const storeKey = 'slotDado_' + nome + '_' + mesKey;
+  let jaAtribuidas = [];
+  try { jaAtribuidas = JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch(e) {}
+  const medalhasNovas = conquistadas.filter(m => m.name !== 'Super Online' && m.name !== 'Spray Explosion' && !jaAtribuidas.includes(m.name));
+  // Medalhas diárias
+  if ((payload.onlines||0) >= 8) {
+    const k = 'slotDiario_' + nome + '_' + payload.data + '_SuperOnline';
+    if (!localStorage.getItem(k)) medalhasNovas.push({ icon:'🌟', name:'Super Online' });
+  }
+  if ((payload.sprays||0) >= 10) {
+    const k = 'slotDiario_' + nome + '_' + payload.data + '_SprayExplosion';
+    if (!localStorage.getItem(k)) medalhasNovas.push({ icon:'💥', name:'Spray Explosion' });
+  }
+
   if (conquistadas.length) {
     metasHtml += '<div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00CC66;margin-bottom:8px">✅ Conquistadas</div>';
     metasHtml += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">';
@@ -1865,6 +1881,17 @@ function mostrarProgressoRegisto(nome, payload) {
       </div>`;
     });
     metasHtml += '</div>';
+  }
+
+  // Botão para abrir slot se há medalhas novas
+  if (medalhasNovas.length > 0) {
+    const primeiraNovaStr = JSON.stringify(medalhasNovas.map(m=>m.name));
+    metasHtml += `<div style="margin:16px 0 8px;background:linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.05));border:2px solid #C9A84C;border-radius:16px;padding:20px;text-align:center">`;
+    metasHtml += `<div style="font-size:32px;margin-bottom:8px">🏅</div>`;
+    metasHtml += `<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#C9A84C;margin-bottom:4px">MEDALHA CONQUISTADA!</div>`;
+    metasHtml += `<div style="font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:16px">${medalhasNovas.map(m=>m.icon+' '+m.name).join(' · ')}</div>`;
+    metasHtml += `<button onclick="abrirSlotMedalha('${nome}','${medalhasNovas[0].name}')" style="width:100%;background:linear-gradient(135deg,#C9A84C,#F5D87E,#C9A84C);border:none;border-radius:14px;padding:16px;color:#07101f;font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;cursor:pointer;box-shadow:0 4px 24px rgba(201,168,76,0.5);touch-action:manipulation">🎰 GIRAR AGORA</button>`;
+    metasHtml += `</div>`;
   }
 
   if (porConquistar.length) {
@@ -3948,6 +3975,29 @@ function slotInit() {
 }
 
 // Abrir a slot machine
+function abrirSlotMedalha(nome, primeiraNovaStr) {
+  // Marcar as medalhas como atribuídas
+  let medalhasNovasNomes = [];
+  try { medalhasNovasNomes = JSON.parse(primeiraNovaStr.replace(/'/g,'"')); } catch(e) { medalhasNomasNomes = [primeiraNovaStr]; }
+  const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
+  const storeKey = 'slotDado_' + nome + '_' + mesKey;
+  let jaAtribuidas = [];
+  try { jaAtribuidas = JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch(e) {}
+  const hoje = new Date().toISOString().split('T')[0];
+  medalhasNovasNomes.forEach(function(mn) {
+    if (mn === 'Super Online') {
+      try { localStorage.setItem('slotDiario_'+nome+'_'+hoje+'_SuperOnline','1'); } catch(e) {}
+    } else if (mn === 'Spray Explosion') {
+      try { localStorage.setItem('slotDiario_'+nome+'_'+hoje+'_SprayExplosion','1'); } catch(e) {}
+    } else {
+      if (!jaAtribuidas.includes(mn)) jaAtribuidas.push(mn);
+    }
+  });
+  try { localStorage.setItem(storeKey, JSON.stringify(jaAtribuidas)); } catch(e) {}
+  // Abrir slot
+  slotAbrir(nome, medalhasNovasNomes[0] || 'Medalha');
+}
+
 function slotAbrir(nome, medalha) {
   _slotSpinning = false;
   _slotPremio = null;
@@ -4067,7 +4117,6 @@ function slotMostrarResultado(p) {
 function slotFechar() {
   const overlay = document.getElementById('slotOverlay');
   if (overlay) overlay.style.display = 'none';
-  if(window._def&&window._def.length){window._def.forEach(fn=>{try{fn();}catch(e){}});window._def=[];}
 }
 
 // ══════════════════════════════════════════════════
@@ -4521,5 +4570,5 @@ function renderDesafiosMedalhas() {
 
 <script>
 function limparChavesSlot(){var k=[];for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(key&&(key.startsWith('slotDado_')||key.startsWith('slotDiario_')))k.push(key);}k.forEach(function(key){localStorage.removeItem(key);});showToast('✅ '+k.length+' chaves slot removidas');}
-function limparRegistosHoje(){var hoje=new Date().toISOString().split('T')[0];var k=[];for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(key&&key.startsWith('registo_')&&key.includes(hoje))k.push(key);}k.forEach(function(key){localStorage.removeItem(key);});try{var h=JSON.parse(localStorage.getItem('historico_local')||'[]');localStorage.setItem('historico_local',JSON.stringify(h.filter(function(d){return d.data!==hoje;})));}catch(e){}showToast('✅ Registos de hoje removidos ('+k.length+')');}
+function limparRegistosHoje(){var hoje=new Date().toISOString().split('T')[0];var k=[];for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(key&&key.startsWith('registo_')&&key.includes(hoje))k.push(key);}k.forEach(function(key){localStorage.removeItem(key);});try{var h=JSON.parse(localStorage.getItem('historico_local')||'[]');localStorage.setItem('historico_local',JSON.stringify(h.filter(function(d){return d.data!==hoje;})));}catch(e){}showToast('✅ '+k.length+' registos removidos');}
 </script>
