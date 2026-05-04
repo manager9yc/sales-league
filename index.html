@@ -797,7 +797,6 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 .swipe-btn-wrap.done .swipe-thumb { background: #22C55E; box-shadow: 0 2px 12px rgba(34,197,94,0.5); }
 .swipe-btn-wrap.done { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.4); }
 .swipe-btn-wrap.done .swipe-label { color: #22C55E; opacity: 1 !important; }
-/* On desktop: show normal button */
 
 
 @keyframes slotLights { 0%{background-position:0 0} 100%{background-position:200px 0} }
@@ -857,7 +856,6 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 }
 .swipe-btn-wrap.done .swipe-thumb { background:#22C55E; box-shadow:0 2px 12px rgba(34,197,94,0.5); }
 .swipe-btn-wrap.done { background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.4); }
-/* On desktop: hide swipe, show normal button */
 
 </style>
 </head>
@@ -1005,7 +1003,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
-      <button class="submit-btn" id="submitBtn" onclick="handleSubmitBtn(this)" style="display:block!important">REGISTAR O MEU DIA</button>
+      <button class="submit-btn" id="submitBtn" onclick="handleSubmitBtn(this)" style="display:block!important;width:100%">REGISTAR O MEU DIA</button>
       <div style="text-align:center;padding:10px 0 4px;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif">APP developed by Dário Santos</div>
     </div>
     <div class="success" id="successMsg">
@@ -1164,6 +1162,8 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
         <div id="adminSummary" style="font-size:12px;color:var(--muted)"></div>
         <button onclick="limparCacheAdmin()" style="background:var(--card);border:1px solid #7a2200;border-radius:10px;padding:10px 14px;color:#FF6644;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Cache</button>
         <button onclick="slotAbrir('TESTE','Medalha Teste')" style="background:var(--card);border:1px solid #C9A84C;border-radius:10px;padding:10px 14px;color:#C9A84C;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🎰 Testar Slot</button>
+        <button onclick="limparChavesSlot()" style="background:#1a0000;border:1px solid #ef4444;border-radius:10px;padding:10px 14px;color:#ef4444;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Reset Slot Keys</button>
+        <button onclick="limparRegistosHoje()" style="background:#1a0000;border:1px solid #ef4444;border-radius:10px;padding:10px 14px;color:#ef4444;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Reset Hoje</button>
         <button onclick="bloquearAdmin()" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-left:auto">🔒 Bloquear</button>
       </div>
       <div style="padding:0 16px" id="adminContent">
@@ -1541,14 +1541,23 @@ async function submeter() {
     try { const tn=[...new Set(equipas.flatMap(e=>e.nomes))]; buildVgrid(tn.map(n=>({nome:n}))); if(equipaAtiva){document.querySelectorAll('.team-tab').forEach(t=>{if(t.dataset.id===equipaAtiva)t.click();});} } catch(e2){}
   }, 2500);
 
-  // Verificar recorde pessoal diário
-  setTimeout(() => verificarRecordeDiario(nomeAtual, payload), 1200);
-  // ★ Verificar posição no ranking
-  setTimeout(() => verificarPosicaoRanking(nomeAtual, payload), 2000);
   // Fechar form overlay
   setTimeout(() => fecharFormOverlay(), 400);
-  // SLOT MACHINE — dentro do setTimeout para garantir que os dados estão guardados
+  // SLOT MACHINE — primeiro, antes de qualquer outro popup
   setTimeout(() => slotVerificarMedalhas(nomeAtual, payload), 600);
+  // Recorde e ranking — depois e só se slot não estiver aberta
+  const _nc=nomeAtual, _pc=Object.assign({},payload);
+  setTimeout(()=>{
+    const _ov=document.getElementById('slotOverlay');
+    if(_ov&&_ov.style.display==='flex'){
+      if(!window._deferred)window._deferred=[];
+      window._deferred.push(()=>verificarRecordeDiario(_nc,_pc));
+      window._deferred.push(()=>setTimeout(()=>verificarPosicaoRanking(_nc,_pc),800));
+    }else{
+      verificarRecordeDiario(_nc,_pc);
+      setTimeout(()=>verificarPosicaoRanking(_nc,_pc),800);
+    }
+  },1200);
 }
 
 
@@ -4067,19 +4076,17 @@ function slotMostrarResultado(p) {
 function slotFechar() {
   const overlay = document.getElementById('slotOverlay');
   if (overlay) overlay.style.display = 'none';
+  if(window._deferred&&window._deferred.length){window._deferred.forEach(fn=>{try{fn();}catch(e){}});window._deferred=[];}
 }
 
 // ══════════════════════════════════════════════════
 // DETEÇÃO DE MEDALHAS — ao registar o dia
 // ══════════════════════════════════════════════════
 function slotVerificarMedalhas(nome, payload) {
-  dbgLog('verificarMedalhas: '+nome+' onlines='+(payload.onlines||0)+' sprays='+(payload.sprays||0));
-
   const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
   const storeKey = 'slotDado_' + nome + '_' + mesKey;
   let jaAtribuidas = [];
   try { jaAtribuidas = JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch(e) {}
-  dbgLog('jaAtrib: '+JSON.stringify(jaAtribuidas));
 
   // Dados do mês
   const mapa = {};
@@ -4087,15 +4094,12 @@ function slotVerificarMedalhas(nome, payload) {
   mapa[payload.data] = payload;
   const mes=new Date().getMonth(), ano=new Date().getFullYear();
   const doMes=Object.values(mapa).filter(d=>{try{const dt=new Date(d.data+'T12:00:00');return dt.getMonth()===mes&&dt.getFullYear()===ano;}catch(e){return false;}});
-  dbgLog('doMes: '+doMes.length+' registos');
 
   const fila = [];
 
   // Medalhas mensais
   const todas = calcularMedalhas(doMes.length ? doMes : [payload]).filter(m=>m.name!=='Super Online'&&m.name!=='Spray Explosion');
-  dbgLog('medalhas earned: '+todas.filter(m=>m.earned).map(m=>m.name).join(', '));
   const novas = todas.filter(m=>m.earned&&!jaAtribuidas.includes(m.name));
-  dbgLog('novas: '+novas.map(m=>m.name).join(', '));
   if (novas.length) {
     try{localStorage.setItem(storeKey,JSON.stringify([...jaAtribuidas,...novas.map(m=>m.name)]));}catch(e){}
     novas.forEach(m=>fila.push(m.name));
@@ -4104,24 +4108,17 @@ function slotVerificarMedalhas(nome, payload) {
   // Medalhas diárias
   if ((payload.onlines||0) >= 8) {
     const k='slotDiario_'+nome+'_'+payload.data+'_SuperOnline';
-    const exists=!!localStorage.getItem(k);
-    dbgLog('SuperOnline: onlines='+(payload.onlines||0)+' key exists='+exists);
-    if (!exists) { try{localStorage.setItem(k,'1');}catch(e){} fila.push('Super Online'); }
+    if (!localStorage.getItem(k)) { try{localStorage.setItem(k,'1');}catch(e){} fila.push('Super Online'); }
   }
   if ((payload.sprays||0) >= 10) {
     const k='slotDiario_'+nome+'_'+payload.data+'_SprayExplosion';
     if (!localStorage.getItem(k)) { try{localStorage.setItem(k,'1');}catch(e){} fila.push('Spray Explosion'); }
   }
 
-  dbgLog('fila: ['+fila.join(', ')+']');
-  if (fila.length === 0) { dbgLog('fila vazia — sem slot'); return; }
+  if (fila.length === 0) return;
 
-  dbgLog('A abrir slot em 300ms...');
   fila.forEach((medalha, idx) => {
-    setTimeout(() => {
-      dbgLog('>>> slotAbrir('+nome+', '+medalha+')');
-      slotAbrir(nome, medalha);
-    }, 300 + idx * 3000);
+    setTimeout(() => slotAbrir(nome, medalha), 300 + idx * 3000);
   });
 }
 
@@ -4510,55 +4507,73 @@ function renderDesafiosMedalhas() {
 </div>
 
 
-<div id="dbgBox" style="position:fixed;bottom:80px;left:8px;right:8px;z-index:2147483646;background:rgba(0,0,0,0.9);color:#0f0;font-family:monospace;font-size:10px;padding:6px;border-radius:8px;max-height:30vh;overflow-y:auto;display:none;pointer-events:none;border:1px solid #333"></div>
 <script>
-var _dbgVisible = false;
-var _dbgTaps = 0;
-document.addEventListener('touchstart', function() {
-  _dbgTaps++;
-  setTimeout(function(){_dbgTaps=0;}, 600);
-  if (_dbgTaps >= 5) {
-    _dbgVisible = !_dbgVisible;
-    document.getElementById('dbgBox').style.display = _dbgVisible ? 'block' : 'none';
-    _dbgTaps = 0;
-  }
-}, {passive:true});
+function limparChavesSlot() {
+  const keys=[];
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&(k.startsWith('slotDado_')||k.startsWith('slotDiario_')))keys.push(k);}
+  keys.forEach(k=>localStorage.removeItem(k));
+  showToast('✅ '+keys.length+' chaves slot removidas');
+}
+function limparRegistosHoje() {
+  const hoje=new Date().toISOString().split('T')[0];
+  const keys=[];
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('registo_')&&k.includes(hoje))keys.push(k);}
+  keys.forEach(k=>localStorage.removeItem(k));
+  try{
+    const h=JSON.parse(localStorage.getItem('historico_local')||'[]');
+    localStorage.setItem('historico_local',JSON.stringify(h.filter(d=>d.data!==hoje)));
+  }catch(e){}
+  showToast('✅ Registos de hoje removidos ('+keys.length+')');
+}
+</script>
 
-function dbgLog(msg) {
-  var box = document.getElementById('dbgBox');
-  if (!box) return;
+<div id="slotLog" style="position:fixed;bottom:80px;left:0;right:0;z-index:2147483646;background:rgba(0,0,0,0.93);color:#fff;font-family:monospace;font-size:12px;padding:10px 14px;display:none;max-height:50vh;overflow-y:auto;border-top:2px solid #C9A84C">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+    <span style="color:#C9A84C;font-weight:700;letter-spacing:2px;font-size:11px">SLOT DEBUG</span>
+    <button onclick="document.getElementById('slotLog').style.display='none'" style="background:#333;border:none;color:#fff;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px">✕</button>
+  </div>
+  <div id="slotLogLines"></div>
+</div>
+
+<script>
+function _slog(msg, color) {
+  var box = document.getElementById('slotLog');
+  var lines = document.getElementById('slotLogLines');
+  if (!lines) return;
   var t = new Date().toLocaleTimeString('pt-PT');
-  var line = document.createElement('div');
-  line.style.borderBottom = '1px solid #111';
-  line.style.padding = '1px 0';
-  var isImportant = msg.indexOf('slotAbrir') !== -1 || msg.indexOf('fila:') !== -1 || msg.indexOf('novas:') !== -1;
-  line.style.color = isImportant ? '#ff0' : '#0f0';
-  line.textContent = '['+t+'] '+msg;
-  box.insertBefore(line, box.firstChild);
-  while(box.children.length > 50) box.removeChild(box.lastChild);
-  // Auto-show on important events
-  if (isImportant) { box.style.display = 'block'; _dbgVisible = true; }
+  var d = document.createElement('div');
+  d.style.cssText = 'padding:2px 0;border-bottom:1px solid #222;color:'+(color||'#aaa');
+  d.textContent = '['+t+'] '+msg;
+  lines.insertBefore(d, lines.firstChild);
+  while(lines.children.length > 60) lines.removeChild(lines.lastChild);
+  // Auto-show on slot events
+  if(color==='#ff0'||color==='#f80'||color==='#f00') box.style.display='block';
 }
 
-// Override submeter start to log
 window.addEventListener('load', function() {
-  var origSubmeter = window.submeter;
-  if (origSubmeter) {
-    window.submeter = function() {
-      dbgLog('submeter() chamado nomeSel='+window.nomeSel);
-      return origSubmeter.apply(this, arguments);
-    };
-  }
-  var origAbrir = window.slotAbrir;
-  if (origAbrir) {
-    window.slotAbrir = function(nome, medalha) {
-      dbgLog('slotAbrir('+nome+','+medalha+') overlay='+document.getElementById('slotOverlay').style.display);
-      origAbrir.apply(this, arguments);
-      setTimeout(function(){
-        dbgLog('overlay após 50ms: '+document.getElementById('slotOverlay').style.display);
-      }, 50);
-    };
-  }
-  dbgLog('Pronto. Faz 5 toques rapidos para ver log.');
+  // Wrap submeter
+  var oS = window.submeter;
+  if(oS) window.submeter = function(){
+    _slog('submeter() nomeSel='+window.nomeSel, '#ff0');
+    return oS.apply(this,arguments);
+  };
+  // Wrap slotVerificarMedalhas
+  var oV = window.slotVerificarMedalhas;
+  if(oV) window.slotVerificarMedalhas = function(nome,payload){
+    _slog('verificarMedalhas: '+nome+' onlines='+(payload.onlines||0)+' sprays='+(payload.sprays||0),'#ff0');
+    return oV.apply(this,arguments);
+  };
+  // Wrap slotAbrir
+  var oA = window.slotAbrir;
+  if(oA) window.slotAbrir = function(nome,medalha){
+    _slog('>>> slotAbrir('+nome+', '+medalha+')','#f80');
+    var r = oA.apply(this,arguments);
+    setTimeout(function(){
+      var ov=document.getElementById('slotOverlay');
+      _slog('overlay.display after 50ms: '+(ov?ov.style.display:'NULL'),'#0f0');
+    },50);
+    return r;
+  };
+  _slog('Pronto', '#0f0');
 });
 </script>
