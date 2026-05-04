@@ -1543,15 +1543,16 @@ async function submeter() {
   setTimeout(() => verificarRecordeDiario(nomeAtual, payload), 1200);
   // ★ Verificar posição no ranking
   setTimeout(() => verificarPosicaoRanking(nomeAtual, payload), 2000);
+  // Abrir slot IMEDIATAMENTE (síncrono, sem setTimeout)
+  var _slotOv = document.getElementById("slotOverlay");
+  if (_slotOv) {
+    _slotOv.style.cssText = "display:flex!important;position:fixed;inset:0;z-index:2147483647;background:rgba(4,10,22,0.97);flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:hidden;text-align:center";
+    var _slotNomeEl = document.getElementById("slotNome");
+    if (_slotNomeEl) _slotNomeEl.textContent = nomeAtual + " · Medalha!";
+    slotInit();
+  }
   setTimeout(() => fecharFormOverlay(), 400);
-  // TESTE DIRETO — abre slot sempre após registo
-  const _nomeParaSlot = nomeAtual;
-  setTimeout(function() {
-    var ov = document.getElementById("slotOverlay");
-    if (ov) {
-      ov.style.display = "flex";
-    }
-  }, 800);
+  setTimeout(() => slotVerificarMedalhas(nomeAtual, payload), 600);
 }
 
 
