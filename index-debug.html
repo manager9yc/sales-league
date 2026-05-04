@@ -91,7 +91,11 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .cval.nz { color: var(--orange); }
 .cval.bump { transform: scale(1.5); }
 
-.submit-btn { width: 100%; background: var(--orange); border: none; border-radius: 14px; color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; padding: 18px; margin-top: 28px; cursor: pointer; transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s; box-shadow: 0 4px 20px rgba(255,107,0,0.35); }
+.submit-btn { width: 100%; background: linear-gradient(135deg, #FF6B00, #FF4500); border: none; border-radius: 16px; color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 3px; padding: 20px 18px; margin-top: 28px; cursor: pointer; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s; box-shadow: 0 6px 28px rgba(255,107,0,0.5); -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.submit-btn:active { transform: scale(0.96); box-shadow: 0 2px 12px rgba(255,107,0,0.4); }
+.submit-btn:disabled { opacity: 0.5; transform: none; }
+.submit-btn.loading { background: #00AA44; }
+.submit-btn.success { background: linear-gradient(135deg, #22C55E, #16a34a); box-shadow: 0 6px 28px rgba(34,197,94,0.4); }
 .submit-btn:hover { box-shadow: 0 6px 28px rgba(255,107,0,0.55); }
 .submit-btn:active { opacity: 0.88; transform: scale(0.98); }
 .submit-btn.loading { background: #28a745; box-shadow: 0 4px 20px rgba(40,167,69,0.4); transform: scale(0.98); }
@@ -797,15 +801,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 .swipe-btn-wrap.done .swipe-thumb { background: #22C55E; box-shadow: 0 2px 12px rgba(34,197,94,0.5); }
 .swipe-btn-wrap.done { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.4); }
 .swipe-btn-wrap.done .swipe-label { color: #22C55E; opacity: 1 !important; }
-/* On desktop: show normal button */
-@media (hover: hover) and (pointer: fine) {
-  .swipe-btn-wrap { display: none !important; }
-  .submit-btn-desktop { display: block !important; }
-}
-@media (hover: none), (pointer: coarse) {
-  .submit-btn-desktop { display: none !important; }
-  .swipe-btn-wrap { display: block; }
-}
+
 
 @keyframes slotLights { 0%{background-position:0 0} 100%{background-position:200px 0} }
 @keyframes slotConfettiFall { 0%{transform:translateY(-10px) rotate(0);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
@@ -864,15 +860,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 }
 .swipe-btn-wrap.done .swipe-thumb { background:#22C55E; box-shadow:0 2px 12px rgba(34,197,94,0.5); }
 .swipe-btn-wrap.done { background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.4); }
-/* On desktop: hide swipe, show normal button */
-@media (hover:hover) and (pointer:fine) {
-  .swipe-btn-wrap { display:none !important; }
-  .submit-btn-desktop { display:block !important; }
-}
-@media (hover:none),(pointer:coarse) {
-  .submit-btn-desktop { display:none !important; }
-  .swipe-btn-wrap { display:block; }
-}
+
 </style>
 </head>
 <body>
@@ -1019,18 +1007,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
-      <button class="submit-btn submit-btn-desktop" id="submitBtn" onclick="handleSubmitBtn(this)">Registar o meu dia</button>
-
-      <!-- SWIPE TO REGISTER (mobile only) -->
-      <div class="swipe-btn-wrap" id="swipeBtnWrap">
-        <div class="swipe-track">
-          <div class="swipe-label" id="swipeLabel">
-            <div class="swipe-arrows"><span>❯</span><span>❯</span><span>❯</span></div>
-            DESLIZA PARA REGISTAR
-          </div>
-        </div>
-        <div class="swipe-thumb" id="swipeThumb">✔</div>
-      </div>
+      <button class="submit-btn" id="submitBtn" onclick="handleSubmitBtn(this)">REGISTAR O MEU DIA</button>
       <div style="text-align:center;padding:10px 0 4px;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif">APP developed by Dário Santos</div>
     </div>
     <div class="success" id="successMsg">
@@ -1465,20 +1442,18 @@ function mostrarPopupDuplicado(nome, data) {
 let _submitEmCurso = false;
 
 async function submeter() {
-  if(window._dbg) window._dbg('submeter() INICIO nomeAtual='+nomeAtual,'#f80');
-  if (!nomeSel) { if(window._dbg)window._dbg('SAIU: nomeSel=null','#f00'); showToast('⚠️ Seleciona o teu nome primeiro'); return; }
+  if (!nomeSel) { showToast('⚠️ Seleciona o teu nome primeiro'); return; }
   const nomeAtual = nomeSel;
   const dataVal = document.getElementById('dataRegisto').value;
   if (!dataVal) { showToast('⚠️ Escolhe a data'); return; }
 
   // Bloquear dupla submissão (double tap, etc.)
-  if (_submitEmCurso) { if(window._dbg)window._dbg('SAIU: _submitEmCurso=true','#f00'); return; }
+  if (_submitEmCurso) return;
 
   // Verificar duplicado por localStorage
   const registoKey = 'registo_' + nomeAtual + '_' + dataVal;
   try {
     if (localStorage.getItem(registoKey)) {
-      if(window._dbg)window._dbg('SAIU: duplicado localStorage key='+registoKey,'#f00');
       mostrarPopupDuplicado(nomeAtual, dataVal);
       return;
     }
@@ -1488,7 +1463,6 @@ async function submeter() {
   try {
     const hist = JSON.parse(localStorage.getItem('historico_local') || '[]');
     if (hist.some(r => r.nome === nomeAtual && r.data === dataVal)) {
-      if(window._dbg)window._dbg('SAIU: duplicado historico_local nome='+nomeAtual+' data='+dataVal,'#f00');
       mostrarPopupDuplicado(nomeAtual, dataVal);
       // Garantir que a chave também fica marcada
       try { localStorage.setItem(registoKey, '1'); } catch(e) {}
@@ -1500,7 +1474,7 @@ async function submeter() {
   _submitEmCurso = true;
   iniciarAudio();
   const btn = document.getElementById('submitBtn');
-  btn.textContent = '✔ A guardar...';
+  btn.textContent = '⏳ A GUARDAR...';
   btn.style.background = '#00AA44';
   btn.style.boxShadow = '0 4px 20px rgba(0,170,68,0.4)';
   btn.disabled = true;
@@ -1540,7 +1514,7 @@ async function submeter() {
 
   // Feedback visual
   tocarSomRegisto();
-  btn.textContent = '✔ Registado com sucesso';
+  btn.textContent = '✔ REGISTADO!';
   btn.style.background = '#22C55E';
   btn.style.color = '#fff';
   btn.style.boxShadow = '0 4px 20px rgba(34,197,94,0.4)';
@@ -1555,7 +1529,7 @@ async function submeter() {
   setTimeout(() => {
     const r = document.getElementById('submitBtn');
     if (!r) return;
-    r.textContent = '＋ Novo Registo';
+    r.textContent = 'REGISTAR O MEU DIA';
     r.style.background = 'transparent';
     r.style.color = 'var(--orange)';
     r.style.border = '2px solid var(--orange)';
@@ -1575,8 +1549,7 @@ async function submeter() {
   setTimeout(() => verificarPosicaoRanking(nomeAtual, payload), 2000);
   // Fechar form overlay
   setTimeout(() => fecharFormOverlay(), 400);
-  // SLOT MACHINE
-  if(window._dbg) window._dbg('submeter: agendando slotVerificarMedalhas em 600ms','#0ff');
+  // SLOT MACHINE — dentro do setTimeout para garantir que os dados estão guardados
   setTimeout(() => slotVerificarMedalhas(nomeAtual, payload), 600);
 }
 
@@ -1660,7 +1633,7 @@ function resetForm() {
   const formEl = document.getElementById('screen-form');
   if (formEl) formEl.scrollTop = 0;
   window.scrollTo({top: 0, behavior: 'smooth'});
-  if (typeof window._resetSwipe === 'function') window._resetSwipe();
+  // swipe removed
   setTimeout(fecharFormOverlay, 300);
 }
 
@@ -4247,8 +4220,6 @@ function calcularMedalhasDiarias(payload) {
     }
 
     // Call the actual submit
-    if(window._dbg) window._dbg('completeSwipe: submitBtn='+(submitBtn?'found (state='+submitBtn.dataset.state+')':'NULL'),'#ff0');
-    if(window._dbg) window._dbg('nomeAtual='+window.nomeAtual+' equipaAtiva='+window.equipaAtiva,'#ff0');
     clicarSubmit(submitBtn);
 
     // Show green "Registo Efetuado"
@@ -4546,92 +4517,3 @@ function renderDesafiosMedalhas() {
   </div>
 </div>
 
-
-<script>
-function resetarRegistosHoje() {
-  const hoje = new Date().toISOString().split('T')[0];
-  const keys = [];
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(k && k.startsWith('registo_') && k.includes(hoje)) keys.push(k);
-  }
-  // Also clean historico_local for today
-  try {
-    const hist = JSON.parse(localStorage.getItem('historico_local')||'[]');
-    const filtered = hist.filter(d => d.data !== hoje);
-    localStorage.setItem('historico_local', JSON.stringify(filtered));
-  } catch(e) {}
-  keys.forEach(k=>localStorage.removeItem(k));
-  showToast('✅ Registos de hoje limpos ('+keys.length+' chaves)');
-}
-
-function resetarSlotKeys() {
-  const keys = [];
-  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&(k.startsWith('slotDado_')||k.startsWith('slotDiario_')))keys.push(k);}
-  keys.forEach(k=>localStorage.removeItem(k));
-  showToast('✅ '+keys.length+' chaves slot limpas');
-}
-
-(function() {
-  const panel = document.createElement('div');
-  panel.id = 'dbgPanel';
-  panel.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999999;background:rgba(0,0,0,0.95);color:#0f0;font-family:monospace;font-size:11px;padding:6px 8px;max-height:45vh;overflow-y:auto;display:none;pointer-events:none';
-  panel.innerHTML = '<div style="color:#ff0;margin-bottom:3px">DEBUG — toca 5x para abrir/fechar</div><div id="dbgLog"></div>';
-  document.body.appendChild(panel);
-
-  let tc=0,tt=null;
-  document.addEventListener('touchstart',function(){tc++;clearTimeout(tt);tt=setTimeout(()=>{tc=0;},700);if(tc>=5){tc=0;panel.style.display=panel.style.display==='none'?'block':'none';}},{passive:true});
-
-  function dbg(msg,col){
-    const logEl=document.getElementById('dbgLog');if(!logEl)return;
-    const t=new Date().toLocaleTimeString('pt-PT');
-    const d=document.createElement('div');
-    d.style.cssText='color:'+(col||'#0f0')+';padding:1px 0;border-bottom:1px solid #111';
-    d.textContent='['+t+'] '+msg;
-    logEl.insertBefore(d,logEl.firstChild);
-    while(logEl.children.length>80)logEl.removeChild(logEl.lastChild);
-    if(col==='#ff0'||col==='#f80'||col==='#f00')panel.style.display='block';
-  }
-  window._dbg=dbg;
-
-  window.addEventListener('load',function(){
-    const origV=window.slotVerificarMedalhas;
-    if(origV){
-      window.slotVerificarMedalhas=function(nome,payload){
-        const mk=new Date().getFullYear()+'-'+(new Date().getMonth()+1);
-        const sk='slotDado_'+nome+'_'+mk;
-        const ja=JSON.parse(localStorage.getItem(sk)||'[]');
-        const dkOn='slotDiario_'+nome+'_'+payload.data+'_SuperOnline';
-        const dkSp='slotDiario_'+nome+'_'+payload.data+'_SprayExplosion';
-        dbg('=== slotVerificarMedalhas ===','#ff0');
-        dbg('nome='+nome+' onlines='+(payload.onlines||0)+' sprays='+(payload.sprays||0),'#ff0');
-        dbg('jaAtrib='+JSON.stringify(ja),'#aaa');
-        dbg('dkOn exists='+!!localStorage.getItem(dkOn),'#aaa');
-        dbg('dkSp exists='+!!localStorage.getItem(dkSp),'#aaa');
-        origV.call(this,nome,payload);
-      };
-    } else { dbg('ERRO slotVerificarMedalhas nao existe','#f00'); }
-
-    const origA=window.slotAbrir;
-    if(origA){
-      window.slotAbrir=function(nome,medalha){
-        dbg('>>> slotAbrir: '+nome+' / '+medalha,'#f80');
-        const ov=document.getElementById('slotOverlay');
-        dbg('overlay antes='+( ov?ov.style.display:'NULL'),'#aaa');
-        origA.call(this,nome,medalha);
-        requestAnimationFrame(function(){
-          const ov2=document.getElementById('slotOverlay');
-          dbg('overlay depois rAF='+(ov2?ov2.style.display:'NULL'),'#0ff');
-          const sf=document.getElementById('screen-form');
-          dbg('screen-form pE='+(sf?sf.style.pointerEvents:'?'),'#aaa');
-        });
-      };
-    } else { dbg('ERRO slotAbrir nao existe','#f00'); }
-
-    dbg('Debug pronto','#0ff');
-    let slotKeys=0;
-    for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&(k.startsWith('slotDado_')||k.startsWith('slotDiario_'))){slotKeys++;dbg('KEY: '+k,'#888');}}
-    if(slotKeys===0) dbg('Sem chaves slot no localStorage','#aaa');
-  });
-})();
-</script>
