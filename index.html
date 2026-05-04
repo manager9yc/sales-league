@@ -32,8 +32,8 @@ body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans
 .nav { display: flex; background: linear-gradient(180deg, #0d1b3e, #070F1F); border: 1px solid rgba(201,168,76,0.35); border-radius: 50px; position: fixed; bottom: 18px; left: 12px; right: 12px; z-index: 9000; align-items: center; height: 64px; padding: 0 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(201,168,76,0.08); padding-bottom: env(safe-area-inset-bottom, 0px); }
 .nav-btn { flex: 1; height: 100%; border: none; background: transparent; color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: color 0.2s; }
 .nav-btn.active { color: #C9A84C; }
-.nav-center-btn { width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(145deg, #F5D87E, #C9A84C); border: none; font-size: 28px; font-weight: 900; color: #070F1F; cursor: pointer; box-shadow: 0 0 24px rgba(201,168,76,0.65), 0 4px 16px rgba(0,0,0,0.6), 0 -2px 8px rgba(255,220,100,0.3); position: relative; top: -16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, box-shadow 0.2s; line-height: 1; }
-.nav-center-btn:active, .nav-center-btn.form-active { background: linear-gradient(145deg, #ff8a3d, #FF6B00); box-shadow: 0 0 24px rgba(255,107,0,0.65), 0 4px 16px rgba(0,0,0,0.6); transform: scale(0.94); }
+.nav-center-btn { width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(145deg, #F5D87E, #C9A84C); border: none; font-size: 28px; font-weight: 900; color: #070F1F; cursor: pointer; box-shadow: 0 0 24px rgba(201,168,76,0.65), 0 4px 16px rgba(0,0,0,0.6), 0 -2px 8px rgba(255,220,100,0.3); position: relative; top: -16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; display: flex; align-items: center; justify-content: center; transition: transform 0.55s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.4s ease, background 0.4s ease; line-height: 1; }
+.nav-center-btn:active, .nav-center-btn.form-active { background: linear-gradient(145deg, #ff8a3d, #FF6B00); box-shadow: 0 0 24px rgba(255,107,0,0.65), 0 4px 16px rgba(0,0,0,0.6); transform: scale(0.88); }
 
 /* SCREENS */
 .screen { display: none; }
@@ -1113,10 +1113,11 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
     </div>
   </div>
   <div id="dashInner" style="max-width:900px;margin:0 auto;padding:0 16px 60px">
-    <div style="text-align:center;padding:48px 20px 32px">
-      <div style="font-size:56px;margin-bottom:16px;animation:trophyBounce 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards">📊</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#fff;margin-bottom:8px">O teu perfil</div>
-      <div style="font-size:14px;color:var(--muted);margin-bottom:28px">Seleciona um vendedor para ver o seu dashboard completo</div>
+    <div style="padding:28px 20px 18px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#fff;margin-bottom:4px">O teu perfil</div>
+      <div style="font-size:14px;color:var(--muted);margin-bottom:20px">Seleciona um vendedor para ver o seu dashboard completo</div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">🏅 Top 3 Consistência este mês</div>
+      <div id="top3ConsistenciaWrap" style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px"></div>
     </div>
     <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Destaques do mês</div>
     <div id="dashDefaultStats"></div>
@@ -1562,13 +1563,23 @@ async function submeter() {
     Object.keys(vals).forEach(k => { vals[k]=0; const el=document.getElementById(k); if(el){el.textContent=0; el.classList.remove('nz');} });
     nomeSel = null;
     document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('active'));
+    // Atualizar botões de nome para refletir registos do dia (marca quem já registou)
+    try {
+      const todosNomesForm = [...new Set(equipas.flatMap(e=>e.nomes))];
+      buildVgrid(todosNomesForm.map(n=>({nome:n})));
+      if (equipaAtiva) {
+        document.querySelectorAll('.team-tab').forEach(t => {
+          if (t.dataset.id === equipaAtiva) t.click();
+        });
+      }
+    } catch(e2) {}
   }, 2500);
 
   // Verificar recorde pessoal diário
   setTimeout(() => verificarRecordeDiario(nomeAtual, payload), 1200);
   // ★ Verificar posição no ranking
   setTimeout(() => verificarPosicaoRanking(nomeAtual, payload), 2000);
-  // ★ SLOT MACHINE — delay para garantir que historico_local e dashAllDados estão atualizados
+  // ★ SLOT MACHINE
   setTimeout(() => fecharFormOverlay(), 400);
   setTimeout(() => slotVerificarMedalhas(nomeAtual, payload), 3200);
 }
@@ -1780,26 +1791,55 @@ function renderRanking(dados) {
   // Medals per vendedor - use ranking dados directly (already monthly)
   if (dados.length) {
     html += '<div class="slabel" style="margin-top:28px">🏅 Medalhas conquistadas este mês</div>';
-    // Group ranking data by nome to use for medal calc
+    // Group all detailed data by nome
     const dadosPorNome = {};
-    dados.forEach(v => {
-      if (!dadosPorNome[v.nome]) dadosPorNome[v.nome] = [];
-      dadosPorNome[v.nome].push(v);
-    });
-    // Also use dashAllDados if available for more complete data
     if (dashAllDados.length) {
-      [...new Set(dashAllDados.map(d=>d.nome))].forEach(nome => {
-        if (!dadosPorNome[nome]) dadosPorNome[nome] = dashAllDados.filter(d=>d.nome===nome);
+      dashAllDados.filter(d=>d&&d.nome).forEach(d => {
+        if (!dadosPorNome[d.nome]) dadosPorNome[d.nome] = [];
+        dadosPorNome[d.nome].push(d);
+      });
+    } else {
+      dados.forEach(v => {
+        if (!dadosPorNome[v.nome]) dadosPorNome[v.nome] = [];
+        dadosPorNome[v.nome].push(v);
       });
     }
+    // Also merge local history
+    try {
+      JSON.parse(localStorage.getItem('historico_local')||'[]').forEach(d => {
+        if (!d||!d.nome) return;
+        if (!dadosPorNome[d.nome]) dadosPorNome[d.nome] = [];
+        const existe = dadosPorNome[d.nome].some(x=>x.data===d.data&&x.nome===d.nome);
+        if (!existe) dadosPorNome[d.nome].push(d);
+      });
+    } catch(e) {}
+
+    const mesAtual = new Date().getMonth(), anoAtual = new Date().getFullYear();
+
     let medalhasHtml = '<div style="display:flex;flex-direction:column;gap:8px">';
     let temMedalhas = false;
-    Object.keys(dadosPorNome).forEach(nome => {
+    // Sort by nome alphabetically for consistent display
+    Object.keys(dadosPorNome).sort().forEach(nome => {
       const conquistadas = calcularMedalhas(dadosPorNome[nome]).filter(m=>m.earned);
+      // Check daily medals (Super Online / Spray Explosion) from actual day records
+      const doMesNome = dadosPorNome[nome].filter(d => {
+        try { const dt = new Date(d.data+'T12:00:00'); return dt.getMonth()===mesAtual&&dt.getFullYear()===anoAtual; } catch(e){return false;}
+      });
+      const maxOnlinesDia = Math.max(...doMesNome.map(d=>d.onlines||0), 0);
+      const maxSpraysDia = Math.max(...doMesNome.map(d=>d.sprays||0), 0);
+      if (maxOnlinesDia >= 8) conquistadas.push({ icon:'🌟', name:'Super Online', earned:true });
+      if (maxSpraysDia >= 10) conquistadas.push({ icon:'💥', name:'Spray Explosion', earned:true });
+
       if (!conquistadas.length) return;
       temMedalhas = true;
+      const foto = getFoto ? getFoto(nome) : null;
+      const ini = nome.split(' ').map(x=>x[0]).slice(0,2).join('');
+      const avatarHtml = foto
+        ? `<img src="${foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+        : `<div style="width:36px;height:36px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#fff;flex-shrink:0;">${ini}</div>`;
       medalhasHtml += `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <div style="font-size:13px;font-weight:700;color:#fff;min-width:110px">${nome}</div>
+        ${avatarHtml}
+        <div style="font-size:13px;font-weight:700;color:#fff;min-width:100px">${nome}</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">${conquistadas.map(m=>`<span style="background:rgba(255,107,0,0.1);border:1px solid rgba(255,107,0,0.3);border-radius:8px;padding:4px 10px;font-size:12px;display:flex;align-items:center;gap:4px"><span>${m.icon}</span><span style="color:var(--orange);font-size:11px;font-weight:600">${m.name}</span></span>`).join('')}</div>
       </div>`;
     });
@@ -2449,32 +2489,11 @@ function mostrarDash(nome) {
     .sort((a,b)=>b.v-a.v).slice(0,8);
   const maxO = compRank[0]?.v||1;
 
-  // Medalhas ganhas para mostrar junto ao nome
-  const medalhasGanhas = calcularMedalhas(dadosVendedor).filter(m => m.earned);
-  const medalhasDiariasGanhas = (() => {
-    const ganhas = [];
-    const doMesDash = dadosVendedor.filter(d => {
-      const dt = new Date(d.data||''); return !isNaN(dt) && dt.getMonth()===new Date().getMonth() && dt.getFullYear()===new Date().getFullYear();
-    });
-    const maxOnlinesDia = Math.max(...doMesDash.map(d => d.onlines||0), 0);
-    const maxSpraysDia = Math.max(...doMesDash.map(d => d.sprays||0), 0);
-    if (maxOnlinesDia >= 8) ganhas.push({ icon:'🌟', name:'Super Online' });
-    if (maxSpraysDia >= 10) ganhas.push({ icon:'💥', name:'Spray Explosion' });
-    return ganhas;
-  })();
-  const todasMedalhasGanhas = [...medalhasGanhas, ...medalhasDiariasGanhas];
-  const medalhasHtmlInline = todasMedalhasGanhas.length
-    ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${todasMedalhasGanhas.map(m=>`<span title="${m.name}" style="font-size:18px;line-height:1;display:inline-block">${m.icon}</span>`).join('')}</div>`
-    : '';
-
   const html = `
     <div class="d-profile">
       ${renderAvatar(nome, 56, 22)}
       <div style="flex:1">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <div class="d-pname">${nome}</div>
-          ${todasMedalhasGanhas.length ? `<div style="display:flex;gap:3px;align-items:center">${todasMedalhasGanhas.map(m=>`<span title="${m.name}" style="font-size:20px;line-height:1">${m.icon}</span>`).join('')}</div>` : ''}
-        </div>
+        <div class="d-pname">${nome}</div>
         <div class="d-pteam">${nomeParaEquipaLabel[nome]||'Loja'}</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
           <div class="d-badge">#${pos1}º Onlines</div>
@@ -2622,6 +2641,7 @@ async function carregarDashboard() {
     dashAllDados = await res.json();
     if (!Array.isArray(dashAllDados)) dashAllDados = [];
     renderDashDefault();
+    renderTop3Consistencia();
   } catch(e) {
     try {
       const proxy = 'https://corsproxy.io/?';
@@ -2630,6 +2650,7 @@ async function carregarDashboard() {
       dashAllDados = await res2.json();
       if (!Array.isArray(dashAllDados)) dashAllDados = [];
       renderDashDefault();
+      renderTop3Consistencia();
     } catch(e2) {
       dashAllDados = [];
     }
@@ -2703,25 +2724,65 @@ function renderDashDefault() {
   html += `</div>`;
 
   const topGeral = [...vendedores].map(v=>({...v, total: categorias.reduce((s,c)=>s+(v[c.key]||0),0)})).sort((a,b)=>b.total-a.total).slice(0,3);
-  if(topGeral.length){
-    html += `<div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;margin-top:4px">Top 3 geral este mês</div>
-    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px">`;
-    const medals = ['🥇','🥈','🥉'];
-    topGeral.forEach((v,i)=>{
-      html += `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px">
-        <span style="font-size:24px">${medals[i]}</span>
-        <div style="flex:1"><div style="font-size:15px;font-weight:700;color:#fff">${v.nome}</div></div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--orange)">${v.total}</div>
-      </div>`;
-    });
-    html += `</div>`;
-  }
 
   el.innerHTML = html;
 }
 
 
-// ══ PIN ADMIN ══
+// ══ TOP 3 CONSISTÊNCIA ══
+function renderTop3Consistencia() {
+  const wrap = document.getElementById('top3ConsistenciaWrap');
+  if (!wrap) return;
+  if (!dashAllDados.length) {
+    wrap.innerHTML = '<div style="color:var(--muted);font-size:13px;font-style:italic">A carregar...</div>';
+    return;
+  }
+  const mesAtual = new Date().getMonth(), anoAtual = new Date().getFullYear();
+  // Contar registos distintos por pessoa este mês
+  const contagem = {};
+  dashAllDados.forEach(d => {
+    const dt = new Date(d.data||'');
+    if (isNaN(dt) || dt.getMonth()!==mesAtual || dt.getFullYear()!==anoAtual) return;
+    if (!contagem[d.nome]) contagem[d.nome] = new Set();
+    contagem[d.nome].add(d.data);
+  });
+  // Também contar do histórico local
+  try {
+    JSON.parse(localStorage.getItem('historico_local')||'[]').forEach(d => {
+      const dt = new Date(d.data||'');
+      if (isNaN(dt) || dt.getMonth()!==mesAtual || dt.getFullYear()!==anoAtual) return;
+      if (!contagem[d.nome]) contagem[d.nome] = new Set();
+      contagem[d.nome].add(d.data);
+    });
+  } catch(e) {}
+  const ranking = Object.entries(contagem)
+    .map(([nome, dias]) => ({ nome, registos: dias.size }))
+    .sort((a, b) => b.registos - a.registos)
+    .slice(0, 3);
+  if (!ranking.length) {
+    wrap.innerHTML = '<div style="color:var(--muted);font-size:13px;font-style:italic">Sem registos este mês</div>';
+    return;
+  }
+  const medalEmoji = ['🥇','🥈','🥉'];
+  const borderColors = ['rgba(201,168,76,0.5)','rgba(180,180,180,0.35)','rgba(180,120,60,0.35)'];
+  wrap.innerHTML = ranking.map((v, i) => {
+    const foto = getFoto ? getFoto(v.nome) : null;
+    const ini = v.nome.split(' ').map(x=>x[0]).slice(0,2).join('');
+    const avatarHtml = foto
+      ? `<img src="${foto}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid ${borderColors[i]}">`
+      : `<div style="width:42px;height:42px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;flex-shrink:0;border:2px solid ${borderColors[i]}">${ini}</div>`;
+    return `<div style="background:var(--card);border:1px solid ${borderColors[i]};border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="abrirDashDeRanking('${v.nome.replace(/'/g,"\\'")}')">
+      ${avatarHtml}
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:700;color:#fff">${v.nome}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${v.registos} registo${v.registos!==1?'s':''} este mês</div>
+      </div>
+      <div style="font-size:26px">${medalEmoji[i]}</div>
+    </div>`;
+  }).join('');
+}
+
+
 const ADMIN_PIN = '101';
 let pinBuffer = '';
 let adminUnlocked = false;
@@ -4106,19 +4167,9 @@ function slotVerificarMedalhas(nome, payload) {
   const medalhasMes = calcularMedalhas(dadosParaCalculo)
     .filter(m => m.name !== 'Super Online' && m.name !== 'Spray Explosion');
 
-  // Find medals earned NOW that were NOT already given
   const novasMes = medalhasMes.filter(m => m.earned && !jaAtribuidas.includes(m.name));
 
-  // Helper to fechar overlays bloqueantes antes de abrir slot
-  function limparOverlays() {
-    ['recordePopupOverlay','duplicadoPopupOverlay','rankingPopupOverlay'].forEach(id => {
-      const el = document.getElementById(id); if(el) el.remove();
-    });
-    const medalPopupEl = document.getElementById('medalPopup');
-    if (medalPopupEl) medalPopupEl.classList.remove('show');
-  }
-
-  // Fila unificada de slots — evita sobreposição
+  // Fila unificada - evita sobreposição de slots
   const slotQueue = [];
 
   if (novasMes.length > 0) {
@@ -4127,7 +4178,7 @@ function slotVerificarMedalhas(nome, payload) {
     novasMes.forEach(m => slotQueue.push(m.name));
   }
 
-  // Check daily medals (Super Online / Spray Explosion)
+  // Medalhas diárias (Super Online / Spray Explosion)
   const diarias = calcularMedalhasDiarias(payload);
   diarias.forEach(m => {
     const diaKey = 'slotDiario_' + nome + '_' + payload.data + '_' + m.name;
@@ -4137,13 +4188,16 @@ function slotVerificarMedalhas(nome, payload) {
     }
   });
 
-  // Abrir slots em sequencia com 2.5s entre cada um
   if (slotQueue.length > 0) {
     slotQueue.forEach((medalha, idx) => {
       setTimeout(() => {
-        limparOverlays();
+        ['recordePopupOverlay','duplicadoPopupOverlay','rankingPopupOverlay'].forEach(id => {
+          const el = document.getElementById(id); if(el) el.remove();
+        });
+        const medalPopupEl = document.getElementById('medalPopup');
+        if (medalPopupEl) medalPopupEl.classList.remove('show');
         slotAbrir(nome, medalha);
-      }, 1400 + (idx * 2500));
+      }, 800 + (idx * 2500));
     });
   }
 }
