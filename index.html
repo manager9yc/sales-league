@@ -1563,7 +1563,7 @@ async function submeter() {
     Object.keys(vals).forEach(k => { vals[k]=0; const el=document.getElementById(k); if(el){el.textContent=0; el.classList.remove('nz');} });
     nomeSel = null;
     document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('active'));
-    // Atualizar botões de nome para refletir registos do dia (marca quem já registou)
+    // Atualizar grelha de nomes para refletir quem já registou hoje
     try {
       const todosNomesForm = [...new Set(equipas.flatMap(e=>e.nomes))];
       buildVgrid(todosNomesForm.map(n=>({nome:n})));
@@ -1577,11 +1577,12 @@ async function submeter() {
 
   // Verificar recorde pessoal diário
   setTimeout(() => verificarRecordeDiario(nomeAtual, payload), 1200);
-  // ★ Verificar posição no ranking
+  // Verificar posição no ranking
   setTimeout(() => verificarPosicaoRanking(nomeAtual, payload), 2000);
-  // ★ SLOT MACHINE
+  // Fechar form overlay
   setTimeout(() => fecharFormOverlay(), 400);
-  setTimeout(() => slotVerificarMedalhas(nomeAtual, payload), 3200);
+  // SLOT MACHINE — corre depois do form fechar e dos dados estarem guardados
+  setTimeout(() => slotVerificarMedalhas(nomeAtual, payload), 1000);
 }
 
 
@@ -1788,57 +1789,46 @@ function renderRanking(dados) {
   // Registos por seccao com barras
   html += renderRegistosPorSeccao(dados);
 
-  // Medals per vendedor - use ranking dados directly (already monthly)
+  // Medalhas conquistadas este mês (mensais + diárias)
   if (dados.length) {
     html += '<div class="slabel" style="margin-top:28px">🏅 Medalhas conquistadas este mês</div>';
-    // Group all detailed data by nome
     const dadosPorNome = {};
-    if (dashAllDados.length) {
-      dashAllDados.filter(d=>d&&d.nome).forEach(d => {
-        if (!dadosPorNome[d.nome]) dadosPorNome[d.nome] = [];
-        dadosPorNome[d.nome].push(d);
-      });
-    } else {
-      dados.forEach(v => {
-        if (!dadosPorNome[v.nome]) dadosPorNome[v.nome] = [];
-        dadosPorNome[v.nome].push(v);
-      });
-    }
-    // Also merge local history
+    // Usar dashAllDados para ter registos detalhados por dia (necessário para medalhas diárias)
+    const fonte = dashAllDados.length ? dashAllDados : dados;
+    fonte.filter(d=>d&&d.nome).forEach(d => {
+      if (!dadosPorNome[d.nome]) dadosPorNome[d.nome] = [];
+      dadosPorNome[d.nome].push(d);
+    });
+    // Merge historico local
     try {
       JSON.parse(localStorage.getItem('historico_local')||'[]').forEach(d => {
         if (!d||!d.nome) return;
         if (!dadosPorNome[d.nome]) dadosPorNome[d.nome] = [];
-        const existe = dadosPorNome[d.nome].some(x=>x.data===d.data&&x.nome===d.nome);
-        if (!existe) dadosPorNome[d.nome].push(d);
+        if (!dadosPorNome[d.nome].some(x=>x.data===d.data)) dadosPorNome[d.nome].push(d);
       });
     } catch(e) {}
-
     const mesAtual = new Date().getMonth(), anoAtual = new Date().getFullYear();
-
     let medalhasHtml = '<div style="display:flex;flex-direction:column;gap:8px">';
     let temMedalhas = false;
-    // Sort by nome alphabetically for consistent display
     Object.keys(dadosPorNome).sort().forEach(nome => {
       const conquistadas = calcularMedalhas(dadosPorNome[nome]).filter(m=>m.earned);
-      // Check daily medals (Super Online / Spray Explosion) from actual day records
-      const doMesNome = dadosPorNome[nome].filter(d => {
-        try { const dt = new Date(d.data+'T12:00:00'); return dt.getMonth()===mesAtual&&dt.getFullYear()===anoAtual; } catch(e){return false;}
+      // Medalhas diárias: verificar máximo num único dia
+      const doMes = dadosPorNome[nome].filter(d => {
+        try { const dt=new Date(d.data+'T12:00:00'); return dt.getMonth()===mesAtual&&dt.getFullYear()===anoAtual; } catch(e){return false;}
       });
-      const maxOnlinesDia = Math.max(...doMesNome.map(d=>d.onlines||0), 0);
-      const maxSpraysDia = Math.max(...doMesNome.map(d=>d.sprays||0), 0);
-      if (maxOnlinesDia >= 8) conquistadas.push({ icon:'🌟', name:'Super Online', earned:true });
-      if (maxSpraysDia >= 10) conquistadas.push({ icon:'💥', name:'Spray Explosion', earned:true });
-
+      const maxOnlines = Math.max(...doMes.map(d=>d.onlines||0), 0);
+      const maxSprays  = Math.max(...doMes.map(d=>d.sprays||0), 0);
+      if (maxOnlines >= 8) conquistadas.push({ icon:'🌟', name:'Super Online' });
+      if (maxSprays  >= 10) conquistadas.push({ icon:'💥', name:'Spray Explosion' });
       if (!conquistadas.length) return;
       temMedalhas = true;
       const foto = getFoto ? getFoto(nome) : null;
       const ini = nome.split(' ').map(x=>x[0]).slice(0,2).join('');
-      const avatarHtml = foto
+      const av = foto
         ? `<img src="${foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
         : `<div style="width:36px;height:36px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;color:#fff;flex-shrink:0;">${ini}</div>`;
       medalhasHtml += `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        ${avatarHtml}
+        ${av}
         <div style="font-size:13px;font-weight:700;color:#fff;min-width:100px">${nome}</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">${conquistadas.map(m=>`<span style="background:rgba(255,107,0,0.1);border:1px solid rgba(255,107,0,0.3);border-radius:8px;padding:4px 10px;font-size:12px;display:flex;align-items:center;gap:4px"><span>${m.icon}</span><span style="color:var(--orange);font-size:11px;font-weight:600">${m.name}</span></span>`).join('')}</div>
       </div>`;
@@ -2723,8 +2713,6 @@ function renderDashDefault() {
 
   html += `</div>`;
 
-  const topGeral = [...vendedores].map(v=>({...v, total: categorias.reduce((s,c)=>s+(v[c.key]||0),0)})).sort((a,b)=>b.total-a.total).slice(0,3);
-
   el.innerHTML = html;
 }
 
@@ -2738,7 +2726,6 @@ function renderTop3Consistencia() {
     return;
   }
   const mesAtual = new Date().getMonth(), anoAtual = new Date().getFullYear();
-  // Contar registos distintos por pessoa este mês
   const contagem = {};
   dashAllDados.forEach(d => {
     const dt = new Date(d.data||'');
@@ -2746,7 +2733,6 @@ function renderTop3Consistencia() {
     if (!contagem[d.nome]) contagem[d.nome] = new Set();
     contagem[d.nome].add(d.data);
   });
-  // Também contar do histórico local
   try {
     JSON.parse(localStorage.getItem('historico_local')||'[]').forEach(d => {
       const dt = new Date(d.data||'');
@@ -2768,11 +2754,11 @@ function renderTop3Consistencia() {
   wrap.innerHTML = ranking.map((v, i) => {
     const foto = getFoto ? getFoto(v.nome) : null;
     const ini = v.nome.split(' ').map(x=>x[0]).slice(0,2).join('');
-    const avatarHtml = foto
+    const av = foto
       ? `<img src="${foto}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid ${borderColors[i]}">`
       : `<div style="width:42px;height:42px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;flex-shrink:0;border:2px solid ${borderColors[i]}">${ini}</div>`;
-    return `<div style="background:var(--card);border:1px solid ${borderColors[i]};border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="abrirDashDeRanking('${v.nome.replace(/'/g,"\\'")}')">
-      ${avatarHtml}
+    return `<div style="background:var(--card);border:1px solid ${borderColors[i]};border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="abrirDashDeRanking('${v.nome.replace(/'/g,"\'")}')">
+      ${av}
       <div style="flex:1">
         <div style="font-size:15px;font-weight:700;color:#fff">${v.nome}</div>
         <div style="font-size:11px;color:var(--muted);margin-top:2px">${v.registos} registo${v.registos!==1?'s':''} este mês</div>
@@ -2782,7 +2768,7 @@ function renderTop3Consistencia() {
   }).join('');
 }
 
-
+// ══ PIN ADMIN ══
 const ADMIN_PIN = '101';
 let pinBuffer = '';
 let adminUnlocked = false;
@@ -4141,65 +4127,70 @@ function slotFechar() {
 // DETEÇÃO DE MEDALHAS — ao registar o dia
 // ══════════════════════════════════════════════════
 function slotVerificarMedalhas(nome, payload) {
-  const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
-  const storageKey = 'slotDado_' + nome + '_' + mesKey;
+  // ── Chaves de controlo ──────────────────────────────────
+  const mesKey  = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
+  const storeKey = 'slotDado_' + nome + '_' + mesKey;
   let jaAtribuidas = [];
-  try { jaAtribuidas = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
+  try { jaAtribuidas = JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch(e) {}
 
-  // Build data from local history + current payload
-  const dadosMapa = {};
+  // ── Construir dados acumulados do mês (historico_local + payload) ──
+  const mapa = {};
   try {
     JSON.parse(localStorage.getItem('historico_local') || '[]')
       .filter(d => d && d.nome === nome)
-      .forEach(d => { dadosMapa[d.data] = d; });
+      .forEach(d => { mapa[d.data] = d; });
   } catch(e) {}
-  if (Array.isArray(dashAllDados) && dashAllDados.length) {
-    dashAllDados.filter(d => d && d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
-  }
-  dadosMapa[payload.data] = payload;
+  mapa[payload.data] = payload; // garantir que o registo atual está incluído
 
   const mes = new Date().getMonth(), ano = new Date().getFullYear();
-  const doMes = Object.values(dadosMapa).filter(d => {
+  const doMes = Object.values(mapa).filter(d => {
     try { const dt = new Date(d.data + 'T12:00:00'); return dt.getMonth()===mes && dt.getFullYear()===ano; } catch(e){ return false; }
   });
 
-  const dadosParaCalculo = doMes.length ? doMes : [payload];
-  const medalhasMes = calcularMedalhas(dadosParaCalculo)
+  // ── Fila de slots a disparar ────────────────────────────
+  const fila = [];
+
+  // 1) Medalhas mensais (todas exceto as diárias que têm lógica própria)
+  const medalhasMes = calcularMedalhas(doMes.length ? doMes : [payload])
     .filter(m => m.name !== 'Super Online' && m.name !== 'Spray Explosion');
-
-  const novasMes = medalhasMes.filter(m => m.earned && !jaAtribuidas.includes(m.name));
-
-  // Fila unificada - evita sobreposição de slots
-  const slotQueue = [];
-
-  if (novasMes.length > 0) {
-    const novasNomes = novasMes.map(m => m.name);
-    try { localStorage.setItem(storageKey, JSON.stringify([...jaAtribuidas, ...novasNomes])); } catch(e) {}
-    novasMes.forEach(m => slotQueue.push(m.name));
+  const novas = medalhasMes.filter(m => m.earned && !jaAtribuidas.includes(m.name));
+  if (novas.length > 0) {
+    const novosNomes = novas.map(m => m.name);
+    try { localStorage.setItem(storeKey, JSON.stringify([...jaAtribuidas, ...novosNomes])); } catch(e) {}
+    novas.forEach(m => fila.push({ nome: m.name, icon: m.icon }));
   }
 
-  // Medalhas diárias (Super Online / Spray Explosion)
-  const diarias = calcularMedalhasDiarias(payload);
-  diarias.forEach(m => {
-    const diaKey = 'slotDiario_' + nome + '_' + payload.data + '_' + m.name;
-    if (!localStorage.getItem(diaKey)) {
-      try { localStorage.setItem(diaKey, '1'); } catch(e) {}
-      slotQueue.push(m.name);
+  // 2) Medalhas diárias — Super Online (≥8 onlines) e Spray Explosion (≥10 sprays)
+  if ((payload.onlines || 0) >= 8) {
+    const k = 'slotDiario_' + nome + '_' + payload.data + '_SuperOnline';
+    if (!localStorage.getItem(k)) {
+      try { localStorage.setItem(k, '1'); } catch(e) {}
+      fila.push({ nome: 'Super Online', icon: '🌟' });
     }
-  });
-
-  if (slotQueue.length > 0) {
-    slotQueue.forEach((medalha, idx) => {
-      setTimeout(() => {
-        ['recordePopupOverlay','duplicadoPopupOverlay','rankingPopupOverlay'].forEach(id => {
-          const el = document.getElementById(id); if(el) el.remove();
-        });
-        const medalPopupEl = document.getElementById('medalPopup');
-        if (medalPopupEl) medalPopupEl.classList.remove('show');
-        slotAbrir(nome, medalha);
-      }, 800 + (idx * 2500));
-    });
   }
+  if ((payload.sprays || 0) >= 10) {
+    const k = 'slotDiario_' + nome + '_' + payload.data + '_SprayExplosion';
+    if (!localStorage.getItem(k)) {
+      try { localStorage.setItem(k, '1'); } catch(e) {}
+      fila.push({ nome: 'Spray Explosion', icon: '💥' });
+    }
+  }
+
+  // ── Disparar slot para cada medalha nova, em sequência ──
+  if (fila.length === 0) return;
+
+  fila.forEach((m, idx) => {
+    setTimeout(() => {
+      // Fechar qualquer overlay que possa estar por cima
+      ['recordePopupOverlay','duplicadoPopupOverlay','rankingPopupOverlay'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.remove();
+      });
+      const mp = document.getElementById('medalPopup');
+      if (mp) mp.classList.remove('show');
+      // Abrir slot
+      slotAbrir(nome, m.nome);
+    }, 300 + idx * 3000);
+  });
 }
 
 // Aliases para compatibilidade com chamadas antigas no código
@@ -4342,7 +4333,7 @@ function abrirFormOverlay() {
   const el = document.getElementById('screen-form');
   const bd = document.getElementById('formOverlayBackdrop');
   const btn = document.getElementById('navCenterBtn');
-  if(el) el.style.transform = 'translateY(0)';
+  if(el) { el.style.transform = 'translateY(0)'; el.style.pointerEvents = ''; }
   if(bd) bd.style.display = 'block';
   if(btn) { btn.classList.add('form-active'); btn.textContent = '−'; }
 }
@@ -4351,7 +4342,7 @@ function fecharFormOverlay() {
   const el = document.getElementById('screen-form');
   const bd = document.getElementById('formOverlayBackdrop');
   const btn = document.getElementById('navCenterBtn');
-  if(el) el.style.transform = 'translateY(110%)';
+  if(el) { el.style.transform = 'translateY(110%)'; el.style.pointerEvents = 'none'; }
   if(bd) bd.style.display = 'none';
   if(btn) { btn.classList.remove('form-active'); btn.textContent = '+'; }
 }
