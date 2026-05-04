@@ -1908,12 +1908,12 @@ function iniciarSplash() {
   const barSpans = document.querySelectorAll('.sp-bar-wrap span');
   barSpans.forEach(el=>{ if(el.id==='mesAtualSplash') el.textContent=mesLabel; });
   const pc = document.getElementById('spParticles');
-  for(let i=0;i<25;i++){
+  if(pc){ for(let i=0;i<25;i++){
     const p=document.createElement('div'); p.className='sp-particle';
     const size = 4+Math.random()*10;
     p.style.cssText=`left:${Math.random()*100}%;width:${size}px;height:${size}px;animation-duration:${4+Math.random()*7}s;animation-delay:${Math.random()*5}s;`;
     pc.appendChild(p);
-  }
+  }}
   const bar=document.getElementById('splashBar');
   splashIv=setInterval(()=>{
     splashProg+=100/80;
