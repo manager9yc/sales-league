@@ -91,11 +91,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .cval.nz { color: var(--orange); }
 .cval.bump { transform: scale(1.5); }
 
-.submit-btn { width: 100%; background: linear-gradient(135deg, #FF6B00, #FF4500); border: none; border-radius: 16px; color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 3px; padding: 20px 18px; margin-top: 28px; cursor: pointer; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s; box-shadow: 0 6px 28px rgba(255,107,0,0.5); -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-.submit-btn:active { transform: scale(0.96); box-shadow: 0 2px 12px rgba(255,107,0,0.4); }
-.submit-btn:disabled { opacity: 0.5; transform: none; }
-.submit-btn.loading { background: #00AA44; }
-.submit-btn.success { background: linear-gradient(135deg, #22C55E, #16a34a); box-shadow: 0 6px 28px rgba(34,197,94,0.4); }
+.submit-btn { width: 100%; background: var(--orange); border: none; border-radius: 14px; color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; padding: 18px; margin-top: 28px; cursor: pointer; transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s; box-shadow: 0 4px 20px rgba(255,107,0,0.35); }
 .submit-btn:hover { box-shadow: 0 6px 28px rgba(255,107,0,0.55); }
 .submit-btn:active { opacity: 0.88; transform: scale(0.98); }
 .submit-btn.loading { background: #28a745; box-shadow: 0 4px 20px rgba(40,167,69,0.4); transform: scale(0.98); }
@@ -801,6 +797,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 .swipe-btn-wrap.done .swipe-thumb { background: #22C55E; box-shadow: 0 2px 12px rgba(34,197,94,0.5); }
 .swipe-btn-wrap.done { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.4); }
 .swipe-btn-wrap.done .swipe-label { color: #22C55E; opacity: 1 !important; }
+/* On desktop: show normal button */
 
 
 @keyframes slotLights { 0%{background-position:0 0} 100%{background-position:200px 0} }
@@ -860,6 +857,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 }
 .swipe-btn-wrap.done .swipe-thumb { background:#22C55E; box-shadow:0 2px 12px rgba(34,197,94,0.5); }
 .swipe-btn-wrap.done { background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.4); }
+/* On desktop: hide swipe, show normal button */
 
 </style>
 </head>
@@ -1474,7 +1472,7 @@ async function submeter() {
   _submitEmCurso = true;
   iniciarAudio();
   const btn = document.getElementById('submitBtn');
-  btn.textContent = '⏳ A GUARDAR...';
+  btn.textContent = '✔ A guardar...';
   btn.style.background = '#00AA44';
   btn.style.boxShadow = '0 4px 20px rgba(0,170,68,0.4)';
   btn.disabled = true;
@@ -1514,7 +1512,7 @@ async function submeter() {
 
   // Feedback visual
   tocarSomRegisto();
-  btn.textContent = '✔ REGISTADO!';
+  btn.textContent = '✔ Registado com sucesso';
   btn.style.background = '#22C55E';
   btn.style.color = '#fff';
   btn.style.boxShadow = '0 4px 20px rgba(34,197,94,0.4)';
@@ -1543,14 +1541,23 @@ async function submeter() {
     try { const tn=[...new Set(equipas.flatMap(e=>e.nomes))]; buildVgrid(tn.map(n=>({nome:n}))); if(equipaAtiva){document.querySelectorAll('.team-tab').forEach(t=>{if(t.dataset.id===equipaAtiva)t.click();});} } catch(e2){}
   }, 2500);
 
-  // Verificar recorde pessoal diário
-  setTimeout(() => verificarRecordeDiario(nomeAtual, payload), 1200);
-  // ★ Verificar posição no ranking
-  setTimeout(() => verificarPosicaoRanking(nomeAtual, payload), 2000);
   // Fechar form overlay
   setTimeout(() => fecharFormOverlay(), 400);
-  // SLOT MACHINE — dentro do setTimeout para garantir que os dados estão guardados
+  // SLOT MACHINE — primeiro, antes de qualquer outro popup
   setTimeout(() => slotVerificarMedalhas(nomeAtual, payload), 600);
+  // Recorde e ranking — só depois, e só se a slot não estiver aberta
+  const _nc=nomeAtual, _pc=Object.assign({},payload);
+  setTimeout(()=>{
+    const _ov=document.getElementById('slotOverlay');
+    if(_ov&&_ov.style.display==='flex'){
+      if(!window._slotDeferred)window._slotDeferred=[];
+      window._slotDeferred.push(()=>verificarRecordeDiario(_nc,_pc));
+      window._slotDeferred.push(()=>setTimeout(()=>verificarPosicaoRanking(_nc,_pc),800));
+    } else {
+      verificarRecordeDiario(_nc,_pc);
+      setTimeout(()=>verificarPosicaoRanking(_nc,_pc),800);
+    }
+  },1200);
 }
 
 
@@ -1618,7 +1625,7 @@ function resetForm() {
   // Reset botão completamente
   const btn = document.getElementById('submitBtn');
   if (btn) {
-    btn.textContent = 'Registar o meu dia';
+    btn.textContent = 'REGISTAR O MEU DIA';
     btn.style.background = '';
     btn.style.color = '';
     btn.style.border = '';
@@ -2979,6 +2986,7 @@ function calcularMedalhas(dados) {
 
 // ══ NOTIFICAÇÃO DE RECORDE PESSOAL DIÁRIO ══
 function verificarRecordeDiario(nome, payload) {
+  const _sOv=document.getElementById('slotOverlay');if(_sOv&&_sOv.style.display==='flex')return;
   // Aggregate data from API + local history, excluding today's date
   const dataHoje = payload.data;
   const dadosAnteriores = [
@@ -3046,6 +3054,7 @@ function showRecordToast(titulo, msg) { mostrarMedalPopup('🏆', titulo, msg); 
 
 
 function verificarPosicaoRanking(nome, payload) {
+  const _sOv2=document.getElementById('slotOverlay');if(_sOv2&&_sOv2.style.display==='flex')return;
   if (!Array.isArray(dashAllDados) || !dashAllDados.length) return;
   // Build scores from local history + api
   const allData = [
@@ -4069,6 +4078,10 @@ function slotMostrarResultado(p) {
 function slotFechar() {
   const overlay = document.getElementById('slotOverlay');
   if (overlay) overlay.style.display = 'none';
+  if(window._slotDeferred&&window._slotDeferred.length){
+    window._slotDeferred.forEach(fn=>{try{fn();}catch(e){}});
+    window._slotDeferred=[];
+  }
 }
 
 // ══════════════════════════════════════════════════
@@ -4453,7 +4466,7 @@ function renderDesafiosMedalhas() {
 </div>
 
 <!-- SLOT MACHINE -->
-<div id="slotOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(4,10,22,0.97);flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:hidden;text-align:center">
+<div id="slotOverlay" style="display:none;position:fixed;inset:0;z-index:2147483647;background:rgba(4,10,22,0.97);flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:hidden;text-align:center">
 
   <!-- Confetti layer -->
   <div id="slotConfettiWrap" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0"></div>
