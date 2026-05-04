@@ -1460,13 +1460,19 @@ function mostrarPopupDuplicado(nome, data) {
   document.body.appendChild(overlay);
 }
 
+// Flag global para evitar dupla submissão
+let _submitEmCurso = false;
+
 async function submeter() {
   if (!nomeSel) { showToast('⚠️ Seleciona o teu nome primeiro'); return; }
   const nomeAtual = nomeSel;
   const dataVal = document.getElementById('dataRegisto').value;
   if (!dataVal) { showToast('⚠️ Escolhe a data'); return; }
 
-  // Block duplicate: 1 registration per vendor per day
+  // Bloquear dupla submissão (double tap, etc.)
+  if (_submitEmCurso) return;
+
+  // Verificar duplicado por localStorage
   const registoKey = 'registo_' + nomeAtual + '_' + dataVal;
   try {
     if (localStorage.getItem(registoKey)) {
@@ -1475,6 +1481,19 @@ async function submeter() {
     }
   } catch(e) {}
 
+  // Verificar duplicado por histórico local (segunda linha de defesa)
+  try {
+    const hist = JSON.parse(localStorage.getItem('historico_local') || '[]');
+    if (hist.some(r => r.nome === nomeAtual && r.data === dataVal)) {
+      mostrarPopupDuplicado(nomeAtual, dataVal);
+      // Garantir que a chave também fica marcada
+      try { localStorage.setItem(registoKey, '1'); } catch(e) {}
+      return;
+    }
+  } catch(e) {}
+
+  // Marcar submissão em curso IMEDIATAMENTE (antes de qualquer await)
+  _submitEmCurso = true;
   iniciarAudio();
   const btn = document.getElementById('submitBtn');
   btn.textContent = '✔ A guardar...';
@@ -1495,7 +1514,7 @@ async function submeter() {
     elogios:   vals.elogios
   };
 
-  // Guardar localmente PRIMEIRO (sem await - não bloqueia)
+  // Guardar localmente PRIMEIRO — marca como registado imediatamente
   try { localStorage.setItem(registoKey, '1'); } catch(e) {}
   try {
     const hist = JSON.parse(localStorage.getItem('historico_local') || '[]');
@@ -1504,20 +1523,17 @@ async function submeter() {
     localStorage.setItem('historico_local', JSON.stringify(filtrado.slice(0, 60)));
   } catch(e) {}
 
-  // Enviar para o servidor em background (não bloqueia o resto)
+  // Enviar para o Sheets — UMA única vez, sem retry que possa duplicar
   fetch(SHEETS_URL, { method:'POST', body: JSON.stringify(payload), mode:'no-cors' })
-  // Enviar para o servidor com retry automático
-  const enviarParaSheets = (tentativa) => {
-    fetch(SHEETS_URL, { method:'POST', body: JSON.stringify(payload), mode:'no-cors' })
-      .then(() => { if(tentativa > 1) console.log('✓ Guardado no Sheets (tentativa ' + tentativa + ')'); })
-      .catch(e => {
-        console.error('Erro ao guardar (tentativa ' + tentativa + '):', e);
-        if (tentativa < 3) setTimeout(() => enviarParaSheets(tentativa + 1), 3000 * tentativa);
-        else showToast('⚠️ Erro de ligação ao servidor. Dados guardados localmente.');
-      });
-  };
-  enviarParaSheets(1);
-  // Feedback visual imediato
+    .catch(e => {
+      console.error('Erro ao enviar para Sheets:', e);
+      showToast('⚠️ Sem ligação. Dados guardados localmente.');
+    });
+
+  // Liberar flag após 3s (tempo suficiente para o fetch ter sido disparado)
+  setTimeout(() => { _submitEmCurso = false; }, 3000);
+
+  // Feedback visual
   tocarSomRegisto();
   btn.textContent = '✔ Registado com sucesso';
   btn.style.background = '#22C55E';
@@ -1542,16 +1558,16 @@ async function submeter() {
     r.disabled = false;
     r.classList.remove('loading');
     r.dataset.state = 'novo';
-    // Reset valores para zero para o próximo vendedor
     Object.keys(vals).forEach(k => { vals[k]=0; const el=document.getElementById(k); if(el){el.textContent=0; el.classList.remove('nz');} });
-    // Reset vendedor selecionado
     nomeSel = null;
     document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('active'));
   }, 2500);
 
   // Verificar recorde pessoal diário
   setTimeout(() => verificarRecordeDiario(nomeAtual, payload), 1200);
-  // ★ SLOT MACHINE — chamar aqui, sem depender de nada
+  // ★ Verificar posição no ranking
+  setTimeout(() => verificarPosicaoRanking(nomeAtual, payload), 2000);
+  // ★ SLOT MACHINE
   slotVerificarMedalhas(nomeAtual, payload);
 }
 
