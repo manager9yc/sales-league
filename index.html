@@ -1003,7 +1003,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
-      <button class="submit-btn" id="submitBtn" onclick="handleSubmitBtn(this)" style="display:block!important;width:100%">REGISTAR</button>
+      <button class="submit-btn" id="submitBtn" onclick="handleSubmitBtn(this)" style="display:block!important;width:100%">REGISTAR O MEU DIA</button>
       <div style="text-align:center;padding:10px 0 4px;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif">APP developed by Dário Santos</div>
     </div>
     <div class="success" id="successMsg">
@@ -1161,6 +1161,8 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
         <button onclick="carregarAdmin()" style="background:var(--orange);border:none;border-radius:10px;padding:10px 18px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer">Atualizar</button>
         <div id="adminSummary" style="font-size:12px;color:var(--muted)"></div>
         <button onclick="limparCacheAdmin()" style="background:var(--card);border:1px solid #7a2200;border-radius:10px;padding:10px 14px;color:#FF6644;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Cache</button>
+        <button onclick="limparChavesSlot()" style="background:#1a0000;border:1px solid #ef4444;border-radius:10px;padding:10px 14px;color:#ef4444;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Reset Slot</button>
+        <button onclick="limparRegistosHoje()" style="background:#1a0000;border:1px solid #ef4444;border-radius:10px;padding:10px 14px;color:#ef4444;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Reset Hoje</button>
         <button onclick="slotAbrir('TESTE','Medalha Teste')" style="background:var(--card);border:1px solid #C9A84C;border-radius:10px;padding:10px 14px;color:#C9A84C;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🎰 Testar Slot</button>
         <button onclick="bloquearAdmin()" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-left:auto">🔒 Bloquear</button>
       </div>
@@ -1525,7 +1527,7 @@ async function submeter() {
   setTimeout(() => {
     const r = document.getElementById('submitBtn');
     if (!r) return;
-    r.textContent = 'REGISTAR';
+    r.textContent = 'REGISTAR O MEU DIA';
     r.style.background = 'transparent';
     r.style.color = 'var(--orange)';
     r.style.border = '2px solid var(--orange)';
@@ -1539,20 +1541,14 @@ async function submeter() {
     try { const tn=[...new Set(equipas.flatMap(e=>e.nomes))]; buildVgrid(tn.map(n=>({nome:n}))); if(equipaAtiva){document.querySelectorAll('.team-tab').forEach(t=>{if(t.dataset.id===equipaAtiva)t.click();});} } catch(e2){}
   }, 2500);
 
-  // Verificar recorde pessoal diário
-  setTimeout(() => verificarRecordeDiario(nomeAtual, payload), 1200);
-  // ★ Verificar posição no ranking
-  setTimeout(() => verificarPosicaoRanking(nomeAtual, payload), 2000);
-  // Abrir slot IMEDIATAMENTE (síncrono, sem setTimeout)
-  var _slotOv = document.getElementById("slotOverlay");
-  if (_slotOv) {
-    _slotOv.style.cssText = "display:flex!important;position:fixed;inset:0;z-index:2147483647;background:rgba(4,10,22,0.97);flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:hidden;text-align:center";
-    var _slotNomeEl = document.getElementById("slotNome");
-    if (_slotNomeEl) _slotNomeEl.textContent = nomeAtual + " · Medalha!";
-    slotInit();
-  }
   setTimeout(() => fecharFormOverlay(), 400);
-  setTimeout(() => slotVerificarMedalhas(nomeAtual, payload), 600);
+  setTimeout(() => slotVerificarMedalhas(nomeAtual, payload), 800);
+  const _nc=nomeAtual,_pc=Object.assign({},payload);
+  setTimeout(()=>{
+    const _ov=document.getElementById("slotOverlay");
+    if(!_ov||_ov.style.display!=="flex"){verificarRecordeDiario(_nc,_pc);setTimeout(()=>verificarPosicaoRanking(_nc,_pc),800);}
+    else{if(!window._def)window._def=[];window._def.push(()=>verificarRecordeDiario(_nc,_pc));window._def.push(()=>setTimeout(()=>verificarPosicaoRanking(_nc,_pc),800));}
+  },1400);
 }
 
 
@@ -4071,6 +4067,7 @@ function slotMostrarResultado(p) {
 function slotFechar() {
   const overlay = document.getElementById('slotOverlay');
   if (overlay) overlay.style.display = 'none';
+  if(window._def&&window._def.length){window._def.forEach(fn=>{try{fn();}catch(e){}});window._def=[];}
 }
 
 // ══════════════════════════════════════════════════
@@ -4519,3 +4516,10 @@ function renderDesafiosMedalhas() {
   </div>
 </div>
 
+
+
+
+<script>
+function limparChavesSlot(){var k=[];for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(key&&(key.startsWith('slotDado_')||key.startsWith('slotDiario_')))k.push(key);}k.forEach(function(key){localStorage.removeItem(key);});showToast('✅ '+k.length+' chaves slot removidas');}
+function limparRegistosHoje(){var hoje=new Date().toISOString().split('T')[0];var k=[];for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(key&&key.startsWith('registo_')&&key.includes(hoje))k.push(key);}k.forEach(function(key){localStorage.removeItem(key);});try{var h=JSON.parse(localStorage.getItem('historico_local')||'[]');localStorage.setItem('historico_local',JSON.stringify(h.filter(function(d){return d.data!==hoje;})));}catch(e){}showToast('✅ Registos de hoje removidos ('+k.length+')');}
+</script>
