@@ -3699,13 +3699,23 @@ const premiosDefault=[
   {icon:'⏰',nome:'Sair 30min ou 1h mais cedo!',prob:0.09,cor:'#1565C0'},
   {icon:'🎰',nome:'Uma raspadinha!',prob:0.16,cor:'#2E7D32'},
   {icon:'💣',nome:'Boom, que azar!',prob:0.13,cor:'#1a1a2e'},
-  {icon:'🧨',nome:'Boom, tiveste azar!',prob:0.05,cor:'#3d0000'},
-  {icon:'🛋️',nome:'Pausa extra de 15 minutos!',prob:0.03,cor:'#1a3d1a'},
+  {icon:'❌',nome:'Boom, tiveste azar!',prob:0.05,cor:'#3d0000'},
+  {icon:'😴',nome:'Pausa extra de 15 minutos!',prob:0.03,cor:'#1a3d1a'},
 ];
 let premios = premiosDefault.map(p=>({...p}));
 try {
   const saved = localStorage.getItem('premiosConfig');
-  if (saved) premios = JSON.parse(saved);
+  if (saved) {
+    const savedArr = JSON.parse(saved);
+    // Merge: update existing items from saved, but always keep all default items
+    premios = premiosDefault.map(def => {
+      const s = savedArr.find(x => x.icon === def.icon || x.nome === def.nome);
+      return s ? {...def, ...s} : def;
+    });
+    // Re-normalize probabilities to sum to 1
+    const total = premios.reduce((s,p) => s + (p.prob||0), 0);
+    if (total > 0) premios.forEach(p => p.prob = parseFloat((p.prob/total).toFixed(4)));
+  }
 } catch(e) {}
 // ══ SLOT MACHINE + ROULETTE ══
 let slotSpinning = false;
@@ -4014,18 +4024,16 @@ function slotVerificarMedalhas(nome, payload) {
   let jaAtribuidas = [];
   try { jaAtribuidas = JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch(e) {}
 
-  // Build data map from local history (reliable, no API dependency)
+  // Build data from local history + current payload
   const dadosMapa = {};
   try {
     JSON.parse(localStorage.getItem('historico_local') || '[]')
       .filter(d => d && d.nome === nome)
       .forEach(d => { dadosMapa[d.data] = d; });
   } catch(e) {}
-  // Also include API data if available
   if (Array.isArray(dashAllDados) && dashAllDados.length) {
     dashAllDados.filter(d => d && d.nome === nome).forEach(d => { dadosMapa[d.data] = d; });
   }
-  // Always include the current payload (most important)
   dadosMapa[payload.data] = payload;
 
   const mes = new Date().getMonth(), ano = new Date().getFullYear();
@@ -4033,35 +4041,42 @@ function slotVerificarMedalhas(nome, payload) {
     try { const dt = new Date(d.data + 'T12:00:00'); return dt.getMonth()===mes && dt.getFullYear()===ano; } catch(e){ return false; }
   });
 
-  // Use at least the current payload if nothing else
   const dadosParaCalculo = doMes.length ? doMes : [payload];
   const medalhasMes = calcularMedalhas(dadosParaCalculo)
     .filter(m => m.name !== 'Super Online' && m.name !== 'Spray Explosion');
+
+  // Find medals earned NOW that were NOT already given
   const novasMes = medalhasMes.filter(m => m.earned && !jaAtribuidas.includes(m.name));
 
   if (novasMes.length > 0) {
-    try { localStorage.setItem(storageKey, JSON.stringify([...jaAtribuidas, ...novasMes.map(m=>m.name)])); } catch(e) {}
-    // Close any other popups first, then open slot
-    const existingPopup = document.getElementById("recordePopupOverlay");
-    if (existingPopup) existingPopup.remove();
-    const medalPopupEl = document.getElementById("medalPopup");
-    if (medalPopupEl) medalPopupEl.classList.remove("show");
-    setTimeout(() => {
-      slotAbrir(nome, novasMes[0].name);
-    }, 1200);
+    // Save FIRST before opening (prevent double-trigger on fast re-render)
+    const novasNomes = novasMes.map(m => m.name);
+    try { localStorage.setItem(storageKey, JSON.stringify([...jaAtribuidas, ...novasNomes])); } catch(e) {}
+
+    // Close any blocking overlays
+    ['recordePopupOverlay','duplicadoPopupOverlay','rankingPopupOverlay'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.remove();
+    });
+    const medalPopupEl = document.getElementById('medalPopup');
+    if (medalPopupEl) medalPopupEl.classList.remove('show');
+
+    // Open slot after short delay to let registration animation finish
+    setTimeout(() => slotAbrir(nome, novasMes[0].name), 1400);
+    return;
   }
-  // Also check daily medals
-  calcularMedalhasDiarias(payload).forEach(m => {
+
+  // Check daily medals (Super Online / Spray Explosion)
+  const diarias = calcularMedalhasDiarias(payload);
+  diarias.forEach((m, idx) => {
     const diaKey = 'slotDiario_' + nome + '_' + payload.data + '_' + m;
     if (!localStorage.getItem(diaKey)) {
       try { localStorage.setItem(diaKey, '1'); } catch(e) {}
       setTimeout(() => {
-        const existingPopup = document.getElementById('recordePopupOverlay');
-        if (existingPopup) existingPopup.remove();
-        const medalPopupEl = document.getElementById('medalPopup');
-        if (medalPopupEl) medalPopupEl.classList.remove('show');
+        ['recordePopupOverlay','duplicadoPopupOverlay','rankingPopupOverlay'].forEach(id => {
+          const el = document.getElementById(id); if(el) el.remove();
+        });
         slotAbrir(nome, m);
-      }, novasMes.length > 0 ? 8000 : 1200);
+      }, 1400 + (idx * 500));
     }
   });
 }
