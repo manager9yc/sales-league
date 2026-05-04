@@ -1189,7 +1189,6 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
         <div id="adminSummary" style="font-size:12px;color:var(--muted)"></div>
         <button onclick="limparCacheAdmin()" style="background:var(--card);border:1px solid #7a2200;border-radius:10px;padding:10px 14px;color:#FF6644;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Cache</button>
         <button onclick="slotAbrir('TESTE','Medalha Teste')" style="background:var(--card);border:1px solid #C9A84C;border-radius:10px;padding:10px 14px;color:#C9A84C;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🎰 Testar Slot</button>
-<button onclick="resetarSlotKeys()" style="background:var(--card);border:1px solid #ef4444;border-radius:10px;padding:10px 14px;color:#ef4444;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Limpar chaves slot</button>
         <button onclick="bloquearAdmin()" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-left:auto">🔒 Bloquear</button>
       </div>
       <div style="padding:0 16px" id="adminContent">
@@ -1466,18 +1465,20 @@ function mostrarPopupDuplicado(nome, data) {
 let _submitEmCurso = false;
 
 async function submeter() {
-  if (!nomeSel) { showToast('⚠️ Seleciona o teu nome primeiro'); return; }
+  if(window._dbg) window._dbg('submeter() INICIO nomeAtual='+nomeAtual,'#f80');
+  if (!nomeSel) { if(window._dbg)window._dbg('SAIU: nomeSel=null','#f00'); showToast('⚠️ Seleciona o teu nome primeiro'); return; }
   const nomeAtual = nomeSel;
   const dataVal = document.getElementById('dataRegisto').value;
   if (!dataVal) { showToast('⚠️ Escolhe a data'); return; }
 
   // Bloquear dupla submissão (double tap, etc.)
-  if (_submitEmCurso) return;
+  if (_submitEmCurso) { if(window._dbg)window._dbg('SAIU: _submitEmCurso=true','#f00'); return; }
 
   // Verificar duplicado por localStorage
   const registoKey = 'registo_' + nomeAtual + '_' + dataVal;
   try {
     if (localStorage.getItem(registoKey)) {
+      if(window._dbg)window._dbg('SAIU: duplicado localStorage key='+registoKey,'#f00');
       mostrarPopupDuplicado(nomeAtual, dataVal);
       return;
     }
@@ -1487,6 +1488,7 @@ async function submeter() {
   try {
     const hist = JSON.parse(localStorage.getItem('historico_local') || '[]');
     if (hist.some(r => r.nome === nomeAtual && r.data === dataVal)) {
+      if(window._dbg)window._dbg('SAIU: duplicado historico_local nome='+nomeAtual+' data='+dataVal,'#f00');
       mostrarPopupDuplicado(nomeAtual, dataVal);
       // Garantir que a chave também fica marcada
       try { localStorage.setItem(registoKey, '1'); } catch(e) {}
@@ -1573,7 +1575,8 @@ async function submeter() {
   setTimeout(() => verificarPosicaoRanking(nomeAtual, payload), 2000);
   // Fechar form overlay
   setTimeout(() => fecharFormOverlay(), 400);
-  // SLOT MACHINE — dentro do setTimeout para garantir que os dados estão guardados
+  // SLOT MACHINE
+  if(window._dbg) window._dbg('submeter: agendando slotVerificarMedalhas em 600ms','#0ff');
   setTimeout(() => slotVerificarMedalhas(nomeAtual, payload), 600);
 }
 
@@ -4244,6 +4247,8 @@ function calcularMedalhasDiarias(payload) {
     }
 
     // Call the actual submit
+    if(window._dbg) window._dbg('completeSwipe: submitBtn='+(submitBtn?'found (state='+submitBtn.dataset.state+')':'NULL'),'#ff0');
+    if(window._dbg) window._dbg('nomeAtual='+window.nomeAtual+' equipaAtiva='+window.equipaAtiva,'#ff0');
     clicarSubmit(submitBtn);
 
     // Show green "Registo Efetuado"
@@ -4543,95 +4548,90 @@ function renderDesafiosMedalhas() {
 
 
 <script>
-// ── RESET SLOT KEYS ──────────────────────────────────────
-function resetarSlotKeys() {
+function resetarRegistosHoje() {
+  const hoje = new Date().toISOString().split('T')[0];
   const keys = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (k && (k.startsWith('slotDado_') || k.startsWith('slotDiario_'))) keys.push(k);
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k && k.startsWith('registo_') && k.includes(hoje)) keys.push(k);
   }
-  keys.forEach(k => localStorage.removeItem(k));
-  showToast('✅ ' + keys.length + ' chaves de slot limpas. Podes testar de novo.');
+  // Also clean historico_local for today
+  try {
+    const hist = JSON.parse(localStorage.getItem('historico_local')||'[]');
+    const filtered = hist.filter(d => d.data !== hoje);
+    localStorage.setItem('historico_local', JSON.stringify(filtered));
+  } catch(e) {}
+  keys.forEach(k=>localStorage.removeItem(k));
+  showToast('✅ Registos de hoje limpos ('+keys.length+' chaves)');
 }
 
-// ── DEBUG PANEL ───────────────────────────────────────────
+function resetarSlotKeys() {
+  const keys = [];
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&(k.startsWith('slotDado_')||k.startsWith('slotDiario_')))keys.push(k);}
+  keys.forEach(k=>localStorage.removeItem(k));
+  showToast('✅ '+keys.length+' chaves slot limpas');
+}
+
 (function() {
-  // Criar painel
   const panel = document.createElement('div');
   panel.id = 'dbgPanel';
   panel.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999999;background:rgba(0,0,0,0.95);color:#0f0;font-family:monospace;font-size:11px;padding:6px 8px;max-height:45vh;overflow-y:auto;display:none;pointer-events:none';
-  panel.innerHTML = '<div style="color:#ff0;margin-bottom:4px">DEBUG — toca 5x para fechar/abrir</div><div id="dbgLog"></div>';
+  panel.innerHTML = '<div style="color:#ff0;margin-bottom:3px">DEBUG — toca 5x para abrir/fechar</div><div id="dbgLog"></div>';
   document.body.appendChild(panel);
 
-  let tc = 0, tt = null;
-  document.addEventListener('touchstart', function() {
-    tc++;
-    clearTimeout(tt);
-    tt = setTimeout(() => { tc = 0; }, 700);
-    if (tc >= 5) { tc = 0; panel.style.display = panel.style.display === 'none' ? 'block' : 'none'; }
-  }, {passive:true});
+  let tc=0,tt=null;
+  document.addEventListener('touchstart',function(){tc++;clearTimeout(tt);tt=setTimeout(()=>{tc=0;},700);if(tc>=5){tc=0;panel.style.display=panel.style.display==='none'?'block':'none';}},{passive:true});
 
-  function dbg(msg, col) {
-    const logEl = document.getElementById('dbgLog');
-    if (!logEl) return;
-    const t = new Date().toLocaleTimeString('pt-PT');
-    const d = document.createElement('div');
-    d.style.cssText = 'color:'+(col||'#0f0')+';padding:2px 0;border-bottom:1px solid #111';
-    d.textContent = '['+t+'] '+msg;
-    logEl.insertBefore(d, logEl.firstChild);
-    while(logEl.children.length > 60) logEl.removeChild(logEl.lastChild);
-    // Auto-show on important events
-    if(col==='#ff0'||col==='#f80'||col==='#f00') panel.style.display = 'block';
+  function dbg(msg,col){
+    const logEl=document.getElementById('dbgLog');if(!logEl)return;
+    const t=new Date().toLocaleTimeString('pt-PT');
+    const d=document.createElement('div');
+    d.style.cssText='color:'+(col||'#0f0')+';padding:1px 0;border-bottom:1px solid #111';
+    d.textContent='['+t+'] '+msg;
+    logEl.insertBefore(d,logEl.firstChild);
+    while(logEl.children.length>80)logEl.removeChild(logEl.lastChild);
+    if(col==='#ff0'||col==='#f80'||col==='#f00')panel.style.display='block';
   }
-  window._dbg = dbg;
+  window._dbg=dbg;
 
-  window.addEventListener('load', function() {
-    // Wrap slotVerificarMedalhas
-    const origV = window.slotVerificarMedalhas;
-    if (!origV) { dbg('ERRO: slotVerificarMedalhas nao existe', '#f00'); return; }
-    window.slotVerificarMedalhas = function(nome, payload) {
-      const mk = new Date().getFullYear()+'-'+(new Date().getMonth()+1);
-      const sk = 'slotDado_'+nome+'_'+mk;
-      const jaAtrib = JSON.parse(localStorage.getItem(sk)||'[]');
-      dbg('─── slotVerificarMedalhas ───', '#ff0');
-      dbg('nome='+nome+' onlines='+(payload.onlines||0)+' sprays='+(payload.sprays||0), '#ff0');
-      dbg('jaAtribuidas='+JSON.stringify(jaAtrib), '#aaa');
-      const dkOn='slotDiario_'+nome+'_'+payload.data+'_SuperOnline';
-      const dkSp='slotDiario_'+nome+'_'+payload.data+'_SprayExplosion';
-      dbg('SuperOnline key exists='+!!localStorage.getItem(dkOn), '#aaa');
-      dbg('SprayExp key exists='+!!localStorage.getItem(dkSp), '#aaa');
-      // Calcular manualmente o que vai acontecer
-      const hl = JSON.parse(localStorage.getItem('historico_local')||'[]').filter(d=>d&&d.nome===nome);
-      dbg('historico_local para '+nome+': '+hl.length+' entradas', '#aaa');
-      dbg('dashAllDados.length='+(window.dashAllDados?window.dashAllDados.length:'N/A'), '#aaa');
-      origV.call(this, nome, payload);
-    };
+  window.addEventListener('load',function(){
+    const origV=window.slotVerificarMedalhas;
+    if(origV){
+      window.slotVerificarMedalhas=function(nome,payload){
+        const mk=new Date().getFullYear()+'-'+(new Date().getMonth()+1);
+        const sk='slotDado_'+nome+'_'+mk;
+        const ja=JSON.parse(localStorage.getItem(sk)||'[]');
+        const dkOn='slotDiario_'+nome+'_'+payload.data+'_SuperOnline';
+        const dkSp='slotDiario_'+nome+'_'+payload.data+'_SprayExplosion';
+        dbg('=== slotVerificarMedalhas ===','#ff0');
+        dbg('nome='+nome+' onlines='+(payload.onlines||0)+' sprays='+(payload.sprays||0),'#ff0');
+        dbg('jaAtrib='+JSON.stringify(ja),'#aaa');
+        dbg('dkOn exists='+!!localStorage.getItem(dkOn),'#aaa');
+        dbg('dkSp exists='+!!localStorage.getItem(dkSp),'#aaa');
+        origV.call(this,nome,payload);
+      };
+    } else { dbg('ERRO slotVerificarMedalhas nao existe','#f00'); }
 
-    // Wrap slotAbrir
-    const origA = window.slotAbrir;
-    if (!origA) { dbg('ERRO: slotAbrir nao existe', '#f00'); return; }
-    window.slotAbrir = function(nome, medalha) {
-      dbg('>>> slotAbrir CHAMADO: '+nome+' / '+medalha, '#f80');
-      const ov = document.getElementById('slotOverlay');
-      dbg('slotOverlay.display ANTES='+( ov?ov.style.display:'NULL'), '#aaa');
-      origA.call(this, nome, medalha);
-      requestAnimationFrame(function() {
-        const ov2 = document.getElementById('slotOverlay');
-        dbg('slotOverlay.display DEPOIS rAF='+( ov2?ov2.style.display:'NULL'), '#0ff');
-        // Check all fixed elements that could be on top
-        const sf=document.getElementById('screen-form');
-        const bd=document.getElementById('formOverlayBackdrop');
-        dbg('screen-form: transform='+( sf?sf.style.transform:'?')+' pE='+(sf?sf.style.pointerEvents:'?'), '#aaa');
-        dbg('backdrop display='+(bd?bd.style.display:'?'), '#aaa');
-      });
-    };
+    const origA=window.slotAbrir;
+    if(origA){
+      window.slotAbrir=function(nome,medalha){
+        dbg('>>> slotAbrir: '+nome+' / '+medalha,'#f80');
+        const ov=document.getElementById('slotOverlay');
+        dbg('overlay antes='+( ov?ov.style.display:'NULL'),'#aaa');
+        origA.call(this,nome,medalha);
+        requestAnimationFrame(function(){
+          const ov2=document.getElementById('slotOverlay');
+          dbg('overlay depois rAF='+(ov2?ov2.style.display:'NULL'),'#0ff');
+          const sf=document.getElementById('screen-form');
+          dbg('screen-form pE='+(sf?sf.style.pointerEvents:'?'),'#aaa');
+        });
+      };
+    } else { dbg('ERRO slotAbrir nao existe','#f00'); }
 
-    dbg('Debug activo. Faz registo com 8+ onlines.', '#0ff');
-    dbg('Chaves slot existentes:', '#aaa');
-    for(let i=0;i<localStorage.length;i++){
-      const k=localStorage.key(i);
-      if(k&&(k.startsWith('slotDado_')||k.startsWith('slotDiario_'))) dbg('  '+k+'='+localStorage.getItem(k),'#888');
-    }
+    dbg('Debug pronto','#0ff');
+    let slotKeys=0;
+    for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&(k.startsWith('slotDado_')||k.startsWith('slotDiario_'))){slotKeys++;dbg('KEY: '+k,'#888');}}
+    if(slotKeys===0) dbg('Sem chaves slot no localStorage','#aaa');
   });
 })();
 </script>
