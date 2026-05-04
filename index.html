@@ -1511,7 +1511,8 @@ async function submeter() {
     camisolas: vals.camisolas,
     sacos:     vals.sacos,
     garrafas:  vals.garrafas,
-    elogios:   vals.elogios
+    elogios:   vals.elogios,
+    uid: nomeAtual.replace(/\s+/g,'_') + '_' + dataVal + '_' + Date.now()
   };
 
   // Guardar localmente PRIMEIRO — marca como registado imediatamente
@@ -1568,7 +1569,8 @@ async function submeter() {
   // ★ Verificar posição no ranking
   setTimeout(() => verificarPosicaoRanking(nomeAtual, payload), 2000);
   // ★ SLOT MACHINE
-  slotVerificarMedalhas(nomeAtual, payload);
+  setTimeout(() => fecharFormOverlay(), 400);
+    slotVerificarMedalhas(nomeAtual, payload);
 }
 
 
@@ -2421,15 +2423,16 @@ function mostrarDash(nome) {
     .sort((a,b)=>b.v-a.v).findIndex(r=>r.n===nome)+1;
 
   // semanas do mes atual
+  // semanas do mes atual
   const mesAtual = new Date().getMonth();
   const anoAtual = new Date().getFullYear();
   const semanas = [0,0,0,0];
-  function getISOWeekNum(d){const dt=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));dt.setUTCDate(dt.getUTCDate()+4-(dt.getUTCDay()||7));const ys=new Date(Date.UTC(dt.getUTCFullYear(),0,1));return Math.ceil((((dt-ys)/86400000)+1)/7);}
-  const semanaAtual = getISOWeekNum(new Date());
+  function getUserWeek(d){const jan1=new Date(d.getFullYear(),0,1);const doy=Math.floor((d-jan1)/86400000);return Math.floor(doy/7)-2;}
+  const semanaAtual = getUserWeek(new Date());
   dadosVendedor.forEach(d => {
     const dt = new Date(d.data || d.Data || '');
     if(!isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual) {
-      const wkNum = getISOWeekNum(dt);
+      const wkNum = getUserWeek(dt);
       const idx = 3 - (semanaAtual - wkNum);
       if(idx >= 0 && idx <= 3) semanas[idx] += dashTot(d);
     }
@@ -2532,7 +2535,7 @@ function mostrarDash(nome) {
             <div class="d-cbar ${i===semanas.length-1?'hi':''}" style="height:${Math.round(v/maxSem*88)}px"></div>
           </div>`).join('')}
         <div style="position:absolute;bottom:0;left:0;right:0;display:flex;gap:10px">
-          ${(()=>{const hoje=new Date();function getISOWeek(d){const dt=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));dt.setUTCDate(dt.getUTCDate()+4-(dt.getUTCDay()||7));const ys=new Date(Date.UTC(dt.getUTCFullYear(),0,1));return Math.ceil((((dt-ys)/86400000)+1)/7);}const wn=getISOWeek(hoje);return [wn-3,wn-2,wn-1,wn].map((w,i)=>`<div style="flex:1;font-size:10px;color:var(--muted);text-align:center">S${Math.max(1,w)}${i===3?' ▶':''}</div>`).join('');})()}
+          ${(()=>{const hoje=new Date();function getUserWeek(d){const jan1=new Date(d.getFullYear(),0,1);const doy=Math.floor((d-jan1)/86400000);return Math.floor(doy/7)-2;}const wn=getUserWeek(hoje);return [wn-3,wn-2,wn-1,wn].map((w,i)=>`<div style="flex:1;font-size:10px;color:var(--muted);text-align:center">S${Math.max(1,w)}${i===3?' ▶':''}</div>`).join('');})()}
         </div>
       </div>
     </div>
@@ -4077,21 +4080,20 @@ function slotVerificarMedalhas(nome, payload) {
     if (medalPopupEl) medalPopupEl.classList.remove('show');
 
     // Open slot after short delay to let registration animation finish
-    setTimeout(() => slotAbrir(nome, novasMes[0].name), 1400);
-    return;
+    setTimeout(() => slotAbrir(nome, novasMes[0].name), 1800);
   }
 
   // Check daily medals (Super Online / Spray Explosion)
   const diarias = calcularMedalhasDiarias(payload);
   diarias.forEach((m, idx) => {
-    const diaKey = 'slotDiario_' + nome + '_' + payload.data + '_' + m;
+    const diaKey = 'slotDiario_' + nome + '_' + payload.data + '_' + m.name;
     if (!localStorage.getItem(diaKey)) {
       try { localStorage.setItem(diaKey, '1'); } catch(e) {}
       setTimeout(() => {
         ['recordePopupOverlay','duplicadoPopupOverlay','rankingPopupOverlay'].forEach(id => {
           const el = document.getElementById(id); if(el) el.remove();
         });
-        slotAbrir(nome, m);
+        slotAbrir(nome, m.name);
       }, 1400 + (idx * 500));
     }
   });
@@ -4270,7 +4272,7 @@ function renderDesafiosMedalhas() {
   el.innerHTML = `
   <div style="background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.04));border:1px solid rgba(201,168,76,0.3);border-radius:14px;padding:16px 18px;margin-bottom:18px;display:flex;gap:12px;align-items:flex-start">
     <div style="font-size:28px;flex-shrink:0">🎰</div>
-    <div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:1.55">Ao alcançares as medalhas, terás a oportunidade de rolar a slot machine juntamente com um membro da equipa de direção para reclamar o teu prémio!</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:1.55">Ao alcançares as medalhas, terás a oportunidade de rolar a slot machine para reclamar o teu prémio</div>
   </div>
   <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:14px">Medalhas disponíveis</div>
   ${todas.map(m=>`
