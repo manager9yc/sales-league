@@ -1439,6 +1439,27 @@ function showToast(msg, duration) {
   toastTimeout = setTimeout(() => { t.classList.remove('show'); }, duration || 2500);
 }
 
+function mostrarPopupDuplicado(nome, data) {
+  const existing = document.getElementById('duplicadoPopupOverlay');
+  if (existing) existing.remove();
+  const dt = new Date(data + 'T12:00:00');
+  const dataLabel = dt.toLocaleDateString('pt-PT', {weekday:'long', day:'numeric', month:'long'});
+  const overlay = document.createElement('div');
+  overlay.id = 'duplicadoPopupOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9992;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.75);cursor:pointer';
+  overlay.onclick = () => overlay.remove();
+  overlay.innerHTML = `
+    <div style="background:linear-gradient(135deg,#1a0a0a,#0f0505);border:2px solid #EF4444;border-radius:24px;padding:28px 24px;text-align:center;max-width:320px;width:100%;box-shadow:0 0 50px rgba(239,68,68,0.35),0 20px 60px rgba(0,0,0,0.8);animation:bounceIn 0.4s cubic-bezier(0.34,1.56,0.64,1)" onclick="event.stopPropagation()">
+      <div style="font-size:52px;margin-bottom:10px">🚫</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(239,68,68,0.7);margin-bottom:6px">REGISTO BLOQUEADO</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;letter-spacing:2px;line-height:1.1;margin-bottom:8px">${nome.split(' ')[0]} já registou hoje!</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:18px">${dataLabel}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:16px">Só é permitido 1 registo por vendedor por dia.</div>
+      <button onclick="document.getElementById('duplicadoPopupOverlay').remove()" style="background:linear-gradient(135deg,#EF4444,#DC2626);border:none;border-radius:12px;padding:12px 32px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#fff;cursor:pointer">OK</button>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
 async function submeter() {
   if (!nomeSel) { showToast('⚠️ Seleciona o teu nome primeiro'); return; }
   const nomeAtual = nomeSel;
@@ -1449,7 +1470,7 @@ async function submeter() {
   const registoKey = 'registo_' + nomeAtual + '_' + dataVal;
   try {
     if (localStorage.getItem(registoKey)) {
-      showToast('⚠️ ' + nomeAtual.split(' ')[0] + ' já registou para este dia!');
+      mostrarPopupDuplicado(nomeAtual, dataVal);
       return;
     }
   } catch(e) {}
@@ -1485,8 +1506,17 @@ async function submeter() {
 
   // Enviar para o servidor em background (não bloqueia o resto)
   fetch(SHEETS_URL, { method:'POST', body: JSON.stringify(payload), mode:'no-cors' })
-    .catch(e => console.error('Erro ao guardar:', e));
-
+  // Enviar para o servidor com retry automático
+  const enviarParaSheets = (tentativa) => {
+    fetch(SHEETS_URL, { method:'POST', body: JSON.stringify(payload), mode:'no-cors' })
+      .then(() => { if(tentativa > 1) console.log('✓ Guardado no Sheets (tentativa ' + tentativa + ')'); })
+      .catch(e => {
+        console.error('Erro ao guardar (tentativa ' + tentativa + '):', e);
+        if (tentativa < 3) setTimeout(() => enviarParaSheets(tentativa + 1), 3000 * tentativa);
+        else showToast('⚠️ Erro de ligação ao servidor. Dados guardados localmente.');
+      });
+  };
+  enviarParaSheets(1);
   // Feedback visual imediato
   tocarSomRegisto();
   btn.textContent = '✔ Registado com sucesso';
@@ -3672,6 +3702,7 @@ const premiosDefault=[
   {icon:'🧨',nome:'Boom, tiveste azar!',prob:0.05,cor:'#3d0000'},
   {icon:'🛋️',nome:'Pausa extra de 15 minutos!',prob:0.03,cor:'#1a3d1a'},
 ];
+let premios = premiosDefault.map(p=>({...p}));
 try {
   const saved = localStorage.getItem('premiosConfig');
   if (saved) premios = JSON.parse(saved);
