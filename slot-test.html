@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Slot Test — Super Liga</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #C9A84C;
+  --orange: #FF6B00;
+  --dark: #070F1F;
+  --card: #111827;
+  --border: #1e2a3a;
+  --muted: #6b7a90;
+  --green: #22C55E;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  background: var(--dark);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  padding: 24px 16px 40px;
+  overflow-x: hidden;
+}
+
+h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 4px;
+}
+.sub {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 28px;
+  letter-spacing: 1px;
+}
+
+/* ── REGISTO FORM ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 14px;
+}
+.field { margin-bottom: 14px; }
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.field input {
+  width: 100%;
+  background: #0d1525;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.field input:focus { border-color: var(--gold); }
+
+.row { display: flex; gap: 10px; }
+.row .field { flex: 1; }
+
+.counter-field {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #0d1525;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.counter-field:focus-within { border-color: var(--gold); }
+.counter-btn {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 22px;
+  font-weight: 700;
+  width: 44px;
+  height: 48px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+  touch-action: manipulation;
+}
+.counter-btn:active { background: rgba(201,168,76,0.1); }
+.counter-val {
+  flex: 1;
+  text-align: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  color: #fff;
+  user-select: none;
+}
+
+/* Threshold indicator */
+.threshold-bar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.threshold-fill {
+  height: 100%;
+  background: var(--orange);
+  border-radius: 2px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+.threshold-fill.done { background: var(--green); }
+.threshold-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.threshold-label .cur { font-weight: 700; }
+.threshold-label .cur.done { color: var(--green); }
+
+.submit-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--orange), #FF4500);
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  color: #fff;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(255,107,0,0.4);
+  transition: transform 0.1s, box-shadow 0.1s;
+  touch-action: manipulation;
+}
+.submit-btn:active { transform: scale(0.97); }
+.submit-btn.done {
+  background: linear-gradient(135deg, #22C55E, #16a34a);
+  box-shadow: 0 4px 20px rgba(34,197,94,0.4);
+}
+
+/* ── LOG ── */
+.log {
+  background: #0a0f1a;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--muted);
+  font-family: monospace;
+  max-height: 160px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+}
+.log .line { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.log .line.ok { color: var(--green); }
+.log .line.medal { color: var(--gold); font-weight: 700; }
+.log .line.err { color: #ef4444; }
+
+/* ── SLOT OVERLAY ── */
+#slotOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(4,10,22,0.97);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+  overflow: hidden;
+}
+#slotOverlay.open { display: flex; }
+
+.slot-lights {
+  position: absolute;
+  left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg,#C9A84C,#FFD700,#fff,#C9A84C,#FFD700,#fff,#C9A84C);
+  background-size: 200px 100%;
+  animation: lightScroll 1.2s linear infinite;
+}
+.slot-lights.bottom {
+  top: auto;
+  bottom: 0;
+  animation-direction: reverse;
+}
+@keyframes lightScroll { to { background-position: 200px 0; } }
+
+.slot-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 380px;
+}
+
+.slot-header-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: rgba(201,168,76,0.7);
+  margin-bottom: 4px;
+}
+.slot-prémio-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 46px;
+  letter-spacing: 4px;
+  color: #fff;
+  line-height: 1;
+  text-shadow: 0 0 30px rgba(201,168,76,0.5);
+}
+#slotNome {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  margin-bottom: 20px;
+  min-height: 20px;
+}
+
+.reel-box {
+  background: linear-gradient(180deg,#1a2744,#0d1a35);
+  border: 2px solid var(--gold);
+  border-radius: 18px;
+  padding: 18px 14px 20px;
+  box-shadow: 0 0 40px rgba(201,168,76,0.2);
+  margin-bottom: 14px;
+  position: relative;
+}
+.reel-box-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 6px;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+.reels-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 14px;
+  position: relative;
+}
+.reel-win-line {
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 2px;
+  background: rgba(201,168,76,0.35);
+  transform: translateY(-50%);
+  z-index: 4;
+  pointer-events: none;
+}
+.reel-wrap {
+  flex: 1;
+  max-width: 90px;
+  height: 110px;
+  background: #070F1F;
+  border: 2px solid rgba(201,168,76,0.3);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+.reel-wrap::before, .reel-wrap::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 26px;
+  z-index: 3;
+  pointer-events: none;
+}
+.reel-wrap::before { top: 0; background: linear-gradient(180deg, #070F1F, transparent); }
+.reel-wrap::after { bottom: 0; background: linear-gradient(0deg, #070F1F, transparent); }
+.reel {
+  will-change: transform;
+  transform: translateY(0);
+}
+.reel-item {
+  width: 100%;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.spin-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--gold), #E8C97A, var(--gold));
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  color: #07101f;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 4px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(201,168,76,0.4);
+  touch-action: manipulation;
+}
+.spin-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* Result */
+#slotResultado {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.result-won {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 6px;
+  color: var(--gold);
+}
+.result-icon {
+  font-size: 88px;
+  line-height: 1;
+  animation: iconPop 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes iconPop {
+  0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+  70% { transform: scale(1.2) rotate(3deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+.result-text {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  color: #fff;
+  letter-spacing: 2px;
+}
+.result-box {
+  background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 12px;
+  padding: 12px 20px;
+  max-width: 280px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.8);
+}
+
+.close-btn {
+  margin-top: 18px;
+  width: 100%;
+  background: transparent;
+  border: 1.5px solid rgba(201,168,76,0.35);
+  border-radius: 10px;
+  padding: 12px;
+  color: rgba(255,255,255,0.7);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* Confetti */
+#confettiWrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+@keyframes cfFall {
+  0% { transform: translateY(-10px) rotate(0); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+/* Medalhas ganhas */
+.medal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(201,168,76,0.1);
+  border: 1px solid rgba(201,168,76,0.4);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold);
+  margin: 3px;
+}
+</style>
+</head>
+<body>
+
+<h1>SLOT MACHINE TEST</h1>
+<p class="sub">Simula um registo e vê a slot abrir automaticamente</p>
+
+<!-- LOG -->
+<div class="log" id="logBox">
+  <div class="line">Pronto. Preenche e regista.</div>
+</div>
+
+<!-- FORM -->
+<div class="card">
+  <div class="card-title">📋 Simular Registo</div>
+
+  <div class="field">
+    <label>Nome do vendedor</label>
+    <input type="text" id="fNome" value="João Ferreira" placeholder="Nome">
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label>🖥️ Onlines</label>
+      <div class="counter-field">
+        <button class="counter-btn" onclick="dec('onlines')">−</button>
+        <div class="counter-val" id="v_onlines">0</div>
+        <button class="counter-btn" onclick="inc('onlines')">+</button>
+      </div>
+      <div class="threshold-bar"><div class="threshold-fill" id="bar_onlines" style="width:0%"></div></div>
+      <div class="threshold-label">
+        <span class="cur" id="lbl_onlines">0 / 15</span>
+        <span>Super Online: 8/dia</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>🧴 Sprays</label>
+      <div class="counter-field">
+        <button class="counter-btn" onclick="dec('sprays')">−</button>
+        <div class="counter-val" id="v_sprays">0</div>
+        <button class="counter-btn" onclick="inc('sprays')">+</button>
+      </div>
+      <div class="threshold-bar"><div class="threshold-fill" id="bar_sprays" style="width:0%"></div></div>
+      <div class="threshold-label">
+        <span class="cur" id="lbl_sprays">0 / 15</span>
+        <span>Spray Explosion: 10/dia</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label>🦶 Palmilhas</label>
+      <div class="counter-field">
+        <button class="counter-btn" onclick="dec('palmilhas')">−</button>
+        <div class="counter-val" id="v_palmilhas">0</div>
+        <button class="counter-btn" onclick="inc('palmilhas')">+</button>
+      </div>
+      <div class="threshold-bar"><div class="threshold-fill" id="bar_palmilhas" style="width:0%"></div></div>
+      <div class="threshold-label"><span class="cur" id="lbl_palmilhas">0 / 10</span><span></span></div>
+    </div>
+    <div class="field">
+      <label>👕 Camisolas</label>
+      <div class="counter-field">
+        <button class="counter-btn" onclick="dec('camisolas')">−</button>
+        <div class="counter-val" id="v_camisolas">0</div>
+        <button class="counter-btn" onclick="inc('camisolas')">+</button>
+      </div>
+      <div class="threshold-bar"><div class="threshold-fill" id="bar_camisolas" style="width:0%"></div></div>
+      <div class="threshold-label"><span class="cur" id="lbl_camisolas">0 / 12</span><span></span></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label>🛍️ Sacos</label>
+      <div class="counter-field">
+        <button class="counter-btn" onclick="dec('sacos')">−</button>
+        <div class="counter-val" id="v_sacos">0</div>
+        <button class="counter-btn" onclick="inc('sacos')">+</button>
+      </div>
+      <div class="threshold-bar"><div class="threshold-fill" id="bar_sacos" style="width:0%"></div></div>
+      <div class="threshold-label"><span class="cur" id="lbl_sacos">0 / 150</span><span></span></div>
+    </div>
+    <div class="field">
+      <label>💧 Garrafas</label>
+      <div class="counter-field">
+        <button class="counter-btn" onclick="dec('garrafas')">−</button>
+        <div class="counter-val" id="v_garrafas">0</div>
+        <button class="counter-btn" onclick="inc('garrafas')">+</button>
+      </div>
+      <div class="threshold-bar"><div class="threshold-fill" id="bar_garrafas" style="width:0%"></div></div>
+      <div class="threshold-label"><span class="cur" id="lbl_garrafas">0 / 15</span><span></span></div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>⭐ Elogios (meta: 3)</label>
+    <div class="counter-field">
+      <button class="counter-btn" onclick="dec('elogios')">−</button>
+      <div class="counter-val" id="v_elogios">0</div>
+      <button class="counter-btn" onclick="inc('elogios')">+</button>
+    </div>
+    <div class="threshold-bar"><div class="threshold-fill" id="bar_elogios" style="width:0%"></div></div>
+    <div class="threshold-label"><span class="cur" id="lbl_elogios">0 / 3</span><span></span></div>
+  </div>
+
+</div>
+
+<!-- STATUS -->
+<div id="medalhasGanhasWrap" style="margin-bottom:12px;display:none">
+  <div style="font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Medalhas acumuladas (mês):</div>
+  <div id="medalhasGanhasInner"></div>
+</div>
+
+<button class="submit-btn" id="btnRegistar" onclick="registar()">REGISTAR</button>
+
+<div style="margin-top:12px;text-align:center">
+  <button onclick="limparDados()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:8px 16px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer">🗑 Limpar dados de teste (localStorage)</button>
+</div>
+
+<!-- SLOT OVERLAY -->
+<div id="slotOverlay">
+  <div class="slot-lights" style="top:0"></div>
+  <div class="slot-lights bottom"></div>
+  <div id="confettiWrap"></div>
+
+  <div class="slot-inner">
+    <div class="slot-header-label">🏅 Medalha Conquistada</div>
+    <div class="slot-prémio-title">PRÉMIO!</div>
+    <div id="slotNome"></div>
+
+    <div id="slotMachineWrap">
+      <div class="reel-box">
+        <div class="reel-box-title">✦ SUPER LIGA ✦</div>
+        <div class="reels-row">
+          <div class="reel-win-line"></div>
+          <div class="reel-wrap"><div class="reel" id="r0"></div></div>
+          <div class="reel-wrap"><div class="reel" id="r1"></div></div>
+          <div class="reel-wrap"><div class="reel" id="r2"></div></div>
+        </div>
+        <button class="spin-btn" id="btnGirar" onclick="girar()">🎰 GIRAR</button>
+      </div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.3);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif;font-weight:600">Carrega para revelar o teu prémio</div>
+    </div>
+
+    <div id="slotResultado">
+      <div class="result-won">✦ GANHASTE ✦</div>
+      <div class="result-icon" id="rIcon">🎁</div>
+      <div class="result-text" id="rText">-</div>
+      <div class="result-box">Tira PrintScreen e mostra à <strong style="color:var(--gold)">Direção</strong> 🎯</div>
+    </div>
+
+    <button class="close-btn" id="btnFechar" style="display:none" onclick="fecharSlot()">← Continuar</button>
+  </div>
+</div>
+
+<script>
+// ── PRÉMIOS ──────────────────────────────────────────────
+const PREMIOS = [
+  {icon:'☕', nome:'Um café!',               prob:0.16, cor:'#4A2C2A'},
+  {icon:'🍫', nome:'Um chocolate!',          prob:0.18, cor:'#5C3317'},
+  {icon:'🥐', nome:'Um pastel de nata!',     prob:0.09, cor:'#C8963E'},
+  {icon:'🍬', nome:'Um saco de gomas!',      prob:0.11, cor:'#E91E8C'},
+  {icon:'⏰', nome:'Sair 30min mais cedo!',  prob:0.09, cor:'#1565C0'},
+  {icon:'🎰', nome:'Uma raspadinha!',        prob:0.16, cor:'#2E7D32'},
+  {icon:'💣', nome:'Boom, que azar!',        prob:0.13, cor:'#1a1a2e'},
+  {icon:'❌', nome:'Tiveste azar!',          prob:0.05, cor:'#3d0000'},
+  {icon:'😴', nome:'Pausa extra 15min!',     prob:0.03, cor:'#1a3d1a'},
+];
+
+// ── THRESHOLDS (valores mensais para medalha) ───────────
+const TH = {
+  onlines:   15,
+  sprays:    15,
+  palmilhas: 10,
+  camisolas: 12,
+  sacos:     150,
+  garrafas:  15,
+  elogios:   3,
+};
+
+// ── ESTADO ───────────────────────────────────────────────
+const vals = { onlines:0, sprays:0, palmilhas:0, camisolas:0, sacos:0, garrafas:0, elogios:0 };
+let spinning = false;
+let premioEscolhido = null;
+
+// Fila de slots pendentes
+let slotFila = [];
+let slotFilaEmCurso = false;
+
+// ── CONTADORES ────────────────────────────────────────────
+function inc(k) { vals[k]++; atualizar(k); }
+function dec(k) { if (vals[k] > 0) { vals[k]--; atualizar(k); } }
+
+function atualizar(k) {
+  document.getElementById('v_' + k).textContent = vals[k];
+  const max = TH[k] || 1;
+  const pct = Math.min(100, Math.round(vals[k] / max * 100));
+  const bar = document.getElementById('bar_' + k);
+  const lbl = document.getElementById('lbl_' + k);
+  if (bar) {
+    bar.style.width = pct + '%';
+    bar.className = 'threshold-fill' + (pct >= 100 ? ' done' : '');
+  }
+  if (lbl) {
+    lbl.textContent = vals[k] + ' / ' + max;
+    lbl.className = 'cur' + (pct >= 100 ? ' done' : '');
+  }
+}
+
+// ── LOG ───────────────────────────────────────────────────
+function log(msg, type='') {
+  const box = document.getElementById('logBox');
+  const d = document.createElement('div');
+  d.className = 'line ' + type;
+  d.textContent = '[' + new Date().toLocaleTimeString('pt-PT') + '] ' + msg;
+  box.insertBefore(d, box.firstChild);
+  // keep max 30 lines
+  while (box.children.length > 30) box.removeChild(box.lastChild);
+}
+
+// ── STORAGE KEY ───────────────────────────────────────────
+function getMesKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + (d.getMonth() + 1);
+}
+function getStoreKey(nome) { return 'slotTESTE_' + nome + '_' + getMesKey(); }
+function getDiaKey(nome, campo) {
+  const hoje = new Date().toISOString().split('T')[0];
+  return 'slotDiaTESTE_' + nome + '_' + hoje + '_' + campo;
+}
+
+// ── CALCULAR MEDALHAS ACUMULADAS DO MÊS ──────────────────
+function calcMedalhasMes(nome, payload) {
+  // Lê histórico do mês para este nome
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem('histTeste_' + nome) || '[]'); } catch(e) {}
+  // Garante que o payload atual está incluído
+  const map = {};
+  hist.forEach(d => { map[d.data] = d; });
+  map[payload.data] = payload;
+
+  const mes = new Date().getMonth(), ano = new Date().getFullYear();
+  const doMes = Object.values(map).filter(d => {
+    try {
+      const dt = new Date(d.data + 'T12:00:00');
+      return dt.getMonth() === mes && dt.getFullYear() === ano;
+    } catch(e) { return false; }
+  });
+
+  const soma = k => doMes.reduce((s, d) => s + (d[k] || 0), 0);
+  const diasUnicos = new Set(doMes.map(d => d.data)).size;
+
+  return [
+    { icon:'🖥️', nome:'Rei dos Onlines',   earned: soma('onlines')   >= TH.onlines   },
+    { icon:'🧴', nome:'Spray King',          earned: soma('sprays')    >= TH.sprays    },
+    { icon:'🦶', nome:'Palmilhas Master',    earned: soma('palmilhas') >= TH.palmilhas },
+    { icon:'👕', nome:'Camisolas Pro',       earned: soma('camisolas') >= TH.camisolas },
+    { icon:'🛍️', nome:'Eco Champion',       earned: soma('sacos')     >= TH.sacos     },
+    { icon:'💧', nome:'Hydration Boss',      earned: soma('garrafas')  >= TH.garrafas  },
+    { icon:'⭐', nome:'Favorito',            earned: soma('elogios')   >= TH.elogios   },
+    { icon:'📅', nome:'Consistente',         earned: diasUnicos        >= 8            },
+  ];
+}
+
+// ── REGISTAR ─────────────────────────────────────────────
+function registar() {
+  const nome = document.getElementById('fNome').value.trim() || 'Vendedor';
+  const hoje = new Date().toISOString().split('T')[0];
+
+  const payload = { data: hoje, nome, ...vals };
+
+  // Guardar no histórico local de teste
+  try {
+    let hist = JSON.parse(localStorage.getItem('histTeste_' + nome) || '[]');
+    hist = hist.filter(d => d.data !== hoje); // substituir registo do dia
+    hist.unshift(payload);
+    localStorage.setItem('histTeste_' + nome, JSON.stringify(hist.slice(0, 30)));
+  } catch(e) {}
+
+  log('Registo guardado: ' + JSON.stringify({onlines:vals.onlines,sprays:vals.sprays,palmilhas:vals.palmilhas,camisolas:vals.camisolas,sacos:vals.sacos,garrafas:vals.garrafas,elogios:vals.elogios}), 'ok');
+
+  // Feedback visual no botão
+  const btn = document.getElementById('btnRegistar');
+  btn.textContent = '✔ REGISTADO';
+  btn.className = 'submit-btn done';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = 'REGISTAR';
+    btn.className = 'submit-btn';
+    btn.disabled = false;
+  }, 2500);
+
+  // Mostrar medalhas acumuladas
+  mostrarMedalhasGanhas(nome, payload);
+
+  // Verificar e disparar slot
+  verificarEDispararSlot(nome, payload);
+}
+
+// ── MOSTRAR MEDALHAS GANHAS ──────────────────────────────
+function mostrarMedalhasGanhas(nome, payload) {
+  const wrap = document.getElementById('medalhasGanhasWrap');
+  const inner = document.getElementById('medalhasGanhasInner');
+  const todas = calcMedalhasMes(nome, payload);
+  const ganhas = todas.filter(m => m.earned);
+  // Adicionar diárias
+  if ((payload.onlines || 0) >= 8) ganhas.push({ icon:'🌟', nome:'Super Online' });
+  if ((payload.sprays  || 0) >= 10) ganhas.push({ icon:'💥', nome:'Spray Explosion' });
+  if (!ganhas.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  inner.innerHTML = ganhas.map(m => `<span class="medal-badge">${m.icon} ${m.nome}</span>`).join('');
+}
+
+// ── VERIFICAR E DISPARAR SLOT ─────────────────────────────
+function verificarEDispararSlot(nome, payload) {
+  const storeKey = getStoreKey(nome);
+  let jaAtribuidas = [];
+  try { jaAtribuidas = JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch(e) {}
+
+  const fila = [];
+
+  // 1) Medalhas mensais
+  const medalhasMes = calcMedalhasMes(nome, payload);
+  const novas = medalhasMes.filter(m => m.earned && !jaAtribuidas.includes(m.nome));
+  if (novas.length > 0) {
+    const novosNomes = novas.map(m => m.nome);
+    try { localStorage.setItem(storeKey, JSON.stringify([...jaAtribuidas, ...novosNomes])); } catch(e) {}
+    novas.forEach(m => {
+      log('🏅 Nova medalha mensal: ' + m.nome, 'medal');
+      fila.push({ nome: m.nome, icon: m.icon });
+    });
+  }
+
+  // 2) Medalhas diárias
+  if ((payload.onlines || 0) >= 8) {
+    const k = getDiaKey(nome, 'SuperOnline');
+    if (!localStorage.getItem(k)) {
+      try { localStorage.setItem(k, '1'); } catch(e) {}
+      log('🌟 Medalha diária: Super Online (' + payload.onlines + ' onlines hoje)', 'medal');
+      fila.push({ nome: 'Super Online', icon: '🌟' });
+    } else {
+      log('Super Online já atribuído hoje.', '');
+    }
+  }
+  if ((payload.sprays || 0) >= 10) {
+    const k = getDiaKey(nome, 'SprayExplosion');
+    if (!localStorage.getItem(k)) {
+      try { localStorage.setItem(k, '1'); } catch(e) {}
+      log('💥 Medalha diária: Spray Explosion (' + payload.sprays + ' sprays hoje)', 'medal');
+      fila.push({ nome: 'Spray Explosion', icon: '💥' });
+    } else {
+      log('Spray Explosion já atribuído hoje.', '');
+    }
+  }
+
+  if (fila.length === 0) {
+    log('Sem medalhas novas neste registo.', '');
+    return;
+  }
+
+  log('→ A abrir slot para ' + fila.length + ' medalha(s)...', 'ok');
+
+  // Disparar fila com 300ms delay (apenas para dar tempo ao browser)
+  fila.forEach((m, i) => {
+    setTimeout(() => {
+      abrirSlot(nome, m.nome);
+    }, 300 + i * 100); // se mais que uma, aguarda fechar a anterior via fila interna
+  });
+}
+
+// ── SLOT MACHINE ─────────────────────────────────────────
+let slotQueue = [];
+let slotOpen = false;
+
+function abrirSlot(nome, medalha) {
+  // Se já está aberta, adicionar à fila
+  if (slotOpen) {
+    slotQueue.push({ nome, medalha });
+    log('Slot em fila (já aberta): ' + medalha, '');
+    return;
+  }
+  slotOpen = true;
+  spinning = false;
+  premioEscolhido = null;
+
+  document.getElementById('slotNome').textContent = nome + ' · ' + medalha;
+  document.getElementById('slotMachineWrap').style.display = 'block';
+  document.getElementById('slotResultado').style.display = 'none';
+  document.getElementById('btnFechar').style.display = 'none';
+  document.getElementById('btnGirar').disabled = false;
+  document.getElementById('btnGirar').textContent = '🎰 GIRAR';
+  document.getElementById('confettiWrap').innerHTML = '';
+
+  initReels();
+
+  const overlay = document.getElementById('slotOverlay');
+  overlay.style.display = 'flex';
+  // force reflow then add class (redundant but ensures display:flex is applied)
+  overlay.offsetHeight;
+
+  log('Slot aberta para: ' + nome + ' / ' + medalha, 'ok');
+}
+
+function fecharSlot() {
+  const overlay = document.getElementById('slotOverlay');
+  overlay.style.display = 'none';
+  slotOpen = false;
+
+  // Próxima da fila?
+  if (slotQueue.length > 0) {
+    const next = slotQueue.shift();
+    setTimeout(() => abrirSlot(next.nome, next.medalha), 500);
+  }
+}
+
+function initReels() {
+  const icons = PREMIOS.map(p => p.icon);
+  for (let r = 0; r < 3; r++) {
+    const reel = document.getElementById('r' + r);
+    if (!reel) continue;
+    let html = '';
+    for (let rep = 0; rep < 8; rep++) {
+      icons.forEach(ic => {
+        html += `<div class="reel-item">${ic}</div>`;
+      });
+    }
+    reel.innerHTML = html;
+    reel.style.transition = 'none';
+    reel.style.transform = 'translateY(0)';
+  }
+}
+
+function girar() {
+  if (spinning) return;
+  spinning = true;
+  document.getElementById('btnGirar').disabled = true;
+  document.getElementById('btnGirar').textContent = '⏳ A girar...';
+
+  // Escolher prémio
+  const rand = Math.random();
+  let acc = 0, idx = 0;
+  for (let i = 0; i < PREMIOS.length; i++) {
+    acc += PREMIOS[i].prob;
+    if (rand <= acc) { idx = i; break; }
+  }
+  premioEscolhido = PREMIOS[idx];
+
+  const itemH = 110;
+  const n = PREMIOS.length;
+  const targetRep = 4;
+  const durations = [3800, 4400, 5000];
+
+  for (let r = 0; r < 3; r++) {
+    const reel = document.getElementById('r' + r);
+    if (!reel) continue;
+    const targetY = -(targetRep * n * itemH + idx * itemH);
+    const dur = durations[r];
+    // Reset first
+    reel.style.transition = 'none';
+    reel.style.transform = 'translateY(0)';
+    // Force reflow
+    reel.offsetHeight;
+    // Animate
+    setTimeout((el, d, y) => {
+      el.style.transition = `transform ${d}ms cubic-bezier(0.17,0.67,0.12,1.0)`;
+      el.style.transform = `translateY(${y}px)`;
+    }, r * 150, reel, dur, targetY);
+  }
+
+  setTimeout(() => {
+    spinning = false;
+    mostrarResultado(premioEscolhido);
+  }, durations[2] + 600);
+}
+
+function mostrarResultado(p) {
+  // Confetti
+  const wrap = document.getElementById('confettiWrap');
+  const cols = [p.cor || '#C9A84C', '#FFD700', '#fff'];
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    const sz = 5 + Math.random() * 10;
+    el.style.cssText = `position:absolute;width:${sz}px;height:${sz}px;border-radius:${Math.random()>.5?'50%':'2px'};background:${cols[Math.floor(Math.random()*cols.length)]};left:${Math.random()*100}%;top:-12px;animation:cfFall ${1.3+Math.random()*1.5}s ease-out ${Math.random()*0.4}s forwards;pointer-events:none`;
+    wrap.appendChild(el);
+  }
+
+  document.getElementById('slotMachineWrap').style.display = 'none';
+  document.getElementById('rIcon').textContent = p.icon;
+  document.getElementById('rText').textContent = p.nome;
+  document.getElementById('slotResultado').style.display = 'flex';
+  document.getElementById('btnFechar').style.display = 'block';
+
+  // Guardar no log
+  try {
+    const log2 = JSON.parse(localStorage.getItem('premiosTeste') || '[]');
+    log2.unshift({ nome: document.getElementById('slotNome').textContent, premio: p.nome, icon: p.icon, data: new Date().toLocaleDateString('pt-PT') });
+    localStorage.setItem('premiosTeste', JSON.stringify(log2.slice(0, 50)));
+  } catch(e) {}
+
+  log('Prémio: ' + p.icon + ' ' + p.nome, 'ok');
+}
+
+// ── LIMPAR DADOS ─────────────────────────────────────────
+function limparDados() {
+  const nome = document.getElementById('fNome').value.trim() || 'Vendedor';
+  // Limpar todas as chaves de teste
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && (k.startsWith('slotTESTE_') || k.startsWith('slotDiaTESTE_') || k.startsWith('histTeste_') || k.startsWith('premiosTeste'))) {
+      keys.push(k);
+    }
+  }
+  keys.forEach(k => localStorage.removeItem(k));
+  // Reset UI
+  Object.keys(vals).forEach(k2 => { vals[k2] = 0; atualizar(k2); });
+  document.getElementById('medalhasGanhasWrap').style.display = 'none';
+  document.getElementById('logBox').innerHTML = '<div class="line ok">Dados limpos. Podes testar de novo.</div>';
+  log('localStorage de teste limpo.', 'ok');
+}
+</script>
+</body>
+</html>
