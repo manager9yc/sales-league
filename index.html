@@ -430,7 +430,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .sp-particle{position:absolute;opacity:0;animation:spFloat linear infinite;}
 @keyframes spFloat{0%{transform:translateY(0) rotate(0deg) scale(1);opacity:0}5%{opacity:1}80%{opacity:0.7}100%{transform:translateY(-110vh) rotate(720deg) scale(0.5);opacity:0}}
 /* Inner layout — elementos ancorados ao fundo com margem extra para não sobrepor o 2026 */
-.sp-inner{position:absolute;bottom:0;left:0;right:0;z-index:2;display:flex;flex-direction:column;align-items:center;padding:0 28px clamp(40px,10vh,72px);}
+.sp-inner{position:absolute;bottom:0;left:0;right:0;z-index:2;display:flex;flex-direction:column;align-items:center;padding:0 28px clamp(28px,6vh,48px);}
 /* Progress section */
 .sp-bottom{width:100%;max-width:380px;display:flex;flex-direction:column;align-items:center;gap:8px;}
 .sp-status-txt{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:2px;}
@@ -438,7 +438,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .sp-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#7a5c18,#C9A84C,#F0D070);border-radius:100px;transition:width 0.12s linear;box-shadow:0 0 10px rgba(201,168,76,0.6);}
 .sp-pct{font-family:'Bebas Neue',sans-serif;font-size:17px;color:#C9A84C;letter-spacing:2px;}
 .sp-enter-btn{width:60%;max-width:220px;background:linear-gradient(135deg,#a07820 0%,#C9A84C 35%,#E8C97A 65%,#C0962A 100%);border:none;border-radius:13px;padding:18px;color:#040608;font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:6px;cursor:pointer;box-shadow:0 6px 32px rgba(201,168,76,0.6),0 1px 0 rgba(255,255,255,0.3) inset;-webkit-tap-highlight-color:transparent;margin-top:4px;}
-.sp-dev-credit{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(201,168,76,0.75);text-align:center;position:absolute;top:20px;left:0;right:0;text-shadow:0 0 12px rgba(201,168,76,0.4);}
+.sp-dev-credit{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(201,168,76,0.65);text-align:center;text-shadow:0 0 10px rgba(201,168,76,0.35);margin-top:10px;}
 @keyframes particleFloat{0%{opacity:0;transform:translateY(100vh) scale(0)}10%{opacity:0.7}90%{opacity:0.3}100%{opacity:0;transform:translateY(-20px) scale(1)}}
 
 /* MEDAL POPUP */
@@ -633,7 +633,7 @@ body.theme-ucl .ucl-stars-banner{display:block}
 
 /* ══ STANDARD BANNER ══ */
 .screen-banner { background: var(--dark); position: relative; overflow: hidden; }
-.screen-banner-inner { padding: 24px 24px 0; text-align: center; position: relative; min-height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.screen-banner-inner { padding: 0 24px; text-align: center; position: relative; height: 108px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .screen-banner-inner::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--orange); }
 .screen-banner-inner::after { content:''; position:absolute; right:0; top:0; bottom:0; width:4px; background:var(--orange); }
 .screen-banner-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(40px,10vw,64px); color:#fff; line-height:0.95; letter-spacing:2px; position:relative; z-index:1; }
@@ -925,9 +925,6 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 
 <!-- SPLASH -->
 <div class="splash" id="splash">
-  <!-- Dev credit -->
-  <div class="sp-dev-credit">APP DEVELOPED BY DÁRIO SANTOS</div>
-
   <!-- Confetti particles -->
   <div class="sp-particles" id="spParticles"></div>
 
@@ -943,6 +940,9 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
       </div>
       <div class="sp-pct" id="splashPct">0%</div>
       <button class="sp-enter-btn" onclick="iniciarAudio();fecharSplash()">ENTRAR</button>
+      <div class="sp-dev-credit">APP DEVELOPED BY DÁRIO SANTOS</div>
+    </div>
+  </div>
     </div>
   </div>
 </div>
@@ -1111,7 +1111,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 <!-- DASHBOARD -->
 <div class="screen" id="screen-dash">
   <div style="background:#0C0C0C;position:relative;overflow:hidden">
-    <div style="padding:24px 24px 0;text-align:center;position:relative;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+    <div style="padding:0 24px;text-align:center;position:relative;height:108px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
       <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#FF6B00"></div>
       <div style="position:absolute;right:0;top:0;bottom:0;width:4px;background:#FF6B00"></div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,10vw,64px);color:#fff;line-height:0.95;letter-spacing:2px">DASHBOARD</div>
@@ -1164,7 +1164,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 <!-- ADMIN -->
 <div class="screen" id="screen-admin">
   <div style="background:#0C0C0C;position:relative;overflow:hidden">
-    <div style="padding:24px 24px 0;text-align:center;position:relative;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+    <div style="padding:0 24px;text-align:center;position:relative;height:108px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
       <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#FF6B00"></div>
       <div style="position:absolute;right:0;top:0;bottom:0;width:4px;background:#FF6B00"></div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,10vw,64px);color:#fff;line-height:0.95;letter-spacing:2px">ADMINISTRAÇÃO</div>
@@ -1369,9 +1369,16 @@ function goTo(screen, btn) {
   if(screen==='info'){renderInfo();renderSugestoes();populateSugestaoNomes();gerarQR();}
   if(screen==='admin'){renderPremiosLog();renderAdminSugestoes();}
   if (screen === 'ranking') {
-    // Show cached data immediately if available
-    if (window._rankingCache) renderRanking(window._rankingCache);
-    carregarRanking();
+    // Render cache instantly — never block navigation
+    if (window._rankingCache) {
+      renderRanking(window._rankingCache);
+    } else {
+      renderRanking([]);
+    }
+    // Fetch fresh data only after UI has painted (non-blocking)
+    const doFetch = () => carregarRanking();
+    if (window.requestIdleCallback) requestIdleCallback(doFetch, { timeout: 400 });
+    else setTimeout(doFetch, 80);
   }
   if (screen === 'dash') carregarDashboard();
   if (screen === 'admin') {
@@ -2148,36 +2155,56 @@ iniciarSplash();
 (function() {
   const splash = document.getElementById('splash');
   if (!splash) return;
-  const MAX = 18; // max px shift
+  const MAX = 10; // subtle — max px shift
+  let curX = 0, curY = 0, tgtX = 0, tgtY = 0;
+  let rafId = null;
 
-  function applyShift(x, y) {
-    // clamp
-    x = Math.max(-MAX, Math.min(MAX, x));
-    y = Math.max(-MAX, Math.min(MAX, y));
-    splash.style.backgroundPosition = `calc(50% + ${x}px) calc(50% + ${y}px)`;
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function tick() {
+    curX = lerp(curX, tgtX, 0.06);
+    curY = lerp(curY, tgtY, 0.06);
+    splash.style.backgroundPosition = `calc(50% + ${curX.toFixed(2)}px) calc(50% + ${curY.toFixed(2)}px)`;
+    rafId = requestAnimationFrame(tick);
+  }
+  tick();
+
+  // Stop animating once splash is gone
+  const obs = new MutationObserver(() => {
+    if (splash.classList.contains('hidden')) { cancelAnimationFrame(rafId); obs.disconnect(); }
+  });
+  obs.observe(splash, { attributes: true, attributeFilter: ['class'] });
+
+  // DeviceOrientation — request permission on iOS 13+
+  function startGyro() {
+    window.addEventListener('deviceorientation', function(e) {
+      if (splash.classList.contains('hidden')) return;
+      const gamma = e.gamma || 0; // left-right −90..90
+      const beta  = e.beta  || 0; // front-back −180..180
+      tgtX = Math.max(-MAX, Math.min(MAX, (gamma / 30) * MAX));
+      tgtY = Math.max(-MAX, Math.min(MAX, ((beta - 45) / 30) * MAX));
+    }, { passive: true });
   }
 
-  // Device orientation (mobile tilt)
-  let gyroActive = false;
-  window.addEventListener('deviceorientation', function(e) {
-    if (splash.classList.contains('hidden')) return;
-    gyroActive = true;
-    const beta  = e.beta  || 0; // front-back tilt, -180 to 180
-    const gamma = e.gamma || 0; // left-right tilt, -90 to 90
-    const x = (gamma / 45) * MAX;
-    const y = ((beta - 45) / 45) * MAX; // 45° is natural hold angle
-    applyShift(x, y);
-  }, { passive: true });
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function') {
+    // iOS 13+ needs user gesture — attach to the ENTRAR button
+    const btn = document.querySelector('.sp-enter-btn');
+    if (btn) {
+      btn.addEventListener('click', () => {
+        DeviceOrientationEvent.requestPermission().then(s => { if (s === 'granted') startGyro(); }).catch(()=>{});
+      }, { once: true });
+    }
+  } else {
+    startGyro();
+  }
 
   // Mouse fallback for desktop
   document.addEventListener('mousemove', function(e) {
-    if (gyroActive) return;
     if (splash.classList.contains('hidden')) return;
-    const cx = window.innerWidth / 2;
-    const cy = window.innerHeight / 2;
-    const x = ((e.clientX - cx) / cx) * MAX;
-    const y = ((e.clientY - cy) / cy) * MAX;
-    applyShift(x, y);
+    const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+    tgtX = ((e.clientX - cx) / cx) * MAX;
+    tgtY = ((e.clientY - cy) / cy) * MAX;
   }, { passive: true });
 })();
 atualizarMesLabels();
