@@ -30,10 +30,16 @@ body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans
 
 /* NAV */
 .nav { display: flex; background: linear-gradient(180deg, #0d1b3e, #070F1F); border: 1px solid rgba(201,168,76,0.35); border-radius: 50px; position: fixed; bottom: 18px; left: 12px; right: 12px; z-index: 9000; align-items: center; height: 64px; padding: 0 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(201,168,76,0.08); padding-bottom: env(safe-area-inset-bottom, 0px); }
-.nav-btn { flex: 1; height: 100%; border: none; background: transparent; color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: color 0.2s; }
+.nav-btn { flex: 1; height: 100%; border: none; background: transparent; color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: color 0.2s; }
 .nav-btn.active { color: #C9A84C; }
-.nav-center-btn { width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(145deg, #F5D87E, #C9A84C); border: none; font-size: 28px; font-weight: 900; color: #070F1F; cursor: pointer; box-shadow: 0 0 24px rgba(201,168,76,0.65), 0 4px 16px rgba(0,0,0,0.6), 0 -2px 8px rgba(255,220,100,0.3); position: relative; top: -16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; display: flex; align-items: center; justify-content: center; transition: transform 0.55s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.4s ease, background 0.4s ease; line-height: 1; }
-.nav-center-btn:active, .nav-center-btn.form-active { background: linear-gradient(145deg, #ff8a3d, #FF6B00); box-shadow: 0 0 24px rgba(255,107,0,0.65), 0 4px 16px rgba(0,0,0,0.6); transform: scale(0.88); }
+.nav-icon { font-size: 20px; line-height: 1; display: block; }
+.nav-center-btn { width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(145deg, #F5D87E, #C9A84C); border: 2.5px solid transparent; font-size: 28px; font-weight: 900; color: #070F1F; cursor: pointer; box-shadow: 0 0 24px rgba(201,168,76,0.65), 0 4px 16px rgba(0,0,0,0.6), 0 -2px 8px rgba(255,220,100,0.3); position: relative; top: -16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; display: flex; align-items: center; justify-content: center; transition: transform 0.55s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.5s ease, background 0.5s ease, color 0.4s ease, border-color 0.4s ease; line-height: 1; animation: plusGlow 2.2s ease-in-out infinite; }
+@keyframes plusGlow {
+  0%, 100% { box-shadow: 0 0 18px rgba(201,168,76,0.6), 0 4px 16px rgba(0,0,0,0.6), 0 0 0px rgba(255,220,100,0); }
+  50% { box-shadow: 0 0 38px rgba(201,168,76,1), 0 4px 16px rgba(0,0,0,0.6), 0 0 60px rgba(255,220,100,0.55); }
+}
+.nav-center-btn.form-active { background: #0d1b3e; border-color: #C9A84C; color: #C9A84C; box-shadow: 0 0 32px rgba(201,168,76,0.8), 0 4px 16px rgba(0,0,0,0.6); animation: none; transform: scale(0.92); }
+.nav-center-btn:active:not(.form-active) { transform: scale(0.88); }
 
 /* SCREENS */
 .screen { display: none; }
@@ -135,6 +141,47 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .rank-pill { display: inline-block; margin-top: 14px; background: rgba(255,107,0,0.15); border: 1px solid rgba(255,107,0,0.4); border-radius: 100px; padding: 5px 16px; font-size: 12px; color: #ffaa55; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
 
 .rank-main { max-width: 1200px; margin: 0 auto; padding: 28px 40px 90px; }
+
+/* ══ LÍDER DO DIA BANNER ══ */
+.lider-banner {
+  margin: 0 12px 4px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #0d1b3e 0%, #1a2f5e 50%, #0d1b3e 100%);
+  border: 1.5px solid rgba(201,168,76,0.5);
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 32px rgba(201,168,76,0.18), 0 0 0 0 rgba(201,168,76,0.3);
+  animation: liderPulse 2.8s ease-in-out infinite;
+}
+@keyframes liderPulse {
+  0%,100% { box-shadow: 0 4px 32px rgba(201,168,76,0.18), 0 0 0 0 rgba(201,168,76,0); border-color: rgba(201,168,76,0.5); }
+  50%      { box-shadow: 0 4px 48px rgba(201,168,76,0.35), 0 0 28px 4px rgba(201,168,76,0.12); border-color: rgba(201,168,76,0.9); }
+}
+.lider-banner::before {
+  content:'';position:absolute;inset:0;
+  background: repeating-linear-gradient(105deg,transparent,transparent 28px,rgba(201,168,76,0.03) 28px,rgba(201,168,76,0.03) 30px);
+  pointer-events:none;
+}
+.lider-shimmer {
+  position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,220,100,0.08),transparent);
+  animation:liderShimmer 3s ease-in-out infinite;
+}
+@keyframes liderShimmer { 0%{left:-60%} 60%,100%{left:130%} }
+.lider-inner { position:relative;z-index:2;display:flex;align-items:center;gap:14px; }
+.lider-crown { font-size:32px; animation: crownBounce 2s ease-in-out infinite; flex-shrink:0; filter:drop-shadow(0 0 10px rgba(255,215,0,0.7)); }
+@keyframes crownBounce { 0%,100%{transform:translateY(0) rotate(-5deg)} 50%{transform:translateY(-5px) rotate(5deg)} }
+.lider-info { flex:1; min-width:0; }
+.lider-tag { font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:rgba(201,168,76,0.7);margin-bottom:2px; }
+.lider-nome { font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:#fff;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; text-shadow: 0 0 20px rgba(201,168,76,0.4); }
+.lider-sub { font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);letter-spacing:1px;margin-top:2px; }
+.lider-score { text-align:right;flex-shrink:0; }
+.lider-score-num { font-family:'Bebas Neue',sans-serif;font-size:36px;color:#C9A84C;line-height:1;text-shadow:0 0 16px rgba(201,168,76,0.6); }
+.lider-score-lbl { font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(201,168,76,0.6); }
+.lider-dots { display:flex;gap:5px;justify-content:center;margin-top:12px;position:relative;z-index:2; }
+.lider-dot { width:6px;height:6px;border-radius:50%;background:rgba(201,168,76,0.25);transition:all 0.3s; }
+.lider-dot.active { background:#C9A84C;box-shadow:0 0 8px rgba(201,168,76,0.8);width:18px;border-radius:3px; }
 
 .sec-divider { display: flex; align-items: center; gap: 12px; margin: 36px 0 18px; padding: 13px 18px; background: linear-gradient(135deg, rgba(255,107,0,0.18), rgba(255,107,0,0.05)); border: 1px solid rgba(255,107,0,0.35); border-left: 4px solid var(--orange); border-radius: 0 10px 10px 0; }
 .sec-divider span:first-child { font-size: 18px; }
@@ -261,8 +308,18 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .d-badge { display: inline-block; background: rgba(255,107,0,0.15); border: 1px solid rgba(255,107,0,0.3); border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600; color: var(--orange); margin-top: 5px; }
 .d-total { background: linear-gradient(135deg,rgba(255,107,0,0.18),rgba(255,107,0,0.04)); border: 1px solid rgba(255,107,0,0.3); border-radius: 14px; padding: 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 .d-total-val { font-family: 'Bebas Neue', sans-serif; font-size: 54px; color: var(--orange); line-height: 1; }
-.d-total-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
-.d-total-desc { font-size: 12px; color: var(--muted); margin-top: 4px; }
+/* ══ ODOMETER COUNTER ══ */
+.odo-val { display:inline-block; transition: none; }
+.odo-bump { animation: odoBump 0.45s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes odoBump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); color: #FFD700; }
+  100% { transform: scale(1); }
+}
+.odo-count { display:inline-block; }
+.odo-digit-wrap { display:inline-block; overflow:hidden; height:1em; vertical-align:bottom; }
+.odo-digit-inner { display:flex; flex-direction:column; transition: transform 0.5s cubic-bezier(0.22,1,0.36,1); }
+.meta-pct { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--orange); transition: color 0.3s; }
 .d-slabel { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--orange); margin-bottom: 10px; margin-top: 20px; }
 .d-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 20px; }
 .d-card-title { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #fff; margin-bottom: 14px; }
@@ -364,10 +421,14 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 @keyframes confettiFall { 0%{transform:translateY(-10px) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
 @keyframes slotResultIn { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
 /* ══ SPLASH ══ */
-.splash{position:fixed;inset:0;z-index:9999;overflow:hidden;transition:opacity 0.65s ease;background:#040608 url('images/splash-bg.jpg') center center/cover no-repeat;}
-@media(min-width:600px){.splash{background-size:contain;background-color:#040608;}}
+.splash{position:fixed;inset:0;z-index:9999;overflow:hidden;transition:opacity 0.65s ease;background:#040608;}
+@media(min-width:600px){.splash{background-color:#040608;}}
 .splash.out{opacity:0;pointer-events:none;}
 .splash.hidden{display:none;}
+/* Canvas splash overlay */
+#splashCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;}
+/* Vignette */
+.splash::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 30%,rgba(2,4,8,0.85) 100%);pointer-events:none;z-index:2;}
 /* Gold confetti particles — bottom to top */
 .sp-particles{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1;}
 .sp-particle{position:absolute;opacity:0;animation:spFloat linear infinite;}
@@ -797,7 +858,6 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 .swipe-btn-wrap.done .swipe-thumb { background: #22C55E; box-shadow: 0 2px 12px rgba(34,197,94,0.5); }
 .swipe-btn-wrap.done { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.4); }
 .swipe-btn-wrap.done .swipe-label { color: #22C55E; opacity: 1 !important; }
-/* On desktop: show normal button */
 
 
 @keyframes slotLights { 0%{background-position:0 0} 100%{background-position:200px 0} }
@@ -857,7 +917,6 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 }
 .swipe-btn-wrap.done .swipe-thumb { background:#22C55E; box-shadow:0 2px 12px rgba(34,197,94,0.5); }
 .swipe-btn-wrap.done { background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.4); }
-/* On desktop: hide swipe, show normal button */
 
 </style>
 </head>
@@ -865,17 +924,30 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 
 <!-- SPLASH -->
 <div class="splash" id="splash">
+  <!-- Animated canvas background -->
+  <canvas id="splashCanvas"></canvas>
+
   <!-- Dev credit -->
   <div class="sp-dev-credit">APP DEVELOPED BY DÁRIO SANTOS</div>
 
   <!-- Confetti particles -->
   <div class="sp-particles" id="spParticles"></div>
 
+  <!-- Center logo overlay -->
+  <div style="position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;pointer-events:none">
+    <div id="splashLogo" style="text-align:center;opacity:0;transform:scale(0.6);transition:opacity 0.8s ease,transform 0.8s cubic-bezier(0.34,1.56,0.64,1)">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(80px,22vw,140px);color:#C9A84C;line-height:0.85;letter-spacing:-2px;text-shadow:0 0 60px rgba(201,168,76,0.9),0 0 120px rgba(201,168,76,0.4)">SL</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(11px,3vw,16px);font-weight:800;letter-spacing:8px;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-top:4px">SUPER LIGA</div>
+      <div style="width:60px;height:2px;background:linear-gradient(90deg,transparent,#C9A84C,transparent);margin:10px auto 0"></div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(9px,2.5vw,12px);font-weight:700;letter-spacing:5px;color:rgba(201,168,76,0.6);margin-top:6px">VASCO DA GAMA · 2026</div>
+    </div>
+  </div>
+
   <!-- Overlay gradient at the bottom for legibility -->
-  <div style="position:absolute;bottom:0;left:0;right:0;height:45%;background:linear-gradient(to top,rgba(3,5,10,0.92) 0%,rgba(3,5,10,0.6) 50%,transparent 100%);pointer-events:none;z-index:1"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:45%;background:linear-gradient(to top,rgba(3,5,10,0.95) 0%,rgba(3,5,10,0.6) 50%,transparent 100%);pointer-events:none;z-index:4"></div>
 
   <!-- Progress + Enter (bottom overlay) -->
-  <div class="sp-inner">
+  <div class="sp-inner" style="z-index:5">
     <div class="sp-bottom">
       <div class="sp-status-txt" id="splashStatusText">A PREPARAR A COMPETIÇÃO...</div>
       <div class="sp-bar-track">
@@ -910,7 +982,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 </div>
 
 <!-- FORM -->
-<div class="screen" id="screen-form" style="position:fixed;bottom:0;left:0;right:0;z-index:450;border-radius:0;max-height:100dvh;overflow-y:auto;transform:translateY(110%);transition:transform 0.45s cubic-bezier(0.34,1.56,0.64,1);display:block!important;box-shadow:0 -8px 48px rgba(0,0,0,0.8);background:var(--dark)">
+<div class="screen" id="screen-form" style="position:fixed;bottom:0;left:0;right:0;z-index:450;border-radius:0;max-height:100dvh;overflow-y:auto;transform:translateY(110%);transition:transform 0.65s cubic-bezier(0.25,0.85,0.3,1);display:block!important;box-shadow:0 -8px 48px rgba(0,0,0,0.8);background:var(--dark)">
   <div style="display:flex;justify-content:center;padding:10px 0 2px"><div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.2)"></div></div>
   <div class="screen-banner">
     <div class="screen-banner-inner">
@@ -1005,7 +1077,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
-      <button class="submit-btn" id="submitBtn" onclick="handleSubmitBtn(this)" style="display:block!important">REGISTAR O MEU DIA</button>
+      <button class="submit-btn" id="submitBtn" onclick="handleSubmitBtn(this)" style="display:block!important;width:100%">REGISTAR O MEU DIA</button>
       <div style="text-align:center;padding:10px 0 4px;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif">APP developed by Dário Santos</div>
     </div>
     <div class="success" id="successMsg">
@@ -1042,6 +1114,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
     </div>
 
   <div style="text-align:center;padding:4px 16px;font-size:11px;color:var(--muted);letter-spacing:1px" id="rankLastUpdate"></div>
+  <div id="liderBannerWrap"></div>
   <div class="rank-main" id="rankMain"></div>
 <div class="record-toast" id="recordToast"></div>
 </div>
@@ -1163,6 +1236,8 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
         <button onclick="carregarAdmin()" style="background:var(--orange);border:none;border-radius:10px;padding:10px 18px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer">Atualizar</button>
         <div id="adminSummary" style="font-size:12px;color:var(--muted)"></div>
         <button onclick="limparCacheAdmin()" style="background:var(--card);border:1px solid #7a2200;border-radius:10px;padding:10px 14px;color:#FF6644;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Cache</button>
+        <button onclick="limparChavesSlot()" style="background:#1a0000;border:1px solid #ef4444;border-radius:10px;padding:10px 14px;color:#ef4444;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Reset Slot</button>
+        <button onclick="limparRegistosHoje()" style="background:#1a0000;border:1px solid #ef4444;border-radius:10px;padding:10px 14px;color:#ef4444;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Reset Hoje</button>
         <button onclick="slotAbrir('TESTE','Medalha Teste')" style="background:var(--card);border:1px solid #C9A84C;border-radius:10px;padding:10px 14px;color:#C9A84C;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🎰 Testar Slot</button>
         <button onclick="bloquearAdmin()" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-left:auto">🔒 Bloquear</button>
       </div>
@@ -1852,6 +1927,22 @@ function mostrarProgressoRegisto(nome, payload) {
   const conquistadas = medalhas.filter(m => m.earned);
   const porConquistar = medalhas.filter(m => !m.earned);
 
+  // Detetar medalhas NOVAS (não atribuídas ainda)
+  const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
+  const storeKey = 'slotDado_' + nome + '_' + mesKey;
+  let jaAtribuidas = [];
+  try { jaAtribuidas = JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch(e) {}
+  const medalhasNovas = conquistadas.filter(m => m.name !== 'Super Online' && m.name !== 'Spray Explosion' && !jaAtribuidas.includes(m.name));
+  // Medalhas diárias
+  if ((payload.onlines||0) >= 8) {
+    const k = 'slotDiario_' + nome + '_' + payload.data + '_SuperOnline';
+    if (!localStorage.getItem(k)) medalhasNovas.push({ icon:'🌟', name:'Super Online' });
+  }
+  if ((payload.sprays||0) >= 10) {
+    const k = 'slotDiario_' + nome + '_' + payload.data + '_SprayExplosion';
+    if (!localStorage.getItem(k)) medalhasNovas.push({ icon:'💥', name:'Spray Explosion' });
+  }
+
   if (conquistadas.length) {
     metasHtml += '<div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00CC66;margin-bottom:8px">✅ Conquistadas</div>';
     metasHtml += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">';
@@ -1865,6 +1956,17 @@ function mostrarProgressoRegisto(nome, payload) {
       </div>`;
     });
     metasHtml += '</div>';
+  }
+
+  // Botão para abrir slot se há medalhas novas
+  if (medalhasNovas.length > 0) {
+    const primeiraNovaStr = JSON.stringify(medalhasNovas.map(m=>m.name));
+    metasHtml += `<div style="margin:16px 0 8px;background:linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.05));border:2px solid #C9A84C;border-radius:16px;padding:20px;text-align:center">`;
+    metasHtml += `<div style="font-size:32px;margin-bottom:8px">🏅</div>`;
+    metasHtml += `<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#C9A84C;margin-bottom:4px">MEDALHA CONQUISTADA!</div>`;
+    metasHtml += `<div style="font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:16px">${medalhasNovas.map(m=>m.icon+' '+m.name).join(' · ')}</div>`;
+    metasHtml += `<button onclick="abrirSlotMedalha('${nome}','${medalhasNovas[0].name}')" style="width:100%;background:linear-gradient(135deg,#C9A84C,#F5D87E,#C9A84C);border:none;border-radius:14px;padding:16px;color:#07101f;font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;cursor:pointer;box-shadow:0 4px 24px rgba(201,168,76,0.5);touch-action:manipulation">🎰 GIRAR AGORA</button>`;
+    metasHtml += `</div>`;
   }
 
   if (porConquistar.length) {
@@ -1935,6 +2037,143 @@ function mostrarProgressoRegisto(nome, payload) {
 let splashProg = 0, splashIv = null;
 function iniciarSplash() {
 
+  // ── CANVAS ANIMATED BACKGROUND ──
+  const canvas = document.getElementById('splashCanvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let W, H, raf;
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // ── Particles
+    const GOLD = '#C9A84C', GOLD2 = '#F0D070', WHITE = 'rgba(255,255,255,0.8)';
+    const particles = [];
+    for (let i = 0; i < 80; i++) {
+      particles.push({
+        x: Math.random(),
+        y: Math.random() * 1.2,
+        r: 0.5 + Math.random() * 2.2,
+        vx: (Math.random() - 0.5) * 0.0003,
+        vy: -(0.0002 + Math.random() * 0.0008),
+        alpha: 0.2 + Math.random() * 0.7,
+        color: [GOLD, GOLD2, WHITE, 'rgba(201,168,76,0.6)'][Math.floor(Math.random()*4)],
+        phase: Math.random() * Math.PI * 2,
+        twinkle: 0.5 + Math.random() * 3
+      });
+    }
+
+    // ── Spotlights
+    const lights = [
+      { x: 0.15, y: -0.05, angle: 0.55, spread: 0.18, color: 'rgba(201,168,76,0.06)' },
+      { x: 0.85, y: -0.05, angle: Math.PI - 0.55, spread: 0.18, color: 'rgba(201,168,76,0.06)' },
+      { x: 0.5,  y: -0.1, angle: Math.PI/2, spread: 0.1, color: 'rgba(255,220,100,0.05)' },
+    ];
+
+    // ── Field lines (subtle)
+    function drawField(t) {
+      const cx = W * 0.5, cy = H * 0.52;
+      const rX = W * 0.42, rY = H * 0.28;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(201,168,76,0.07)';
+      ctx.lineWidth = 1;
+      // Centre circle
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rX * 0.38, rY * 0.38, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      // Outer oval
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rX, rY, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      // Centre spot pulsing
+      const pulse = 0.5 + 0.5 * Math.sin(t * 0.002);
+      ctx.fillStyle = `rgba(201,168,76,${0.15 + pulse * 0.25})`;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 4 + pulse * 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawSpotlights(t) {
+      lights.forEach(l => {
+        const swing = Math.sin(t * 0.0007 + l.phase) * 0.06;
+        const ang = l.angle + swing;
+        const sx = l.x * W, sy = l.y * H;
+        const len = H * 1.3;
+        const tx1 = sx + Math.cos(ang - l.spread) * len;
+        const ty1 = sy + Math.sin(ang - l.spread) * len;
+        const tx2 = sx + Math.cos(ang + l.spread) * len;
+        const ty2 = sy + Math.sin(ang + l.spread) * len;
+        const grad = ctx.createLinearGradient(sx, sy, sx + Math.cos(ang)*len*0.6, sy + Math.sin(ang)*len*0.6);
+        grad.addColorStop(0, l.color.replace(')', ',1)').replace('rgba','rgba') );
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(tx1, ty1);
+        ctx.lineTo(tx2, ty2);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+      });
+    }
+    // patch lights phase
+    lights.forEach((l,i) => l.phase = i * 1.3);
+
+    let t0 = null;
+    function frame(ts) {
+      if (!t0) t0 = ts;
+      const t = ts - t0;
+      ctx.clearRect(0, 0, W, H);
+
+      // Dark gradient bg
+      const bgGrad = ctx.createRadialGradient(W*0.5, H*0.45, 0, W*0.5, H*0.5, Math.max(W,H)*0.75);
+      bgGrad.addColorStop(0, '#0d1b3e');
+      bgGrad.addColorStop(0.5, '#060e1f');
+      bgGrad.addColorStop(1, '#02040a');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      drawSpotlights(t);
+      drawField(t);
+
+      // Particles
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.y < -0.05) { p.y = 1.1; p.x = Math.random(); }
+        if (p.x < 0) p.x = 1;
+        if (p.x > 1) p.x = 0;
+        const twinkle = 0.4 + 0.6 * Math.abs(Math.sin(t * 0.001 * p.twinkle + p.phase));
+        ctx.save();
+        ctx.globalAlpha = p.alpha * twinkle;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x * W, p.y * H, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+
+    // Cleanup when splash closes
+    window._stopSplashCanvas = () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', resize);
+    };
+  }
+
+  // Reveal logo
+  setTimeout(() => {
+    const logo = document.getElementById('splashLogo');
+    if (logo) { logo.style.opacity = '1'; logo.style.transform = 'scale(1)'; }
+  }, 200);
+
   const pc = document.getElementById('spParticles');
   if(pc){
     const colors = ['#C9A84C','#F0D070','#E8C97A','#D4AE50','#fff'];
@@ -1944,7 +2183,7 @@ function iniciarSplash() {
       const size = 2+Math.random()*5;
       const isRect = Math.random()>0.5;
       const color = colors[Math.floor(Math.random()*colors.length)];
-      p.style.cssText=`left:${Math.random()*100}%;bottom:${Math.random()*20}%;width:${size}px;height:${size}${isRect?'px;border-radius:1px;transform:rotate(45deg)':'px'};background:${color};animation-duration:${5+Math.random()*8}s;animation-delay:${Math.random()*6}s;opacity:0;`;
+      p.style.cssText=`left:${Math.random()*100}%;bottom:${Math.random()*20}%;width:${size}px;height:${size}${isRect?'px;border-radius:1px;transform:rotate(45deg)':'px'};background:${color};animation-duration:${5+Math.random()*8}s;animation-delay:${Math.random()*6}s;opacity:0;z-index:3;position:absolute;`;
       pc.appendChild(p);
     }
   }
@@ -1960,6 +2199,7 @@ function iniciarSplash() {
 }
 function fecharSplash(){
   clearInterval(splashIv);
+  if (typeof window._stopSplashCanvas === 'function') window._stopSplashCanvas();
   const bar=document.getElementById('splashBar');
   if(bar){bar.style.width='100%';}
   const pctEl=document.getElementById('splashPct');
@@ -3948,6 +4188,29 @@ function slotInit() {
 }
 
 // Abrir a slot machine
+function abrirSlotMedalha(nome, primeiraNovaStr) {
+  // Marcar as medalhas como atribuídas
+  let medalhasNovasNomes = [];
+  try { medalhasNovasNomes = JSON.parse(primeiraNovaStr.replace(/'/g,'"')); } catch(e) { medalhasNomasNomes = [primeiraNovaStr]; }
+  const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
+  const storeKey = 'slotDado_' + nome + '_' + mesKey;
+  let jaAtribuidas = [];
+  try { jaAtribuidas = JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch(e) {}
+  const hoje = new Date().toISOString().split('T')[0];
+  medalhasNovasNomes.forEach(function(mn) {
+    if (mn === 'Super Online') {
+      try { localStorage.setItem('slotDiario_'+nome+'_'+hoje+'_SuperOnline','1'); } catch(e) {}
+    } else if (mn === 'Spray Explosion') {
+      try { localStorage.setItem('slotDiario_'+nome+'_'+hoje+'_SprayExplosion','1'); } catch(e) {}
+    } else {
+      if (!jaAtribuidas.includes(mn)) jaAtribuidas.push(mn);
+    }
+  });
+  try { localStorage.setItem(storeKey, JSON.stringify(jaAtribuidas)); } catch(e) {}
+  // Abrir slot
+  slotAbrir(nome, medalhasNovasNomes[0] || 'Medalha');
+}
+
 function slotAbrir(nome, medalha) {
   _slotSpinning = false;
   _slotPremio = null;
@@ -4073,55 +4336,61 @@ function slotFechar() {
 // DETEÇÃO DE MEDALHAS — ao registar o dia
 // ══════════════════════════════════════════════════
 function slotVerificarMedalhas(nome, payload) {
-  dbgLog('verificarMedalhas: '+nome+' onlines='+(payload.onlines||0)+' sprays='+(payload.sprays||0));
-
-  const mesKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
+  const mesKey   = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
   const storeKey = 'slotDado_' + nome + '_' + mesKey;
   let jaAtribuidas = [];
   try { jaAtribuidas = JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch(e) {}
-  dbgLog('jaAtrib: '+JSON.stringify(jaAtribuidas));
 
-  // Dados do mês
+  // Dados acumulados do mês: historico_local + payload atual
   const mapa = {};
-  try { JSON.parse(localStorage.getItem('historico_local')||'[]').filter(d=>d&&d.nome===nome).forEach(d=>{mapa[d.data]=d;}); } catch(e){}
+  try {
+    JSON.parse(localStorage.getItem('historico_local') || '[]')
+      .filter(d => d && d.nome === nome)
+      .forEach(d => { mapa[d.data] = d; });
+  } catch(e) {}
+  if (Array.isArray(dashAllDados) && dashAllDados.length) {
+    dashAllDados.filter(d => d && d.nome === nome).forEach(d => { mapa[d.data] = d; });
+  }
   mapa[payload.data] = payload;
-  const mes=new Date().getMonth(), ano=new Date().getFullYear();
-  const doMes=Object.values(mapa).filter(d=>{try{const dt=new Date(d.data+'T12:00:00');return dt.getMonth()===mes&&dt.getFullYear()===ano;}catch(e){return false;}});
-  dbgLog('doMes: '+doMes.length+' registos');
 
+  const mes = new Date().getMonth(), ano = new Date().getFullYear();
+  const doMes = Object.values(mapa).filter(d => {
+    try { const dt = new Date(d.data + 'T12:00:00'); return dt.getMonth()===mes && dt.getFullYear()===ano; } catch(e){ return false; }
+  });
+
+  // Fila de slots a abrir
   const fila = [];
 
-  // Medalhas mensais
-  const todas = calcularMedalhas(doMes.length ? doMes : [payload]).filter(m=>m.name!=='Super Online'&&m.name!=='Spray Explosion');
-  dbgLog('medalhas earned: '+todas.filter(m=>m.earned).map(m=>m.name).join(', '));
-  const novas = todas.filter(m=>m.earned&&!jaAtribuidas.includes(m.name));
-  dbgLog('novas: '+novas.map(m=>m.name).join(', '));
-  if (novas.length) {
-    try{localStorage.setItem(storeKey,JSON.stringify([...jaAtribuidas,...novas.map(m=>m.name)]));}catch(e){}
-    novas.forEach(m=>fila.push(m.name));
+  // 1) Medalhas mensais
+  const medalhasMes = calcularMedalhas(doMes.length ? doMes : [payload])
+    .filter(m => m.name !== 'Super Online' && m.name !== 'Spray Explosion');
+  const novas = medalhasMes.filter(m => m.earned && !jaAtribuidas.includes(m.name));
+  if (novas.length > 0) {
+    try { localStorage.setItem(storeKey, JSON.stringify([...jaAtribuidas, ...novas.map(m=>m.name)])); } catch(e) {}
+    novas.forEach(m => fila.push({ name: m.name }));
   }
 
-  // Medalhas diárias
-  if ((payload.onlines||0) >= 8) {
-    const k='slotDiario_'+nome+'_'+payload.data+'_SuperOnline';
-    const exists=!!localStorage.getItem(k);
-    dbgLog('SuperOnline: onlines='+(payload.onlines||0)+' key exists='+exists);
-    if (!exists) { try{localStorage.setItem(k,'1');}catch(e){} fila.push('Super Online'); }
+  // 2) Medalhas diárias
+  if ((payload.onlines || 0) >= 8) {
+    const k = 'slotDiario_' + nome + '_' + payload.data + '_SuperOnline';
+    if (!localStorage.getItem(k)) {
+      try { localStorage.setItem(k, '1'); } catch(e) {}
+      fila.push({ name: 'Super Online' });
+    }
   }
-  if ((payload.sprays||0) >= 10) {
-    const k='slotDiario_'+nome+'_'+payload.data+'_SprayExplosion';
-    if (!localStorage.getItem(k)) { try{localStorage.setItem(k,'1');}catch(e){} fila.push('Spray Explosion'); }
+  if ((payload.sprays || 0) >= 10) {
+    const k = 'slotDiario_' + nome + '_' + payload.data + '_SprayExplosion';
+    if (!localStorage.getItem(k)) {
+      try { localStorage.setItem(k, '1'); } catch(e) {}
+      fila.push({ name: 'Spray Explosion' });
+    }
   }
 
-  dbgLog('fila: ['+fila.join(', ')+']');
-  if (fila.length === 0) { dbgLog('fila vazia — sem slot'); return; }
+  if (fila.length === 0) return;
 
-  dbgLog('A abrir slot em 300ms...');
-  fila.forEach((medalha, idx) => {
-    setTimeout(() => {
-      dbgLog('>>> slotAbrir('+nome+', '+medalha+')');
-      slotAbrir(nome, medalha);
-    }, 300 + idx * 3000);
+  // Abrir slots em sequência (a mesma lógica do slot-test.html que funciona)
+  fila.forEach((m, idx) => {
+    setTimeout(() => slotAbrir(nome, m.name), idx * 100);
   });
 }
 
@@ -4445,7 +4714,7 @@ function renderDesafiosMedalhas() {
 </div>
 
 <!-- SLOT MACHINE -->
-<div id="slotOverlay" style="display:none;position:fixed;inset:0;z-index:2147483647;background:rgba(4,10,22,0.97);flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:hidden;text-align:center">
+<div id="slotOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(4,10,22,0.97);flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:hidden;text-align:center">
 
   <!-- Confetti layer -->
   <div id="slotConfettiWrap" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0"></div>
@@ -4510,55 +4779,243 @@ function renderDesafiosMedalhas() {
 </div>
 
 
-<div id="dbgBox" style="position:fixed;bottom:80px;left:8px;right:8px;z-index:2147483646;background:rgba(0,0,0,0.9);color:#0f0;font-family:monospace;font-size:10px;padding:6px;border-radius:8px;max-height:30vh;overflow-y:auto;display:none;pointer-events:none;border:1px solid #333"></div>
+
+
 <script>
-var _dbgVisible = false;
-var _dbgTaps = 0;
-document.addEventListener('touchstart', function() {
-  _dbgTaps++;
-  setTimeout(function(){_dbgTaps=0;}, 600);
-  if (_dbgTaps >= 5) {
-    _dbgVisible = !_dbgVisible;
-    document.getElementById('dbgBox').style.display = _dbgVisible ? 'block' : 'none';
-    _dbgTaps = 0;
+function limparChavesSlot(){var k=[];for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(key&&(key.startsWith('slotDado_')||key.startsWith('slotDiario_')))k.push(key);}k.forEach(function(key){localStorage.removeItem(key);});showToast('✅ '+k.length+' chaves slot removidas');}
+function limparRegistosHoje(){var hoje=new Date().toISOString().split('T')[0];var k=[];for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(key&&key.startsWith('registo_')&&key.includes(hoje))k.push(key);}k.forEach(function(key){localStorage.removeItem(key);});try{var h=JSON.parse(localStorage.getItem('historico_local')||'[]');localStorage.setItem('historico_local',JSON.stringify(h.filter(function(d){return d.data!==hoje;})));}catch(e){}showToast('✅ '+k.length+' registos removidos');}
+</script>
+
+<script>
+// ══ BANNER LÍDER DO DIA ══
+(function() {
+  let _liderRotIdx = 0;
+  let _liderRotTimer = null;
+
+  function renderLiderBanner(dados) {
+    const wrap = document.getElementById('liderBannerWrap');
+    if (!wrap) return;
+    if (!dados || !dados.length) { wrap.innerHTML = ''; return; }
+
+    // Hoje
+    const hoje = new Date().toISOString().split('T')[0];
+
+    // Líderes de hoje por categoria
+    const lideresHoje = [];
+    if (typeof categorias !== 'undefined') {
+      categorias.forEach(cat => {
+        const doHoje = dados.filter(d => (d.data||'').slice(0,10) === hoje && (d[cat.key]||0) > 0);
+        if (!doHoje.length) return;
+        const top = doHoje.sort((a,b) => (b[cat.key]||0)-(a[cat.key]||0))[0];
+        lideresHoje.push({ nome: top.nome, val: top[cat.key], cat: cat.emoji + ' ' + cat.label, catKey: cat.key });
+      });
+    }
+
+    // Líder geral do mês (onlines)
+    const _mesNow = new Date().getMonth(), _anoNow = new Date().getFullYear();
+    const doMes = dados.filter(d => { try { const dt=new Date(d.data); return dt.getMonth()===_mesNow&&dt.getFullYear()===_anoNow; } catch(e){return false;} });
+    const rankMes = {};
+    doMes.forEach(d => { rankMes[d.nome] = (rankMes[d.nome]||0) + (d.onlines||0); });
+    const topMes = Object.entries(rankMes).sort((a,b)=>b[1]-a[1])[0];
+
+    // Build slides
+    const slides = [];
+    if (topMes) {
+      slides.push({
+        tag: '👑 LÍDER DO MÊS · ONLINES',
+        nome: topMes[0],
+        sub: nomeParaEquipaLabel ? (nomeParaEquipaLabel[topMes[0]] || 'Loja') : 'Loja',
+        scoreNum: topMes[1],
+        scoreLbl: 'onlines'
+      });
+    }
+    lideresHoje.slice(0, 4).forEach(l => {
+      slides.push({
+        tag: '🔥 LÍDER DE HOJE · ' + l.cat.toUpperCase(),
+        nome: l.nome,
+        sub: nomeParaEquipaLabel ? (nomeParaEquipaLabel[l.nome] || 'Loja') : 'Loja',
+        scoreNum: l.val,
+        scoreLbl: l.cat
+      });
+    });
+
+    if (!slides.length) { wrap.innerHTML = ''; return; }
+
+    function buildSlide(s) {
+      const foto = typeof getFoto === 'function' ? getFoto(s.nome) : null;
+      const ini = s.nome.split(' ').map(x=>x[0]).slice(0,2).join('');
+      const av = foto
+        ? `<img src="${foto}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #C9A84C;flex-shrink:0;">`
+        : `<div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#C9A84C,#8a6a1a);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#040608;flex-shrink:0;border:2px solid #C9A84C;">${ini}</div>`;
+      return `
+        <div class="lider-shimmer"></div>
+        <div class="lider-inner">
+          <div class="lider-crown">👑</div>
+          ${av}
+          <div class="lider-info">
+            <div class="lider-tag">${s.tag}</div>
+            <div class="lider-nome">${s.nome}</div>
+            <div class="lider-sub">${s.sub}</div>
+          </div>
+          <div class="lider-score">
+            <div class="lider-score-num">${s.scoreNum}</div>
+            <div class="lider-score-lbl">${s.scoreLbl}</div>
+          </div>
+        </div>
+        ${slides.length > 1 ? `<div class="lider-dots">${slides.map((_,i)=>`<div class="lider-dot${i===_liderRotIdx?' active':''}"></div>`).join('')}</div>` : ''}
+      `;
+    }
+
+    function renderSlide() {
+      wrap.innerHTML = `<div class="lider-banner">${buildSlide(slides[_liderRotIdx])}</div>`;
+    }
+
+    renderSlide();
+
+    if (_liderRotTimer) clearInterval(_liderRotTimer);
+    if (slides.length > 1) {
+      _liderRotTimer = setInterval(() => {
+        _liderRotIdx = (_liderRotIdx + 1) % slides.length;
+        const banner = wrap.querySelector('.lider-banner');
+        if (banner) {
+          banner.style.opacity = '0';
+          banner.style.transform = 'translateY(6px)';
+          banner.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+          setTimeout(() => { renderSlide(); }, 320);
+        }
+      }, 4500);
+    }
   }
-}, {passive:true});
 
-function dbgLog(msg) {
-  var box = document.getElementById('dbgBox');
-  if (!box) return;
-  var t = new Date().toLocaleTimeString('pt-PT');
-  var line = document.createElement('div');
-  line.style.borderBottom = '1px solid #111';
-  line.style.padding = '1px 0';
-  var isImportant = msg.indexOf('slotAbrir') !== -1 || msg.indexOf('fila:') !== -1 || msg.indexOf('novas:') !== -1;
-  line.style.color = isImportant ? '#ff0' : '#0f0';
-  line.textContent = '['+t+'] '+msg;
-  box.insertBefore(line, box.firstChild);
-  while(box.children.length > 50) box.removeChild(box.lastChild);
-  // Auto-show on important events
-  if (isImportant) { box.style.display = 'block'; _dbgVisible = true; }
-}
-
-// Override submeter start to log
-window.addEventListener('load', function() {
-  var origSubmeter = window.submeter;
-  if (origSubmeter) {
-    window.submeter = function() {
-      dbgLog('submeter() chamado nomeSel='+window.nomeSel);
-      return origSubmeter.apply(this, arguments);
+  // Hook into renderRanking
+  const _origRenderRanking = window.renderRanking;
+  if (typeof _origRenderRanking === 'function') {
+    window.renderRanking = function(dados) {
+      _origRenderRanking(dados);
+      try { renderLiderBanner(dados); } catch(e) {}
     };
   }
-  var origAbrir = window.slotAbrir;
-  if (origAbrir) {
-    window.slotAbrir = function(nome, medalha) {
-      dbgLog('slotAbrir('+nome+','+medalha+') overlay='+document.getElementById('slotOverlay').style.display);
-      origAbrir.apply(this, arguments);
-      setTimeout(function(){
-        dbgLog('overlay após 50ms: '+document.getElementById('slotOverlay').style.display);
-      }, 50);
+  window.renderLiderBanner = renderLiderBanner;
+})();
+
+// ══ ODÓMETRO DE MÉTRICAS ══
+(function() {
+  // Animate a number counting up from 0 to target in an element
+  function animateOdometer(el, target, duration) {
+    if (!el || isNaN(target)) return;
+    const start = 0;
+    const startTime = performance.now();
+    const str = String(target);
+    const digits = str.length;
+
+    // Build digit columns
+    function buildDigits(val) {
+      const s = String(val).padStart(digits, '0');
+      return s.split('').map((d, i) => {
+        const num = parseInt(d);
+        // Build a column from 0-9 and position it
+        let col = '';
+        for (let n = 0; n <= 9; n++) col += `<span style="display:block;height:1em;line-height:1">${n}</span>`;
+        return `<span class="odo-digit-wrap"><span class="odo-digit-inner" id="odig_${el.id||Math.random().toString(36).slice(2)}_${i}" style="transform:translateY(-${num}em)">${col}</span></span>`;
+      }).join('');
+    }
+
+    el.innerHTML = buildDigits(0);
+    el.classList.add('odo-val');
+
+    function update(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(start + (target - start) * eased);
+      const s = String(current).padStart(digits, '0');
+      // Update each digit column
+      el.querySelectorAll('.odo-digit-inner').forEach((inner, i) => {
+        const num = parseInt(s[i]);
+        inner.style.transform = `translateY(-${num}em)`;
+      });
+      if (progress < 1) requestAnimationFrame(update);
+      else {
+        // Final: show clean number without padding zeros
+        el.innerHTML = `<span class="odo-val">${target}</span>`;
+        el.classList.add('odo-bump');
+        el.addEventListener('animationend', () => el.classList.remove('odo-bump'), {once:true});
+      }
+    }
+    requestAnimationFrame(update);
+  }
+
+  // Hook into mostrarDash to animate metrics after render
+  const _origMostrarDash = window.mostrarDash;
+  if (typeof _origMostrarDash === 'function') {
+    window.mostrarDash = function(nome) {
+      _origMostrarDash(nome);
+      // After a short delay (DOM settled), animate the total accumulator
+      setTimeout(() => {
+        // Animate d-total-val
+        const totalEl = document.querySelector('.d-total-val');
+        if (totalEl) {
+          const val = parseInt(totalEl.textContent.trim());
+          if (!isNaN(val) && val > 0) {
+            totalEl.id = totalEl.id || 'odo_total';
+            animateOdometer(totalEl, val, 1200);
+          }
+        }
+        // Animate streak card big number (registos este mês)
+        const streakEl = document.querySelector('.streak-card [style*="Bebas Neue"][style*="38px"]');
+        if (streakEl) {
+          const val = parseInt(streakEl.textContent.trim());
+          if (!isNaN(val) && val > 0) {
+            streakEl.id = streakEl.id || 'odo_streak';
+            animateOdometer(streakEl, val, 800);
+          }
+        }
+        // Animate all meta-pct values
+        document.querySelectorAll('.meta-pct').forEach((el, i) => {
+          const txt = el.textContent.trim().replace('%','');
+          const val = parseInt(txt);
+          if (!isNaN(val) && val > 0) {
+            const isDone = el.classList.contains('done');
+            el.id = el.id || 'odo_meta_' + i;
+            const orig = el.className;
+            animateCountUp(el, val, 900 + i*80, isDone ? '#00CC66' : 'var(--orange)', '%');
+          }
+        });
+        // Animate breakdown bar values
+        document.querySelectorAll('.d-bval').forEach((el, i) => {
+          const val = parseInt(el.textContent.trim());
+          if (!isNaN(val) && val > 0) {
+            el.id = el.id || 'odo_bval_' + i;
+            animateOdometer(el, val, 700 + i*60);
+          }
+        });
+      }, 80);
     };
   }
-  dbgLog('Pronto. Faz 5 toques rapidos para ver log.');
-});
+
+  // Simple count-up for percentage values (no digit columns, just number)
+  function animateCountUp(el, target, duration, color, suffix) {
+    suffix = suffix || '';
+    const startTime = performance.now();
+    function update(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(target * eased);
+      el.textContent = current + suffix;
+      if (color) el.style.color = color;
+      if (progress < 1) requestAnimationFrame(update);
+      else {
+        el.textContent = target + suffix;
+        el.classList.add('odo-bump');
+        el.addEventListener('animationend', () => el.classList.remove('odo-bump'), {once:true});
+      }
+    }
+    requestAnimationFrame(update);
+  }
+
+  window._animateOdometer = animateOdometer;
+  window._animateCountUp = animateCountUp;
+})();
 </script>
