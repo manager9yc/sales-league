@@ -142,6 +142,47 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 
 .rank-main { max-width: 1200px; margin: 0 auto; padding: 28px 40px 90px; }
 
+/* ══ LÍDER DO DIA BANNER ══ */
+.lider-banner {
+  margin: 0 12px 4px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #0d1b3e 0%, #1a2f5e 50%, #0d1b3e 100%);
+  border: 1.5px solid rgba(201,168,76,0.5);
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 32px rgba(201,168,76,0.18), 0 0 0 0 rgba(201,168,76,0.3);
+  animation: liderPulse 2.8s ease-in-out infinite;
+}
+@keyframes liderPulse {
+  0%,100% { box-shadow: 0 4px 32px rgba(201,168,76,0.18), 0 0 0 0 rgba(201,168,76,0); border-color: rgba(201,168,76,0.5); }
+  50%      { box-shadow: 0 4px 48px rgba(201,168,76,0.35), 0 0 28px 4px rgba(201,168,76,0.12); border-color: rgba(201,168,76,0.9); }
+}
+.lider-banner::before {
+  content:'';position:absolute;inset:0;
+  background: repeating-linear-gradient(105deg,transparent,transparent 28px,rgba(201,168,76,0.03) 28px,rgba(201,168,76,0.03) 30px);
+  pointer-events:none;
+}
+.lider-shimmer {
+  position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,220,100,0.08),transparent);
+  animation:liderShimmer 3s ease-in-out infinite;
+}
+@keyframes liderShimmer { 0%{left:-60%} 60%,100%{left:130%} }
+.lider-inner { position:relative;z-index:2;display:flex;align-items:center;gap:14px; }
+.lider-crown { font-size:32px; animation: crownBounce 2s ease-in-out infinite; flex-shrink:0; filter:drop-shadow(0 0 10px rgba(255,215,0,0.7)); }
+@keyframes crownBounce { 0%,100%{transform:translateY(0) rotate(-5deg)} 50%{transform:translateY(-5px) rotate(5deg)} }
+.lider-info { flex:1; min-width:0; }
+.lider-tag { font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:rgba(201,168,76,0.7);margin-bottom:2px; }
+.lider-nome { font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:#fff;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; text-shadow: 0 0 20px rgba(201,168,76,0.4); }
+.lider-sub { font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);letter-spacing:1px;margin-top:2px; }
+.lider-score { text-align:right;flex-shrink:0; }
+.lider-score-num { font-family:'Bebas Neue',sans-serif;font-size:36px;color:#C9A84C;line-height:1;text-shadow:0 0 16px rgba(201,168,76,0.6); }
+.lider-score-lbl { font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(201,168,76,0.6); }
+.lider-dots { display:flex;gap:5px;justify-content:center;margin-top:12px;position:relative;z-index:2; }
+.lider-dot { width:6px;height:6px;border-radius:50%;background:rgba(201,168,76,0.25);transition:all 0.3s; }
+.lider-dot.active { background:#C9A84C;box-shadow:0 0 8px rgba(201,168,76,0.8);width:18px;border-radius:3px; }
+
 .sec-divider { display: flex; align-items: center; gap: 12px; margin: 36px 0 18px; padding: 13px 18px; background: linear-gradient(135deg, rgba(255,107,0,0.18), rgba(255,107,0,0.05)); border: 1px solid rgba(255,107,0,0.35); border-left: 4px solid var(--orange); border-radius: 0 10px 10px 0; }
 .sec-divider span:first-child { font-size: 18px; }
 .sec-divider span:last-child { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; color: #ffffff; text-shadow: 0 1px 4px rgba(0,0,0,0.6); }
@@ -267,8 +308,18 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .d-badge { display: inline-block; background: rgba(255,107,0,0.15); border: 1px solid rgba(255,107,0,0.3); border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600; color: var(--orange); margin-top: 5px; }
 .d-total { background: linear-gradient(135deg,rgba(255,107,0,0.18),rgba(255,107,0,0.04)); border: 1px solid rgba(255,107,0,0.3); border-radius: 14px; padding: 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 .d-total-val { font-family: 'Bebas Neue', sans-serif; font-size: 54px; color: var(--orange); line-height: 1; }
-.d-total-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
-.d-total-desc { font-size: 12px; color: var(--muted); margin-top: 4px; }
+/* ══ ODOMETER COUNTER ══ */
+.odo-val { display:inline-block; transition: none; }
+.odo-bump { animation: odoBump 0.45s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes odoBump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); color: #FFD700; }
+  100% { transform: scale(1); }
+}
+.odo-count { display:inline-block; }
+.odo-digit-wrap { display:inline-block; overflow:hidden; height:1em; vertical-align:bottom; }
+.odo-digit-inner { display:flex; flex-direction:column; transition: transform 0.5s cubic-bezier(0.22,1,0.36,1); }
+.meta-pct { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--orange); transition: color 0.3s; }
 .d-slabel { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--orange); margin-bottom: 10px; margin-top: 20px; }
 .d-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 20px; }
 .d-card-title { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #fff; margin-bottom: 14px; }
@@ -1046,6 +1097,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
     </div>
 
   <div style="text-align:center;padding:4px 16px;font-size:11px;color:var(--muted);letter-spacing:1px" id="rankLastUpdate"></div>
+  <div id="liderBannerWrap"></div>
   <div class="rank-main" id="rankMain"></div>
 <div class="record-toast" id="recordToast"></div>
 </div>
@@ -4577,4 +4629,238 @@ function renderDesafiosMedalhas() {
 <script>
 function limparChavesSlot(){var k=[];for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(key&&(key.startsWith('slotDado_')||key.startsWith('slotDiario_')))k.push(key);}k.forEach(function(key){localStorage.removeItem(key);});showToast('✅ '+k.length+' chaves slot removidas');}
 function limparRegistosHoje(){var hoje=new Date().toISOString().split('T')[0];var k=[];for(var i=0;i<localStorage.length;i++){var key=localStorage.key(i);if(key&&key.startsWith('registo_')&&key.includes(hoje))k.push(key);}k.forEach(function(key){localStorage.removeItem(key);});try{var h=JSON.parse(localStorage.getItem('historico_local')||'[]');localStorage.setItem('historico_local',JSON.stringify(h.filter(function(d){return d.data!==hoje;})));}catch(e){}showToast('✅ '+k.length+' registos removidos');}
+</script>
+
+<script>
+// ══ BANNER LÍDER DO DIA ══
+(function() {
+  let _liderRotIdx = 0;
+  let _liderRotTimer = null;
+
+  function renderLiderBanner(dados) {
+    const wrap = document.getElementById('liderBannerWrap');
+    if (!wrap) return;
+    if (!dados || !dados.length) { wrap.innerHTML = ''; return; }
+
+    // Hoje
+    const hoje = new Date().toISOString().split('T')[0];
+
+    // Líderes de hoje por categoria
+    const lideresHoje = [];
+    if (typeof categorias !== 'undefined') {
+      categorias.forEach(cat => {
+        const doHoje = dados.filter(d => (d.data||'').slice(0,10) === hoje && (d[cat.key]||0) > 0);
+        if (!doHoje.length) return;
+        const top = doHoje.sort((a,b) => (b[cat.key]||0)-(a[cat.key]||0))[0];
+        lideresHoje.push({ nome: top.nome, val: top[cat.key], cat: cat.emoji + ' ' + cat.label, catKey: cat.key });
+      });
+    }
+
+    // Líder geral do mês (onlines)
+    const _mesNow = new Date().getMonth(), _anoNow = new Date().getFullYear();
+    const doMes = dados.filter(d => { try { const dt=new Date(d.data); return dt.getMonth()===_mesNow&&dt.getFullYear()===_anoNow; } catch(e){return false;} });
+    const rankMes = {};
+    doMes.forEach(d => { rankMes[d.nome] = (rankMes[d.nome]||0) + (d.onlines||0); });
+    const topMes = Object.entries(rankMes).sort((a,b)=>b[1]-a[1])[0];
+
+    // Build slides
+    const slides = [];
+    if (topMes) {
+      slides.push({
+        tag: '👑 LÍDER DO MÊS · ONLINES',
+        nome: topMes[0],
+        sub: nomeParaEquipaLabel ? (nomeParaEquipaLabel[topMes[0]] || 'Loja') : 'Loja',
+        scoreNum: topMes[1],
+        scoreLbl: 'onlines'
+      });
+    }
+    lideresHoje.slice(0, 4).forEach(l => {
+      slides.push({
+        tag: '🔥 LÍDER DE HOJE · ' + l.cat.toUpperCase(),
+        nome: l.nome,
+        sub: nomeParaEquipaLabel ? (nomeParaEquipaLabel[l.nome] || 'Loja') : 'Loja',
+        scoreNum: l.val,
+        scoreLbl: l.cat
+      });
+    });
+
+    if (!slides.length) { wrap.innerHTML = ''; return; }
+
+    function buildSlide(s) {
+      const foto = typeof getFoto === 'function' ? getFoto(s.nome) : null;
+      const ini = s.nome.split(' ').map(x=>x[0]).slice(0,2).join('');
+      const av = foto
+        ? `<img src="${foto}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #C9A84C;flex-shrink:0;">`
+        : `<div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#C9A84C,#8a6a1a);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#040608;flex-shrink:0;border:2px solid #C9A84C;">${ini}</div>`;
+      return `
+        <div class="lider-shimmer"></div>
+        <div class="lider-inner">
+          <div class="lider-crown">👑</div>
+          ${av}
+          <div class="lider-info">
+            <div class="lider-tag">${s.tag}</div>
+            <div class="lider-nome">${s.nome}</div>
+            <div class="lider-sub">${s.sub}</div>
+          </div>
+          <div class="lider-score">
+            <div class="lider-score-num">${s.scoreNum}</div>
+            <div class="lider-score-lbl">${s.scoreLbl}</div>
+          </div>
+        </div>
+        ${slides.length > 1 ? `<div class="lider-dots">${slides.map((_,i)=>`<div class="lider-dot${i===_liderRotIdx?' active':''}"></div>`).join('')}</div>` : ''}
+      `;
+    }
+
+    function renderSlide() {
+      wrap.innerHTML = `<div class="lider-banner">${buildSlide(slides[_liderRotIdx])}</div>`;
+    }
+
+    renderSlide();
+
+    if (_liderRotTimer) clearInterval(_liderRotTimer);
+    if (slides.length > 1) {
+      _liderRotTimer = setInterval(() => {
+        _liderRotIdx = (_liderRotIdx + 1) % slides.length;
+        const banner = wrap.querySelector('.lider-banner');
+        if (banner) {
+          banner.style.opacity = '0';
+          banner.style.transform = 'translateY(6px)';
+          banner.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+          setTimeout(() => { renderSlide(); }, 320);
+        }
+      }, 4500);
+    }
+  }
+
+  // Hook into renderRanking
+  const _origRenderRanking = window.renderRanking;
+  if (typeof _origRenderRanking === 'function') {
+    window.renderRanking = function(dados) {
+      _origRenderRanking(dados);
+      try { renderLiderBanner(dados); } catch(e) {}
+    };
+  }
+  window.renderLiderBanner = renderLiderBanner;
+})();
+
+// ══ ODÓMETRO DE MÉTRICAS ══
+(function() {
+  // Animate a number counting up from 0 to target in an element
+  function animateOdometer(el, target, duration) {
+    if (!el || isNaN(target)) return;
+    const start = 0;
+    const startTime = performance.now();
+    const str = String(target);
+    const digits = str.length;
+
+    // Build digit columns
+    function buildDigits(val) {
+      const s = String(val).padStart(digits, '0');
+      return s.split('').map((d, i) => {
+        const num = parseInt(d);
+        // Build a column from 0-9 and position it
+        let col = '';
+        for (let n = 0; n <= 9; n++) col += `<span style="display:block;height:1em;line-height:1">${n}</span>`;
+        return `<span class="odo-digit-wrap"><span class="odo-digit-inner" id="odig_${el.id||Math.random().toString(36).slice(2)}_${i}" style="transform:translateY(-${num}em)">${col}</span></span>`;
+      }).join('');
+    }
+
+    el.innerHTML = buildDigits(0);
+    el.classList.add('odo-val');
+
+    function update(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(start + (target - start) * eased);
+      const s = String(current).padStart(digits, '0');
+      // Update each digit column
+      el.querySelectorAll('.odo-digit-inner').forEach((inner, i) => {
+        const num = parseInt(s[i]);
+        inner.style.transform = `translateY(-${num}em)`;
+      });
+      if (progress < 1) requestAnimationFrame(update);
+      else {
+        // Final: show clean number without padding zeros
+        el.innerHTML = `<span class="odo-val">${target}</span>`;
+        el.classList.add('odo-bump');
+        el.addEventListener('animationend', () => el.classList.remove('odo-bump'), {once:true});
+      }
+    }
+    requestAnimationFrame(update);
+  }
+
+  // Hook into mostrarDash to animate metrics after render
+  const _origMostrarDash = window.mostrarDash;
+  if (typeof _origMostrarDash === 'function') {
+    window.mostrarDash = function(nome) {
+      _origMostrarDash(nome);
+      // After a short delay (DOM settled), animate the total accumulator
+      setTimeout(() => {
+        // Animate d-total-val
+        const totalEl = document.querySelector('.d-total-val');
+        if (totalEl) {
+          const val = parseInt(totalEl.textContent.trim());
+          if (!isNaN(val) && val > 0) {
+            totalEl.id = totalEl.id || 'odo_total';
+            animateOdometer(totalEl, val, 1200);
+          }
+        }
+        // Animate streak card big number (registos este mês)
+        const streakEl = document.querySelector('.streak-card [style*="Bebas Neue"][style*="38px"]');
+        if (streakEl) {
+          const val = parseInt(streakEl.textContent.trim());
+          if (!isNaN(val) && val > 0) {
+            streakEl.id = streakEl.id || 'odo_streak';
+            animateOdometer(streakEl, val, 800);
+          }
+        }
+        // Animate all meta-pct values
+        document.querySelectorAll('.meta-pct').forEach((el, i) => {
+          const txt = el.textContent.trim().replace('%','');
+          const val = parseInt(txt);
+          if (!isNaN(val) && val > 0) {
+            const isDone = el.classList.contains('done');
+            el.id = el.id || 'odo_meta_' + i;
+            const orig = el.className;
+            animateCountUp(el, val, 900 + i*80, isDone ? '#00CC66' : 'var(--orange)', '%');
+          }
+        });
+        // Animate breakdown bar values
+        document.querySelectorAll('.d-bval').forEach((el, i) => {
+          const val = parseInt(el.textContent.trim());
+          if (!isNaN(val) && val > 0) {
+            el.id = el.id || 'odo_bval_' + i;
+            animateOdometer(el, val, 700 + i*60);
+          }
+        });
+      }, 80);
+    };
+  }
+
+  // Simple count-up for percentage values (no digit columns, just number)
+  function animateCountUp(el, target, duration, color, suffix) {
+    suffix = suffix || '';
+    const startTime = performance.now();
+    function update(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(target * eased);
+      el.textContent = current + suffix;
+      if (color) el.style.color = color;
+      if (progress < 1) requestAnimationFrame(update);
+      else {
+        el.textContent = target + suffix;
+        el.classList.add('odo-bump');
+        el.addEventListener('animationend', () => el.classList.remove('odo-bump'), {once:true});
+      }
+    }
+    requestAnimationFrame(update);
+  }
+
+  window._animateOdometer = animateOdometer;
+  window._animateCountUp = animateCountUp;
+})();
 </script>
