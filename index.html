@@ -803,16 +803,27 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 .swipe-btn-wrap {
   position: relative;
   width: 100%;
-  height: 62px;
-  background: rgba(255,107,0,0.15);
-  border: 2px solid rgba(255,107,0,0.5);
-  border-radius: 14px;
+  height: 66px;
+  background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(255,107,0,0.08));
+  border: 1.5px solid rgba(201,168,76,0.35);
+  border-radius: 16px;
   margin-top: 28px;
   overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
+  box-shadow: 0 4px 20px rgba(201,168,76,0.08);
 }
+/* Shimmer line that sweeps across */
+.swipe-btn-wrap::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -60%; width: 40%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.12), transparent);
+  animation: swipeSweep 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes swipeSweep { 0%{left:-60%} 60%,100%{left:130%} }
 .swipe-track {
   position: absolute;
   inset: 0;
@@ -823,49 +834,75 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 }
 .swipe-label {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
-  letter-spacing: 2px;
-  color: rgba(255,107,0,0.6);
+  font-size: 17px;
+  letter-spacing: 3px;
+  color: rgba(201,168,76,0.55);
   transition: opacity 0.2s;
   pointer-events: none;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  padding-left: 62px;
 }
 .swipe-arrows {
   display: flex;
-  gap: 2px;
+  gap: 3px;
   align-items: center;
 }
 .swipe-arrows span {
-  font-size: 14px;
-  color: rgba(255,107,0,0.4);
-  animation: swipeArrowPulse 1.2s ease-in-out infinite;
+  width: 6px; height: 6px;
+  border-right: 2px solid rgba(201,168,76,0.5);
+  border-top: 2px solid rgba(201,168,76,0.5);
+  transform: rotate(45deg);
+  display: inline-block;
+  animation: swipeArrowPulse 1.1s ease-in-out infinite;
 }
-.swipe-arrows span:nth-child(2) { animation-delay: 0.15s; }
-.swipe-arrows span:nth-child(3) { animation-delay: 0.30s; }
-@keyframes swipeArrowPulse { 0%,100%{opacity:0.2} 50%{opacity:0.8} }
+.swipe-arrows span:nth-child(2) { animation-delay: 0.18s; opacity: 0.7; }
+.swipe-arrows span:nth-child(3) { animation-delay: 0.36s; opacity: 0.4; }
+@keyframes swipeArrowPulse { 0%,100%{opacity:0.15} 50%{opacity:0.9} }
+/* Trail effect behind thumb */
+.swipe-trail {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  background: linear-gradient(90deg, rgba(201,168,76,0.0), rgba(201,168,76,0.12));
+  pointer-events: none;
+  border-radius: 12px 0 0 12px;
+  transition: width 0s;
+}
 .swipe-thumb {
   position: absolute;
   left: 4px;
   top: 4px;
   bottom: 4px;
-  width: 52px;
-  background: var(--orange);
-  border-radius: 10px;
+  width: 54px;
+  background: linear-gradient(135deg, #E8C97A, #C9A84C, #a07820);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
   cursor: grab;
-  box-shadow: 0 2px 12px rgba(255,107,0,0.5);
-  transition: background 0.3s;
+  box-shadow: 0 2px 16px rgba(201,168,76,0.5), inset 0 1px 0 rgba(255,255,255,0.25);
   will-change: transform;
   touch-action: none;
+  transition: background 0.35s, box-shadow 0.35s;
 }
-.swipe-btn-wrap.done .swipe-thumb { background: #22C55E; box-shadow: 0 2px 12px rgba(34,197,94,0.5); }
-.swipe-btn-wrap.done { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.4); }
-.swipe-btn-wrap.done .swipe-label { color: #22C55E; opacity: 1 !important; }
+/* SVG arrow inside thumb */
+.swipe-thumb-arrow {
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+}
+.swipe-thumb-arrow svg { display: block; }
+@keyframes thumbPulse { 0%,100%{box-shadow:0 2px 16px rgba(201,168,76,0.5),inset 0 1px 0 rgba(255,255,255,0.25)} 50%{box-shadow:0 2px 28px rgba(201,168,76,0.85),inset 0 1px 0 rgba(255,255,255,0.25)} }
+.swipe-thumb { animation: thumbPulse 2s ease-in-out infinite; }
+.swipe-btn-wrap.done .swipe-thumb {
+  background: linear-gradient(135deg, #4ade80, #22C55E, #15803d);
+  box-shadow: 0 2px 20px rgba(34,197,94,0.6);
+  animation: none;
+}
+.swipe-btn-wrap.done { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.4); }
+.swipe-btn-wrap.done::before { display: none; }
+.swipe-btn-wrap.done .swipe-label { color: #22C55E; opacity: 1 !important; letter-spacing: 3px; }
 
 
 @keyframes slotLights { 0%{background-position:0 0} 100%{background-position:200px 0} }
@@ -1072,7 +1109,25 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
-      <button class="submit-btn" id="submitBtn" onclick="handleSubmitBtn(this)" style="display:block!important;width:100%">REGISTAR O MEU DIA</button>
+      <!-- submitBtn hidden — swipe to register handles submission -->
+      <button class="submit-btn" id="submitBtn" onclick="handleSubmitBtn(this)" style="display:none!important;width:100%">REGISTAR O MEU DIA</button>
+      <!-- SWIPE TO REGISTER -->
+      <div class="swipe-btn-wrap" id="swipeBtnWrap">
+        <div class="swipe-trail" id="swipeTrail"></div>
+        <div class="swipe-track">
+          <div class="swipe-label" id="swipeLabel">
+            <div class="swipe-arrows"><span></span><span></span><span></span></div>
+            REGISTAR O MEU DIA
+          </div>
+        </div>
+        <div class="swipe-thumb" id="swipeThumb">
+          <div class="swipe-thumb-arrow">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 11H18M18 11L12 5M18 11L12 17" stroke="#07101f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
       <div style="text-align:center;padding:10px 0 4px;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif">APP developed by Dário Santos</div>
     </div>
     <div class="success" id="successMsg">
@@ -1374,15 +1429,17 @@ function goTo(screen, btn) {
   document.getElementById('printBtn').style.display = screen === 'ranking' ? 'flex' : 'none';
 
   // Render skeleton / cached content INSTANTLY before any fetch
+  // Cancel any in-flight fetch when switching screens
+  if (screen !== 'ranking' && typeof _rankingAbort !== 'undefined' && _rankingAbort) {
+    _rankingAbort.abort(); _rankingAbort = null;
+  }
   if (screen === 'ranking') {
     if (window._rankingCache) {
       renderRanking(window._rankingCache);
     } else {
-      // Skeleton placeholder
       const rm = document.getElementById('rankMain');
       if (rm) rm.innerHTML = _skeletonRanking();
     }
-    // Fetch after paint — never blocks navigation
     requestAnimationFrame(() => setTimeout(carregarRanking, 0));
   }
   if (screen === 'dash') {
@@ -1847,7 +1904,13 @@ function secDiv(icon, title) {
 }
 
 
+let _rankingAbort = null;
 async function carregarRanking() {
+  // Cancel any in-flight fetch from previous load
+  if (_rankingAbort) { _rankingAbort.abort(); }
+  _rankingAbort = new AbortController();
+  const signal = _rankingAbort.signal;
+
   // Show localStorage cache IMMEDIATELY
   try {
     const cached = localStorage.getItem('rankingCache');
@@ -1865,32 +1928,36 @@ async function carregarRanking() {
       renderRanking([]);
     }
   } catch(e) { renderRanking([]); }
-  // Parallel fetch - race direct vs proxy
+
   try {
     const directUrl = SHEETS_URL + '?action=getRanking';
     const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(directUrl);
     const result = await Promise.race([
-      fetch(directUrl, {cache:'no-store'}).then(r=>r.json()).catch(()=>Promise.reject()),
-      fetch(proxyUrl, {cache:'no-store'}).then(r=>r.json()).catch(()=>Promise.reject()),
+      fetch(directUrl, {cache:'no-store', signal}).then(r=>r.json()).catch(()=>Promise.reject()),
+      fetch(proxyUrl, {cache:'no-store', signal}).then(r=>r.json()).catch(()=>Promise.reject()),
       new Promise((_,reject) => setTimeout(()=>reject('timeout'), 6000))
     ]);
+    if (signal.aborted) return;
     if (Array.isArray(result) && result.length) {
       window._rankingCache = result;
       try { localStorage.setItem('rankingCache', JSON.stringify(result)); localStorage.setItem('rankingCacheTime', Date.now().toString()); } catch(e2) {}
-      renderRanking(result);
+      if (!signal.aborted) { renderRanking(result); }
       const elU = document.getElementById('rankLastUpdate');
-      if (elU) elU.textContent = '✓ Atualizado agora';
+      if (elU && !signal.aborted) elU.textContent = '✓ Atualizado agora';
     }
   } catch(e) {}
 
-  if (!dashAllDados.length) {
+  if (!dashAllDados.length && !signal.aborted) {
     try {
-      const r = await fetch(SHEETS_URL + '?action=getTodos');
+      const r = await fetch(SHEETS_URL + '?action=getTodos', {signal});
       const td = await r.json();
-      if (Array.isArray(td)) { dashAllDados = td; renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []); }
+      if (!signal.aborted && Array.isArray(td)) {
+        dashAllDados = td;
+        if (!signal.aborted) renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []);
+      }
     } catch(e) {}
   }
-  verificarMedalhasRanking();
+  if (!signal.aborted) verificarMedalhasRanking();
 }
 
 async function getRankingFromDados(todos) {
@@ -2191,6 +2258,44 @@ iniciarSplash();
 })();
 
 atualizarMesLabels();
+
+// ── SWIPE LATERAL ENTRE MENUS ──
+(function() {
+  const SCREENS = ['desafios', 'ranking', 'dash', 'info'];
+  const BTN_IDS  = ['navBtnDesafios', 'navBtnRanking', 'navBtnDash', 'navBtnInfo'];
+  let tsX = 0, tsY = 0, tId = null;
+
+  function currentIdx() {
+    return SCREENS.findIndex(s => {
+      const el = document.getElementById('screen-' + s);
+      return el && el.classList.contains('active');
+    });
+  }
+
+  document.addEventListener('touchstart', function(e) {
+    // Ignore if form is open, swipe-btn, or modals
+    if (document.getElementById('screen-form')?.style.transform === 'translateY(0)') return;
+    if (e.target.closest('#swipeBtnWrap,#slotOverlay,.modal-overlay,.pin-overlay')) return;
+    const t = e.touches[0];
+    tsX = t.clientX; tsY = t.clientY; tId = t.identifier;
+  }, { passive: true });
+
+  document.addEventListener('touchend', function(e) {
+    const t = [...e.changedTouches].find(t => t.identifier === tId);
+    if (!t) return;
+    const dx = t.clientX - tsX;
+    const dy = t.clientY - tsY;
+    // Only horizontal swipes (dx bigger than dy, and > 55px)
+    if (Math.abs(dx) < 55 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+    const idx = currentIdx();
+    if (idx < 0) return;
+    let next = idx + (dx < 0 ? 1 : -1); // swipe left → next, swipe right → prev
+    next = Math.max(0, Math.min(SCREENS.length - 1, next));
+    if (next === idx) return;
+    const btn = document.getElementById(BTN_IDS[next]);
+    goTo(SCREENS[next], btn);
+  }, { passive: true });
+})();
 
 // ── HOLD TO REPEAT ──
 let changeIv=null, changeTo=null;
@@ -4442,11 +4547,14 @@ function calcularMedalhasDiarias(payload) {
     if (!swiping || swipeDone) return;
     const wrap = getWrap(); if (!wrap) return;
     const thumb = getThumb();
-    const maxX = wrap.offsetWidth - (thumb ? thumb.offsetWidth : 52) - 8;
+    const maxX = wrap.offsetWidth - (thumb ? thumb.offsetWidth : 54) - 8;
     const dx = Math.max(0, Math.min(clientX - swipeStartX, maxX));
     if (thumb) thumb.style.transform = 'translateX(' + dx + 'px)';
+    // Trail
+    const trail = document.getElementById('swipeTrail');
+    if (trail) trail.style.width = (dx + (thumb ? thumb.offsetWidth : 54) + 4) + 'px';
     const label = getLabel();
-    if (label) label.style.opacity = Math.max(0, 1 - (dx / maxX) * 2);
+    if (label) label.style.opacity = Math.max(0, 1 - (dx / maxX) * 2.2);
     if (dx / maxX >= 0.9) completeSwipe(maxX);
   }
 
@@ -4462,6 +4570,8 @@ function calcularMedalhasDiarias(payload) {
     if (dx / maxX < 0.9) {
       thumb.style.transition = 'transform 0.3s cubic-bezier(0.34,1.56,0.64,1)';
       thumb.style.transform = 'translateX(0)';
+      const trail = document.getElementById('swipeTrail');
+      if (trail) { trail.style.transition = 'width 0.3s'; trail.style.width = '0'; setTimeout(()=>{ if(trail) trail.style.transition=''; }, 350); }
       const label = getLabel();
       if (label) { label.style.transition = 'opacity 0.3s'; label.style.opacity = 1; }
     }
@@ -4474,32 +4584,35 @@ function calcularMedalhasDiarias(payload) {
     const wrap = getWrap();
     const thumb = getThumb();
     const label = getLabel();
-    if (thumb) { thumb.style.transform = 'translateX(' + maxX + 'px)'; thumb.textContent = '✓'; }
+    const trail = document.getElementById('swipeTrail');
+    if (thumb) {
+      thumb.style.transition = 'transform 0.25s cubic-bezier(0.34,1.56,0.64,1)';
+      thumb.style.transform = 'translateX(' + maxX + 'px)';
+      thumb.innerHTML = '<div class="swipe-thumb-arrow"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 11L9 16L18 6" stroke="#07101f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+    }
 
     // Check if already submitted (novo registo state)
     const submitBtn = document.getElementById('submitBtn');
     if (submitBtn && submitBtn.dataset.state === 'novo') {
       swipeDone = false;
+      if (trail) { trail.style.transition = 'width 0.3s'; trail.style.width = '0'; setTimeout(()=>{if(trail)trail.style.transition='';},350); }
       resetForm();
       return;
     }
 
-    // Call the actual submit
     clicarSubmit(submitBtn);
 
-    // Show green "Registo Efetuado"
     setTimeout(() => {
       if (!wrap) return;
       wrap.classList.add('done');
-      if (thumb) { thumb.style.background = '#22C55E'; thumb.style.boxShadow = '0 2px 12px rgba(34,197,94,0.5)'; }
+      if (trail) { trail.style.background = 'linear-gradient(90deg, rgba(34,197,94,0), rgba(34,197,94,0.15))'; trail.style.width = '100%'; }
       if (label) {
         label.style.opacity = 1;
         label.style.color = '#22C55E';
-        label.innerHTML = '✓ REGISTO EFETUADO';
+        label.innerHTML = '<span style="font-size:16px">✓</span> REGISTO EFETUADO';
       }
     }, 300);
 
-    // Auto-reset after 4s
     setTimeout(() => {
       swipeDone = false;
       _resetSwipe();
@@ -4522,15 +4635,33 @@ window._resetSwipe = function() {
   const wrap = document.getElementById('swipeBtnWrap');
   const thumb = document.getElementById('swipeThumb');
   const label = document.getElementById('swipeLabel');
+  const trail = document.getElementById('swipeTrail');
   if (!wrap) return;
   wrap.classList.remove('done');
-  if (thumb) { thumb.style.transition = 'none'; thumb.style.transform = 'translateX(0)'; thumb.textContent = '✔'; thumb.style.background = ''; thumb.style.boxShadow = ''; }
-  if (label) { label.style.opacity = 1; label.style.color = ''; label.innerHTML = '<div class="swipe-arrows"><span>❯</span><span>❯</span><span>❯</span></div>DESLIZA PARA REGISTAR'; }
+  if (trail) { trail.style.transition = 'none'; trail.style.width = '0'; trail.style.background = 'linear-gradient(90deg, rgba(201,168,76,0.0), rgba(201,168,76,0.12))'; }
+  if (thumb) {
+    thumb.style.transition = 'none'; thumb.style.transform = 'translateX(0)'; thumb.style.background = ''; thumb.style.boxShadow = '';
+    thumb.innerHTML = '<div class="swipe-thumb-arrow"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 11H18M18 11L12 5M18 11L12 17" stroke="#07101f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+  }
+  if (label) { label.style.opacity = 1; label.style.color = ''; label.innerHTML = '<div class="swipe-arrows"><span></span><span></span><span></span></div>REGISTAR O MEU DIA'; }
 };
 
 // ── FORM OVERLAY ──
 let formOverlayOpen = false;
 function toggleFormOverlay() {
+  iniciarAudio();
+  // Som de abertura do form — nota única aguda
+  try {
+    if (audioCtx) {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = 'sine';
+      o.frequency.setValueAtTime(formOverlayOpen ? 440 : 660, audioCtx.currentTime);
+      g.gain.setValueAtTime(0.18, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
+      o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + 0.2);
+    }
+  } catch(e) {}
   formOverlayOpen ? fecharFormOverlay() : abrirFormOverlay();
 }
 function abrirFormOverlay() {
