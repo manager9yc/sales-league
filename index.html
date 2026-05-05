@@ -473,9 +473,31 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 }
 .streak-badge { display:inline-flex; align-items:center; gap:2px; background:rgba(255,107,0,0.15); border:1px solid rgba(255,107,0,0.4); border-radius:8px; padding:1px 5px; font-size:10px; font-weight:800; color:#FF6B00; letter-spacing:0.5px; vertical-align:middle; margin-left:4px; }
 
+/* FIRE #1 em cada categoria do ranking */
+.rank-1-fire { display:inline-block; animation: fire1Burn 0.7s ease-in-out infinite alternate; transform-origin: bottom center; margin-left:5px; font-size:16px; }
+@keyframes fire1Burn {
+  0%   { transform: scaleY(1)    scaleX(1)    rotate(-3deg); filter: drop-shadow(0 0 3px #FF6B00) brightness(1);   }
+  30%  { transform: scaleY(1.2)  scaleX(0.93) rotate(2deg);  filter: drop-shadow(0 0 8px #FF8C00) brightness(1.4); }
+  60%  { transform: scaleY(0.93) scaleX(1.07) rotate(-2deg); filter: drop-shadow(0 0 5px #FF6B00) brightness(1.2); }
+  100% { transform: scaleY(1.12) scaleX(0.96) rotate(3deg);  filter: drop-shadow(0 0 10px #FFA500) brightness(1.5); }
+}
+
+/* NAV TAP BURST */
+@keyframes navTap { 0%{transform:scale(1)} 30%{transform:scale(1.35)} 60%{transform:scale(0.92)} 100%{transform:scale(1)} }
+.nav-icon-tap { animation: navTap 0.38s cubic-bezier(0.34,1.56,0.64,1) both; }
+
 /* RANKING POPUP SUBIU */
 @keyframes slideUpBounce { 0%{transform:translateY(60px);opacity:0} 70%{transform:translateY(-6px)} 100%{transform:translateY(0);opacity:1} }
 .ranking-subiu-popup { animation: slideUpBounce 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+/* SPLASH ZOOM */
+@keyframes splashZoomIn { 0%{transform:scale(1)} 100%{transform:scale(1.15)} }
+.splash::before { content:''; position:absolute; inset:-10%; background:inherit; background-size:cover !important; background-position:center !important; animation: splashZoomIn 9s ease-in forwards; z-index:0; }
+.splash { background: #040608 !important; }
+.sp-particles { z-index:3 !important; }
+.sp-inner { z-index:4 !important; }
+.sp-dev-credit { z-index:4 !important; }
+@media(min-width:600px){ .splash::before { background-size:contain !important; } }
 
 /* LEVEL + STREAK */
 .nivel-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px;}
@@ -1335,6 +1357,16 @@ function goTo(screen, btn) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   const _se=document.getElementById('screen-'+screen); if(_se) _se.classList.add('active'); else return;
   if(btn && btn.classList) btn.classList.add('active');
+  // Tap burst on nav icon
+  if (btn) {
+    const icon = btn.querySelector('.nav-icon');
+    if (icon) {
+      icon.classList.remove('nav-icon-tap');
+      void icon.offsetWidth; // reflow to restart animation
+      icon.classList.add('nav-icon-tap');
+      icon.addEventListener('animationend', () => icon.classList.remove('nav-icon-tap'), {once:true});
+    }
+  }
   try { localStorage.setItem('lastTab', screen); } catch(e) {}
   document.getElementById('printBtn').style.display = screen === 'ranking' ? 'flex' : 'none';
   if(screen==='desafios'){ renderDesafiosMedalhas(); }
@@ -1764,9 +1796,10 @@ function buildRows(sorted, key) {
     const streakHtml = streak >= 3
       ? `<span class="streak-badge"><span class="streak-fire">🔥</span>${streak}</span>`
       : '';
+    const fire1Html = i === 0 ? `<span class="rank-1-fire">🔥</span>` : '';
     return `<tr class="rank-${i+1}">
       <td class="td-pos">${i+1}</td>
-      <td class="td-name" style="display:flex;align-items:center;cursor:pointer" onclick="abrirDashDeRanking('${nome}')" style="cursor:pointer">${avatarHtml}<div><div>${nome}${streakHtml}</div>${secaoVendedor?`<div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:1px">${secaoVendedor}</div>`:''}</div></td>
+      <td class="td-name" style="display:flex;align-items:center;cursor:pointer" onclick="abrirDashDeRanking('${nome}')" style="cursor:pointer">${avatarHtml}<div><div>${nome}${fire1Html}${streakHtml}</div>${secaoVendedor?`<div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:1px">${secaoVendedor}</div>`:''}</div></td>
       <td class="td-bar"><div class="bar-bg"><div class="bar-fg" data-pct="${pct}" style="width:0%"></div></div></td>
       <td class="td-score">${v[key]}</td>
     </tr>`;
@@ -2555,7 +2588,7 @@ function mostrarDash(nome) {
   const mesAtual = new Date().getMonth();
   const anoAtual = new Date().getFullYear();
   const semanas = [0,0,0,0];
-  function getUserWeek(d){const jan1=new Date(d.getFullYear(),0,1);const doy=Math.floor((d-jan1)/86400000);return Math.floor(doy/7)-2;}
+  function getUserWeek(d){const jan1=new Date(d.getFullYear(),0,1);const doy=Math.floor((d-jan1)/86400000);return Math.floor(doy/7)-3;}
   const semanaAtual = getUserWeek(new Date());
   dadosVendedor.forEach(d => {
     const dt = new Date(d.data || d.Data || '');
@@ -2663,7 +2696,7 @@ function mostrarDash(nome) {
             <div class="d-cbar ${i===semanas.length-1?'hi':''}" style="height:${Math.round(v/maxSem*88)}px"></div>
           </div>`).join('')}
         <div style="position:absolute;bottom:0;left:0;right:0;display:flex;gap:10px">
-          ${(()=>{const hoje=new Date();function getUserWeek(d){const jan1=new Date(d.getFullYear(),0,1);const doy=Math.floor((d-jan1)/86400000);return Math.floor(doy/7)-2;}const wn=getUserWeek(hoje);return [wn-3,wn-2,wn-1,wn].map((w,i)=>`<div style="flex:1;font-size:10px;color:var(--muted);text-align:center">S${Math.max(1,w)}${i===3?' ▶':''}</div>`).join('');})()}
+          ${(()=>{const hoje=new Date();function getUserWeek(d){const jan1=new Date(d.getFullYear(),0,1);const doy=Math.floor((d-jan1)/86400000);return Math.floor(doy/7)-3;}const wn=getUserWeek(hoje);return [wn-3,wn-2,wn-1,wn].map((w,i)=>`<div style="flex:1;font-size:10px;color:var(--muted);text-align:center">S${Math.max(1,w)}${i===3?' ▶':''}</div>`).join('');})()}
         </div>
       </div>
     </div>
@@ -4591,7 +4624,7 @@ function renderDesafiosMedalhas() {
         <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px">
           <select id="sugestaoNome" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;margin-bottom:8px"><option value="">— Nome —</option></select>
           <textarea id="sugestaoTexto" placeholder="Escreve a tua sugestão..." style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;resize:none;height:80px;font-family:inherit"></textarea>
-          <button onclick="enviarSugestao()" style="width:100%;background:var(--orange);border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;margin-top:6px">Enviar →</button>
+          <button onclick="enviarSugestao()" style="background:var(--orange);border:none;border-radius:10px;padding:11px 28px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;margin-top:6px;align-self:flex-end;display:block;margin-left:auto">Enviar →</button>
         </div>
         <div id="sugestoesList"></div>
       </div>
