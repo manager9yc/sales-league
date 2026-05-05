@@ -462,6 +462,21 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .rank-table tbody tr{opacity:0;transform:translateY(8px);}
 .rank-table tbody tr.row-visible{opacity:1;transform:translateY(0);transition:opacity 0.35s ease,transform 0.35s ease;}
 
+/* STREAK FIRE */
+.streak-fire { display:inline-block; animation: firePulse 0.9s ease-in-out infinite alternate; transform-origin: bottom center; cursor:default; }
+@keyframes firePulse {
+  0%   { transform: scaleY(1)    scaleX(1)    rotate(-2deg); filter: brightness(1);   }
+  25%  { transform: scaleY(1.15) scaleX(0.95) rotate(1deg);  filter: brightness(1.3); }
+  50%  { transform: scaleY(0.95) scaleX(1.05) rotate(-1deg); filter: brightness(1.1); }
+  75%  { transform: scaleY(1.1)  scaleX(0.97) rotate(2deg);  filter: brightness(1.4); }
+  100% { transform: scaleY(1.05) scaleX(1.02) rotate(-2deg); filter: brightness(1.2); }
+}
+.streak-badge { display:inline-flex; align-items:center; gap:2px; background:rgba(255,107,0,0.15); border:1px solid rgba(255,107,0,0.4); border-radius:8px; padding:1px 5px; font-size:10px; font-weight:800; color:#FF6B00; letter-spacing:0.5px; vertical-align:middle; margin-left:4px; }
+
+/* RANKING POPUP SUBIU */
+@keyframes slideUpBounce { 0%{transform:translateY(60px);opacity:0} 70%{transform:translateY(-6px)} 100%{transform:translateY(0);opacity:1} }
+.ranking-subiu-popup { animation: slideUpBounce 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+
 /* LEVEL + STREAK */
 .nivel-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px;}
 .nivel-bronze{background:rgba(205,127,50,0.15);border:1px solid rgba(205,127,50,0.4);color:#CD7F32;}
@@ -1540,8 +1555,23 @@ async function submeter() {
   // Liberar flag após 3s (tempo suficiente para o fetch ter sido disparado)
   setTimeout(() => { _submitEmCurso = false; }, 3000);
 
+  // Calcular nível do dia para som diferenciado
+  const totalDia = categorias.reduce((s,c) => s + (payload[c.key]||0), 0);
+  let nivelSom = 'normal';
+  try {
+    const hist2 = JSON.parse(localStorage.getItem('historico_local') || '[]');
+    const dadosNome2 = hist2.filter(d => d.nome === nomeAtual && d.data !== payload.data);
+    if (dadosNome2.length >= 3) {
+      const medias = dadosNome2.map(d => categorias.reduce((s,c)=>s+(d[c.key]||0),0));
+      const media = medias.reduce((s,v)=>s+v,0) / medias.length;
+      const maximo = Math.max(...medias);
+      if (totalDia > maximo) nivelSom = 'recorde';
+      else if (totalDia > media * 1.2) nivelSom = 'bom';
+    }
+  } catch(e) {}
+
   // Feedback visual
-  tocarSomRegisto();
+  tocarSomRegisto(nivelSom);
   btn.textContent = '✔ Registado com sucesso';
   btn.style.background = '#22C55E';
   btn.style.color = '#fff';
@@ -1582,22 +1612,61 @@ async function submeter() {
 }
 
 
-function tocarSomRegisto() {
+function tocarSomRegisto(nivel) {
+  // nivel: 'normal' | 'bom' | 'recorde'
   iniciarAudio();
   if (!audioCtx) return;
-  // Success chime - 3 ascending notes
-  [[523,0],[659,0.15],[784,0.3]].forEach(([freq,t]) => {
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.connect(g); g.connect(audioCtx.destination);
-    o.type = 'sine';
-    o.frequency.setValueAtTime(freq, audioCtx.currentTime + t);
-    g.gain.setValueAtTime(0, audioCtx.currentTime + t);
-    g.gain.linearRampToValueAtTime(0.25, audioCtx.currentTime + t + 0.02);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + t + 0.25);
-    o.start(audioCtx.currentTime + t);
-    o.stop(audioCtx.currentTime + t + 0.3);
-  });
+  const t = audioCtx.currentTime;
+
+  if (nivel === 'recorde') {
+    // Fanfarra — 6 notas ascendentes com último acorde
+    const seq = [[523,0],[659,0.13],[784,0.26],[1047,0.39],[1319,0.52],[1568,0.65]];
+    seq.forEach(([freq, dt]) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(freq, t + dt);
+      g.gain.setValueAtTime(0, t + dt);
+      g.gain.linearRampToValueAtTime(0.3, t + dt + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dt + 0.4);
+      o.start(t + dt); o.stop(t + dt + 0.45);
+    });
+    // Acorde final
+    [784,1047,1319].forEach((freq, i) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = 'sine';
+      o.frequency.setValueAtTime(freq, t + 0.85);
+      g.gain.setValueAtTime(0, t + 0.85);
+      g.gain.linearRampToValueAtTime(0.2, t + 0.87);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
+      o.start(t + 0.85); o.stop(t + 1.45);
+    });
+  } else if (nivel === 'bom') {
+    // Coins — 4 notas rápidas a subir com staccato
+    [[784,0],[988,0.1],[1175,0.2],[1568,0.32]].forEach(([freq, dt]) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = 'square';
+      o.frequency.setValueAtTime(freq, t + dt);
+      g.gain.setValueAtTime(0, t + dt);
+      g.gain.linearRampToValueAtTime(0.15, t + dt + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dt + 0.12);
+      o.start(t + dt); o.stop(t + dt + 0.15);
+    });
+  } else {
+    // Normal — 3 notas suaves (comportamento original)
+    [[523,0],[659,0.15],[784,0.3]].forEach(([freq, dt]) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = 'sine';
+      o.frequency.setValueAtTime(freq, t + dt);
+      g.gain.setValueAtTime(0, t + dt);
+      g.gain.linearRampToValueAtTime(0.25, t + dt + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dt + 0.25);
+      o.start(t + dt); o.stop(t + dt + 0.3);
+    });
+  }
 }
 
 function selecionarData(opcao) {
@@ -1672,6 +1741,17 @@ function emptyRows() {
 
 function buildRows(sorted, key) {
   const max = sorted[0]?.[key] || 1;
+  // Pre-calculate streaks from historico_local + dashAllDados
+  const streakMap = {};
+  try {
+    const hist = JSON.parse(localStorage.getItem('historico_local') || '[]');
+    const allD = [...(dashAllDados || [])];
+    hist.forEach(d => { if (!allD.some(x => x.nome === d.nome && x.data === d.data)) allD.push(d); });
+    const byNome = {};
+    allD.forEach(d => { if (!byNome[d.nome]) byNome[d.nome] = []; byNome[d.nome].push(d); });
+    Object.entries(byNome).forEach(([nome, dados]) => { streakMap[nome] = calcularStreak(dados); });
+  } catch(e) {}
+
   return sorted.map((v, i) => {
     const pct = Math.round((v[key] / max) * 100);
     const nome = v.nome || v.equipa;
@@ -1680,9 +1760,13 @@ function buildRows(sorted, key) {
       ? `<img src="${foto}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;margin-right:8px;flex-shrink:0;vertical-align:middle">`
       : `<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--orange);align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#fff;margin-right:8px;flex-shrink:0;vertical-align:middle">${nome.split(' ').map(x=>x[0]).slice(0,2).join('')}</span>`;
     const secaoVendedor = (()=>{ for(const e of equipas){ if(e.nomes&&e.nomes.includes(nome)) return e.label.replace(/^\S+\s/,''); } return ''; })();
+    const streak = streakMap[nome] || 0;
+    const streakHtml = streak >= 3
+      ? `<span class="streak-badge"><span class="streak-fire">🔥</span>${streak}</span>`
+      : '';
     return `<tr class="rank-${i+1}">
       <td class="td-pos">${i+1}</td>
-      <td class="td-name" style="display:flex;align-items:center;cursor:pointer" onclick="abrirDashDeRanking('${nome}')" style="cursor:pointer">${avatarHtml}<div><div>${nome}</div>${secaoVendedor?`<div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:1px">${secaoVendedor}</div>`:''}</div></td>
+      <td class="td-name" style="display:flex;align-items:center;cursor:pointer" onclick="abrirDashDeRanking('${nome}')" style="cursor:pointer">${avatarHtml}<div><div>${nome}${streakHtml}</div>${secaoVendedor?`<div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:1px">${secaoVendedor}</div>`:''}</div></td>
       <td class="td-bar"><div class="bar-bg"><div class="bar-fg" data-pct="${pct}" style="width:0%"></div></div></td>
       <td class="td-score">${v[key]}</td>
     </tr>`;
@@ -3106,34 +3190,46 @@ function showRecordToast(titulo, msg) { mostrarMedalPopup('🏆', titulo, msg); 
 
 function verificarPosicaoRanking(nome, payload) {
   if (!Array.isArray(dashAllDados) || !dashAllDados.length) return;
-  // Build scores from local history + api
-  const allData = [
-    ...(Array.isArray(dashAllDados) ? dashAllDados : []),
-    ...(()=>{ try { return JSON.parse(localStorage.getItem('historico_local')||'[]'); } catch(e){ return []; } })()
-  ];
   const mesAtual = new Date().getMonth(), anoAtual = new Date().getFullYear();
-  // Add current payload
-  const allWithPayload = [...allData.filter(d => !(d.nome===nome && d.data===payload.data)), payload];
-  const scoresPorNome = {};
-  allWithPayload.forEach(d => {
+
+  // Scores SEM o payload atual (posição antes)
+  const allSem = [...(dashAllDados || []),
+    ...(() => { try { return JSON.parse(localStorage.getItem('historico_local')||'[]'); } catch(e){ return []; } })()
+  ].filter(d => d.nome !== nome || d.data !== payload.data);
+  const scoreSem = {};
+  allSem.forEach(d => {
     const dt = new Date((d.data||'') + 'T12:00:00');
     if (isNaN(dt) || dt.getMonth()!==mesAtual || dt.getFullYear()!==anoAtual) return;
-    if (!scoresPorNome[d.nome]) scoresPorNome[d.nome] = 0;
-    scoresPorNome[d.nome] += categorias.reduce((s,c)=>s+(d[c.key]||0),0);
+    if (!scoreSem[d.nome]) scoreSem[d.nome] = 0;
+    scoreSem[d.nome] += categorias.reduce((s,c)=>s+(d[c.key]||0),0);
   });
-  const sorted = Object.entries(scoresPorNome).sort((a,b)=>b[1]-a[1]);
-  if (!sorted.length) return;
-  const myScore = scoresPorNome[nome] || 0;
-  const pos = sorted.findIndex(([n])=>n===nome) + 1;
-  const leader = sorted[0];
-  const diff = (leader[1]||0) - myScore;
+  const sortedSem = Object.entries(scoreSem).sort((a,b)=>b[1]-a[1]);
+  const posSem = (sortedSem.findIndex(([n])=>n===nome) + 1) || sortedSem.length + 1;
 
-  // Remove any existing ranking popup
+  // Scores COM o payload atual (posição depois)
+  const allCom = [...allSem, payload];
+  const scoreCom = {};
+  allCom.forEach(d => {
+    const dt = new Date((d.data||'') + 'T12:00:00');
+    if (isNaN(dt) || dt.getMonth()!==mesAtual || dt.getFullYear()!==anoAtual) return;
+    if (!scoreCom[d.nome]) scoreCom[d.nome] = 0;
+    scoreCom[d.nome] += categorias.reduce((s,c)=>s+(d[c.key]||0),0);
+  });
+  const sortedCom = Object.entries(scoreCom).sort((a,b)=>b[1]-a[1]);
+  const posCom = sortedCom.findIndex(([n])=>n===nome) + 1;
+  if (!posCom) return;
+
+  const myScore = scoreCom[nome] || 0;
+  const leader = sortedCom[0];
+  const diff = (leader[1]||0) - myScore;
+  const subiu = posSem - posCom; // positivo = subiu posições
+
   const existingRpop = document.getElementById('rankingPopupOverlay');
   if (existingRpop) existingRpop.remove();
 
-  let titulo, desc, emoji;
-  if (pos === 1 && sorted.length > 1) {
+  let titulo, desc, emoji, corBorda = '#FF6B00', corBg = 'linear-gradient(135deg,#1a0e00,#090909)';
+
+  if (posCom === 1 && sortedCom.length > 1) {
     emoji = '👑';
     titulo = 'ESTÁS EM 1º LUGAR!';
     const motivacoes = [
@@ -3143,6 +3239,20 @@ function verificarPosicaoRanking(nome, payload) {
       'Invencível! Deixa os outros a tentar acompanhar! ⚡',
     ];
     desc = motivacoes[Math.floor(Math.random()*motivacoes.length)];
+    corBorda = '#C9A84C';
+    corBg = 'linear-gradient(135deg,#1a1200,#090909)';
+  } else if (subiu >= 1) {
+    emoji = subiu >= 3 ? '🚀' : '⬆️';
+    titulo = subiu === 1
+      ? `SUBISTE 1 POSIÇÃO!`
+      : `SUBISTE ${subiu} POSIÇÕES!`;
+    desc = posCom <= 3
+      ? `Estás em ${posCom}º lugar! O pódio está ao teu alcance! 🏅`
+      : diff <= 5
+        ? `Só ${diff} pontos para o topo — continua! 💥`
+        : `Agora em ${posCom}º lugar. Mantém o ritmo! 🔥`;
+    corBorda = '#22C55E';
+    corBg = 'linear-gradient(135deg,#001a08,#090909)';
   } else if (diff >= 1 && diff <= 3) {
     emoji = '🔥';
     titulo = `ESTÁS A ${diff} PONTO${diff===1?'':'S'} DO TOPO!`;
@@ -3153,15 +3263,15 @@ function verificarPosicaoRanking(nome, payload) {
 
   const overlay = document.createElement('div');
   overlay.id = 'rankingPopupOverlay';
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.6);animation:fadeSlideIn 0.3s ease;cursor:pointer';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;display:flex;align-items:flex-end;justify-content:center;padding:20px;padding-bottom:100px;background:rgba(0,0,0,0.5);cursor:pointer';
   overlay.onclick = () => overlay.remove();
   overlay.innerHTML = `
-    <div style="background:linear-gradient(135deg,#0d2b1f,#090909);border:2px solid #FF6B00;border-radius:24px;padding:28px 24px;text-align:center;max-width:320px;width:100%;box-shadow:0 0 50px rgba(255,107,0,0.4),0 20px 60px rgba(0,0,0,0.8);animation:bounceIn 0.5s cubic-bezier(0.34,1.56,0.64,1)">
-      <div style="font-size:56px;margin-bottom:8px">${emoji}</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,107,0,0.7);margin-bottom:4px">RANKING DO MÊS</div>
+    <div class="ranking-subiu-popup" style="background:${corBg};border:2px solid ${corBorda};border-radius:24px;padding:22px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 0 50px ${corBorda}55,0 20px 60px rgba(0,0,0,0.8)">
+      <div style="font-size:48px;margin-bottom:6px;line-height:1">${emoji}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:${corBorda};opacity:0.8;margin-bottom:4px">RANKING DO MÊS</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;letter-spacing:2px;line-height:1.1;margin-bottom:8px">${titulo}</div>
-      <div style="font-size:14px;color:rgba(255,255,255,0.85);margin-bottom:16px">${desc}</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.35)">Toca para fechar</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.85);margin-bottom:14px">${desc}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.3)">Toca para fechar</div>
     </div>`;
   document.body.appendChild(overlay);
   setTimeout(() => { if(overlay.parentNode) overlay.remove(); }, 5000);
