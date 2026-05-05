@@ -26,7 +26,8 @@
   --text: #f0f0f0;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-body { background: var(--dark); background-image: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.04) 0%, transparent 60%); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
+html { overflow-x: hidden; max-width: 100vw; }
+body { background: var(--dark); background-image: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.04) 0%, transparent 60%); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; max-width: 100vw; padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
 
 /* NAV */
 .nav { display: flex; background: linear-gradient(180deg, #1a1410, #0a0a0a); border: 1px solid rgba(201,168,76,0.35); border-radius: 50px; position: fixed; bottom: 18px; left: 12px; right: 12px; z-index: 9000; align-items: center; height: 64px; padding: 0 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(201,168,76,0.08); padding-bottom: env(safe-area-inset-bottom, 0px); }
@@ -140,7 +141,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .rank-store { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 6px; text-transform: uppercase; color: var(--orange); margin-top: 8px; }
 .rank-pill { display: inline-block; margin-top: 14px; background: rgba(255,107,0,0.15); border: 1px solid rgba(255,107,0,0.4); border-radius: 100px; padding: 5px 16px; font-size: 12px; color: #ffaa55; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
 
-.rank-main { max-width: 1200px; margin: 0 auto; padding: 28px 40px 90px; }
+.rank-main { max-width: 1200px; margin: 0 auto; padding: 8px 40px 90px; }
 
 /* ══ LÍDER DO DIA BANNER ══ */
 .lider-banner {
@@ -701,6 +702,12 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
 @keyframes barFill { from { width:0 !important; } to { } }
 @keyframes floatUp { 0% { opacity:1; transform:translateY(0) scale(1); } 100% { opacity:0; transform:translateY(-60px) scale(1.3); } }
 @keyframes shimmer { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
+/* SKELETON LOADING */
+@keyframes skelShimmer { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
+.skel { background: linear-gradient(90deg, var(--card) 25%, var(--card2) 50%, var(--card) 75%); background-size: 1200px 100%; animation: skelShimmer 1.4s infinite linear; border-radius: 8px; }
+.skel-row { height: 44px; margin-bottom: 6px; border-radius: 10px; }
+.skel-head { height: 28px; margin-bottom: 10px; border-radius: 8px; width: 55%; }
+.skel-block { padding: 14px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
 @keyframes medalPop { 0% { transform:scale(0) rotate(-20deg); opacity:0; } 70% { transform:scale(1.15) rotate(3deg); } 100% { transform:scale(1) rotate(0); opacity:1; } }
 @keyframes countBounce { 0%,100% { transform:scale(1); } 50% { transform:scale(1.08); } }
 
@@ -939,7 +946,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
         <div class="sp-bar-fill" id="splashBar"></div>
       </div>
       <div class="sp-pct" id="splashPct">0%</div>
-      <button class="sp-enter-btn" onclick="iniciarAudio();fecharSplash()">ENTRAR</button>
+      <button class="sp-enter-btn" id="splashEnterBtn">ENTRAR</button>
       <div class="sp-dev-credit">APP DEVELOPED BY DÁRIO SANTOS</div>
     </div>
   </div>
@@ -1358,29 +1365,33 @@ function goTo(screen, btn) {
     const icon = btn.querySelector('.nav-icon');
     if (icon) {
       icon.classList.remove('nav-icon-tap');
-      void icon.offsetWidth; // reflow to restart animation
+      void icon.offsetWidth;
       icon.classList.add('nav-icon-tap');
       icon.addEventListener('animationend', () => icon.classList.remove('nav-icon-tap'), {once:true});
     }
   }
   try { localStorage.setItem('lastTab', screen); } catch(e) {}
   document.getElementById('printBtn').style.display = screen === 'ranking' ? 'flex' : 'none';
-  if(screen==='desafios'){ renderDesafiosMedalhas(); }
-  if(screen==='info'){renderInfo();renderSugestoes();populateSugestaoNomes();gerarQR();}
-  if(screen==='admin'){renderPremiosLog();renderAdminSugestoes();}
+
+  // Render skeleton / cached content INSTANTLY before any fetch
   if (screen === 'ranking') {
-    // Render cache instantly — never block navigation
     if (window._rankingCache) {
       renderRanking(window._rankingCache);
     } else {
-      renderRanking([]);
+      // Skeleton placeholder
+      const rm = document.getElementById('rankMain');
+      if (rm) rm.innerHTML = _skeletonRanking();
     }
-    // Fetch fresh data only after UI has painted (non-blocking)
-    const doFetch = () => carregarRanking();
-    if (window.requestIdleCallback) requestIdleCallback(doFetch, { timeout: 400 });
-    else setTimeout(doFetch, 80);
+    // Fetch after paint — never blocks navigation
+    requestAnimationFrame(() => setTimeout(carregarRanking, 0));
   }
-  if (screen === 'dash') carregarDashboard();
+  if (screen === 'dash') {
+    // Render with whatever data exists first, fetch after
+    requestAnimationFrame(() => setTimeout(carregarDashboard, 0));
+  }
+  if(screen==='desafios'){ requestAnimationFrame(() => renderDesafiosMedalhas()); }
+  if(screen==='info'){ requestAnimationFrame(() => { renderInfo();renderSugestoes();populateSugestaoNomes();gerarQR(); }); }
+  if(screen==='admin'){renderPremiosLog();renderAdminSugestoes();}
   if (screen === 'admin') {
     if (!adminUnlocked) {
       pinBuffer = '';
@@ -1392,6 +1403,17 @@ function goTo(screen, btn) {
       renderDadosTab();
     }
   }
+}
+
+function _skeletonRanking() {
+  let h = '';
+  for (let i = 0; i < 3; i++) {
+    h += `<div class="skel-block">
+      <div class="skel skel-head"></div>
+      ${[1,2,3,4,5].map(()=>`<div class="skel skel-row"></div>`).join('')}
+    </div>`;
+  }
+  return h;
 }
 
 function renderTabs() {
@@ -2151,62 +2173,23 @@ function fecharSplash(){
 }
 iniciarSplash();
 
-// ── SPLASH PARALLAX (gyroscope / mouse) ──
+// ── BOTÃO ENTRAR ROBUSTO ──
 (function() {
-  const splash = document.getElementById('splash');
-  if (!splash) return;
-  const MAX = 10; // subtle — max px shift
-  let curX = 0, curY = 0, tgtX = 0, tgtY = 0;
-  let rafId = null;
-
-  function lerp(a, b, t) { return a + (b - a) * t; }
-
-  function tick() {
-    curX = lerp(curX, tgtX, 0.06);
-    curY = lerp(curY, tgtY, 0.06);
-    splash.style.backgroundPosition = `calc(50% + ${curX.toFixed(2)}px) calc(50% + ${curY.toFixed(2)}px)`;
-    rafId = requestAnimationFrame(tick);
+  const btn = document.getElementById('splashEnterBtn');
+  if (!btn) return;
+  let clicked = false;
+  function entrar(e) {
+    if (clicked) return;
+    clicked = true;
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    btn.style.opacity = '0.7';
+    iniciarAudio();
+    fecharSplash();
   }
-  tick();
-
-  // Stop animating once splash is gone
-  const obs = new MutationObserver(() => {
-    if (splash.classList.contains('hidden')) { cancelAnimationFrame(rafId); obs.disconnect(); }
-  });
-  obs.observe(splash, { attributes: true, attributeFilter: ['class'] });
-
-  // DeviceOrientation — request permission on iOS 13+
-  function startGyro() {
-    window.addEventListener('deviceorientation', function(e) {
-      if (splash.classList.contains('hidden')) return;
-      const gamma = e.gamma || 0; // left-right −90..90
-      const beta  = e.beta  || 0; // front-back −180..180
-      tgtX = Math.max(-MAX, Math.min(MAX, (gamma / 30) * MAX));
-      tgtY = Math.max(-MAX, Math.min(MAX, ((beta - 45) / 30) * MAX));
-    }, { passive: true });
-  }
-
-  if (typeof DeviceOrientationEvent !== 'undefined' &&
-      typeof DeviceOrientationEvent.requestPermission === 'function') {
-    // iOS 13+ needs user gesture — attach to the ENTRAR button
-    const btn = document.querySelector('.sp-enter-btn');
-    if (btn) {
-      btn.addEventListener('click', () => {
-        DeviceOrientationEvent.requestPermission().then(s => { if (s === 'granted') startGyro(); }).catch(()=>{});
-      }, { once: true });
-    }
-  } else {
-    startGyro();
-  }
-
-  // Mouse fallback for desktop
-  document.addEventListener('mousemove', function(e) {
-    if (splash.classList.contains('hidden')) return;
-    const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
-    tgtX = ((e.clientX - cx) / cx) * MAX;
-    tgtY = ((e.clientY - cy) / cy) * MAX;
-  }, { passive: true });
+  btn.addEventListener('touchend', entrar, { passive: false });
+  btn.addEventListener('click', entrar);
 })();
+
 atualizarMesLabels();
 
 // ── HOLD TO REPEAT ──
