@@ -568,34 +568,6 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .ticker-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--orange); flex-shrink: 0; }
 @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-/* SURPRISE BOX */
-.surprise-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.92); z-index: 10000; display: none; align-items: center; justify-content: space-between; flex-direction: column; padding: 44px 20px 36px; }
-.surprise-overlay.open { display: flex; animation: fadeIn 0.4s ease; }
-.surprise-pre { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 8px; text-align: center; }
-.surprise-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 3px; color: #fff; margin-bottom: 4px; text-align: center; }
-.surprise-nome { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; color: var(--orange); margin-bottom: 24px; text-align: center; }
-.surprise-box-wrap { position: relative; cursor: pointer; margin-bottom: 20px; transition: transform 0.15s; }
-.surprise-box-wrap:hover { transform: scale(1.04); }
-.surprise-box-wrap:active { transform: scale(0.97); }
-.surprise-box { position: relative; width: 200px; height: 200px; }
-.surprise-box-bottom { width: 200px; height: 140px; background: linear-gradient(135deg, #FF6B00, #FF4500); border-radius: 8px 8px 16px 16px; position: absolute; bottom: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(255,107,0,0.5); }
-.surprise-box-ribbon-v { position: absolute; width: 28px; height: 100%; background: rgba(255,255,255,0.25); left: 50%; transform: translateX(-50%); border-radius: 4px; }
-.surprise-box-ribbon-h { position: absolute; width: 100%; height: 28px; background: rgba(255,255,255,0.25); top: 50%; transform: translateY(-50%); border-radius: 4px; }
-.surprise-box-lid { width: 200px; height: 60px; background: linear-gradient(135deg, #FF8C00, #FF6B00); border-radius: 12px; position: absolute; top: 0; transform-origin: left center; transition: transform 0.6s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 4px 20px rgba(255,107,0,0.4); display: flex; align-items: center; justify-content: center; }
-.surprise-box-lid.open { transform: rotate(-65deg) translateY(-20px); }
-.surprise-box-lid-ribbon { width: 28px; height: 100%; background: rgba(255,255,255,0.3); border-radius: 4px; }
-.surprise-bow { position: absolute; top: -24px; left: 50%; transform: translateX(-50%); font-size: 36px; }
-.surprise-content { position: absolute; top: 50px; left: 50%; transform: translateX(-50%) translateY(20px); opacity: 0; transition: all 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.3s; text-align: center; width: 220px; pointer-events: none; }
-.surprise-content.show { opacity: 1; transform: translateX(-50%) translateY(-80px); }
-.surprise-content-icon { font-size: 96px; display: block; line-height: 1; }
-.surprise-content-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: #fff; letter-spacing: 2px; margin-top: 4px; }
-.surprise-hint { font-size: 13px; color: rgba(255,255,255,0.4); text-align: center; margin-top: 8px; letter-spacing: 1px; }
-.surprise-hint.hidden { opacity: 0; }
-.surprise-close { margin-top: 20px; background: transparent; border: 1.5px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 10px 28px; color: rgba(255,255,255,0.5); font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
-.surprise-close:hover { border-color: var(--orange); color: #fff; }
-.surprise-confetti-wrap { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-@keyframes fadeInScale { from { opacity:0; transform:scale(0.7); } to { opacity:1; transform:scale(1); } }
-@keyframes shakeBox { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-5deg)} 40%{transform:rotate(5deg)} 60%{transform:rotate(-4deg)} 80%{transform:rotate(4deg)} }
 
 /* FORM TICKER */
 .form-ticker-wrap { background: var(--dark); border-bottom: none; overflow: hidden; padding: 11px 0; width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; display: flex; align-items: center; height: 44px; }
@@ -2129,7 +2101,8 @@ function calcCountdown(){
 
 // ── MEDAL POPUP ──
 let medalTimer=null;
-function mostrarMedalPopup(emoji,nome,medalha,comSurprise){
+let _pendingSlotNome=null, _pendingSlotMedalha=null;
+function mostrarMedalPopup(emoji,nome,medalha){
   iniciarAudio();
   tocarSomMedalha();
   const popup=document.getElementById('medalPopup');
@@ -2166,11 +2139,14 @@ function mostrarMedalPopup(emoji,nome,medalha,comSurprise){
   }
   popup.classList.add('show');
   clearTimeout(medalTimer);
-  medalTimer=setTimeout(()=>{
+  medalTimer = setTimeout(() => {
     popup.classList.remove('show');
-    // Show surprise box ONLY when triggered from registration flow
-    if (comSurprise) setTimeout(()=>mostrarSurprise(nome, medalha), 300);
-  },3000);
+    if (_pendingSlotNome && _pendingSlotMedalha) {
+      const n = _pendingSlotNome, m = _pendingSlotMedalha;
+      _pendingSlotNome = null; _pendingSlotMedalha = null;
+      setTimeout(() => slotAbrir(n, m), 300);
+    }
+  }, 3000);
 }
 
 // ── LAST REGISTO ──
@@ -2961,7 +2937,7 @@ function limparCacheAdmin() {
   const toRemove = [];
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (k && (k.startsWith('medalhasShown_') || k.startsWith('surpriseShown_') || k.startsWith('mbShown_') || k.startsWith('registo_') || k.startsWith('slotDado_'))) toRemove.push(k);
+    if (k && (k.startsWith('medalhasShown_') || k.startsWith('registo_') || k.startsWith('slotDado_'))) toRemove.push(k);
   }
   toRemove.forEach(k => { try { localStorage.removeItem(k); } catch(e) {} });
   showToast('✓ Cache limpo com sucesso');
@@ -3688,20 +3664,6 @@ function toggleGestaoLista() {
   }
 }
 
-// ── SURPRISE BOX ──
-const mbPrizes = [
-  { icon: '🍫', text: 'Um chocolate!' },
-  { icon: '☕', text: 'Um café!' },
-  { icon: '🍬', text: 'Um saco de gomas!' },
-  { icon: '🧃', text: 'Um sumo!' },
-  { icon: '🥐', text: 'Um pastel de nata!' },
-  { icon: '⏰', text: 'Sair 30min ou 1h mais cedo, um dia a combinar!' },
-];
-
-let mbOpened = false;
-
-// Aliases para compatibilidade com código antigo
-
 
 // ── INFO + SUGESTÕES + QR ──
 const infoSections=[
@@ -4233,10 +4195,21 @@ function slotVerificarMedalhas(nome, payload) {
 
   if (fila.length === 0) return;
 
-  // Abrir slots em sequência (a mesma lógica do slot-test.html que funciona)
-  fila.forEach((m, idx) => {
-    setTimeout(() => slotAbrir(nome, m.name), idx * 100);
-  });
+  // Mostrar popup de medalha + auto-abrir slot a seguir
+  const primeira = fila[0];
+  const iconesMedalha = { 'Super Online':'🌟', 'Spray Explosion':'💥' };
+  const todasAsIcones = calcularMedalhas([payload]);
+  const medalhaInfo = todasAsIcones.find(m => m.name === primeira.name);
+  const emoji = medalhaInfo ? medalhaInfo.icon : (iconesMedalha[primeira.name] || '🏅');
+
+  _pendingSlotNome = nome;
+  _pendingSlotMedalha = primeira.name;
+  mostrarMedalPopup(emoji, nome, primeira.name);
+
+  // Se há mais de uma medalha, abrir as restantes depois (com delay)
+  for (let i = 1; i < fila.length; i++) {
+    setTimeout(() => slotAbrir(nome, fila[i].name), 4500 + (i - 1) * 500);
+  }
 }
 
 // Aliases para compatibilidade com chamadas antigas no código
