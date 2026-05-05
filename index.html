@@ -492,7 +492,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 
 /* SPLASH ZOOM */
 @keyframes splashZoomIn { 0%{transform:scale(1)} 100%{transform:scale(1.15)} }
-.splash::before { content:''; position:absolute; inset:-10%; background:inherit; background-size:cover !important; background-position:center !important; animation: splashZoomIn 9s ease-in forwards; z-index:0; }
+.splash::before { content:''; position:absolute; inset:-10%; background: #040608 url('images/splash-bg.jpg') center center/cover no-repeat; animation: splashZoomIn 9s ease-in forwards; z-index:0; }
 .splash { background: #040608 !important; }
 .sp-particles { z-index:3 !important; }
 .sp-inner { z-index:4 !important; }
@@ -4624,7 +4624,7 @@ function renderDesafiosMedalhas() {
         <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px">
           <select id="sugestaoNome" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;margin-bottom:8px"><option value="">— Nome —</option></select>
           <textarea id="sugestaoTexto" placeholder="Escreve a tua sugestão..." style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;outline:none;resize:none;height:80px;font-family:inherit"></textarea>
-          <button onclick="enviarSugestao()" style="background:var(--orange);border:none;border-radius:10px;padding:11px 28px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;margin-top:6px;align-self:flex-end;display:block;margin-left:auto">Enviar →</button>
+          <button onclick="enviarSugestao()" style="background:var(--orange);border:none;border-radius:10px;padding:11px 28px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;margin-top:6px;display:block;margin-left:auto;margin-right:auto">Enviar →</button>
         </div>
         <div id="sugestoesList"></div>
       </div>
