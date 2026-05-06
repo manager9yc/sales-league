@@ -5870,6 +5870,9 @@ function syncCofreJackpot() {
 }
 
 
+// ══ COFRE (isolated scope) ══
+(function() {
+
 // ══════════════════════════════════════════════
 // SUPER LIGA — O COFRE  (versão demo)
 // ══════════════════════════════════════════════
@@ -6370,7 +6373,11 @@ function cofreToast(msg, type='') {
   window._toastTimer = setTimeout(()=>t.classList.remove('show'), 2800);
 }
 
-// ── START ──
-cofreInit();
+// Expose only the entry point
+window.cofreInit = cofreInit;
+// Do NOT auto-run — waits for user action
+
+})(); // end IIFE
+
 
 </script>
