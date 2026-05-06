@@ -634,7 +634,7 @@ body.theme-ucl .ucl-stars-banner{display:block}
 
 /* ══ STANDARD BANNER ══ */
 .screen-banner { background: var(--dark); position: relative; overflow: hidden; }
-.screen-banner-inner { padding: 0 24px; text-align: center; position: relative; height: 108px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.screen-banner-inner { padding: 0 24px; text-align: center; position: relative; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .screen-banner-inner::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--orange); }
 .screen-banner-inner::after { content:''; position:absolute; right:0; top:0; bottom:0; width:4px; background:var(--orange); }
 .screen-banner-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(40px,10vw,64px); color:#fff; line-height:0.95; letter-spacing:2px; position:relative; z-index:1; }
@@ -651,27 +651,7 @@ body.theme-ucl .ucl-stars-banner { display:block; }
 
 
 /* ══ UNIFORM BANNERS ══ */
-.screen-banner-inner,
-.banner-top {
-  padding: 28px 24px 0 !important;
-  min-height: 130px;
-}
-.screen-banner-title,
-.banner-top [style*="font-family:'Bebas Neue'"],
-.banner-top [style*='font-family:"Bebas Neue"'] {
-  font-size: clamp(40px,10vw,64px) !important;
-  line-height: 0.95 !important;
-}
-.screen-banner-sub,
-.banner-top [style*="font-size:13px"][style*="Barlow"] {
-  font-size: 13px !important;
-  margin-top: 6px !important;
-}
-.screen-banner-bar,
-.banner-bar {
-  margin-top: 20px !important;
-  padding: 10px 24px !important;
-}
+/* All banners unified via .screen-banner-inner height */
 
 
 .name-btn:active, .submit-btn:active, .sp-btn:active,
@@ -860,6 +840,9 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 .swipe-arrows span:nth-child(2) { animation-delay: 0.18s; opacity: 0.7; }
 .swipe-arrows span:nth-child(3) { animation-delay: 0.36s; opacity: 0.4; }
 @keyframes swipeArrowPulse { 0%,100%{opacity:0.15} 50%{opacity:0.9} }
+@keyframes rocketFloat0 { 0%,100%{transform:translateY(0) rotate(-5deg)} 50%{transform:translateY(-6px) rotate(5deg)} }
+@keyframes rocketFloat1 { 0%,100%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(-5px) rotate(4deg)} }
+@keyframes rocketFloat2 { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-4px) rotate(3deg)} }
 /* Trail effect behind thumb */
 .swipe-trail {
   position: absolute;
@@ -1128,7 +1111,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
           </div>
         </div>
       </div>
-      <div style="text-align:center;padding:10px 0 4px;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif">APP developed by Dário Santos</div>
+
     </div>
     <div class="success" id="successMsg">
       <!-- HERO CONFIRMAÇÃO -->
@@ -1173,7 +1156,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 <!-- DASHBOARD -->
 <div class="screen" id="screen-dash">
   <div style="background:#0C0C0C;position:relative;overflow:hidden">
-    <div style="padding:0 24px;text-align:center;position:relative;height:108px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+    <div style="padding:0 24px;text-align:center;position:relative;height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
       <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#FF6B00"></div>
       <div style="position:absolute;right:0;top:0;bottom:0;width:4px;background:#FF6B00"></div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,10vw,64px);color:#fff;line-height:0.95;letter-spacing:2px">DASHBOARD</div>
@@ -1214,7 +1197,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
     <div style="padding:28px 20px 18px">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#fff;margin-bottom:4px">O teu perfil</div>
       <div style="font-size:14px;color:var(--muted);margin-bottom:20px">Seleciona um vendedor para ver o seu dashboard completo</div>
-      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">🏅 Top 3 Consistência este mês</div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">🚀 Top 3 Consistência este mês</div>
       <div id="top3ConsistenciaWrap" style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px"></div>
     </div>
     <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Destaques do mês</div>
@@ -1226,7 +1209,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 <!-- ADMIN -->
 <div class="screen" id="screen-admin">
   <div style="background:#0C0C0C;position:relative;overflow:hidden">
-    <div style="padding:0 24px;text-align:center;position:relative;height:108px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+    <div style="padding:0 24px;text-align:center;position:relative;height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
       <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#FF6B00"></div>
       <div style="position:absolute;right:0;top:0;bottom:0;width:4px;background:#FF6B00"></div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,10vw,64px);color:#fff;line-height:0.95;letter-spacing:2px">ADMINISTRAÇÃO</div>
@@ -2234,8 +2217,8 @@ function fecharSplash(){
   s.classList.add('out');
   setTimeout(()=>{
     s.classList.add('hidden');
-    const desafiosBtn = document.getElementById('navBtnDesafios');
-    if(desafiosBtn) goTo('desafios', desafiosBtn);
+    const rankingBtn = document.getElementById('navBtnRanking');
+    if(rankingBtn) goTo('ranking', rankingBtn);
   },600);
 }
 iniciarSplash();
@@ -2307,15 +2290,23 @@ function startChange(campo,delta,e){
   if(e&&e.type==='touchstart'){
     touchStartY=e.touches[0].clientY;
     touchMoved=false;
-    const tm = (ev)=>{ if(Math.abs(ev.touches[0].clientY-touchStartY)>8){touchMoved=true;stopChange();document.removeEventListener('touchmove',tm);} };
+    const tm = (ev)=>{ if(Math.abs(ev.touches[0].clientY-touchStartY)>18){touchMoved=true;stopChange();document.removeEventListener('touchmove',tm);} };
     document.addEventListener('touchmove',tm,{passive:true});
-    setTimeout(()=>document.removeEventListener('touchmove',tm),600);
+    setTimeout(()=>document.removeEventListener('touchmove',tm),800);
   }
   if(e&&e.type==='mousedown')e.preventDefault();
   const now=Date.now(); if(now-lastChangeTime<200)return; lastChangeTime=now;
   if(touchMoved)return;
-  change(campo,delta);
-  changeTo=setTimeout(()=>{changeIv=setInterval(()=>{if(touchMoved){stopChange();return;}lastChangeTime=Date.now();change(campo,delta);},150);},500);
+  // Delay first action on touch to distinguish scroll from tap
+  const isSacos = campo === 'sacos';
+  const firstDelay = e&&e.type==='touchstart' ? 80 : 0;
+  setTimeout(()=>{
+    if(touchMoved)return;
+    change(campo,delta);
+    const repeatDelay = isSacos ? 200 : 500;
+    const repeatInterval = isSacos ? 60 : 150;
+    changeTo=setTimeout(()=>{changeIv=setInterval(()=>{if(touchMoved){stopChange();return;}lastChangeTime=Date.now();change(campo,delta);},repeatInterval);},repeatDelay);
+  }, firstDelay);
 }
 function stopChange(e){
   if(e && e.type === 'touchend' && touchMoved) {
@@ -2329,7 +2320,7 @@ function stopChange(e){
 document.addEventListener('touchmove', function(e) {
   if (touchStartY !== 0) {
     const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
-    if (deltaY > 8) {
+    if (deltaY > 18) {
       touchMoved = true;
       clearTimeout(changeTo);clearInterval(changeIv);changeTo=null;changeIv=null;
     }
@@ -3022,7 +3013,8 @@ function renderTop3Consistencia() {
     .map(([nome,dias])=>({nome,registos:dias.size}))
     .sort((a,b)=>b.registos-a.registos).slice(0,3);
   if (!ranking.length) { wrap.innerHTML = '<div style="color:var(--muted);font-size:13px;font-style:italic">Sem registos este mês</div>'; return; }
-  const medalEmoji=['🥇','🥈','🥉'];
+  const posLabel=['1º','2º','3º'];
+  const posColor=['#C9A84C','rgba(180,180,180,0.9)','rgba(180,120,60,0.9)'];
   const borders=['rgba(201,168,76,0.5)','rgba(180,180,180,0.35)','rgba(180,120,60,0.35)'];
   wrap.innerHTML = ranking.map((v,i)=>{
     const foto=getFoto?getFoto(v.nome):null;
@@ -3031,7 +3023,10 @@ function renderTop3Consistencia() {
     return `<div style="background:var(--card);border:1px solid ${borders[i]};border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="abrirDashDeRanking('${v.nome.replace(/'/g,"\'")}')">
       ${av}
       <div style="flex:1"><div style="font-size:15px;font-weight:700;color:#fff">${v.nome}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${v.registos} registo${v.registos!==1?'s':''} este mês</div></div>
-      <div style="font-size:26px">${medalEmoji[i]}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+        <span style="display:inline-block;animation:rocketFloat${i} 1.8s ease-in-out infinite;font-size:22px;filter:drop-shadow(0 0 6px rgba(255,107,0,0.6))">🚀</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:11px;color:${posColor[i]};letter-spacing:1px">${posLabel[i]}</span>
+      </div>
     </div>`;
   }).join('');
 }
