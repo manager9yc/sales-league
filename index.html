@@ -1458,7 +1458,7 @@ function goTo(screen, btn) {
       const rm = document.getElementById('rankMain');
       if (rm) rm.innerHTML = _skeletonRanking();
     }
-    requestAnimationFrame(() => setTimeout(carregarRanking, 0));
+    requestAnimationFrame(() => setTimeout(carregarRanking, 500));
   }
   if (screen === 'dash') {
     // Render with whatever data exists first, fetch after
@@ -2017,24 +2017,37 @@ function verificarMedalhasRanking() {
 }
 
 function renderRanking(dados) {
+  const rm = document.getElementById('rankMain');
+  if (!rm) return;
   calcCountdown();
   const agora = new Date().toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  let html = '';
-  let d = 0.05;
 
-    html += secDiv('🎯', 'Ranking por Produto');
-  categorias.forEach(cat => {
-    const sorted = [...dados].filter(v=>(v[cat.key]||0)>0).sort((a,b)=>b[cat.key]-a[cat.key]).slice(0,10);
-    html += catBlock(cat.emoji, cat.label, sorted.length ? buildRows(sorted, cat.key) : emptyRows(), agora, d);
-    d += 0.07;
+  // Split rendering into chunks to avoid blocking UI thread
+  const chunks = [];
+
+  // Chunk 1: ranking por produto
+  chunks.push(() => {
+    let html = secDiv('🎯', 'Ranking por Produto');
+    let d = 0.05;
+    categorias.forEach(cat => {
+      const sorted = [...dados].filter(v=>(v[cat.key]||0)>0).sort((a,b)=>b[cat.key]-a[cat.key]).slice(0,10);
+      html += catBlock(cat.emoji, cat.label, sorted.length ? buildRows(sorted, cat.key) : emptyRows(), agora, d);
+      d += 0.07;
+    });
+    rm.innerHTML = html;
+    // Animate rows
+    rm.querySelectorAll('.rank-table tbody tr').forEach((row,i)=>setTimeout(()=>row.classList.add('row-visible'),i*60));
   });
 
-  // Registos por seccao com barras
-  html += renderRegistosPorSeccao(dados);
+  // Chunk 2: registos por secção
+  chunks.push(() => {
+    rm.insertAdjacentHTML('beforeend', renderRegistosPorSeccao(dados));
+  });
 
-  // Medalhas conquistadas este mês (mensais + diárias)
-  if (dados.length) {
-    html += '<div class="slabel" style="margin-top:28px">🏅 Medalhas conquistadas este mês</div>';
+  // Chunk 3: medalhas conquistadas
+  chunks.push(() => {
+    if (!dados.length) return;
+    let medalhasHtml = '<div class="slabel" style="margin-top:28px">🏅 Medalhas conquistadas este mês</div><div style="display:flex;flex-direction:column;gap:8px">';
     const dadosPorNome = {};
     const fonte = dashAllDados.length ? dashAllDados : dados;
     fonte.filter(d=>d&&d.nome).forEach(d => {
@@ -2049,7 +2062,6 @@ function renderRanking(dados) {
       });
     } catch(e) {}
     const mesAtual2 = new Date().getMonth(), anoAtual2 = new Date().getFullYear();
-    let medalhasHtml = '<div style="display:flex;flex-direction:column;gap:8px">';
     let temMedalhas = false;
     Object.keys(dadosPorNome).sort().forEach(nome => {
       const conquistadas = calcularMedalhas(dadosPorNome[nome]).filter(m=>m.earned);
@@ -2065,21 +2077,17 @@ function renderRanking(dados) {
     });
     if (!temMedalhas) medalhasHtml += '<div style="color:var(--muted);font-size:13px;font-style:italic;padding:12px">Nenhuma medalha conquistada ainda este mês</div>';
     medalhasHtml += '</div>';
-    html += medalhasHtml;
-  }
-  document.getElementById('rankMain').innerHTML = html;
-  // Animate rows cascade
-  const rows2 = document.querySelectorAll('.rank-table tbody tr');
-  rows2.forEach((row,i)=>setTimeout(()=>row.classList.add('row-visible'),i*80));
-  // Animate bars and scores
-  setTimeout(() => {
-    document.querySelectorAll('.bar-fg[data-pct]').forEach(el => {
-      el.style.width = el.dataset.pct + '%';
-    });
-    document.querySelectorAll('.team-bar-fill[data-pct]').forEach(el => {
-      el.style.width = el.dataset.pct + '%';
-    });
-  }, 150);
+    rm.insertAdjacentHTML('beforeend', medalhasHtml);
+  });
+
+  // Chunk 4: animate bars
+  chunks.push(() => {
+    rm.querySelectorAll('.bar-fg[data-pct]').forEach(el => { el.style.width = el.dataset.pct + '%'; });
+    rm.querySelectorAll('.team-bar-fill[data-pct]').forEach(el => { el.style.width = el.dataset.pct + '%'; });
+  });
+
+  // Execute chunks with yield between each so UI stays responsive
+  chunks.forEach((fn, i) => setTimeout(fn, i * 30));
 }
 
 
@@ -2272,8 +2280,8 @@ function fecharSplash(){
   s.classList.add('out');
   setTimeout(()=>{
     s.classList.add('hidden');
-    const desafiosBtn = document.getElementById('navBtnRanking');
-    if(desafiosBtn) goTo('ranking', desafiosBtn);
+    const desafiosBtn = document.getElementById('navBtnDesafios');
+    if(desafiosBtn) goTo('desafios', desafiosBtn);
   },600);
 }
 iniciarSplash();
