@@ -4075,7 +4075,7 @@ async function carregarAdmin() {
   const data = dateInput.value;
   if (!data) return;
   document.getElementById('adminDataLabel').textContent = new Date(data+'T12:00:00').toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'long'});
-  const content = document.getElementById('adminContent');
+  const content = document.getElementById('adminContentCofre');
   content.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted)"><div style="font-size:28px;margin-bottom:8px">⏳</div><p>A carregar...</p></div>';
 
   function normData(r) {
@@ -5379,23 +5379,33 @@ function renderDesafiosMedalhas() {
 
     <!-- COFRE BUTTON -->
     <div style="margin-top:20px;margin-bottom:8px" id="cofreBannerWrap">
-      <button onclick="abrirCofre()" id="cofreBtn" style="width:100%;background:linear-gradient(135deg,#0d0c08,#1a1408);border:1px solid rgba(201,168,76,0.4);border-radius:20px;padding:0;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative;box-shadow:0 8px 32px rgba(201,168,76,0.15);">
-        <div style="position:absolute;inset:0;overflow:hidden;border-radius:20px;pointer-events:none;"><div style="position:absolute;top:0;bottom:0;left:-80%;width:60%;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.07),transparent);transform:skewX(-15deg);animation:cofreShimmer 2.5s ease-in-out infinite;"></div></div>
-        <div style="padding:20px 20px 16px;position:relative;">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
-            <div style="font-size:40px;animation:cofrePulse 2s ease-in-out infinite;filter:drop-shadow(0 0 12px rgba(201,168,76,0.6));">🔒</div>
+      <button onclick="abrirCofre()" id="cofreBtn" style="width:100%;background:linear-gradient(135deg,#0d0c08,#1c1a0e,#0d0c08);border:2px solid rgba(201,168,76,0.45);border-radius:20px;padding:0;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative;box-shadow:0 12px 40px rgba(201,168,76,0.18),0 4px 16px rgba(0,0,0,0.6);">
+        <!-- Shimmer sweep -->
+        <div style="position:absolute;top:0;bottom:0;left:-80%;width:60%;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.08),transparent);transform:skewX(-15deg);animation:cofreShimmer 2.8s ease-in-out infinite;pointer-events:none;"></div>
+        <!-- Top accent line -->
+        <div style="position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.6),transparent);"></div>
+        <!-- Content -->
+        <div style="padding:22px 22px 18px;position:relative;">
+          <!-- Icon + title row -->
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+            <div style="font-size:46px;animation:cofrePulse 2s ease-in-out infinite;filter:drop-shadow(0 0 14px rgba(201,168,76,0.7));flex-shrink:0;">🔒</div>
             <div style="text-align:left;">
-              <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(201,168,76,0.55);margin-bottom:2px;">PRÉMIO EXCLUSIVO</div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:3px;color:#fff;line-height:1;">O COFRE</div>
-              <div style="font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:1px;">Lidera a semana. Tenta abrir.</div>
+              <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:rgba(201,168,76,0.55);margin-bottom:3px;">PRÉMIO EXCLUSIVO · SUPER LIGA</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:3px;color:#fff;line-height:1;">O COFRE</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.45);letter-spacing:1px;margin-top:2px;font-style:italic;">Só os melhores chegam aqui</div>
             </div>
           </div>
-          <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+          <!-- Jackpot display -->
+          <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);border-radius:14px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
             <div>
-              <div style="font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(201,168,76,0.5);">PRÉMIO ACUMULADO</div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;background:linear-gradient(135deg,#a07820,#C9A84C,#E8C97A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;" id="cofreBtnJackpot">€ 2,00</div>
+              <div style="font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(201,168,76,0.5);margin-bottom:2px;">PRÉMIO ACUMULADO</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;background:linear-gradient(135deg,#a07820,#C9A84C,#E8C97A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;" id="cofreBtnJackpot">€ 2,00</div>
             </div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;background:linear-gradient(135deg,#C9A84C,#E8C97A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">JOGAR →</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+              <div style="background:linear-gradient(135deg,#a07820,#C9A84C);border-radius:10px;padding:10px 16px;">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#090909;">JOGAR →</div>
+              </div>
+            </div>
           </div>
         </div>
       </button>
@@ -5945,7 +5955,7 @@ function renderAll() {
 
 // ── VAULT VISUALS ──
 function buildVaultVisuals() {
-  const spokes = document.getElementById('vaultSpokes');
+  const spokes = document.getElementById('vaultSpokesCofre');
   const notches = document.getElementById('vaultNotches');
   spokes.innerHTML = '';
   notches.innerHTML = '';
@@ -5964,7 +5974,7 @@ function buildVaultVisuals() {
 }
 
 function buildNumpad() {
-  const pad = document.getElementById('numpad');
+  const pad = document.getElementById('numpadCofre');
   pad.innerHTML = '';
   const keys = ['1','2','3','4','5','6','7','8','9','⌫','0','✓'];
   keys.forEach(k => {
@@ -5993,14 +6003,14 @@ function buildComboDisplay() {
 // ── JACKPOT ──
 function renderJackpot() {
   const fmt = v => v.toFixed(2).replace('.',',');
-  document.getElementById('jackpotDisplay').textContent = fmt(state.jackpot);
-  document.getElementById('statusJackpot').textContent = fmt(state.jackpot);
+  document.getElementById('jackpotDisplayCofre').textContent = fmt(state.jackpot);
+  document.getElementById('statusJackpotCofre').textContent = fmt(state.jackpot);
   document.getElementById('weeksNoWinner').textContent = state.weeksNoWinner;
 }
 
 // ── STATUS BAR ──
 function updateStatusBar() {
-  document.getElementById('statusWeek').textContent = state.weekLabel || ('SEMANA '+state.week);
+  document.getElementById('statusWeekCofre').textContent = state.weekLabel || ('SEMANA '+state.week);
 }
 
 // ── PLAYER SELECT ──
@@ -6030,7 +6040,7 @@ function onPlayerChange() {
 
 // ── ELIGIBILITY ──
 function renderEligibility() {
-  const list = document.getElementById('eligList');
+  const list = document.getElementById('eligListCofre');
   const medals = ['r1','r2','r3'];
   const pos = ['👑 1º','🥈 2º','🥉 3º'];
   list.innerHTML = state.top3.map((p,i) => {
@@ -6052,8 +6062,8 @@ function renderEligibility() {
 // ── VAULT STATUS ──
 function renderVaultStatus() {
   const msg = document.getElementById('vaultStatusMsg');
-  const pad = document.getElementById('numpad');
-  const door = document.getElementById('vaultDoor');
+  const pad = document.getElementById('numpadCofre');
+  const door = document.getElementById('vaultDoorCofre');
 
   if (!currentPlayer) {
     msg.innerHTML = '<span style="color:var(--muted)">Seleciona o teu nome para jogar</span>';
@@ -6096,7 +6106,7 @@ function handleKey(k) {
     currentEntry += k;
     updateComboDisplay();
     // Spin vault dial
-    const door = document.getElementById('vaultDoor');
+    const door = document.getElementById('vaultDoorCofre');
     door.classList.remove('spinning');
     void door.offsetWidth;
     door.classList.add('spinning');
@@ -6237,10 +6247,10 @@ function handleWin() {
   const cofreWov = document.getElementById('cofreWinOv'); if(cofreWov){ cofreWov.style.display='flex'; cofreWov.style.animation='fadeIn 0.4s ease'; }
 
   // Update vault door
-  const door = document.getElementById('vaultDoor');
+  const door = document.getElementById('vaultDoorCofre');
   door.classList.add('open-vault');
-  document.getElementById('lockIcon').textContent = '🔓';
-  document.getElementById('lockIcon').classList.add('unlocked');
+  document.getElementById('lockIconCofre').textContent = '🔓';
+  document.getElementById('lockIconCofre').classList.add('unlocked');
 
   renderAll();
 }
@@ -6254,7 +6264,7 @@ function cofreFecharWin() {
 
 // ── HISTORY ──
 function cofreAbrirHistorico() {
-  const list = document.getElementById('histList');
+  const list = document.getElementById('cofreHistList');
   if (!state.history.length) {
     list.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">Ainda nenhum prémio atribuído</div>';
   } else {
@@ -6281,7 +6291,7 @@ let adminUnlocked = false;
 
 function cofreToggleAdmin() {
   adminOpen = !adminOpen;
-  document.getElementById('adminPanel').classList.toggle('open', adminOpen);
+  document.getElementById('adminPanelCofre').classList.toggle('open', adminOpen);
   document.getElementById('adminArrow').textContent = adminOpen ? '▲' : '▼';
 }
 
@@ -6289,7 +6299,7 @@ function verificarAdminPin() {
   const pin = document.getElementById('adminPinInput').value;
   if(pin === ADMIN_PIN_COFRE) {
     adminUnlocked = true;
-    document.getElementById('adminContent').style.display = 'block';
+    document.getElementById('adminContentCofre').style.display = 'block';
     document.getElementById('adminShowCode').textContent = state.secretCode;
     buildAdminTop3();
     cofreToast('Admin desbloqueado', 'green');
@@ -6358,8 +6368,8 @@ function cofreAdminReset() {
   buildComboDisplay();
   document.getElementById('attemptsList').innerHTML = '';
   document.getElementById('attemptsLabel').style.display = 'none';
-  document.getElementById('vaultDoor').classList.remove('open-vault');
-  document.getElementById('lockIcon').textContent = '🔒';
+  document.getElementById('vaultDoorCofre').classList.remove('open-vault');
+  document.getElementById('lockIconCofre').textContent = '🔒';
   renderAll();
   cofreToast('Reset efectuado', 'red');
 }
