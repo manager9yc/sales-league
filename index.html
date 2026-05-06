@@ -975,8 +975,32 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 .swipe-btn-wrap.done { background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.4); }
 
 </style>
+  <!-- PWA MANIFEST inline -->
+  <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22Super%20Liga%22%2C%22short_name%22%3A%22Super%20Liga%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23080808%22%2C%22theme_color%22%3A%22%23080808%22%2C%22orientation%22%3A%22portrait%22%7D">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Super Liga">
+  <meta name="mobile-web-app-capable" content="yes">
 </head>
 <body>
+
+<!-- OFFLINE INDICATOR placeholder -->
+
+<!-- PWA INSTALL BANNER -->
+<div id="pwaInstallBanner" style="display:none;position:fixed;bottom:80px;left:12px;right:12px;z-index:9990;background:linear-gradient(135deg,#1a1208,#111108);border:1px solid rgba(201,168,76,0.4);border-radius:16px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.6)">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div style="font-size:32px;flex-shrink:0">🏆</div>
+    <div style="flex:1">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;letter-spacing:1px">ADICIONAR À HOMESCREEN</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px">Acede à Super Liga diretamente do ecrã inicial</div>
+    </div>
+    <button onclick="document.getElementById('pwaInstallBanner').style.display='none';localStorage.setItem('pwaDismissed','1')" style="background:transparent;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px">✕</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button id="pwaInstallBtn" style="flex:1;background:linear-gradient(135deg,#C9A84C,#E8C97A);border:none;border-radius:10px;padding:10px;color:#090909;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer">INSTALAR</button>
+    <div id="pwaIosHint" style="display:none;flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 10px;font-size:11px;color:rgba(255,255,255,0.6);text-align:center;line-height:1.4">Toca em <strong style="color:#C9A84C">⎙ Partilhar</strong> e depois<br><strong style="color:#C9A84C">Adicionar ao ecrã inicial</strong></div>
+  </div>
+</div>
 
 <!-- SPLASH -->
 <div class="splash" id="splash">
@@ -1305,6 +1329,12 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
         <button onclick="limparRegistosHoje()" style="background:#1a0000;border:1px solid #ef4444;border-radius:10px;padding:10px 14px;color:#ef4444;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🗑 Reset Hoje</button>
         <button onclick="slotAbrir('TESTE','Medalha Teste')" style="background:var(--card);border:1px solid #C9A84C;border-radius:10px;padding:10px 14px;color:#C9A84C;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">🎰 Testar Slot</button>
         <button onclick="bloquearAdmin()" style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-left:auto">🔒 Bloquear</button>
+        <!-- THEME SWITCHER -->
+        <div style="display:flex;gap:6px;align-items:center;margin-left:8px;border-left:1px solid var(--border);padding-left:10px">
+          <button id="btnTheme_ucl" onclick="aplicarTema('ucl')" title="Champions (default)" style="background:var(--card);border:2px solid #C9A84C;border-radius:8px;padding:7px 10px;color:#C9A84C;font-size:12px;cursor:pointer">👑</button>
+          <button id="btnTheme_dark" onclick="aplicarTema('dark')" title="Modo Escuro" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--muted);font-size:12px;cursor:pointer">🌙</button>
+          <button id="btnTheme_oled" onclick="aplicarTema('oled')" title="OLED / Alto Contraste" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--muted);font-size:12px;cursor:pointer">⚡</button>
+        </div>
       </div>
       <div style="padding:0 16px" id="adminContent">
         <div style="text-align:center;padding:40px;color:var(--muted)">
@@ -1947,25 +1977,32 @@ async function carregarRanking() {
   const signal = _rankingAbort.signal;
 
   const elU = document.getElementById('rankLastUpdate');
-  if (elU) elU.innerHTML = '<span style="display:inline-flex;align-items:center;gap:5px;color:rgba(201,168,76,0.6)"><span style="width:7px;height:7px;border-radius:50%;background:#C9A84C;display:inline-block;animation:rankDotPulse 0.9s ease-in-out infinite"></span>A carregar dados...</span>';
 
-  // Show localStorage cache IMMEDIATELY
+  // Smart cache — skip fetch if data is < 5 minutes old
+  const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
   try {
     const cached = localStorage.getItem('rankingCache');
-    const cachedTime = localStorage.getItem('rankingCacheTime');
+    const cachedTime = parseInt(localStorage.getItem('rankingCacheTime') || '0');
+    const age = Date.now() - cachedTime;
     if (cached) {
       window._rankingCache = JSON.parse(cached);
       renderRanking(window._rankingCache);
-      if (cachedTime) {
-        const dt = new Date(parseInt(cachedTime));
-        const label = dt.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
-        const el = document.getElementById('rankLastUpdate');
-        if (el) el.textContent = '⏱ Última atualização: ' + label;
+      const dt = new Date(cachedTime);
+      const label = dt.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+      if (age < CACHE_TTL) {
+        // Fresh cache — skip fetch entirely
+        if (elU) elU.textContent = '✓ Atualizado às ' + label;
+        if (!signal.aborted) verificarMedalhasRanking();
+        return;
       }
+      // Stale cache — show it but fetch in background
+      if (elU) elU.textContent = '⏱ Cache de ' + label + ' — a atualizar...';
     } else {
       renderRanking([]);
     }
   } catch(e) { renderRanking([]); }
+
+  if (elU) elU.innerHTML = '<span style="display:inline-flex;align-items:center;gap:5px;color:rgba(201,168,76,0.6)"><span style="width:7px;height:7px;border-radius:50%;background:#C9A84C;display:inline-block;animation:rankDotPulse 0.9s ease-in-out infinite"></span>A carregar dados...</span>';
 
   try {
     const directUrl = SHEETS_URL + '?action=getRanking';
@@ -2323,6 +2360,102 @@ iniciarSplash();
 
 atualizarMesLabels();
 
+// ── PWA INSTALL PROMPT ──
+(function() {
+  if (localStorage.getItem('pwaDismissed') || localStorage.getItem('pwaInstalled')) return;
+  let deferredPrompt = null;
+  const banner = document.getElementById('pwaInstallBanner');
+  const installBtn = document.getElementById('pwaInstallBtn');
+  const iosHint = document.getElementById('pwaIosHint');
+
+  // Android/Chrome
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (banner) {
+      banner.style.display = 'block';
+      if (installBtn) installBtn.style.display = 'block';
+      if (iosHint) iosHint.style.display = 'none';
+    }
+  });
+
+  if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          localStorage.setItem('pwaInstalled','1');
+          banner.style.display = 'none';
+        }
+        deferredPrompt = null;
+      }
+    });
+  }
+
+  // iOS Safari — não tem beforeinstallprompt
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.navigator.standalone === true;
+  if (isIOS && !isStandalone && banner) {
+    setTimeout(() => {
+      banner.style.display = 'block';
+      if (installBtn) installBtn.style.display = 'none';
+      if (iosHint) iosHint.style.display = 'flex';
+    }, 8000); // Mostra 8s depois de abrir
+  }
+})();
+(function() {
+  function syncOfflineRegistos() {
+    const pendentes = JSON.parse(localStorage.getItem('offline_queue') || '[]');
+    if (!pendentes.length) return;
+    console.log('[Offline] A sincronizar', pendentes.length, 'registos pendentes...');
+    const promises = pendentes.map(payload =>
+      fetch(SHEETS_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      }).then(r => r.json()).then(d => ({ ok: true, payload })).catch(() => ({ ok: false, payload }))
+    );
+    Promise.allSettled(promises).then(results => {
+      const falhou = results.filter(r => r.value && !r.value.ok).map(r => r.value.payload);
+      localStorage.setItem('offline_queue', JSON.stringify(falhou));
+      const sincronizados = pendentes.length - falhou.length;
+      if (sincronizados > 0) {
+        window._rankingCache = null;
+        localStorage.removeItem('rankingCache');
+        // Show toast
+        const t = document.createElement('div');
+        t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#22C55E;color:#fff;padding:10px 20px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:2px;font-size:13px;z-index:9999;box-shadow:0 4px 20px rgba(34,197,94,0.4)';
+        t.textContent = '✓ ' + sincronizados + ' registo' + (sincronizados > 1 ? 's' : '') + ' sincronizado' + (sincronizados > 1 ? 's' : '');
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 3500);
+      }
+    });
+  }
+  window.addEventListener('online', syncOfflineRegistos);
+  // Try on load too in case we're back online
+  if (navigator.onLine) setTimeout(syncOfflineRegistos, 3000);
+
+  // Indicador offline no topo
+  function updateOfflineIndicator() {
+    let ind = document.getElementById('offlineIndicator');
+    if (!navigator.onLine) {
+      if (!ind) {
+        ind = document.createElement('div');
+        ind.id = 'offlineIndicator';
+        ind.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#7a2200;color:#FFB09A;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;padding:4px;z-index:99999';
+        ind.textContent = '📡 SEM LIGAÇÃO — Os registos serão guardados e enviados depois';
+        document.body.appendChild(ind);
+      }
+    } else {
+      if (ind) ind.remove();
+    }
+  }
+  window.addEventListener('online', updateOfflineIndicator);
+  window.addEventListener('offline', updateOfflineIndicator);
+  updateOfflineIndicator();
+})();
+
 // ── SWIPE LATERAL ENTRE MENUS ──
 (function() {
   const SCREENS = ['desafios', 'ranking', 'dash', 'info'];
@@ -2627,12 +2760,18 @@ function renderCompare(nomeA, nomeB) {
 
 function aplicarTema(tema){
   document.body.classList.remove('theme-dark','theme-ucl','theme-oled');
-  document.body.classList.add('theme-ucl'); // sempre champions
-  try{localStorage.setItem('appTheme','ucl');}catch(e){}
-  const btnU=document.getElementById('btnThemeUCL');
-  if(btnU){btnU.style.borderColor='#C9A84C';btnU.style.color='#C9A84C';}
+  if(tema) document.body.classList.add('theme-'+tema);
+  try{localStorage.setItem('appTheme', tema||'ucl');}catch(e){}
+  // Update admin theme buttons if present
+  ['ucl','dark','oled'].forEach(t => {
+    const btn = document.getElementById('btnTheme_'+t);
+    if(btn){ btn.style.opacity = (tema===t)?'1':'0.45'; btn.style.borderWidth = (tema===t)?'2px':'1px'; }
+  });
 }
-try{aplicarTema('ucl');localStorage.setItem('appTheme','ucl');}catch(e){aplicarTema('ucl');}
+try{
+  const savedTheme = localStorage.getItem('appTheme') || 'ucl';
+  aplicarTema(savedTheme);
+}catch(e){aplicarTema('ucl');}
 
 async function carregarSplashTop3(){
   try{
@@ -3452,6 +3591,23 @@ function mostrarRecordePopup(nome, novo, anterior, cat) {
   document.body.appendChild(overlay);
   // Play medal sound
   try { tocarSomMedalha && tocarSomMedalha(); } catch(e) {}
+  // Confetti!
+  lancarConfettiRecorde();
+}
+
+function lancarConfettiRecorde() {
+  const wrap = document.querySelector('.success-confetti-wrap');
+  if (!wrap) return;
+  const colors = ['#C9A84C','#F5D87E','#FF6B00','#fff','#E8C97A','#FFD700'];
+  wrap.innerHTML = '';
+  for (let i = 0; i < 70; i++) {
+    const el = document.createElement('div');
+    const size = 5 + Math.random() * 8;
+    const isRect = Math.random() > 0.4;
+    el.style.cssText = `position:absolute;left:${Math.random()*100}%;top:-10px;width:${size}px;height:${size * (isRect?0.4:1)}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${isRect?'2px':'50%'};transform:rotate(${Math.random()*360}deg);animation:confettiFall ${1.5+Math.random()*2}s ease-in ${Math.random()*0.8}s forwards;`;
+    wrap.appendChild(el);
+  }
+  setTimeout(() => { wrap.innerHTML = ''; }, 4000);
 }
 
 // Legacy alias
