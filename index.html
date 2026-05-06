@@ -632,7 +632,23 @@ body.theme-ucl .ucl-stars-banner{display:block}
 .wheel-canvas{border-radius:50%;box-shadow:0 0 30px rgba(255,107,0,0.3)}
 .wheel-pointer{position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:28px solid #fff;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6))}
 
-/* ══ STANDARD BANNER ══ */
+/* ══ RANKING TICKER ══ */
+.rank-ticker-wrap { overflow: hidden; background: rgba(201,168,76,0.05); border-top: 1px solid rgba(201,168,76,0.15); border-bottom: 1px solid rgba(201,168,76,0.15); padding: 7px 0; margin-bottom: 4px; position: relative; }
+.rank-ticker-wrap::before, .rank-ticker-wrap::after { content:''; position:absolute; top:0; bottom:0; width:40px; z-index:2; pointer-events:none; }
+.rank-ticker-wrap::before { left:0; background:linear-gradient(90deg, var(--dark), transparent); }
+.rank-ticker-wrap::after { right:0; background:linear-gradient(-90deg, var(--dark), transparent); }
+.rank-ticker-track { display: flex; gap: 0; white-space: nowrap; animation: tickerScroll 28s linear infinite; }
+.rank-ticker-track:hover { animation-play-state: paused; }
+@keyframes tickerScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.ticker-item { display:inline-flex; align-items:center; gap:6px; padding:0 18px; font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:1px; color:rgba(255,255,255,0.75); border-right:1px solid rgba(201,168,76,0.15); flex-shrink:0; }
+.ticker-item .ticker-pos { font-family:'Bebas Neue',sans-serif; font-size:15px; color:rgba(201,168,76,0.6); min-width:18px; }
+.ticker-item .ticker-name { color:#fff; }
+.ticker-item .ticker-arrow { font-size:11px; font-weight:900; }
+.ticker-item .ticker-arrow.up { color:#22C55E; }
+.ticker-item .ticker-arrow.down { color:#ef4444; }
+.ticker-item .ticker-arrow.same { color:rgba(255,255,255,0.3); }
+.ticker-item .ticker-score { color:rgba(201,168,76,0.8); font-size:12px; }
+.ticker-sep { display:inline-flex; align-items:center; padding:0 12px; color:rgba(201,168,76,0.3); font-size:16px; flex-shrink:0; }
 .screen-banner { background: var(--dark); position: relative; overflow: hidden; }
 .screen-banner-inner { padding: 0 24px; text-align: center; position: relative; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .screen-banner-inner::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--orange); }
@@ -1203,6 +1219,12 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
     </div>
 
   <div style="text-align:center;padding:4px 16px;font-size:11px;color:var(--muted);letter-spacing:1px" id="rankLastUpdate"></div>
+
+  <!-- RANKING TICKER -->
+  <div class="rank-ticker-wrap" id="rankTickerWrap" style="display:none">
+    <div class="rank-ticker-track" id="rankTickerTrack"></div>
+  </div>
+
   <div id="liderBannerWrap"></div>
   <div class="rank-main" id="rankMain"></div>
 <div class="record-toast" id="recordToast"></div>
@@ -2129,10 +2151,12 @@ function renderRanking(dados) {
       rm.innerHTML = html;
       rm.style.opacity = '1';
       _animateRankingBars(rm);
+      renderRankingTicker(dados);
     }, 200);
   } else {
     rm.innerHTML = html;
     _animateRankingBars(rm);
+    renderRankingTicker(dados);
   }
 }
 
@@ -2142,6 +2166,55 @@ function _animateRankingBars(rm) {
     rm.querySelectorAll('.bar-fg[data-pct]').forEach(el => { el.style.width = el.dataset.pct + '%'; });
     rm.querySelectorAll('.team-bar-fill[data-pct]').forEach(el => { el.style.width = el.dataset.pct + '%'; });
   }, 100);
+}
+
+function renderRankingTicker(dados) {
+  const wrap = document.getElementById('rankTickerWrap');
+  const track = document.getElementById('rankTickerTrack');
+  if (!wrap || !track || !dados.length) return;
+
+  // Sort by total score
+  const scored = dados.map(d => ({
+    nome: d.nome,
+    score: categorias.reduce((s,c) => s+(d[c.key]||0), 0)
+  })).sort((a,b) => b.score - a.score);
+
+  // Get previous ranking from cache for movement arrows
+  let prevRanking = {};
+  try { prevRanking = JSON.parse(localStorage.getItem('tickerPrevRanking') || '{}'); } catch(e) {}
+  const newRanking = {};
+  scored.forEach((d,i) => { newRanking[d.nome] = i+1; });
+
+  // Build ticker items
+  const items = scored.slice(0, 12).map((d, i) => {
+    const pos = i + 1;
+    const prev = prevRanking[d.nome];
+    let arrow = '', arrowClass = 'same';
+    if (prev && prev > pos) { arrow = '▲'; arrowClass = 'up'; }
+    else if (prev && prev < pos) { arrow = '▼'; arrowClass = 'down'; }
+    else { arrow = '—'; arrowClass = 'same'; }
+    const firstName = d.nome.split(' ')[0];
+    const posLabel = pos === 1 ? '👑' : pos + 'º';
+    return `<div class="ticker-item">
+      <span class="ticker-pos">${posLabel}</span>
+      <span class="ticker-name">${firstName}</span>
+      <span class="ticker-arrow ${arrowClass}">${arrow}</span>
+      <span class="ticker-score">${d.score}pts</span>
+    </div>`;
+  }).join('<span class="ticker-sep">·</span>');
+
+  // Duplicate for seamless loop
+  track.innerHTML = items + '<span class="ticker-sep" style="padding:0 20px"></span>' + items;
+
+  // Save current for next comparison
+  try { localStorage.setItem('tickerPrevRanking', JSON.stringify(newRanking)); } catch(e) {}
+
+  // Adjust speed based on number of items
+  const totalItems = scored.slice(0,12).length;
+  const duration = Math.max(20, totalItems * 2.8);
+  track.style.animationDuration = duration + 's';
+
+  wrap.style.display = 'block';
 }
 
 function mostrarProgressoRegisto(nome, payload) {
