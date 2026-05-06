@@ -1106,11 +1106,15 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('garrafas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="garrafas">0</div><button class="cbtn plus" onmousedown="startChange('garrafas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
-      <div class="sec-label">Elogios recebidos</div>
+      <div class="sec-label">Outros</div>
       <div class="card">
         <div class="prod-row">
           <div class="prod-info"><div class="prod-emoji">⭐</div><div class="prod-text"><div class="prod-name">Elogios</div><div class="prod-hint">Escritos ou Google Reviews</div></div></div>
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()">+</button></div>
+        </div>
+        <div class="prod-row">
+          <div class="prod-info"><div class="prod-emoji">🎫</div><div class="prod-text"><div class="prod-name">SZClub</div><div class="prod-hint">Adesões Sport Zone Club</div></div></div>
+          <div class="counter"><button class="cbtn minus" onmousedown="startChange('szclub',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('szclub',-1,event)" ontouchend="stopChange()">−</button><div class="cval" id="szclub">0</div><button class="cbtn plus" onmousedown="startChange('szclub',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('szclub',1,event)" ontouchend="stopChange()">+</button></div>
         </div>
       </div>
       <!-- submitBtn hidden — swipe to register handles submission -->
@@ -1397,11 +1401,12 @@ const categorias = [
   { key:'sacos',     label:'Sacos Reutilizáveis', emoji:'🛍️' },
   { key:'garrafas',  label:'Garrafas',            emoji:'💧' },
   { key:'elogios',   label:'Elogios',             emoji:'⭐' },
+  { key:'szclub',    label:'SZClub',              emoji:'🎫' },
 ];
 
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzEFAMnkvjueKCrbj-zksBs-159QQ4PTrGqykfC0mHPDt7l8DdWM-fPnNYe0R--LFMj/exec';
 
-const vals = {onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0};
+const vals = {onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0,szclub:0};
 let nomeSel = null, equipaAtiva = null;
 
 const hoje = new Date();
@@ -1651,6 +1656,7 @@ async function submeter() {
     sacos:     vals.sacos,
     garrafas:  vals.garrafas,
     elogios:   vals.elogios,
+    szclub:    vals.szclub,
     uid: nomeAtual.replace(/\s+/g,'_') + '_' + dataVal + '_' + Date.now()
   };
 
@@ -1972,7 +1978,7 @@ async function getRankingFromDados(todos) {
   todos.forEach(d => {
     const dt = new Date(d.data||'');
     if (isNaN(dt) || dt.getMonth()!==mesAtual || dt.getFullYear()!==anoAtual) return;
-    if (!agg[d.nome]) agg[d.nome] = {nome:d.nome,equipa:d.equipa||'',onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0};
+    if (!agg[d.nome]) agg[d.nome] = {nome:d.nome,equipa:d.equipa||'',onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0,szclub:0};
     categorias.forEach(cat => { agg[d.nome][cat.key] += (d[cat.key]||0); });
   });
   return Object.values(agg);
@@ -2730,7 +2736,7 @@ function mostrarDash(nome) {
   dadosVendedor.forEach(d => {
     const dt = new Date(d.data || d.Data || '');
     const mes = dt && !isNaN(dt) ? dt.toLocaleDateString('pt-PT',{month:'short',year:'numeric'}) : 'Sem data';
-    if(!porMes[mes]) porMes[mes] = { mes, onlines:0, sprays:0, palmilhas:0, camisolas:0, sacos:0, garrafas:0, elogios:0 };
+    if(!porMes[mes]) porMes[mes] = { mes, onlines:0, sprays:0, palmilhas:0, camisolas:0, sacos:0, garrafas:0, elogios:0, szclub:0 };
     categorias.forEach(c => { porMes[mes][c.key] += (d[c.key]||0); });
   });
   const mesesArr = Object.values(porMes);
@@ -3246,7 +3252,8 @@ const medalhasDefault = {
   tPalmilhas_calcado:20, tPalmilhas_normal:10,
   tCamisolas_calcadotextil:25, tCamisolas_normal:12,
   tSacos_caixa:1000, tSacos_normal:150,
-  tGarrafas_caixa:30, tGarrafas_normal:15, tElogios:3
+  tGarrafas_caixa:30, tGarrafas_normal:15, tElogios:3,
+  tSZClub_caixa:100, tSZClub_calcado:50, tSZClub_normal:30
 };
 let medalhasConfig = Object.assign({}, medalhasDefault);
 try { const _mmc=localStorage.getItem('medalhasConfig'); if(_mmc){ const _mp=JSON.parse(_mmc); Object.keys(_mp).forEach(k=>{ if(medalhasConfig.hasOwnProperty(k)) medalhasConfig[k]=Number(_mp[k])||medalhasConfig[k]; }); } } catch(e){}
@@ -3288,6 +3295,7 @@ function calcularMedalhas(dados) {
   const sacosMes     = dadosMes.reduce((s,d)=>s+(d.sacos||0),0);
   const garrafasMes  = dadosMes.reduce((s,d)=>s+(d.garrafas||0),0);
   const elogiosMes   = dadosMes.reduce((s,d)=>s+(d.elogios||0),0);
+  const szclubMes    = dadosMes.reduce((s,d)=>s+(d.szclub||0),0);
   const diasComRegisto = new Set(dadosMes.map(d=>d.data)).size;
   const caixaNomes = equipas.find(e=>e.id==='caixa')?.nomes||[];
   const isCaixa = caixaNomes.includes(nome);
@@ -3308,6 +3316,7 @@ function calcularMedalhas(dados) {
     { icon:'🛍️', name:'Eco Champion',     desc:tSacos+' sacos este mês',          earned: sacosMes     >= tSacos },
     { icon:'💧', name:'Hydration Boss',    desc:tGarrafas+' garrafas este mês',    earned: garrafasMes  >= tGarrafas },
     { icon:'⭐', name:'Favorito',          desc:'3 elogios este mês',              earned: elogiosMes   >= 3 },
+    { icon:'🎫', name:'SZClub Star',       desc:(isCaixa?100:isCalcadoSneaker2?50:30)+' adesões SZClub este mês', earned: szclubMes >= (isCaixa ? (medalhasConfig.tSZClub_caixa||100) : isCalcadoSneaker2 ? (medalhasConfig.tSZClub_calcado||50) : (medalhasConfig.tSZClub_normal||30)) },
     { icon:'📅', name:'Consistente',       desc:th.consistente+' registos este mês', earned: diasComRegisto >= th.consistente },
     { icon:'🌟', name:'Super Online',      desc:'8 onlines num dia',                  earned: false }, // verificado em slotVerificarMedalhas
     { icon:'💥', name:'Spray Explosion',   desc:'10 sprays num dia',                  earned: false }, // verificado em slotVerificarMedalhas
