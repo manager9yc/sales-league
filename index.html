@@ -2050,24 +2050,37 @@ function renderRanking(dados) {
     let medalhasHtml = '<div class="slabel" style="margin-top:28px">🏅 Medalhas conquistadas este mês</div><div style="display:flex;flex-direction:column;gap:8px">';
     const dadosPorNome = {};
     const fonte = dashAllDados.length ? dashAllDados : dados;
+    // Normalize dates (Sheets can return ISO strings)
     fonte.filter(d=>d&&d.nome).forEach(d => {
-      if (!dadosPorNome[d.nome]) dadosPorNome[d.nome] = [];
-      dadosPorNome[d.nome].push(d);
+      const dNorm = {...d, data: (d.data||'').split('T')[0]};
+      if (!dadosPorNome[dNorm.nome]) dadosPorNome[dNorm.nome] = [];
+      dadosPorNome[dNorm.nome].push(dNorm);
     });
     try {
       JSON.parse(localStorage.getItem('historico_local')||'[]').forEach(d => {
         if (!d||!d.nome) return;
-        if (!dadosPorNome[d.nome]) dadosPorNome[d.nome] = [];
-        if (!dadosPorNome[d.nome].some(x=>x.data===d.data)) dadosPorNome[d.nome].push(d);
+        const dNorm = {...d, data: (d.data||'').split('T')[0]};
+        if (!dadosPorNome[dNorm.nome]) dadosPorNome[dNorm.nome] = [];
+        if (!dadosPorNome[dNorm.nome].some(x=>x.data===dNorm.data)) dadosPorNome[dNorm.nome].push(dNorm);
       });
     } catch(e) {}
     const mesAtual2 = new Date().getMonth(), anoAtual2 = new Date().getFullYear();
     let temMedalhas = false;
     Object.keys(dadosPorNome).sort().forEach(nome => {
       const conquistadas = calcularMedalhas(dadosPorNome[nome]).filter(m=>m.earned);
-      const doMesN = dadosPorNome[nome].filter(d=>{try{const dt=new Date(d.data+'T12:00:00');return dt.getMonth()===mesAtual2&&dt.getFullYear()===anoAtual2;}catch(e){return false;}});
-      if (Math.max(...doMesN.map(d=>d.onlines||0),0) >= 8) conquistadas.push({icon:'🌟',name:'Super Online'});
-      if (Math.max(...doMesN.map(d=>d.sprays||0),0) >= 10) conquistadas.push({icon:'💥',name:'Spray Explosion'});
+      // Filter this month — data already normalized to YYYY-MM-DD
+      const doMesN = dadosPorNome[nome].filter(d => {
+        try {
+          const dt = new Date(d.data + 'T12:00:00');
+          return dt.getMonth() === mesAtual2 && dt.getFullYear() === anoAtual2;
+        } catch(e) { return false; }
+      });
+      const maxOnlines = doMesN.length ? Math.max(...doMesN.map(d=>Number(d.onlines)||0)) : 0;
+      const maxSprays  = doMesN.length ? Math.max(...doMesN.map(d=>Number(d.sprays)||0))  : 0;
+      if (maxOnlines >= 8 && !conquistadas.some(m=>m.name==='Super Online'))
+        conquistadas.push({icon:'🌟',name:'Super Online'});
+      if (maxSprays >= 10 && !conquistadas.some(m=>m.name==='Spray Explosion'))
+        conquistadas.push({icon:'💥',name:'Spray Explosion'});
       if (!conquistadas.length) return;
       temMedalhas = true;
       const foto=getFoto?getFoto(nome):null;
@@ -2246,6 +2259,15 @@ function mostrarProgressoRegisto(nome, payload) {
 // ── SPLASH ──
 let splashProg = 0, splashIv = null;
 function iniciarSplash() {
+  // Tocar som da intro via ficheiro externo
+  const audio = new Audio('sounds/intro.mp3');
+  window._splashAudio = audio;
+  audio.volume = 0.7;
+  audio.play().catch(() => {
+    const unlock = () => { audio.play().catch(()=>{}); document.removeEventListener('touchstart', unlock); document.removeEventListener('click', unlock); };
+    document.addEventListener('touchstart', unlock, {once:true, passive:true});
+    document.addEventListener('click', unlock, {once:true});
+  });
 
   const pc = document.getElementById('spParticles');
   if(pc){
@@ -2272,6 +2294,14 @@ function iniciarSplash() {
 }
 function fecharSplash(){
   clearInterval(splashIv);
+  // Fade out splash audio
+  const audio = window._splashAudio;
+  if (audio && !audio.paused) {
+    const fade = setInterval(() => {
+      if (audio.volume > 0.06) { audio.volume = Math.max(0, audio.volume - 0.06); }
+      else { audio.pause(); audio.currentTime = 0; clearInterval(fade); }
+    }, 40);
+  }
   const bar=document.getElementById('splashBar');
   if(bar){bar.style.width='100%';}
   const pctEl=document.getElementById('splashPct');
