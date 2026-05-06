@@ -401,12 +401,12 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .admin-date { font-size: 11px; color: var(--muted); }
 
 /* ══ PIN LOCK ══ */
-.pin-overlay { position:relative; background:transparent; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px 20px 40px; }
+.pin-overlay { position:relative; background:transparent; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px calc(88px + env(safe-area-inset-bottom, 16px)); }
 .pin-overlay.hidden { display:none; }
-.pin-icon { font-size:48px; margin-bottom:16px; }
+.pin-icon { font-size:48px; margin-bottom:12px; }
 .pin-title { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:2px; color:#fff; margin-bottom:6px; }
-.pin-sub { font-size:13px; color:var(--muted); margin-bottom:24px; }
-.pin-dots { display:flex; gap:12px; margin-bottom:24px; }
+.pin-sub { font-size:13px; color:var(--muted); margin-bottom:20px; }
+.pin-dots { display:flex; gap:12px; margin-bottom:20px; }
 .pin-dot { width:14px; height:14px; border-radius:50%; background:var(--border); transition:background 0.15s; }
 .pin-dot.filled { background:var(--orange); }
 .pin-pad { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:240px; width:100%; }
