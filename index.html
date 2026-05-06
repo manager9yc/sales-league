@@ -2218,7 +2218,6 @@ function emptyRows() {
 
 function buildRows(sorted, key) {
   const max = sorted[0]?.[key] || 1;
-  // Pre-calculate streaks from historico_local + dashAllDados
   const streakMap = {};
   try {
     const hist = JSON.parse(localStorage.getItem('historico_local') || '[]');
@@ -2238,13 +2237,13 @@ function buildRows(sorted, key) {
       : `<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--orange);align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#fff;margin-right:8px;flex-shrink:0;vertical-align:middle">${nome.split(' ').map(x=>x[0]).slice(0,2).join('')}</span>`;
     const secaoVendedor = (()=>{ for(const e of equipas){ if(e.nomes&&e.nomes.includes(nome)) return e.label.replace(/^\S+\s/,''); } return ''; })();
     const streak = streakMap[nome] || 0;
-    const streakHtml = streak >= 3
-      ? `<span class="streak-badge"><span class="streak-fire">🔥</span>${streak}</span>`
-      : '';
+    const streakHtml = streak >= 3 ? `<span class="streak-badge"><span class="streak-fire">🔥</span>${streak}</span>` : '';
     const fire1Html = i === 0 ? `<span class="rank-1-fire">🔥</span>` : '';
-    return `<tr class="rank-${i+1}">
+    // Rows 6-10 hidden by default
+    const hiddenStyle = i >= 5 ? ' class="rank-extra" style="display:none"' : '';
+    return `<tr${hiddenStyle}>
       <td class="td-pos">${i+1}</td>
-      <td class="td-name" style="display:flex;align-items:center;cursor:pointer" onclick="abrirDashDeRanking('${nome}')" style="cursor:pointer">${avatarHtml}<div><div>${nome}${fire1Html}${streakHtml}</div>${secaoVendedor?`<div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:1px">${secaoVendedor}</div>`:''}</div></td>
+      <td class="td-name" style="display:flex;align-items:center;cursor:pointer" onclick="abrirDashDeRanking('${nome}')">${avatarHtml}<div><div>${nome}${fire1Html}${streakHtml}</div>${secaoVendedor?`<div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:1px">${secaoVendedor}</div>`:''}</div></td>
       <td class="td-bar"><div class="bar-bg"><div class="bar-fg" data-pct="${pct}" style="width:0%"></div></div></td>
       <td class="td-score">${v[key]}</td>
     </tr>`;
@@ -2252,14 +2251,43 @@ function buildRows(sorted, key) {
 }
 
 function catBlock(emoji, label, rows, agora, delay) {
+  // Count total rows to decide if expand button is needed
+  const totalRows = (rows.match(/class="rank-extra"/g) || []).length;
+  const expandBtn = totalRows > 0
+    ? `<button class="rank-expand-btn" onclick="rankExpandir(this)" style="width:100%;background:transparent;border:none;border-top:1px solid var(--border);padding:9px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+        <span class="rank-expand-icon">▼</span> Ver mais ${totalRows} →
+      </button>`
+    : '';
   return `<div class="cat-block" style="animation-delay:${delay}s">
     <div class="cat-head">
       <div class="cat-left"><span class="cat-emoji">${emoji}</span><span class="cat-name">${label}</span></div>
-      <span class="cat-sub">Top 10</span>
+      <span class="cat-sub">Top 5</span>
     </div>
     <table class="rank-table"><tbody>${rows}</tbody></table>
+    ${expandBtn}
     <div class="last-up">${agora}</div>
   </div>`;
+}
+
+function rankExpandir(btn) {
+  const table = btn.closest('.cat-block').querySelector('.rank-table');
+  const extras = table.querySelectorAll('.rank-extra');
+  const icon = btn.querySelector('.rank-expand-icon');
+  const isExpanded = extras[0]?.style.display !== 'none';
+  if (isExpanded) {
+    extras.forEach(r => { r.style.display = 'none'; });
+    btn.innerHTML = `<span class="rank-expand-icon">▼</span> Ver mais ${extras.length} →`;
+    btn.closest('.cat-block').querySelector('.cat-sub').textContent = 'Top 5';
+  } else {
+    extras.forEach(r => {
+      r.style.display = '';
+      r.classList.add('row-visible');
+      // Animate bars for newly shown rows
+      r.querySelectorAll('.bar-fg[data-pct]').forEach(el => { el.style.width = el.dataset.pct + '%'; });
+    });
+    btn.innerHTML = `<span class="rank-expand-icon">▲</span> Ver menos`;
+    btn.closest('.cat-block').querySelector('.cat-sub').textContent = 'Top 10';
+  }
 }
 
 function secDiv(icon, title) {
