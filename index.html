@@ -639,7 +639,7 @@ body.theme-ucl .ucl-stars-banner{display:block}
 .screen-banner-inner::after { content:''; position:absolute; right:0; top:0; bottom:0; width:4px; background:var(--orange); }
 .screen-banner-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(40px,10vw,64px); color:#fff; line-height:0.95; letter-spacing:2px; position:relative; z-index:1; }
 .screen-banner-sub { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:rgba(255,255,255,0.35); margin-top:6px; position:relative; z-index:1; }
-.screen-banner-bar { background: var(--orange); margin-top:20px; padding:10px 24px; display:flex; align-items:center; justify-content:center; gap:16px; }
+.screen-banner-bar { background: var(--orange); margin-top:0; padding:10px 24px; display:flex; align-items:center; justify-content:center; gap:16px; }
 .screen-banner-bar-line { height:1px; flex:1; background:rgba(255,255,255,0.3); }
 .screen-banner-bar span { font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:4px; color:#fff; }
 body.theme-ucl .screen-banner { background:#090909 !important; }
@@ -649,9 +649,33 @@ body.theme-ucl .screen-banner-bar { background:linear-gradient(90deg,#090909,#11
 body.theme-ucl .ucl-banner-img { display:block; }
 body.theme-ucl .ucl-stars-banner { display:block; }
 
+/* ROCKET FLOAT ANIMATIONS */
+@keyframes rocketFloat0 { 0%,100%{transform:translateY(0) rotate(-5deg)} 50%{transform:translateY(-7px) rotate(5deg)} }
+@keyframes rocketFloat1 { 0%,100%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(-6px) rotate(4deg)} }
+@keyframes rocketFloat2 { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-5px) rotate(3deg)} }
 
 /* ══ UNIFORM BANNERS ══ */
-/* All banners unified via .screen-banner-inner height */
+.screen-banner-inner,
+.banner-top {
+  padding: 28px 24px 0 !important;
+  min-height: 130px;
+}
+.screen-banner-title,
+.banner-top [style*="font-family:'Bebas Neue'"],
+.banner-top [style*='font-family:"Bebas Neue"'] {
+  font-size: clamp(40px,10vw,64px) !important;
+  line-height: 0.95 !important;
+}
+.screen-banner-sub,
+.banner-top [style*="font-size:13px"][style*="Barlow"] {
+  font-size: 13px !important;
+  margin-top: 6px !important;
+}
+.screen-banner-bar,
+.banner-bar {
+  margin-top: 20px !important;
+  padding: 10px 24px !important;
+}
 
 
 .name-btn:active, .submit-btn:active, .sp-btn:active,
@@ -840,9 +864,6 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 .swipe-arrows span:nth-child(2) { animation-delay: 0.18s; opacity: 0.7; }
 .swipe-arrows span:nth-child(3) { animation-delay: 0.36s; opacity: 0.4; }
 @keyframes swipeArrowPulse { 0%,100%{opacity:0.15} 50%{opacity:0.9} }
-@keyframes rocketFloat0 { 0%,100%{transform:translateY(0) rotate(-5deg)} 50%{transform:translateY(-6px) rotate(5deg)} }
-@keyframes rocketFloat1 { 0%,100%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(-5px) rotate(4deg)} }
-@keyframes rocketFloat2 { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-4px) rotate(3deg)} }
 /* Trail effect behind thumb */
 .swipe-trail {
   position: absolute;
@@ -1197,7 +1218,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
     <div style="padding:28px 20px 18px">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#fff;margin-bottom:4px">O teu perfil</div>
       <div style="font-size:14px;color:var(--muted);margin-bottom:20px">Seleciona um vendedor para ver o seu dashboard completo</div>
-      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">🚀 Top 3 Consistência este mês</div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">🏅 Top 3 Consistência este mês</div>
       <div id="top3ConsistenciaWrap" style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px"></div>
     </div>
     <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Destaques do mês</div>
@@ -2217,8 +2238,8 @@ function fecharSplash(){
   s.classList.add('out');
   setTimeout(()=>{
     s.classList.add('hidden');
-    const rankingBtn = document.getElementById('navBtnRanking');
-    if(rankingBtn) goTo('ranking', rankingBtn);
+    const desafiosBtn = document.getElementById('navBtnRanking');
+    if(desafiosBtn) goTo('ranking', desafiosBtn);
   },600);
 }
 iniciarSplash();
@@ -2297,15 +2318,12 @@ function startChange(campo,delta,e){
   if(e&&e.type==='mousedown')e.preventDefault();
   const now=Date.now(); if(now-lastChangeTime<200)return; lastChangeTime=now;
   if(touchMoved)return;
-  // Delay first action on touch to distinguish scroll from tap
-  const isSacos = campo === 'sacos';
-  const firstDelay = e&&e.type==='touchstart' ? 80 : 0;
+  const isSacos = campo==='sacos';
+  const firstDelay = (e&&e.type==='touchstart') ? 80 : 0;
   setTimeout(()=>{
     if(touchMoved)return;
     change(campo,delta);
-    const repeatDelay = isSacos ? 200 : 500;
-    const repeatInterval = isSacos ? 60 : 150;
-    changeTo=setTimeout(()=>{changeIv=setInterval(()=>{if(touchMoved){stopChange();return;}lastChangeTime=Date.now();change(campo,delta);},repeatInterval);},repeatDelay);
+    changeTo=setTimeout(()=>{changeIv=setInterval(()=>{if(touchMoved){stopChange();return;}lastChangeTime=Date.now();change(campo,delta);},isSacos?60:150);},isSacos?200:500);
   }, firstDelay);
 }
 function stopChange(e){
@@ -3014,7 +3032,7 @@ function renderTop3Consistencia() {
     .sort((a,b)=>b.registos-a.registos).slice(0,3);
   if (!ranking.length) { wrap.innerHTML = '<div style="color:var(--muted);font-size:13px;font-style:italic">Sem registos este mês</div>'; return; }
   const posLabel=['1º','2º','3º'];
-  const posColor=['#C9A84C','rgba(180,180,180,0.9)','rgba(180,120,60,0.9)'];
+  const posColor=['#C9A84C','rgba(200,200,200,0.9)','rgba(180,120,60,0.9)'];
   const borders=['rgba(201,168,76,0.5)','rgba(180,180,180,0.35)','rgba(180,120,60,0.35)'];
   wrap.innerHTML = ranking.map((v,i)=>{
     const foto=getFoto?getFoto(v.nome):null;
@@ -3024,7 +3042,7 @@ function renderTop3Consistencia() {
       ${av}
       <div style="flex:1"><div style="font-size:15px;font-weight:700;color:#fff">${v.nome}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${v.registos} registo${v.registos!==1?'s':''} este mês</div></div>
       <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-        <span style="display:inline-block;animation:rocketFloat${i} 1.8s ease-in-out infinite;font-size:22px;filter:drop-shadow(0 0 6px rgba(255,107,0,0.6))">🚀</span>
+        <span style="display:inline-block;animation:rocketFloat${i} ${1.6+i*0.2}s ease-in-out infinite;font-size:22px;filter:drop-shadow(0 0 5px rgba(255,107,0,0.5))">🚀</span>
         <span style="font-family:'Bebas Neue',sans-serif;font-size:11px;color:${posColor[i]};letter-spacing:1px">${posLabel[i]}</span>
       </div>
     </div>`;
