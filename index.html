@@ -2019,38 +2019,34 @@ function verificarMedalhasRanking() {
 function renderRanking(dados) {
   const rm = document.getElementById('rankMain');
   if (!rm) return;
+
+  // If already showing real data and this is just a refresh, keep current visible
+  // while building the new HTML off-screen
+  const isRefresh = rm.children.length > 0 && !rm.querySelector('.rank-loading-bar');
+
   calcCountdown();
   const agora = new Date().toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
-  // Split rendering into chunks to avoid blocking UI thread
-  const chunks = [];
+  // Build ALL html off-DOM in one go, then write once — no flicker
+  let html = '';
 
-  // Chunk 1: ranking por produto
-  chunks.push(() => {
-    let html = secDiv('🎯', 'Ranking por Produto');
-    let d = 0.05;
-    categorias.forEach(cat => {
-      const sorted = [...dados].filter(v=>(v[cat.key]||0)>0).sort((a,b)=>b[cat.key]-a[cat.key]).slice(0,10);
-      html += catBlock(cat.emoji, cat.label, sorted.length ? buildRows(sorted, cat.key) : emptyRows(), agora, d);
-      d += 0.07;
-    });
-    rm.innerHTML = html;
-    // Animate rows
-    rm.querySelectorAll('.rank-table tbody tr').forEach((row,i)=>setTimeout(()=>row.classList.add('row-visible'),i*60));
+  // Ranking por produto
+  html += secDiv('🎯', 'Ranking por Produto');
+  let d = 0.05;
+  categorias.forEach(cat => {
+    const sorted = [...dados].filter(v=>(v[cat.key]||0)>0).sort((a,b)=>b[cat.key]-a[cat.key]).slice(0,10);
+    html += catBlock(cat.emoji, cat.label, sorted.length ? buildRows(sorted, cat.key) : emptyRows(), agora, d);
+    d += 0.07;
   });
 
-  // Chunk 2: registos por secção
-  chunks.push(() => {
-    rm.insertAdjacentHTML('beforeend', renderRegistosPorSeccao(dados));
-  });
+  // Registos por secção
+  html += renderRegistosPorSeccao(dados);
 
-  // Chunk 3: medalhas conquistadas
-  chunks.push(() => {
-    if (!dados.length) return;
+  // Medalhas conquistadas
+  if (dados.length) {
     let medalhasHtml = '<div class="slabel" style="margin-top:28px">🏅 Medalhas conquistadas este mês</div><div style="display:flex;flex-direction:column;gap:8px">';
     const dadosPorNome = {};
     const fonte = dashAllDados.length ? dashAllDados : dados;
-    // Normalize dates (Sheets can return ISO strings)
     fonte.filter(d=>d&&d.nome).forEach(d => {
       const dNorm = {...d, data: (d.data||'').split('T')[0]};
       if (!dadosPorNome[dNorm.nome]) dadosPorNome[dNorm.nome] = [];
@@ -2068,19 +2064,13 @@ function renderRanking(dados) {
     let temMedalhas = false;
     Object.keys(dadosPorNome).sort().forEach(nome => {
       const conquistadas = calcularMedalhas(dadosPorNome[nome]).filter(m=>m.earned);
-      // Filter this month — data already normalized to YYYY-MM-DD
       const doMesN = dadosPorNome[nome].filter(d => {
-        try {
-          const dt = new Date(d.data + 'T12:00:00');
-          return dt.getMonth() === mesAtual2 && dt.getFullYear() === anoAtual2;
-        } catch(e) { return false; }
+        try { const dt = new Date(d.data+'T12:00:00'); return dt.getMonth()===mesAtual2&&dt.getFullYear()===anoAtual2; } catch(e){ return false; }
       });
       const maxOnlines = doMesN.length ? Math.max(...doMesN.map(d=>Number(d.onlines)||0)) : 0;
       const maxSprays  = doMesN.length ? Math.max(...doMesN.map(d=>Number(d.sprays)||0))  : 0;
-      if (maxOnlines >= 8 && !conquistadas.some(m=>m.name==='Super Online'))
-        conquistadas.push({icon:'🌟',name:'Super Online'});
-      if (maxSprays >= 10 && !conquistadas.some(m=>m.name==='Spray Explosion'))
-        conquistadas.push({icon:'💥',name:'Spray Explosion'});
+      if (maxOnlines >= 8 && !conquistadas.some(m=>m.name==='Super Online')) conquistadas.push({icon:'🌟',name:'Super Online'});
+      if (maxSprays >= 10 && !conquistadas.some(m=>m.name==='Spray Explosion')) conquistadas.push({icon:'💥',name:'Spray Explosion'});
       if (!conquistadas.length) return;
       temMedalhas = true;
       const foto=getFoto?getFoto(nome):null;
@@ -2090,19 +2080,32 @@ function renderRanking(dados) {
     });
     if (!temMedalhas) medalhasHtml += '<div style="color:var(--muted);font-size:13px;font-style:italic;padding:12px">Nenhuma medalha conquistada ainda este mês</div>';
     medalhasHtml += '</div>';
-    rm.insertAdjacentHTML('beforeend', medalhasHtml);
-  });
+    html += medalhasHtml;
+  }
 
-  // Chunk 4: animate bars
-  chunks.push(() => {
-    rm.querySelectorAll('.bar-fg[data-pct]').forEach(el => { el.style.width = el.dataset.pct + '%'; });
-    rm.querySelectorAll('.team-bar-fill[data-pct]').forEach(el => { el.style.width = el.dataset.pct + '%'; });
-  });
-
-  // Execute chunks with yield between each so UI stays responsive
-  chunks.forEach((fn, i) => setTimeout(fn, i * 30));
+  // Write to DOM once — no intermediate states visible
+  if (isRefresh) {
+    // Fade transition so refresh isn't jarring
+    rm.style.transition = 'opacity 0.2s';
+    rm.style.opacity = '0';
+    setTimeout(() => {
+      rm.innerHTML = html;
+      rm.style.opacity = '1';
+      _animateRankingBars(rm);
+    }, 200);
+  } else {
+    rm.innerHTML = html;
+    _animateRankingBars(rm);
+  }
 }
 
+function _animateRankingBars(rm) {
+  rm.querySelectorAll('.rank-table tbody tr').forEach((row,i) => setTimeout(()=>row.classList.add('row-visible'), i*40));
+  setTimeout(() => {
+    rm.querySelectorAll('.bar-fg[data-pct]').forEach(el => { el.style.width = el.dataset.pct + '%'; });
+    rm.querySelectorAll('.team-bar-fill[data-pct]').forEach(el => { el.style.width = el.dataset.pct + '%'; });
+  }, 100);
+}
 
 function mostrarProgressoRegisto(nome, payload) {
   const prog = document.getElementById('successProgress');
@@ -2259,15 +2262,7 @@ function mostrarProgressoRegisto(nome, payload) {
 // ── SPLASH ──
 let splashProg = 0, splashIv = null;
 function iniciarSplash() {
-  // Tocar som da intro via ficheiro externo
-  const audio = new Audio('sounds/intro.mp3');
-  window._splashAudio = audio;
-  audio.volume = 0.7;
-  audio.play().catch(() => {
-    const unlock = () => { audio.play().catch(()=>{}); document.removeEventListener('touchstart', unlock); document.removeEventListener('click', unlock); };
-    document.addEventListener('touchstart', unlock, {once:true, passive:true});
-    document.addEventListener('click', unlock, {once:true});
-  });
+
 
   const pc = document.getElementById('spParticles');
   if(pc){
@@ -2294,14 +2289,7 @@ function iniciarSplash() {
 }
 function fecharSplash(){
   clearInterval(splashIv);
-  // Fade out splash audio
-  const audio = window._splashAudio;
-  if (audio && !audio.paused) {
-    const fade = setInterval(() => {
-      if (audio.volume > 0.06) { audio.volume = Math.max(0, audio.volume - 0.06); }
-      else { audio.pause(); audio.currentTime = 0; clearInterval(fade); }
-    }, 40);
-  }
+
   const bar=document.getElementById('splashBar');
   if(bar){bar.style.width='100%';}
   const pctEl=document.getElementById('splashPct');
