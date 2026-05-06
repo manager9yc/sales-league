@@ -2425,7 +2425,7 @@ atualizarMesLabels();
         localStorage.removeItem('rankingCache');
         // Show toast
         const t = document.createElement('div');
-        t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#22C55E;color:#fff;padding:10px 20px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:2px;font-size:13px;z-index:9999;box-shadow:0 4px 20px rgba(34,197,94,0.4)';
+        t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#22C55E;color:#fff;padding:10px 20px;border-radius:10px;font-family:sans-serif;font-weight:700;letter-spacing:2px;font-size:13px;z-index:9999;box-shadow:0 4px 20px rgba(34,197,94,0.4)';
         t.textContent = '✓ ' + sincronizados + ' registo' + (sincronizados > 1 ? 's' : '') + ' sincronizado' + (sincronizados > 1 ? 's' : '');
         document.body.appendChild(t);
         setTimeout(() => t.remove(), 3500);
@@ -2443,7 +2443,7 @@ atualizarMesLabels();
       if (!ind) {
         ind = document.createElement('div');
         ind.id = 'offlineIndicator';
-        ind.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#7a2200;color:#FFB09A;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;padding:4px;z-index:99999';
+        ind.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#7a2200;color:#FFB09A;text-align:center;font-size:12px;font-weight:700;letter-spacing:2px;padding:4px;z-index:99999';
         ind.textContent = '📡 SEM LIGAÇÃO — Os registos serão guardados e enviados depois';
         document.body.appendChild(ind);
       }
