@@ -5435,7 +5435,7 @@ function renderDesafiosMedalhas() {
 
     <!-- COFRE BUTTON — topo da página -->
     <div style="margin-bottom:24px" id="cofreBannerWrap">
-      <div onclick="abrirCofre()" id="cofreBtn" style="width:100%;background:linear-gradient(135deg,#0d0c08,#1c1a0e,#0d0c08);border:2px solid rgba(201,168,76,0.45);border-radius:20px;padding:0;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative;box-shadow:0 12px 40px rgba(201,168,76,0.18),0 4px 16px rgba(0,0,0,0.6);user-select:none;">
+      <div style="width:100%;background:linear-gradient(135deg,#0d0c08,#1c1a0e,#0d0c08);border:2px solid rgba(201,168,76,0.45);border-radius:20px;overflow:hidden;position:relative;box-shadow:0 12px 40px rgba(201,168,76,0.18),0 4px 16px rgba(0,0,0,0.6);">
         <div style="position:absolute;top:0;bottom:0;left:-80%;width:60%;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.08),transparent);transform:skewX(-15deg);animation:cofreShimmer 2.8s ease-in-out infinite;pointer-events:none;"></div>
         <div style="position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.6),transparent);pointer-events:none;"></div>
         <div style="padding:22px 22px 18px;position:relative;">
@@ -5452,12 +5452,11 @@ function renderDesafiosMedalhas() {
               <div style="font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(201,168,76,0.5);margin-bottom:2px;">PRÉMIO ACUMULADO</div>
               <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;background:linear-gradient(135deg,#a07820,#C9A84C,#E8C97A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;" id="cofreBtnJackpot">€ 2,00</div>
             </div>
-            <div style="background:linear-gradient(135deg,#a07820,#C9A84C);border-radius:10px;padding:10px 16px;">
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#fff;">JOGAR →</div>
-            </div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:rgba(201,168,76,0.6);">JOGAR →</div>
           </div>
         </div>
       </div>
+      <button id="cofreBtn" style="width:100%;margin-top:10px;background:linear-gradient(135deg,#a07820,#C9A84C);border:none;border-radius:14px;padding:16px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#fff;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;" onclick="abrirCofre()">🔒 ABRIR O COFRE</button>
     </div>
 
     <!-- SEPARADOR -->
