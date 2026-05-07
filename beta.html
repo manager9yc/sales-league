@@ -90,7 +90,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .prod-hint { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.3; white-space: normal; }
 
 .counter { display: flex; align-items: center; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
-.cbtn { width: 56px; height: 56px; background: transparent; border: none; color: var(--text); font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.1s; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+.cbtn { width: 64px; height: 64px; background: transparent; border: none; color: var(--text); font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.08s; -webkit-user-select: none; user-select: none; touch-action: manipulation; padding: 0; }
 .cbtn:active { background: var(--border); }
 .cbtn.minus { color: var(--muted); }
 .cbtn.plus { color: var(--orange); }
@@ -2254,8 +2254,8 @@ function catBlock(emoji, label, rows, agora, delay) {
   // Count total rows to decide if expand button is needed
   const totalRows = (rows.match(/class="rank-extra"/g) || []).length;
   const expandBtn = totalRows > 0
-    ? `<button class="rank-expand-btn" onclick="rankExpandir(this)" style="width:100%;background:transparent;border:none;border-top:1px solid var(--border);padding:9px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
-        <span class="rank-expand-icon">▼</span> Ver mais ${totalRows} →
+    ? `<button class="rank-expand-btn" onclick="rankExpandir(this)" style="width:100%;background:transparent;border:none;border-top:1px solid var(--border);padding:9px;color:#C9A84C;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+        <span class="rank-expand-icon" style="color:#C9A84C">▼</span> Ver mais ${totalRows} →
       </button>`
     : '';
   return `<div class="cat-block" style="animation-delay:${delay}s">
@@ -2276,7 +2276,7 @@ function rankExpandir(btn) {
   const isExpanded = extras[0]?.style.display !== 'none';
   if (isExpanded) {
     extras.forEach(r => { r.style.display = 'none'; });
-    btn.innerHTML = `<span class="rank-expand-icon">▼</span> Ver mais ${extras.length} →`;
+    btn.innerHTML = `<span class="rank-expand-icon" style="color:#C9A84C">▼</span> <span style="color:#C9A84C">Ver mais ${extras.length} →</span>`;
     btn.closest('.cat-block').querySelector('.cat-sub').textContent = 'Top 5';
   } else {
     extras.forEach(r => {
@@ -2285,7 +2285,7 @@ function rankExpandir(btn) {
       // Animate bars for newly shown rows
       r.querySelectorAll('.bar-fg[data-pct]').forEach(el => { el.style.width = el.dataset.pct + '%'; });
     });
-    btn.innerHTML = `<span class="rank-expand-icon">▲</span> Ver menos`;
+    btn.innerHTML = `<span class="rank-expand-icon" style="color:#C9A84C">▲</span> <span style="color:#C9A84C">Ver menos</span>`;
     btn.closest('.cat-block').querySelector('.cat-sub').textContent = 'Top 10';
   }
 }
@@ -2367,7 +2367,7 @@ async function getRankingFromDados(todos) {
   const anoAtual = new Date().getFullYear();
   const agg = {};
   todos.forEach(d => {
-    const dt = new Date(d.data||'');
+    const dt = new Date((d.data||'')+'T12:00:00');
     if (isNaN(dt) || dt.getMonth()!==mesAtual || dt.getFullYear()!==anoAtual) return;
     if (!agg[d.nome]) agg[d.nome] = {nome:d.nome,equipa:d.equipa||'',onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0,szclub:0};
     categorias.forEach(cat => { agg[d.nome][cat.key] += (d[cat.key]||0); });
@@ -2409,13 +2409,8 @@ function renderRanking(dados) {
   if (dados.length) {
     let medalhasHtml = '<div class="slabel" style="margin-top:28px">🏅 Medalhas conquistadas este mês</div><div style="display:flex;flex-direction:column;gap:8px">';
     const mesAtual2 = new Date().getMonth(), anoAtual2 = new Date().getFullYear();
-    const mesKey = `medalhasCache_${anoAtual2}_${mesAtual2}`;
 
-    // Load persistent medal cache — never loses medals already earned
-    let medalCache = {};
-    try { medalCache = JSON.parse(localStorage.getItem(mesKey) || '{}'); } catch(e) {}
-
-    // Compute from current data and MERGE with cache (union — never remove)
+    // Compute medals fresh from current data (no persistent cache that ignores deletions)
     const dadosPorNome = {};
     const fonte = dashAllDados.length ? dashAllDados : dados;
     fonte.filter(d=>d&&d.nome).forEach(d => {
@@ -2432,7 +2427,8 @@ function renderRanking(dados) {
       });
     } catch(e) {}
 
-    // Update cache with newly computed medals
+    // Compute fresh medal set per person — no merging with old cache
+    const medalCache = {};
     Object.keys(dadosPorNome).forEach(nome => {
       const earned = calcularMedalhas(dadosPorNome[nome]).filter(m=>m.earned).map(m=>({icon:m.icon,name:m.name}));
       const doMesN = dadosPorNome[nome].filter(d => {
@@ -2442,15 +2438,10 @@ function renderRanking(dados) {
       const maxSprays  = doMesN.length ? Math.max(...doMesN.map(d=>Number(d.sprays)||0))  : 0;
       if (maxOnlines >= 8 && !earned.some(m=>m.name==='Super Online')) earned.push({icon:'🌟',name:'Super Online'});
       if (maxSprays >= 10 && !earned.some(m=>m.name==='Spray Explosion')) earned.push({icon:'💥',name:'Spray Explosion'});
-      if (!medalCache[nome]) medalCache[nome] = [];
-      // Merge — only add, never remove
-      earned.forEach(m => { if (!medalCache[nome].some(c=>c.name===m.name)) medalCache[nome].push(m); });
+      medalCache[nome] = earned;
     });
 
-    // Persist updated cache
-    try { localStorage.setItem(mesKey, JSON.stringify(medalCache)); } catch(e) {}
-
-    // Render from cache (always complete, never loses medals)
+    // Render from freshly computed medals
     let temMedalhas = false;
     Object.keys(medalCache).sort().forEach(nome => {
       const conquistadas = medalCache[nome];
@@ -2500,7 +2491,7 @@ function mostrarProgressoRegisto(nome, payload) {
   const anoAtual = new Date().getFullYear();
   const dadosMes = dashAllDados.filter(d => {
     if (d.nome !== nome) return false;
-    const dt = new Date(d.data || '');
+    const dt = new Date((d.data || '')+'T12:00:00');
     return !isNaN(dt) && dt.getMonth() === mesAtual && dt.getFullYear() === anoAtual;
   });
 
@@ -2859,18 +2850,18 @@ let touchMoved = false;
 let lastChangeTime=0;
 function startChange(campo,delta,e){
   if(e&&e.type==='touchstart'){
+    e.preventDefault();
     touchStartY=e.touches[0].clientY;
     touchMoved=false;
-    const tm = (ev)=>{ if(Math.abs(ev.touches[0].clientY-touchStartY)>14){touchMoved=true;stopChange();document.removeEventListener('touchmove',tm);} };
+    const tm = (ev)=>{ if(Math.abs(ev.touches[0].clientY-touchStartY)>12){touchMoved=true;stopChange();document.removeEventListener('touchmove',tm);} };
     document.addEventListener('touchmove',tm,{passive:true});
     setTimeout(()=>document.removeEventListener('touchmove',tm),800);
   }
   if(e&&e.type==='mousedown')e.preventDefault();
-  const now=Date.now(); if(now-lastChangeTime<200)return; lastChangeTime=now;
+  const now=Date.now(); if(now-lastChangeTime<80)return; lastChangeTime=now;
   if(touchMoved)return;
   const isSacos = campo==='sacos';
-  const firstDelay = (e&&e.type==='touchstart') ? 90 : 0;
-  // Track this timeout so stopChange can cancel it
+  // Fire immediately — no initial delay
   clearTimeout(changeFirstTo);
   changeFirstTo = setTimeout(()=>{
     changeFirstTo = null;
@@ -2883,7 +2874,7 @@ function startChange(campo,delta,e){
         change(campo,delta);
       }, isSacos?60:150);
     }, isSacos?200:500);
-  }, firstDelay);
+  }, 0);
 }
 function stopChange(e){
   // Cancel ALL pending timers including the initial delay
@@ -3293,12 +3284,12 @@ function mostrarDash(nome) {
   const dadosVendedor = dashAllDados.filter(d=>d.nome===nome);
   if(!dadosVendedor.length){ return; }
   const _mesNow = new Date().getMonth(), _anoNow = new Date().getFullYear();
-  const dadosMesAtual2 = dadosVendedor.filter(d=>{const dt=new Date(d.data||'');return !isNaN(dt)&&dt.getMonth()===_mesNow&&dt.getFullYear()===_anoNow;});
+  const dadosMesAtual2 = dadosVendedor.filter(d=>{const dt=new Date((d.data||'')+'T12:00:00');return !isNaN(dt)&&dt.getMonth()===_mesNow&&dt.getFullYear()===_anoNow;});
 
   // agrupar por mes
   const porMes = {};
   dadosVendedor.forEach(d => {
-    const dt = new Date(d.data || d.Data || '');
+    const dt = new Date((d.data || d.Data || '')+'T12:00:00');
     const mes = dt && !isNaN(dt) ? dt.toLocaleDateString('pt-PT',{month:'short',year:'numeric'}) : 'Sem data';
     if(!porMes[mes]) porMes[mes] = { mes, onlines:0, sprays:0, palmilhas:0, camisolas:0, sacos:0, garrafas:0, elogios:0, szclub:0 };
     categorias.forEach(c => { porMes[mes][c.key] += (d[c.key]||0); });
@@ -3318,7 +3309,7 @@ function mostrarDash(nome) {
   function getUserWeek(d){const jan1=new Date(d.getFullYear(),0,1);const doy=Math.floor((d-jan1)/86400000);return Math.floor(doy/7)-3;}
   const semanaAtual = getUserWeek(new Date());
   dadosVendedor.forEach(d => {
-    const dt = new Date(d.data || d.Data || '');
+    const dt = new Date((d.data || d.Data || '')+'T12:00:00');
     if(!isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual) {
       const wkNum = getUserWeek(dt);
       const idx = 3 - (semanaAtual - wkNum);
@@ -3375,7 +3366,7 @@ function mostrarDash(nome) {
     <div class="meta-grid">
       ${categorias.map(cat => {
         const dadosMesAtual = dadosVendedor.filter(d => {
-          const dt = new Date(d.data||'');
+          const dt = new Date((d.data||'')+'T12:00:00');
           return !isNaN(dt) && dt.getMonth()===new Date().getMonth() && dt.getFullYear()===new Date().getFullYear();
         });
         const v = dadosMesAtual.reduce((s,d)=>s+(d[cat.key]||0),0);
@@ -3513,7 +3504,7 @@ function renderDashDefault() {
   const mesAtual = new Date().getMonth();
   const anoAtual = new Date().getFullYear();
   const dadosMes = dashAllDados.filter(d => {
-    const dt = new Date(d.data||'');
+    const dt = new Date((d.data||'')+'T12:00:00');
     return !isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual;
   });
   if (!dadosMes.length) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;font-style:italic">Sem registos este mês ainda</div>'; return; }
@@ -3584,14 +3575,14 @@ function renderTop3Consistencia() {
   const mesAtual = new Date().getMonth(), anoAtual = new Date().getFullYear();
   const contagem = {};
   dashAllDados.forEach(d => {
-    const dt = new Date(d.data||'');
+    const dt = new Date((d.data||'')+'T12:00:00');
     if (isNaN(dt)||dt.getMonth()!==mesAtual||dt.getFullYear()!==anoAtual) return;
     if (!contagem[d.nome]) contagem[d.nome] = new Set();
     contagem[d.nome].add(d.data);
   });
   try {
     JSON.parse(localStorage.getItem('historico_local')||'[]').forEach(d => {
-      const dt = new Date(d.data||'');
+      const dt = new Date((d.data||'')+'T12:00:00');
       if (isNaN(dt)||dt.getMonth()!==mesAtual||dt.getFullYear()!==anoAtual) return;
       if (!contagem[d.nome]) contagem[d.nome] = new Set();
       contagem[d.nome].add(d.data);
@@ -3779,15 +3770,17 @@ function togglePremiosEditor() {
 
 // ══ LIMPAR CACHE ══
 function limparCacheAdmin() {
-  if (!confirm('Limpar cache local? (ranking, splash, medalhas, histórico)\nOs dados no Google Sheets não são afetados.')) return;
-  const fixedKeys = ['rankingCache','rankingCacheTime','splashDate','premiosLog','metasConfig','medalhasConfig','historico_local'];
+  if (!confirm('Limpar cache local? (ranking, splash, medalhas)\nOs dados no Google Sheets e os registos locais não são afetados.')) return;
+  const fixedKeys = ['rankingCache','rankingCacheTime','splashDate','premiosLog','metasConfig','medalhasConfig'];
   fixedKeys.forEach(k => { try { localStorage.removeItem(k); } catch(e) {} });
   const toRemove = [];
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (k && (k.startsWith('medalhasShown_') || k.startsWith('registo_') || k.startsWith('slotDado_'))) toRemove.push(k);
+    if (k && (k.startsWith('medalhasShown_') || k.startsWith('medalhasCache_') || k.startsWith('slotDado_'))) toRemove.push(k);
   }
   toRemove.forEach(k => { try { localStorage.removeItem(k); } catch(e) {} });
+  // Reset in-memory ranking cache so admin reloads fresh data from Sheets
+  dashAllDados = [];
   showToast('✓ Cache limpo com sucesso');
 }
 function bloquearAdmin() {
@@ -3848,7 +3841,7 @@ function calcularMedalhas(dados) {
   // If data has no date field (aggregated from getRanking), treat as current month
   const dadosMes = dados[0]?.data
     ? dados.filter(d => {
-        const dt = new Date(d.data||'');
+        const dt = new Date((d.data||'')+'T12:00:00');
         return !isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual;
       })
     : dados; // aggregated data - already current month
@@ -5612,7 +5605,7 @@ function limparRegistosHoje(){var hoje=new Date().toISOString().split('T')[0];va
 
     // Líder geral do mês (onlines)
     const _mesNow = new Date().getMonth(), _anoNow = new Date().getFullYear();
-    const doMes = dados.filter(d => { try { const dt=new Date(d.data); return dt.getMonth()===_mesNow&&dt.getFullYear()===_anoNow; } catch(e){return false;} });
+    const doMes = dados.filter(d => { try { const dt=new Date((d.data||'')+'T12:00:00'); return dt.getMonth()===_mesNow&&dt.getFullYear()===_anoNow; } catch(e){return false;} });
     const rankMes = {};
     doMes.forEach(d => { rankMes[d.nome] = (rankMes[d.nome]||0) + (d.onlines||0); });
     const topMes = Object.entries(rankMes).sort((a,b)=>b[1]-a[1])[0];
@@ -5818,6 +5811,139 @@ function limparRegistosHoje(){var hoje=new Date().toISOString().split('T')[0];va
   window._animateCountUp = animateCountUp;
 })();
 
+
+// ── COFRE OVERLAY — inject HTML ──
+(function() {
+  if (document.getElementById('cofreOverlay')) return;
+  const el = document.createElement('div');
+  el.id = 'cofreOverlay';
+  el.style.cssText = 'display:none;position:fixed;inset:0;z-index:9800;background:#080808;overflow-y:auto;-webkit-overflow-scrolling:touch;';
+  el.innerHTML = `
+    <div class="status-bar">
+      <span class="status-week" id="statusWeekCofre">SEMANA —</span>
+      <span class="status-jackpot" id="statusJackpotCofre">€ 0,00</span>
+      <button onclick="fecharCofre()" style="background:transparent;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:0 0 0 12px;line-height:1;">✕</button>
+    </div>
+    <div class="app">
+      <div class="header">
+        <div class="header-eyebrow">SUPER LIGA · VDG</div>
+        <div class="header-title">O <span>COFRE</span></div>
+        <div class="header-sub">Descobre o código e ganha o jackpot</div>
+      </div>
+      <div class="jackpot-section">
+        <div class="jackpot-label">JACKPOT ATUAL</div>
+        <div class="jackpot-amount-wrap">
+          <span class="jackpot-currency">€</span><span class="jackpot-amount" id="jackpotDisplayCofre">0,00</span>
+        </div>
+        <div><button class="jackpot-history-btn" onclick="cofreAbrirHistorico()">Ver histórico →</button></div>
+        <div class="jackpot-week-info" id="jackpotWeekInfo"></div>
+      </div>
+      <div class="player-select-wrap">
+        <span class="player-select-label">O teu nome</span>
+        <select class="player-select" id="playerSelect" onchange="onPlayerChange()">
+          <option value="">— Seleciona o teu nome —</option>
+        </select>
+      </div>
+      <div class="vault-section">
+        <div class="vault-wrap">
+          <div class="vault-door" id="vaultDoorCofre">
+            <div class="vault-door-outer" id="vaultDoorOuterCofre">
+              <div class="vault-ring"><div class="vault-ring-inner"></div></div>
+              <div class="vault-handle"></div>
+              <div class="vault-spokes" id="vaultSpokesCofre"></div>
+              <div class="vault-notches" id="vaultNotches"></div>
+            </div>
+            <div class="vault-lock-icon" id="lockIconCofre">🔒</div>
+          </div>
+        </div>
+        <div id="vaultStatusMsg" style="text-align:center;font-size:13px;margin:10px 0 16px;min-height:20px;"></div>
+        <div class="combo-display" id="comboDisplay"></div>
+        <div class="hint-row">
+          <span class="hint-dot"><span class="dot" style="background:var(--green)"></span> Certo</span>
+          <span class="hint-dot"><span class="dot" style="background:#F59E0B"></span> Errado lugar</span>
+          <span class="hint-dot"><span class="dot" style="background:rgba(255,255,255,0.15)"></span> Não existe</span>
+        </div>
+        <div class="numpad" id="numpadCofre"></div>
+        <div class="attempts-section">
+          <div class="attempts-label" id="attemptsLabel" style="display:none">Tentativas desta sessão</div>
+          <div id="attemptsList"></div>
+        </div>
+      </div>
+      <div class="eligibility-section">
+        <div class="elig-card">
+          <div class="elig-header">
+            <span class="elig-header-icon">🏆</span>
+            <div class="elig-header-text">
+              <div class="elig-title">Elegíveis esta semana</div>
+              <div class="elig-sub">Top 3 do ranking mensal</div>
+            </div>
+          </div>
+          <div class="elig-list" id="eligListCofre"></div>
+        </div>
+      </div>
+      <div class="rules-section">
+        <div class="rules-card">
+          <div class="rules-title">Como Funciona</div>
+          <div class="rule-item"><span class="rule-num">1</span><span class="rule-text">Os 3 melhores vendedores do mês têm acesso ao cofre semanalmente.</span></div>
+          <div class="rule-item"><span class="rule-num">2</span><span class="rule-text">Tens 5 tentativas para descobrir o código de 4 dígitos (estilo Mastermind).</span></div>
+          <div class="rule-item"><span class="rule-num">3</span><span class="rule-text">O jackpot acumula €2 por semana até ser ganho.</span></div>
+          <div class="rule-item"><span class="rule-num">4</span><span class="rule-text">Cada jogador pode tentar uma vez por semana.</span></div>
+        </div>
+      </div>
+      <div class="admin-section">
+        <button class="admin-toggle" onclick="cofreToggleAdmin()">Admin <span id="adminArrowCofre">▼</span></button>
+        <div class="admin-panel" id="adminPanelCofre">
+          <div class="admin-pin-row">
+            <input class="admin-pin-input" id="adminPinInput" type="tel" maxlength="4" placeholder="PIN">
+            <button class="admin-btn" onclick="cofreVerifyAdmin()">Entrar</button>
+          </div>
+          <div id="adminBodyCofre" style="display:none">
+            <div class="admin-row">
+              <span class="admin-label">Código secreto</span>
+              <span id="adminShowCode" style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:var(--gold)">—</span>
+            </div>
+            <div class="admin-row" style="margin-top:10px"><span class="admin-label">Top 3 desta semana</span></div>
+            <div id="adminTop3Wrap"></div>
+            <div class="admin-row" style="margin-top:10px">
+              <button class="admin-btn" onclick="adminSaveTop3()">Guardar Top 3</button>
+            </div>
+            <div class="admin-row" style="margin-top:14px">
+              <span class="admin-label">Adicionar ao jackpot</span>
+              <input class="admin-input" id="adminAddAmount" type="number" value="2" style="width:80px">
+              <button class="admin-btn" onclick="adminAddJackpot()">+€</button>
+            </div>
+            <div class="admin-row" style="margin-top:10px">
+              <button class="admin-btn" onclick="cofreAdminNextWeek()">Avançar semana →</button>
+              <button class="admin-btn red" onclick="cofreAdminReset()">Reset total</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Histórico modal -->
+    <div class="modal-overlay" id="cofreHistModal">
+      <div class="modal-box">
+        <div class="modal-title">Histórico de Jackpots</div>
+        <div id="cofreHistList"></div>
+        <button onclick="cofreFecharHistorico()" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px;color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;margin-top:16px">Fechar</button>
+      </div>
+    </div>
+    <!-- Win overlay -->
+    <div class="win-overlay" id="cofreWinOv" style="display:none">
+      <div class="win-box">
+        <div class="win-confetti">🎉</div>
+        <div class="win-label">JACKPOT</div>
+        <div class="win-title">GANHOU!</div>
+        <div class="win-name" id="cofreWinName"></div>
+        <div class="win-amount" id="cofreWinAmt"></div>
+        <button class="win-close" onclick="cofreFecharWin()">Fechar</button>
+      </div>
+    </div>
+    <!-- Toast -->
+    <div class="toast" id="cofreToastEl"></div>
+  `;
+  document.body.appendChild(el);
+})();
 
 // ── COFRE OVERLAY ──
 function abrirCofre() {
@@ -6315,19 +6441,19 @@ function cofreFecharHistorico() { document.getElementById('cofreHistModal').clas
 
 // ── ADMIN ──
 let adminOpen = false;
-let adminUnlocked = false;
+let cofreAdminUnlocked = false;
 
 function cofreToggleAdmin() {
   adminOpen = !adminOpen;
   document.getElementById('adminPanelCofre').classList.toggle('open', adminOpen);
-  document.getElementById('adminArrow').textContent = adminOpen ? '▲' : '▼';
+  document.getElementById('adminArrowCofre').textContent = adminOpen ? '▲' : '▼';
 }
 
-function verificarAdminPin() {
+function cofreVerifyAdmin() {
   const pin = document.getElementById('adminPinInput').value;
   if(pin === ADMIN_PIN_COFRE) {
-    adminUnlocked = true;
-    document.getElementById('adminContentCofre').style.display = 'block';
+    cofreAdminUnlocked = true;
+    document.getElementById('adminBodyCofre').style.display = 'block';
     document.getElementById('adminShowCode').textContent = state.secretCode;
     buildAdminTop3();
     cofreToast('Admin desbloqueado', 'green');
@@ -6335,6 +6461,8 @@ function verificarAdminPin() {
     cofreToast('PIN incorreto', 'red');
   }
 }
+
+function verificarAdminPin() { cofreVerifyAdmin(); }
 
 function buildAdminTop3() {
   const wrap = document.getElementById('adminTop3Wrap');
@@ -6347,7 +6475,7 @@ function buildAdminTop3() {
 }
 
 function adminSaveTop3() {
-  if(!adminUnlocked) return;
+  if(!cofreAdminUnlocked) return;
   state.top3 = state.top3.map((p,i)=>({
     ...p,
     nome: document.getElementById('adminTop3_'+i)?.value || p.nome,
@@ -6361,7 +6489,7 @@ function adminSaveTop3() {
 }
 
 function adminAddJackpot() {
-  if(!adminUnlocked) return;
+  if(!cofreAdminUnlocked) return;
   const v = parseFloat(document.getElementById('adminAddAmount').value)||0;
   state.jackpot = Math.round((state.jackpot+v)*100)/100;
   state.weeksNoWinner++;
@@ -6371,7 +6499,7 @@ function adminAddJackpot() {
 }
 
 function cofreAdminNextWeek() {
-  if(!adminUnlocked) return;
+  if(!cofreAdminUnlocked) return;
   state.week++;
   state.weekLabel = 'Semana '+state.week;
   state.jackpot = Math.round((state.jackpot+WEEKLY_ADD)*100)/100;
@@ -6385,7 +6513,7 @@ function cofreAdminNextWeek() {
 }
 
 function cofreAdminReset() {
-  if(!adminUnlocked) return;
+  if(!cofreAdminUnlocked) return;
   if(!confirm('Reset completo? Perdes todo o histórico.')) return;
   localStorage.removeItem('cofreState');
   state = defaultState();
