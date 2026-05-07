@@ -5989,16 +5989,12 @@ function getWeekNum() {
 
 // Default state
 const defaultState = () => ({
-  jackpot: 2.00,
+  jackpot: 10.00,
   week: getWeekNum(),
   weekLabel: 'Semana ' + getWeekNum(),
   weeksNoWinner: 1,
   secretCode: generateCode(),
-  top3: [
-    { nome: 'João Ferreira', score: 42, attempts: 0, usedThisWeek: false },
-    { nome: 'Ricardo Pereira', score: 38, attempts: 0, usedThisWeek: false },
-    { nome: 'Nicole Pinto', score: 31, attempts: 0, usedThisWeek: false },
-  ],
+  top3: [],
   history: []
 });
 
@@ -6006,6 +6002,8 @@ let state = loadState() || defaultState();
 // Migrate old state missing fields
 if (!state.history) state.history = [];
 if (state.weeksNoWinner === undefined) state.weeksNoWinner = 1;
+// Enforce minimum jackpot
+if (!state.jackpot || state.jackpot < JACKPOT_MIN) { state.jackpot = JACKPOT_MIN; saveState(); }
 
 function generateCode() {
   // 4 digit code, digits can repeat, but first digit isn't 0
@@ -6126,10 +6124,13 @@ function buildComboDisplay() {
 }
 
 // ── JACKPOT ──
+const JACKPOT_MIN = 10.00;
+
 function renderJackpot() {
   const fmt = v => v.toFixed(2).replace('.',',');
-  document.getElementById('jackpotDisplayCofre').textContent = fmt(state.jackpot);
-  document.getElementById('statusJackpotCofre').textContent = fmt(state.jackpot);
+  const display = Math.max(state.jackpot, JACKPOT_MIN);
+  document.getElementById('jackpotDisplayCofre').textContent = fmt(display);
+  document.getElementById('statusJackpotCofre').textContent = fmt(display);
   document.getElementById('weeksNoWinner').textContent = state.weeksNoWinner;
 }
 
@@ -6418,8 +6419,8 @@ function handleWin() {
     code: state.secretCode
   });
 
-  // Reset jackpot and generate new code
-  state.jackpot = 0;
+  // Reset jackpot to minimum and generate new code
+  state.jackpot = JACKPOT_MIN;
   state.weeksNoWinner = 0;
   state.secretCode = generateCode();
 
@@ -6752,14 +6753,7 @@ window.cofreSom = cofreSom;
             <strong id="adminShowCode" style="color:#C9A84C;font-size:22px;letter-spacing:4px;font-family:'Bebas Neue',sans-serif;">——</strong>
           </div>
           <div class="admin-row">
-            <span class="admin-label">Top 3 (nome + pontos):</span>
-          </div>
-          <div id="adminTop3Wrap" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;"></div>
-          <div class="admin-row">
-            <button class="admin-btn" onclick="adminSaveTop3()">💾 Guardar Top 3</button>
             <button class="admin-btn red" onclick="adminResetWeek()">🔄 Nova Semana</button>
-          </div>
-          <div class="admin-row">
             <button class="admin-btn red" onclick="adminResetAll()">🗑 Reset Total</button>
           </div>
         </div>
