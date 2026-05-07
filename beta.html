@@ -8176,7 +8176,7 @@ function feedLoad() {
   mergeAutoEvents();
   renderFeed();
 
-  if (FEED_SCRIPT_URL.includes('https://script.google.com/macros/s/AKfycbxZ7J7wCftImXw40mXQ7fM-DBMLOngZe9a95liYQ3Q4qaBSnYWot8gDiFqxzIB5cPFEwQ/exec')) {
+  if (FEED_SCRIPT_URL.includes('COLE_AQUI')) {
     // Demo mode — use only auto events
     if (btn) btn.style.animation = '';
     return;
@@ -8779,7 +8779,7 @@ window.feedExpandComments = function(postId) {
 
 // ── SHEETS SYNC ──
 function feedApiCall(payload) {
-  if (FEED_SCRIPT_URL.includes('https://script.google.com/macros/s/AKfycbxZ7J7wCftImXw40mXQ7fM-DBMLOngZe9a95liYQ3Q4qaBSnYWot8gDiFqxzIB5cPFEwQ/exec')) return;
+  if (FEED_SCRIPT_URL.includes('COLE_AQUI')) return;
   const url = FEED_SCRIPT_URL;
   fetch(url, {
     method: 'POST',
