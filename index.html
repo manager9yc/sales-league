@@ -2887,7 +2887,7 @@ function startChange(campo,delta,e){
     setTimeout(()=>document.removeEventListener('touchmove',tm),800);
   }
   if(e&&e.type==='mousedown')e.preventDefault();
-  const now=Date.now(); if(now-lastChangeTime<200)return; lastChangeTime=now;
+  const now=Date.now(); if(now-lastChangeTime<50)return; lastChangeTime=now;
   if(touchMoved)return;
   const isSacos = campo==='sacos';
   const firstDelay = 0;
@@ -2902,8 +2902,8 @@ function startChange(campo,delta,e){
         if(touchMoved){stopChange();return;}
         lastChangeTime=Date.now();
         change(campo,delta);
-      }, isSacos?60:150);
-    }, isSacos?200:500);
+      }, isSacos?40:80);
+    }, isSacos?150:300);
   }, firstDelay);
 }
 function stopChange(e){
