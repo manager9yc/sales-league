@@ -5910,6 +5910,7 @@ function _abrirCofreDirecto() {
   document.getElementById('cofreOverlay').style.display = 'block';
   document.body.style.overflow = 'hidden';
   if (!window._cofreInitDone) { window._cofreInitDone = true; cofreInit(); }
+  else { window.cofreRefreshDados && window.cofreRefreshDados(); }
   // Sync jackpot
   try {
     const s = JSON.parse(localStorage.getItem('cofreState2') || localStorage.getItem('cofreState') || '{}');
@@ -6002,7 +6003,49 @@ function cofreInit() {
   buildVaultVisuals();
   buildNumpad();
   buildComboDisplay();
-  renderAll();
+  renderJackpot();
+  renderVaultStatus();
+  updateStatusBar();
+  // Buscar dados primeiro, depois renderizar nomes
+  cofreRefreshDados();
+}
+
+function cofreRefreshDados() {
+  const sel = document.getElementById('playerSelect');
+  if (sel) sel.innerHTML = '<option value="">⏳ A carregar...</option>';
+
+  const sheetsUrl = 'https://script.google.com/macros/s/AKfycbxpnTHL-_VI1WrxzVD5H5uSciwJZHVGHW__jH0I4JBMjYBfzxQAcAK0oKFU8728OzJQ/exec';
+  const url = sheetsUrl + '?action=getTodos';
+  const proxy = 'https://corsproxy.io/?' + encodeURIComponent(url);
+
+  const normalize = arr => arr.map(r => {
+    if (r && r.data && typeof r.data === 'string' && (r.data.includes('T') || r.data.includes('Z'))) {
+      return {...r, data: r.data.substring(0,10)};
+    }
+    return r;
+  });
+
+  const aplicar = td => {
+    if (Array.isArray(td) && td.length) {
+      window.dashAllDados = normalize(td);
+      renderPlayerSelect();
+      renderEligibility();
+    } else {
+      if (sel) sel.innerHTML = '<option value="">⚠️ Sem dados</option>';
+    }
+  };
+
+  fetch(url, {cache:'no-store'})
+    .then(r => r.json())
+    .then(aplicar)
+    .catch(() => {
+      fetch(proxy, {cache:'no-store'})
+        .then(r => r.json())
+        .then(aplicar)
+        .catch(() => {
+          if (sel) sel.innerHTML = '<option value="">⚠️ Erro ao carregar</option>';
+        });
+    });
 }
 
 function renderAll() {
@@ -6074,22 +6117,73 @@ function updateStatusBar() {
 }
 
 // ── PLAYER SELECT ──
+// ── ELEGÍVEIS: 1º de cada categoria do ranking do mês ──
+function getCofreElegiveis() {
+  const todos = window.dashAllDados || [];
+  const mesAtual = new Date().getMonth();
+  const anoAtual = new Date().getFullYear();
+  const cats = ['onlines','sprays','palmilhas','camisolas','sacos','garrafas','elogios','szclub'];
+  const catLabels = {onlines:'🖥️ Onlines',sprays:'🧴 Sprays',palmilhas:'🦶 Palmilhas',camisolas:'👕 Camisolas',sacos:'🛍️ Sacos',garrafas:'💧 Garrafas',elogios:'⭐ Elogios',szclub:'🎫 SZClub'};
+
+  // Agregar mês atual
+  const agg = {};
+  todos.forEach(d => {
+    const dt = new Date((d.data||'')+'T12:00:00');
+    if (isNaN(dt) || dt.getMonth()!==mesAtual || dt.getFullYear()!==anoAtual) return;
+    if (!agg[d.nome]) agg[d.nome] = {nome:d.nome,onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0,szclub:0};
+    cats.forEach(k => { agg[d.nome][k] += (Number(d[k])||0); });
+  });
+  const ranking = Object.values(agg);
+
+  // 1º de cada categoria (com pelo menos 1)
+  const nomes = new Map(); // nome -> lista de categorias ganhas
+  cats.forEach(k => {
+    const sorted = ranking.filter(r=>(r[k]||0)>0).sort((a,b)=>b[k]-a[k]);
+    if (!sorted.length) return;
+    const lider = sorted[0];
+    if (!nomes.has(lider.nome)) nomes.set(lider.nome, []);
+    nomes.get(lider.nome).push(catLabels[k]);
+  });
+
+  // Converter para array com estado do cofre
+  return Array.from(nomes.entries()).map(([nome, cats]) => {
+    const existing = state.top3.find(p=>p.nome===nome);
+    return {
+      nome,
+      cats,
+      attempts: existing ? existing.attempts : 0,
+      usedThisWeek: existing ? existing.usedThisWeek : false
+    };
+  });
+}
+
 function renderPlayerSelect() {
   const sel = document.getElementById('playerSelect');
   const current = sel.value;
   sel.innerHTML = '<option value="">— Seleciona o teu nome —</option>';
-  state.top3.forEach((p,i) => {
+  const elegiveis = getCofreElegiveis();
+  elegiveis.forEach(p => {
     const opt = document.createElement('option');
     opt.value = p.nome;
     opt.textContent = p.nome;
     sel.appendChild(opt);
   });
-  if(current) sel.value = current;
+  if (current) sel.value = current;
 }
 
 function onPlayerChange() {
   const sel = document.getElementById('playerSelect');
-  currentPlayer = state.top3.find(p=>p.nome===sel.value) || null;
+  const elegiveis = getCofreElegiveis();
+  currentPlayer = elegiveis.find(p=>p.nome===sel.value) || null;
+  // Sync with state.top3 for persistence
+  if (currentPlayer) {
+    let existing = state.top3.find(p=>p.nome===currentPlayer.nome);
+    if (!existing) {
+      existing = {nome:currentPlayer.nome,score:0,attempts:0,usedThisWeek:false};
+      state.top3.push(existing);
+    }
+    currentPlayer = existing;
+  }
   currentEntry = '';
   sessionAttempts = [];
   updateComboDisplay();
@@ -6101,19 +6195,25 @@ function onPlayerChange() {
 // ── ELIGIBILITY ──
 function renderEligibility() {
   const list = document.getElementById('eligListCofre');
-  const medals = ['r1','r2','r3'];
-  const pos = ['👑 1º','🥈 2º','🥉 3º'];
-  list.innerHTML = state.top3.map((p,i) => {
-    const attLeft = MAX_ATTEMPTS - (p.attempts||0);
-    const badge = p.usedThisWeek
+  const elegiveis = getCofreElegiveis();
+  if (!elegiveis.length) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px">Sem dados do ranking ainda — abre o Ranking primeiro.</div>';
+    return;
+  }
+  list.innerHTML = elegiveis.map((p, i) => {
+    const existing = state.top3.find(s=>s.nome===p.nome) || p;
+    const attLeft = MAX_ATTEMPTS - (existing.attempts||0);
+    const badge = existing.usedThisWeek
       ? `<span class="elig-badge used">Jogou</span>`
       : attLeft > 0
         ? `<span class="elig-badge eligible">${attLeft} tent.</span>`
         : `<span class="elig-badge used">Esgotado</span>`;
+    const catsLabel = p.cats.join(' · ');
     return `<div class="elig-item">
-      <div class="elig-rank ${medals[i]}">${pos[i]}</div>
-      <div class="elig-name">${p.nome}</div>
-      <div class="elig-score">${p.score} pts</div>
+      <div style="flex:1">
+        <div class="elig-name">${p.nome}</div>
+        <div style="font-size:10px;color:var(--gold);margin-top:2px">${catsLabel}</div>
+      </div>
       ${badge}
     </div>`;
   }).join('');
@@ -6492,6 +6592,8 @@ function cofreToast(msg, type='') {
 }
 
 // Expose only the entry point
+window.getCofreElegiveis = getCofreElegiveis;
+window.cofreRefreshDados = cofreRefreshDados;
 window.cofreInit = cofreInit;
 window.cofreToggleAdmin = cofreToggleAdmin;
 window.verificarAdminPin = verificarAdminPin;
@@ -6596,7 +6698,7 @@ window.cofreSom = cofreSom;
           <div class="elig-header-icon">🏆</div>
           <div class="elig-header-text">
             <div class="elig-title">QUEM PODE JOGAR</div>
-            <div class="elig-sub">Top 3 do mês têm direito a jogar</div>
+            <div class="elig-sub">1º lugar de cada categoria do ranking</div>
           </div>
         </div>
         <div class="elig-list" id="eligListCofre"></div>
