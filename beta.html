@@ -2724,8 +2724,8 @@ function fecharSplash(){
   s.classList.add('out');
   setTimeout(()=>{
     s.classList.add('hidden');
-    const desafiosBtn = document.getElementById('navBtnDesafios');
-    if(desafiosBtn) goTo('desafios', desafiosBtn);
+    const feedBtn = document.getElementById('navBtnFeed');
+    if(feedBtn) { goTo('feed', feedBtn); feedInit(); }
   },600);
 }
 iniciarSplash();
@@ -5551,7 +5551,7 @@ function renderDesafiosMedalhas() {
 <!-- ═══════════════════════════════════════════════════════ -->
 <style>
 /* ══ FEED SCREEN ══ */
-#screen-feed { display:none; flex-direction:column; height:calc(100vh - 64px - env(safe-area-inset-bottom,0px)); overflow:hidden; }
+#screen-feed { display:none; flex-direction:column; height:100dvh; overflow:hidden; padding-bottom:calc(68px + env(safe-area-inset-bottom,0px)); }
 #screen-feed.active { display:flex; }
 
 .feed-header {
@@ -5738,9 +5738,10 @@ function renderDesafiosMedalhas() {
 
 /* COMPOSE POST */
 .feed-compose {
-  flex-shrink:0;border-top:1px solid var(--border);
-  background:rgba(8,8,8,0.95);backdrop-filter:blur(12px);
-  padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));
+  flex-shrink:0;border-top:1px solid rgba(201,168,76,0.15);
+  background:rgba(8,8,8,0.98);backdrop-filter:blur(16px);
+  padding:10px 12px 10px;
+  position:relative;z-index:10;
 }
 .compose-row { display:flex;align-items:center;gap:8px; }
 .compose-avatar {
@@ -8053,8 +8054,8 @@ window.PRIZES_RASP = PRIZES;
 (function() {
 
 // ── CONFIG ──
-const FEED_SCRIPT_URL = 'COLE_AQUI_URL_DO_APPS_SCRIPT_FEED';
-const TENOR_KEY = 'AIzaSyAyimkuYQYF_FuasThVpfdsHd5-GNHaAek'; // public demo key
+const FEED_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZ7J7wCftImXw40mXQ7fM-DBMLOngZe9a95liYQ3Q4qaBSnYWot8gDiFqxzIB5cPFEwQ/exec';
+const TENOR_KEY = 'AIzaSyAyimkuYQYF_FuasThVpfdsHd5-GNHaAek';
 const REACTIONS_LIST = ['🔥','💪','😂','👑','🤙','💀'];
 
 // ── USER IDENTITY ──
@@ -8175,7 +8176,7 @@ function feedLoad() {
   mergeAutoEvents();
   renderFeed();
 
-  if (FEED_SCRIPT_URL.includes('COLE_AQUI')) {
+  if (FEED_SCRIPT_URL.includes('https://script.google.com/macros/s/AKfycbxZ7J7wCftImXw40mXQ7fM-DBMLOngZe9a95liYQ3Q4qaBSnYWot8gDiFqxzIB5cPFEwQ/exec')) {
     // Demo mode — use only auto events
     if (btn) btn.style.animation = '';
     return;
@@ -8191,8 +8192,6 @@ function feedLoad() {
 // ── AUTO-GENERATE EVENTS FROM RANKING DATA ──
 function mergeAutoEvents() {
   const todos = window.dashAllDados || [];
-  if (!todos.length) return;
-
   const autoEvents = [];
   const now = new Date();
   const mesAtual = now.getMonth();
@@ -8202,114 +8201,226 @@ function mergeAutoEvents() {
   const catLabels = {onlines:'Onlines',sprays:'Sprays',palmilhas:'Palmilhas',camisolas:'Camisolas',sacos:'Sacos',garrafas:'Garrafas',elogios:'Elogios',szclub:'SZClub'};
   const catEmojis = {onlines:'🖥️',sprays:'🧴',palmilhas:'🦶',camisolas:'👕',sacos:'🛍️',garrafas:'💧',elogios:'⭐',szclub:'🎫'};
 
-  // Aggregate month
-  const agg = {};
-  const todayAgg = {};
-  todos.forEach(d => {
-    const dt = new Date((d.data||'') + 'T12:00:00');
-    const isMonth = !isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual;
-    const isToday = (d.data||'').slice(0,10) === today;
-    if (!isMonth) return;
-    if (!agg[d.nome]) agg[d.nome] = {nome:d.nome, total:0};
-    cats.forEach(k => { agg[d.nome].total += (Number(d[k])||0); agg[d.nome][k] = (agg[d.nome][k]||0)+(Number(d[k])||0); });
-    if (isToday) {
-      if (!todayAgg[d.nome]) todayAgg[d.nome] = {nome:d.nome, total:0};
-      cats.forEach(k => { todayAgg[d.nome].total += (Number(d[k])||0); todayAgg[d.nome][k] = (todayAgg[d.nome][k]||0)+(Number(d[k])||0); });
+  function ev(id, tag, highlight, text, tsExtra, extra) {
+    return { id, type:'auto', tag, author:'Super Liga', ts: today + (tsExtra||'T07:00:00'),
+      highlight: highlight||null, text, reactions:{}, comments:[], pinned:false, ...(extra||{}) };
+  }
+
+  if (todos.length) {
+    // ── Aggregate by month and by day ──
+    const agg = {}, todayAgg = {}, byDay = {};
+    todos.forEach(d => {
+      const dt = new Date((d.data||'')+'T12:00:00');
+      const isMonth = !isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual;
+      const dayKey = (d.data||'').slice(0,10);
+      const isToday = dayKey === today;
+      if (!isMonth) return;
+      if (!agg[d.nome]) agg[d.nome] = {nome:d.nome, total:0, dias:new Set()};
+      cats.forEach(k => { agg[d.nome].total += (Number(d[k])||0); agg[d.nome][k] = (agg[d.nome][k]||0)+(Number(d[k])||0); });
+      agg[d.nome].dias.add(dayKey);
+      if (!byDay[dayKey]) byDay[dayKey] = {};
+      if (!byDay[dayKey][d.nome]) byDay[dayKey][d.nome] = {nome:d.nome, total:0};
+      cats.forEach(k => { byDay[dayKey][d.nome].total += (Number(d[k])||0); byDay[dayKey][d.nome][k] = (byDay[dayKey][d.nome][k]||0)+(Number(d[k])||0); });
+      if (isToday) {
+        if (!todayAgg[d.nome]) todayAgg[d.nome] = {nome:d.nome, total:0};
+        cats.forEach(k => { todayAgg[d.nome].total += (Number(d[k])||0); todayAgg[d.nome][k] = (todayAgg[d.nome][k]||0)+(Number(d[k])||0); });
+      }
+    });
+
+    const ranking = Object.values(agg).sort((a,b) => b.total - a.total);
+    const todayRanking = Object.values(todayAgg).sort((a,b) => b.total - a.total);
+    const allNames = typeof equipas !== 'undefined' ? equipas.flatMap(e=>e.nomes||[]) : ranking.map(r=>r.nome);
+
+    // ── 1. LÍDER DO MÊS ──
+    if (ranking[0]) {
+      const segundo = ranking[1];
+      const diff = segundo ? ranking[0].total - segundo.total : null;
+      autoEvents.push(ev('auto_leader_month','ranking',
+        '🏆 ' + ranking[0].nome.split(' ')[0].toUpperCase() + ' LIDERA O MÊS',
+        ranking[0].nome + ' está no topo com ' + ranking[0].total + ' registos este mês.' +
+        (diff !== null ? (diff > 5 ? ' Margem confortável de ' + diff + ' pontos sobre ' + segundo.nome.split(' ')[0] + '.' : ' ' + segundo.nome.split(' ')[0] + ' está só a ' + diff + ' de distância! 🔥') : ''),
+        'T09:00:00'
+      ));
     }
-  });
 
-  const ranking = Object.values(agg).sort((a,b) => b.total - a.total);
-  const todayRanking = Object.values(todayAgg).sort((a,b) => b.total - a.total);
+    // ── 2. BATALHA PELO TOP — quem está próximo ──
+    if (ranking.length >= 2) {
+      const pares = [];
+      for (let i = 0; i < Math.min(ranking.length-1, 4); i++) {
+        const diff = ranking[i].total - ranking[i+1].total;
+        if (diff <= 3 && diff >= 0) {
+          pares.push(ranking[i].nome.split(' ')[0] + ' (' + ranking[i].total + ') vs ' + ranking[i+1].nome.split(' ')[0] + ' (' + ranking[i+1].total + ')');
+        }
+      }
+      if (pares.length) {
+        autoEvents.push(ev('auto_battle_top','ranking',
+          '⚔️ BATALHA APERTADA NO RANKING',
+          'Diferenças mínimas no ranking: ' + pares.join(' · ') + '. Tudo pode mudar num único registo!',
+          'T10:00:00'
+        ));
+      }
+    }
 
-  // 1. LÍDER DO MÊS
-  if (ranking[0]) {
-    autoEvents.push({
-      id: 'auto_leader_month',
-      type: 'auto', tag: 'ranking',
-      author: 'Super Liga',
-      ts: now.toISOString(),
-      highlight: '🏆 ' + ranking[0].nome.split(' ')[0].toUpperCase() + ' LIDERA O MÊS',
-      text: ranking[0].nome + ' está no topo do ranking com ' + ranking[0].total + ' registos este mês. Alguém vai reagir?',
-      reactions: {}, comments: [],
-      pinned: false
+    // ── 3. LÍDER DO DIA ──
+    if (todayRanking[0] && todayRanking[0].total > 0) {
+      autoEvents.push(ev('auto_leader_today','ranking',
+        '⚡ LÍDER DE HOJE: ' + todayRanking[0].nome.split(' ')[0].toUpperCase(),
+        todayRanking[0].nome + ' já tem ' + todayRanking[0].total + ' registos hoje!' +
+        (todayRanking[1] ? ' ' + todayRanking[1].nome.split(' ')[0] + ' está a ' + (todayRanking[0].total - todayRanking[1].total) + ' atrás.' : ' O resto da equipa a dormir? 😴'),
+        'T08:30:00'
+      ));
+    }
+
+    // ── 4. RESUMO DO DIA ──
+    if (todayRanking.length) {
+      const totalHoje = todayRanking.reduce((s,p)=>s+p.total,0);
+      const nomes = todayRanking.slice(0,3).map(p=>p.nome.split(' ')[0]+'('+p.total+')').join(' · ');
+      autoEvents.push(ev('auto_today_summary_'+today,'ranking',
+        '📊 RESUMO DE ' + new Date(today+'T12:00:00').toLocaleDateString('pt-PT',{weekday:'long'}).toUpperCase(),
+        totalHoje + ' registos no total hoje. Destaques: ' + nomes + '. 💪',
+        'T08:00:00'
+      ));
+    }
+
+    // ── 5. SEM REGISTOS HOJE ──
+    const comRegistos = new Set(Object.keys(todayAgg));
+    const semHoje = allNames.filter(n => !comRegistos.has(n) && agg[n] && agg[n].total > 0).map(n=>n.split(' ')[0]);
+    if (semHoje.length) {
+      const msgs = ['Acordem! 😅','O que se passa? 🤔','Vão ao trabalho! 😂','Toca a trabalhar! 💀'];
+      const msg = msgs[Math.floor(today.slice(-1) % msgs.length)];
+      autoEvents.push(ev('auto_missing_'+today,'ranking', null,
+        '👀 Ainda sem registos hoje: ' + semHoje.join(', ') + '. ' + msg,
+        'T09:30:00'
+      ));
+    }
+
+    // ── 6. ULTRAPASAGENS — quem subiu de posição vs ontem ──
+    const yesterday = new Date(now); yesterday.setDate(yesterday.getDate()-1);
+    const yesterdayKey = yesterday.toISOString().slice(0,10);
+    if (byDay[yesterdayKey] && byDay[today]) {
+      // Compare totals acumulados até ontem vs hoje
+      const rankOntem = ranking.map((r,i)=>({nome:r.nome,pos:i}));
+      // Simple: quem tem mais registos hoje que ontem (cresceu mais rápido)
+      const subidas = [];
+      for (let i = 1; i < ranking.length; i++) {
+        const atual = ranking[i];
+        const anterior = ranking[i-1];
+        const ganhouHoje = (todayAgg[atual.nome]||{total:0}).total;
+        const anteriorHoje = (todayAgg[anterior.nome]||{total:0}).total;
+        if (ganhouHoje > anteriorHoje + 2) {
+          subidas.push(atual.nome.split(' ')[0] + ' está a ganhar terreno a ' + anterior.nome.split(' ')[0]);
+        }
+      }
+      if (subidas.length) {
+        autoEvents.push(ev('auto_climb_'+today,'ranking',
+          '📈 MOVIMENTO NO RANKING',
+          subidas[0] + '! O ranking pode mudar ainda hoje. 👀',
+          'T11:00:00'
+        ));
+      }
+    }
+
+    // ── 7. CATEGORIAS ──
+    cats.forEach(k => {
+      const sorted = ranking.filter(r=>(r[k]||0)>0).sort((a,b)=>b[k]-a[k]);
+      if (!sorted.length) return;
+      autoEvents.push(ev('auto_cat_'+k,'ranking', null,
+        catEmojis[k] + ' ' + catLabels[k] + ': ' + sorted[0].nome + ' lidera com ' + sorted[0][k] +
+        (sorted[1] ? ' · ' + sorted[1].nome.split(' ')[0] + ' em 2.º com ' + sorted[1][k] : '') + ' 🔥',
+        'T07:30:00'
+      ));
     });
+
+    // ── 8. DIAS SEM REGISTOS (streak negativo) ──
+    const allDays = Object.keys(byDay).sort().reverse();
+    allNames.forEach(nome => {
+      if (!agg[nome]) return; // nunca registou
+      let diasSem = 0;
+      const d = new Date(now);
+      while (diasSem < 7) {
+        const key = d.toISOString().slice(0,10);
+        const isWeekend = d.getDay()===0 || d.getDay()===6;
+        if (!isWeekend) {
+          if (byDay[key] && byDay[key][nome] && byDay[key][nome].total > 0) break;
+          diasSem++;
+        }
+        d.setDate(d.getDate()-1);
+      }
+      if (diasSem >= 3) {
+        const mensagens = [
+          nome.split(' ')[0] + ' não regista há ' + diasSem + ' dias úteis. Está tudo bem? 🤔',
+          nome.split(' ')[0] + ' desapareceu do radar há ' + diasSem + ' dias. SOS! 📡',
+          diasSem + ' dias sem ver ' + nome.split(' ')[0] + ' nos registos... voltou de férias sem avisar? 😅'
+        ];
+        autoEvents.push(ev('auto_nosales_'+nome.replace(/\s/g,'_'),  'ranking', null,
+          mensagens[diasSem % mensagens.length], 'T10:30:00'
+        ));
+      }
+    });
+
+    // ── 9. MEDALHAS CONQUISTADAS ──
+    if (typeof calcularMedalhas === 'function') {
+      try {
+        const todosMes = todos.filter(d => {
+          const dt = new Date((d.data||'')+'T12:00:00');
+          return !isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual;
+        });
+        const nomesMes = [...new Set(todosMes.map(d=>d.nome))];
+        nomesMes.forEach(nome => {
+          const dadosNome = todosMes.filter(d=>d.nome===nome);
+          const meds = calcularMedalhas(dadosNome).filter(m=>m.earned);
+          if (meds.length) {
+            const medalStr = meds.map(m=>m.icon+' '+m.name).join(', ');
+            autoEvents.push(ev('auto_medal_'+nome.replace(/\s/g,'_'),'medals',
+              '🏅 ' + nome.split(' ')[0].toUpperCase() + ' CONQUISTOU MEDALHA!',
+              nome + ' conquistou: ' + medalStr + ' este mês! 🎉 Vai à Slot Machine buscar o prémio!',
+              'T08:00:00'
+            ));
+          }
+        });
+      } catch(e) {}
+    }
+
+    // ── 10. COFRE — estado atual ──
+    try {
+      const cofreState = JSON.parse(localStorage.getItem('cofreState')||'{}');
+      if (cofreState.jackpot !== undefined) {
+        const semanas = cofreState.weeksNoWinner || 1;
+        autoEvents.push(ev('auto_cofre_estado','medals',
+          '🔒 O COFRE TEM €' + Number(cofreState.jackpot).toFixed(2).replace('.',','),
+          'Já ' + semanas + ' semana(s) sem vencedor. O prémio acumulado é de €' + Number(cofreState.jackpot).toFixed(2).replace('.',',') + '. Os líderes de cada categoria podem tentar o código! 🤑',
+          'T07:00:00'
+        ));
+      }
+    } catch(e) {}
+
+    // ── 11. TOP 3 GERAL — pódio ──
+    if (ranking.length >= 3) {
+      const podio = ['🥇','🥈','🥉'].map((m,i)=> m + ' ' + ranking[i].nome.split(' ')[0] + ' — ' + ranking[i].total).join('\n');
+      autoEvents.push(ev('auto_podium_'+today.slice(0,7),'ranking',
+        '🏟️ PÓDIO DO MÊS',
+        podio,
+        'T07:15:00'
+      ));
+    }
+
+  } else {
+    // Sem dados — evento de boas-vindas
+    autoEvents.push(ev('auto_welcome','ranking',
+      '👋 BEM-VINDOS AO BALNEÁRIO',
+      'O feed atualiza automaticamente com eventos do ranking, medalhas, cofre e muito mais. Carrega o Ranking para começar! 🏆',
+      'T07:00:00'
+    ));
   }
 
-  // 2. LÍDER DO DIA
-  if (todayRanking[0] && todayRanking[0].total > 0) {
-    autoEvents.push({
-      id: 'auto_leader_today',
-      type: 'auto', tag: 'ranking',
-      author: 'Super Liga',
-      ts: today + 'T08:00:00',
-      highlight: '⚡ LÍDER DE HOJE: ' + todayRanking[0].nome.split(' ')[0].toUpperCase(),
-      text: todayRanking[0].nome + ' já tem ' + todayRanking[0].total + ' registos hoje! ' + (todayRanking[1] ? todayRanking[1].nome.split(' ')[0] + ' está a ' + (todayRanking[0].total - todayRanking[1].total) + ' de distância.' : ''),
-      reactions: {}, comments: [],
-      pinned: false
-    });
-  }
-
-  // 3. CATEGORIAS — líder de cada uma
-  cats.forEach(k => {
-    const sorted = ranking.filter(r=>(r[k]||0)>0).sort((a,b)=>b[k]-a[k]);
-    if (!sorted.length) return;
-    const lider = sorted[0];
-    autoEvents.push({
-      id: 'auto_cat_' + k,
-      type: 'auto', tag: 'ranking',
-      author: 'Super Liga',
-      ts: today + 'T07:30:00',
-      text: catEmojis[k] + ' ' + catLabels[k] + ': ' + lider.nome + ' lidera com ' + lider[k] + (sorted[1] ? ' — ' + sorted[1].nome.split(' ')[0] + ' em 2º com ' + sorted[1][k] : '') + '. 🔥',
-      reactions: {}, comments: [],
-      pinned: false
-    });
-  });
-
-  // 4. REGISTOS DE HOJE (detalhado)
-  if (todayRanking.length) {
-    const hoje = todayRanking.slice(0,3).map(p => p.nome.split(' ')[0] + ' (' + p.total + ')').join(', ');
-    autoEvents.push({
-      id: 'auto_today_summary_' + today,
-      type: 'auto', tag: 'ranking',
-      author: 'Super Liga',
-      ts: now.toISOString(),
-      highlight: '📊 RESUMO DE HOJE',
-      text: 'Registos de hoje: ' + hoje + '. Mantém o ritmo! 💪',
-      reactions: {}, comments: [],
-      pinned: false
-    });
-  }
-
-  // 5. SEM REGISTOS hoje
-  const comRegistos = new Set(Object.keys(todayAgg));
-  const semRegistos = ranking.filter(r => !comRegistos.has(r.nome) && r.total > 0).map(r => r.nome.split(' ')[0]);
-  if (semRegistos.length) {
-    autoEvents.push({
-      id: 'auto_missing_' + today,
-      type: 'auto', tag: 'ranking',
-      author: 'Super Liga',
-      ts: today + 'T09:00:00',
-      text: '👀 Ainda sem registos hoje: ' + semRegistos.join(', ') + '. Acordem! 😅',
-      reactions: {}, comments: [],
-      pinned: false
-    });
-  }
-
-  // Merge: auto events get replaced/kept, staff posts persist
+  // ── Preservar reações/comentários existentes ──
   const staffPosts = feedPosts.filter(p => p.type !== 'auto');
-  const existingAutoIds = new Set(autoEvents.map(e => e.id));
-
-  // Preserve reactions/comments from existing auto events
   autoEvents.forEach(ae => {
     const existing = feedPosts.find(p => p.id === ae.id);
-    if (existing) {
-      ae.reactions = existing.reactions || {};
-      ae.comments = existing.comments || [];
-    }
+    if (existing) { ae.reactions = existing.reactions||{}; ae.comments = existing.comments||[]; ae.userReactions = existing.userReactions||{}; }
   });
 
-  feedPosts = [...autoEvents, ...staffPosts]
-    .sort((a,b) => new Date(b.ts) - new Date(a.ts));
+  feedPosts = [...autoEvents, ...staffPosts].sort((a,b) => new Date(b.ts) - new Date(a.ts));
 }
 
 // ── RENDER FEED ──
@@ -8553,22 +8664,51 @@ window.closeGifPicker = function() {
 
 function fetchGifs(query) {
   const grid = document.getElementById('gifGrid');
-  grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">A carregar...</div>';
-  const url = `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(query)}&key=${TENOR_KEY}&limit=16&media_filter=gif`;
-  fetch(url)
-    .then(r => r.json())
-    .then(data => {
-      if (!data.results || !data.results.length) {
-        grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">Sem resultados</div>';
-        return;
-      }
-      grid.innerHTML = data.results.map(r => {
-        const gifUrl = r.media_formats?.gif?.url || r.media_formats?.tinygif?.url || '';
-        return `<div class="gif-item" onclick="selectGif('${gifUrl}')"><img src="${gifUrl}" loading="lazy" alt="gif"></div>`;
-      }).join('');
-    })
+  grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">A carregar GIFs...</div>';
+
+  // Tenor v2 via corsproxy para evitar CORS
+  const tenorUrl = `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(query)}&key=${TENOR_KEY}&limit=16&media_filter=gif,tinygif`;
+  const proxiedUrl = 'https://corsproxy.io/?' + encodeURIComponent(tenorUrl);
+
+  const renderGifs = (urls) => {
+    if (!urls.length) {
+      grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">Sem resultados para "' + query + '"</div>';
+      return;
+    }
+    grid.innerHTML = urls.map(({url, preview}) =>
+      `<div class="gif-item" onclick="selectGif(${JSON.stringify(url)})"><img src="${preview || url}" loading="lazy" alt="gif"></div>`
+    ).join('');
+  };
+
+  const parseTenor = (data) => {
+    if (!data.results || !data.results.length) return [];
+    return data.results.map(r => {
+      const gif = r.media_formats?.gif?.url || r.media_formats?.tinygif?.url || '';
+      const preview = r.media_formats?.tinygif?.url || r.media_formats?.nanogif?.url || gif;
+      return { url: gif, preview };
+    }).filter(r => r.url);
+  };
+
+  // Try direct first, then proxy
+  fetch(tenorUrl, { mode: 'cors' })
+    .then(r => { if (!r.ok) throw new Error('cors'); return r.json(); })
+    .then(data => renderGifs(parseTenor(data)))
     .catch(() => {
-      grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">Erro ao carregar GIFs</div>';
+      fetch(proxiedUrl)
+        .then(r => r.json())
+        .then(data => renderGifs(parseTenor(data)))
+        .catch(() => {
+          // Last resort: Giphy public beta
+          const giphyUrl = `https://api.giphy.com/v1/gifs/search?api_key=dc6zaTOxFJmzC&q=${encodeURIComponent(query)}&limit=16&rating=g`;
+          fetch(giphyUrl)
+            .then(r => r.json())
+            .then(data => {
+              if (!data.data || !data.data.length) { grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">Sem resultados</div>'; return; }
+              const urls = data.data.map(g => ({ url: g.images.original.url, preview: g.images.fixed_height_small.url }));
+              renderGifs(urls);
+            })
+            .catch(() => { grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">Erro a carregar GIFs. Verifica a ligação.</div>'; });
+        });
     });
 }
 
@@ -8639,7 +8779,7 @@ window.feedExpandComments = function(postId) {
 
 // ── SHEETS SYNC ──
 function feedApiCall(payload) {
-  if (FEED_SCRIPT_URL.includes('COLE_AQUI')) return;
+  if (FEED_SCRIPT_URL.includes('https://script.google.com/macros/s/AKfycbxZ7J7wCftImXw40mXQ7fM-DBMLOngZe9a95liYQ3Q4qaBSnYWot8gDiFqxzIB5cPFEwQ/exec')) return;
   const url = FEED_SCRIPT_URL;
   fetch(url, {
     method: 'POST',
