@@ -3518,19 +3518,6 @@ async function carregarDashboard() {
       dashAllDados = [];
     }
   }
-    renderDashDefault(); renderTop3Consistencia();
-  } catch(e) {
-    try {
-      const proxy = 'https://corsproxy.io/?';
-      const url = encodeURIComponent(SHEETS_URL + '?action=getTodos');
-      const res2 = await fetch(proxy + url);
-      dashAllDados = await res2.json();
-      if (!Array.isArray(dashAllDados)) dashAllDados = [];
-      renderDashDefault(); renderTop3Consistencia();
-    } catch(e2) {
-      dashAllDados = [];
-    }
-  }
 }
 
 function renderDashDefault() {
