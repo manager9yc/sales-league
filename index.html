@@ -5876,6 +5876,7 @@ function abrirCofre() {
   }
   _abrirCofreDirecto();
 }
+window.abrirCofre = abrirCofre;
 
 function _mostrarCofrePinModal() {
   // Remove modal anterior se existir
@@ -6638,6 +6639,15 @@ window.cofreSom = cofreSom;
 // Do NOT auto-run — waits for user action
 
 })(); // end IIFE
+
+// Bind cofre button via JS to avoid any onclick issues
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('cofreBtn');
+  if (btn) {
+    btn.addEventListener('click', function(e) { e.preventDefault(); abrirCofre(); });
+    btn.addEventListener('touchend', function(e) { e.preventDefault(); abrirCofre(); }, {passive:false});
+  }
+});
 
 
 </script>
