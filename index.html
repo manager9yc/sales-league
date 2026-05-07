@@ -5910,6 +5910,7 @@ function _abrirCofreDirecto() {
   document.getElementById('cofreOverlay').style.display = 'block';
   document.body.style.overflow = 'hidden';
   if (!window._cofreInitDone) { window._cofreInitDone = true; cofreInit(); }
+  else { window.cofreRefreshDados && window.cofreRefreshDados(); }
   // Sync jackpot
   try {
     const s = JSON.parse(localStorage.getItem('cofreState2') || localStorage.getItem('cofreState') || '{}');
@@ -6003,6 +6004,37 @@ function cofreInit() {
   buildNumpad();
   buildComboDisplay();
   renderAll();
+  // Carregar dados do Sheets se necessário
+  cofreRefreshDados();
+}
+
+function cofreRefreshDados() {
+  const sel = document.getElementById('playerSelect');
+  if (window.dashAllDados && window.dashAllDados.length) {
+    renderPlayerSelect();
+    renderEligibility();
+    return;
+  }
+  if (sel) sel.innerHTML = '<option value="">⏳ A carregar...</option>';
+  const url = window.SHEETS_URL + '?action=getTodos';
+  const proxy = 'https://corsproxy.io/?' + encodeURIComponent(url);
+  Promise.race([
+    fetch(url, {cache:'no-store'}).then(r=>r.json()).catch(()=>Promise.reject()),
+    fetch(proxy, {cache:'no-store'}).then(r=>r.json()).catch(()=>Promise.reject())
+  ]).then(td => {
+    if (Array.isArray(td) && td.length) {
+      window.dashAllDados = td.map(r => {
+        if (r && r.data && typeof r.data === 'string' && (r.data.includes('T') || r.data.includes('Z'))) {
+          return {...r, data: r.data.substring(0,10)};
+        }
+        return r;
+      });
+      renderPlayerSelect();
+      renderEligibility();
+    }
+  }).catch(() => {
+    if (sel) sel.innerHTML = '<option value="">⚠️ Erro ao carregar dados</option>';
+  });
 }
 
 function renderAll() {
@@ -6550,6 +6582,7 @@ function cofreToast(msg, type='') {
 
 // Expose only the entry point
 window.getCofreElegiveis = getCofreElegiveis;
+window.cofreRefreshDados = cofreRefreshDados;
 window.cofreInit = cofreInit;
 window.cofreToggleAdmin = cofreToggleAdmin;
 window.verificarAdminPin = verificarAdminPin;
