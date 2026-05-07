@@ -1136,9 +1136,9 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
   border-color:var(--gold); color:#fff;
   box-shadow:0 0 16px rgba(201,168,76,0.3);
 }
-#cofreOverlay .combo-digit.correct { border-color:var(--green); color:var(--green); background:rgba(34,197,94,0.08); box-shadow:0 0 16px rgba(34,197,94,0.3); }
-#cofreOverlay .combo-digit.wrong { border-color:var(--red); color:var(--red); background:rgba(239,68,68,0.08); box-shadow:0 0 16px rgba(239,68,68,0.3); }
-#cofreOverlay .combo-digit.partial { border-color:#F59E0B; color:#F59E0B; background:rgba(245,158,11,0.08); box-shadow:0 0 16px rgba(245,158,11,0.3); }
+#cofreOverlay .combo-digit.correct { border-color:#00FF44; color:#00FF44; background:rgba(0,255,68,0.18); box-shadow:0 0 20px rgba(0,255,68,0.6); }
+#cofreOverlay .combo-digit.wrong { border-color:#FF1A1A; color:#FF1A1A; background:rgba(255,26,26,0.18); box-shadow:0 0 20px rgba(255,26,26,0.6); }
+#cofreOverlay .combo-digit.partial { border-color:#FFB800; color:#FFB800; background:rgba(255,184,0,0.18); box-shadow:0 0 20px rgba(255,184,0,0.5); }
 @keyframes digitFlip { 0%{transform:rotateX(90deg);opacity:0} 100%{transform:rotateX(0);opacity:1} }
 #cofreOverlay .combo-digit.flip { animation:digitFlip 0.2s ease both; }
 
@@ -1153,8 +1153,8 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 }
 #cofreOverlay .numpad-key:active, #cofreOverlay .numpad-key.pressed { background:rgba(201,168,76,0.15); border-color:var(--gold); transform:scale(0.93); }
 #cofreOverlay .numpad-key.del { color:var(--muted); font-size:18px; }
-#cofreOverlay .numpad-key.submit-key { background:linear-gradient(135deg,var(--gold3),var(--gold)); color:#090909; font-weight:900; border-color:var(--gold); }
-#cofreOverlay .numpad-key.submit-key:active { background:var(--gold2); }
+#cofreOverlay .numpad-key.submit-key { background:linear-gradient(135deg,var(--gold3),var(--gold)); color:#fff; font-weight:900; border-color:var(--gold); font-size:22px; }
+#cofreOverlay .numpad-key.submit-key:active { background:var(--gold2); color:#fff; }
 
 /* HINT ROW */
 #cofreOverlay .hint-row { display:flex; gap:8px; justify-content:center; font-size:12px; color:var(--muted); margin-bottom:16px; flex-wrap:wrap; }
@@ -1171,8 +1171,8 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 }
 #cofreOverlay .attempt-digits { display:flex; gap:5px; flex:1; }
 #cofreOverlay .attempt-digit { width:24px; height:28px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:13px; }
-#cofreOverlay .attempt-digit.c { background:rgba(34,197,94,0.15); color:var(--green); border:1px solid rgba(34,197,94,0.3); }
-#cofreOverlay .attempt-digit.p { background:rgba(245,158,11,0.15); color:#F59E0B; border:1px solid rgba(245,158,11,0.3); }
+#cofreOverlay .attempt-digit.c { background:rgba(0,255,68,0.2); color:#00FF44; border:1px solid rgba(0,255,68,0.6); }
+#cofreOverlay .attempt-digit.p { background:rgba(255,184,0,0.2); color:#FFB800; border:1px solid rgba(255,184,0,0.6); }
 #cofreOverlay .attempt-digit.x { background:rgba(255,255,255,0.05); color:var(--muted); border:1px solid var(--border); }
 #cofreOverlay .attempt-info { font-size:11px; color:var(--muted); text-align:right; line-height:1.3; }
 
@@ -1219,8 +1219,8 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 #cofreOverlay .admin-row { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
 #cofreOverlay .admin-label { font-size:12px; color:var(--muted); letter-spacing:1px; flex:1; min-width:120px; }
 #cofreOverlay .admin-input { background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:8px 12px; color:var(--text); font-size:14px; outline:none; width:120px; }
-#cofreOverlay .admin-btn { background:linear-gradient(135deg,var(--gold3),var(--gold)); border:none; border-radius:8px; padding:9px 16px; color:#090909; font-family:'Bebas Neue',sans-serif; font-size:15px; letter-spacing:2px; cursor:pointer; white-space:nowrap; }
-#cofreOverlay .admin-btn.red { background:rgba(239,68,68,0.15); color:var(--red); border:1px solid rgba(239,68,68,0.3); }
+#cofreOverlay .admin-btn { background:linear-gradient(135deg,var(--gold3),var(--gold)); border:none; border-radius:8px; padding:9px 16px; color:#fff; font-family:'Bebas Neue',sans-serif; font-size:15px; letter-spacing:2px; cursor:pointer; white-space:nowrap; font-weight:900; }
+#cofreOverlay .admin-btn.red { background:rgba(239,68,68,0.15); color:#FF4444; border:1px solid rgba(239,68,68,0.5); }
 #cofreOverlay .admin-pin-row { display:flex; gap:8px; margin-bottom:12px; }
 #cofreOverlay .admin-pin-input { background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:8px 12px; color:var(--text); font-size:16px; outline:none; width:100px; letter-spacing:4px; }
 
@@ -5948,7 +5948,7 @@ function syncCofreJackpot() {
 // ══════════════════════════════════════════════
 
 const ADMIN_PIN_COFRE = '1313';
-const CODE_LENGTH = 4;
+const CODE_LENGTH = 3;
 const MAX_ATTEMPTS = 3;
 const WEEKLY_ADD = 2.00;
 
@@ -6164,6 +6164,7 @@ function handleKey(k) {
   } else {
     if (currentEntry.length >= CODE_LENGTH) return;
     currentEntry += k;
+    cofreSom('click');
     updateComboDisplay();
     // Spin vault dial
     const door = document.getElementById('vaultDoorCofre');
@@ -6225,6 +6226,7 @@ function submitAttempt() {
   if (isWin) {
     setTimeout(()=>handleWin(), 800);
   } else {
+    cofreSom('errado');
     if (attLeft <= 0) {
       state.top3[pidx].usedThisWeek = true;
       cofreToast('Sem mais tentativas! Tenta na semana seguinte.', 'red');
@@ -6308,6 +6310,7 @@ function handleWin() {
 
   // Update vault door
   const door = document.getElementById('vaultDoorCofre');
+  cofreSom('abrir');
   door.classList.add('open-vault');
   document.getElementById('lockIconCofre').textContent = '🔓';
   document.getElementById('lockIconCofre').classList.add('unlocked');
@@ -6436,6 +6439,50 @@ function cofreAdminReset() {
 }
 
 // ── TOAST ──
+// ── SONS DO COFRE ──
+function cofreSom(tipo) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (tipo === 'click') {
+      // Click mecânico ao rodar
+      const buf = ctx.createBuffer(1, ctx.sampleRate * 0.06, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random()*2-1) * Math.exp(-i/(ctx.sampleRate*0.015));
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      const g = ctx.createGain(); g.gain.value = 0.4;
+      src.connect(g); g.connect(ctx.destination);
+      src.start();
+    } else if (tipo === 'abrir') {
+      // Som dramático de cofre a abrir
+      [200, 280, 380, 520].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
+        g.gain.setValueAtTime(0, ctx.currentTime + i * 0.12);
+        g.gain.linearRampToValueAtTime(0.5, ctx.currentTime + i * 0.12 + 0.05);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.4);
+        osc.connect(g); g.connect(ctx.destination);
+        osc.start(ctx.currentTime + i * 0.12);
+        osc.stop(ctx.currentTime + i * 0.12 + 0.5);
+      });
+    } else if (tipo === 'errado') {
+      // Tom descendente de erro
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(300, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(120, ctx.currentTime + 0.3);
+      g.gain.setValueAtTime(0.3, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + 0.35);
+    }
+    setTimeout(() => ctx.close(), 2000);
+  } catch(e) {}
+}
+
 function cofreToast(msg, type='') {
   const t = document.getElementById('cofreToastEl');
   t.textContent = msg;
@@ -6453,6 +6500,7 @@ window.adminResetWeek = cofreAdminNextWeek;
 window.adminResetAll = cofreAdminReset;
 window.buildAdminTop3 = buildAdminTop3;
 window.onPlayerChange = onPlayerChange;
+window.cofreSom = cofreSom;
 // Do NOT auto-run — waits for user action
 
 })(); // end IIFE
@@ -6519,7 +6567,6 @@ window.onPlayerChange = onPlayerChange;
           <div class="combo-digit" id="cd0">—</div>
           <div class="combo-digit" id="cd1">—</div>
           <div class="combo-digit" id="cd2">—</div>
-          <div class="combo-digit" id="cd3">—</div>
         </div>
 
         <!-- NUMPAD -->
@@ -6560,7 +6607,7 @@ window.onPlayerChange = onPlayerChange;
     <div class="rules-section">
       <div class="rules-card">
         <div class="rules-title">COMO FUNCIONA</div>
-        <div class="rule-item"><div class="rule-num">1</div><div class="rule-text">Os 3 melhores vendedores do mês têm direito a tentar adivinhar o código secreto de 4 dígitos.</div></div>
+        <div class="rule-item"><div class="rule-num">1</div><div class="rule-text">Os 3 melhores vendedores do mês têm direito a tentar adivinhar o código secreto de 3 dígitos.</div></div>
         <div class="rule-item"><div class="rule-num">2</div><div class="rule-text">Cada jogador tem <strong>3 tentativas por semana</strong>. O código muda semanalmente.</div></div>
         <div class="rule-item"><div class="rule-num">3</div><div class="rule-text">O prémio aumenta <strong>€2,00 por semana</strong> sem vencedor. Se ninguém acertar, acumula para a semana seguinte.</div></div>
         <div class="rule-item"><div class="rule-num">4</div><div class="rule-text">Quem adivinhar o código ganha o prémio acumulado e o cofre reinicia.</div></div>
