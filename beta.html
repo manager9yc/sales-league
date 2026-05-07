@@ -8053,7 +8053,7 @@ window.PRIZES_RASP = PRIZES;
 (function() {
 
 // ── CONFIG ──
-const FEED_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBEshwWK2pMpAOjHdDYaLrFMxAyC09Nti6m46MsmjIxw-0L6O-uwNRcdKy9FWjjlHq/exec';
+const FEED_SCRIPT_URL = 'COLE_AQUI_URL_DO_APPS_SCRIPT_FEED';
 const TENOR_KEY = 'AIzaSyAyimkuYQYF_FuasThVpfdsHd5-GNHaAek'; // public demo key
 const REACTIONS_LIST = ['🔥','💪','😂','👑','🤙','💀'];
 
@@ -8106,22 +8106,37 @@ function feedShowOnboard() {
   const sel = document.getElementById('feedOnboardSelect');
   if (!modal || !sel) return;
 
-  // Populate with team members from dashAllDados
   sel.innerHTML = '<option value="">— Escolhe o teu nome —</option>';
-  const todos = window.dashAllDados || [];
-  const nomes = [...new Set(todos.map(d => d.nome).filter(Boolean))].sort();
-  nomes.forEach(n => {
-    const o = document.createElement('option');
-    o.value = n; o.textContent = n;
-    sel.appendChild(o);
-  });
 
-  // Also populate goTo info select if empty
-  const infoSel = document.getElementById('sugestaoNome');
-  if (infoSel && infoSel.options.length <= 1) {
+  // 1. Preferência: usar array equipas (sempre disponível, hardcoded no app)
+  let nomes = [];
+  if (typeof equipas !== 'undefined' && equipas.length) {
+    nomes = equipas.flatMap(e => e.nomes || []).filter(Boolean).sort();
+  }
+  // 2. Fallback: dashAllDados se já tiver carregado
+  if (!nomes.length) {
+    const todos = window.dashAllDados || [];
+    nomes = [...new Set(todos.map(d => d.nome).filter(Boolean))].sort();
+  }
+
+  // Agrupar por equipa para melhor legibilidade no select
+  if (typeof equipas !== 'undefined' && equipas.length) {
+    equipas.forEach(eq => {
+      if (!eq.nomes || !eq.nomes.length) return;
+      const group = document.createElement('optgroup');
+      group.label = eq.label;
+      eq.nomes.slice().sort().forEach(n => {
+        const o = document.createElement('option');
+        o.value = n; o.textContent = n;
+        group.appendChild(o);
+      });
+      sel.appendChild(group);
+    });
+  } else {
     nomes.forEach(n => {
-      const o = document.createElement('option'); o.value = n; o.textContent = n;
-      infoSel.appendChild(o);
+      const o = document.createElement('option');
+      o.value = n; o.textContent = n;
+      sel.appendChild(o);
     });
   }
 
