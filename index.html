@@ -59,7 +59,7 @@ body { background: var(--dark); background-image: radial-gradient(ellipse at 50%
 .f-title { font-family: 'Bebas Neue', sans-serif; font-size: 54px; letter-spacing: 3px; line-height: 1; color: #fff; text-shadow: 0 3px 0 rgba(0,0,0,0.2); }
 .f-sub { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-top: 6px; }
 
-.form-wrap { max-width: 900px; margin: 0 auto; padding: 28px 14px calc(100px + env(safe-area-inset-bottom, 0px)); }
+.form-wrap { max-width: 900px; margin: 0 auto; padding: 28px 14px calc(140px + env(safe-area-inset-bottom, 0px)); }
 .sec-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--orange); margin-bottom: 10px; margin-top: 28px; }
 .sec-label:first-of-type { margin-top: 0; }
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 12px; margin-bottom: 8px; }
@@ -482,8 +482,8 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .rank-countdown{background:rgba(255,255,255,0.12);border-radius:20px;padding:4px 12px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;white-space:nowrap;}
 
 /* RANKING ANIMATION */
-.rank-table tbody tr{opacity:0;transform:translateY(8px);}
-.rank-table tbody tr.row-visible{opacity:1;transform:translateY(0);transition:opacity 0.35s ease,transform 0.35s ease;}
+.rank-table tbody tr{opacity:1;transform:translateY(0);}
+.rank-table tbody tr.row-visible{opacity:1;transform:translateY(0);transition:none;}
 
 /* STREAK FIRE */
 .streak-fire { display:inline-block; animation: firePulse 0.9s ease-in-out infinite alternate; transform-origin: bottom center; cursor:default; }
@@ -763,7 +763,7 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
 .bar-fill { animation: barFill 0.9s cubic-bezier(0.34,1.1,0.64,1) both; }
 
 /* Rank row entrance */
-.rank-row { animation: fadeSlideUp 0.2s ease both; }
+.rank-row { opacity:1; }
 
 /* Medal pop */
 .medalha-item.unlocked { animation: medalPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
@@ -3900,7 +3900,7 @@ function calcularMedalhas(dados) {
     { icon:'👕', name:'Camisolas Pro',     desc:tCamisolas+' camisolas este mês',  earned: camisolasMes >= tCamisolas },
     { icon:'🛍️', name:'Eco Champion',     desc:tSacos+' sacos este mês',          earned: sacosMes     >= tSacos },
     { icon:'💧', name:'Hydration Boss',    desc:tGarrafas+' garrafas este mês',    earned: garrafasMes  >= tGarrafas },
-    { icon:'⭐', name:'Favorito',          desc:'3 elogios este mês',              earned: elogiosMes   >= 3 },
+    { icon:'⭐', name:'Favorito',          desc:'3 elogios este mês',              earned: elogiosMes >= 3 && nome !== 'Dário Santos' },
     { icon:'🎫', name:'SZClub Star',       desc:(isCaixa?100:isCalcadoSneaker2?50:30)+' adesões SZClub este mês', earned: szclubMes >= (isCaixa ? (medalhasConfig.tSZClub_caixa||100) : isCalcadoSneaker2 ? (medalhasConfig.tSZClub_calcado||50) : (medalhasConfig.tSZClub_normal||30)) },
     { icon:'📅', name:'Consistente',       desc:th.consistente+' registos este mês', earned: diasComRegisto >= th.consistente },
     { icon:'🌟', name:'Super Online',      desc:'8 onlines num dia',                  earned: false }, // verificado em slotVerificarMedalhas
@@ -3986,6 +3986,21 @@ function lancarConfettiRecorde() {
     wrap.appendChild(el);
   }
   setTimeout(() => { wrap.innerHTML = ''; }, 4000);
+}
+
+function lancarConfettiSucesso() {
+  const wrap = document.querySelector('.success-confetti-wrap');
+  if (!wrap) return;
+  const colors = ['#C9A84C','#F5D87E','#FF6B00','#fff','#E8C97A','#FFD700','#22C55E','#60A5FA','#F472B6'];
+  wrap.innerHTML = '';
+  for (let i = 0; i < 120; i++) {
+    const el = document.createElement('div');
+    const size = 4 + Math.random() * 10;
+    const isRect = Math.random() > 0.3;
+    el.style.cssText = `position:absolute;left:${Math.random()*100}%;top:-10px;width:${size}px;height:${size * (isRect?0.4:1)}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${isRect?'2px':'50%'};transform:rotate(${Math.random()*360}deg);animation:confettiFall ${1.2+Math.random()*2.5}s ease-in ${Math.random()*1.2}s forwards;`;
+    wrap.appendChild(el);
+  }
+  setTimeout(() => { wrap.innerHTML = ''; }, 5000);
 }
 
 // Legacy alias
@@ -6345,6 +6360,7 @@ function verificarAdminPin() {
   if(pin === ADMIN_PIN_COFRE) {
     adminUnlocked = true;
     document.getElementById('adminContentCofre').style.display = 'block';
+    document.getElementById('adminLoginCofre').style.display = 'none';
     document.getElementById('adminShowCode').textContent = state.secretCode;
     buildAdminTop3();
     cofreToast('Admin desbloqueado', 'green');
@@ -6436,3 +6452,169 @@ window.cofreInit = cofreInit;
 
 
 </script>
+
+<!-- COFRE OVERLAY -->
+<div id="cofreOverlay" style="display:none;position:fixed;inset:0;z-index:99990;background:#080808;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div class="app">
+    <!-- STATUS BAR -->
+    <div class="status-bar">
+      <div class="status-week" id="statusWeekCofre">SEMANA —</div>
+      <div class="status-jackpot" id="statusJackpotCofre">€ 0,00</div>
+      <button onclick="fecharCofre()" style="background:transparent;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;padding:4px 8px;-webkit-tap-highlight-color:transparent;">✕</button>
+    </div>
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="header-eyebrow">SUPER LIGA</div>
+      <div class="header-title">O <span>COFRE</span></div>
+      <div class="header-sub">Adivinhas o código e ganhas o prémio acumulado</div>
+    </div>
+
+    <!-- JACKPOT -->
+    <div class="jackpot-section">
+      <div class="jackpot-label">PRÉMIO ACUMULADO</div>
+      <div class="jackpot-amount-wrap">
+        <span class="jackpot-currency">€</span>
+        <span class="jackpot-amount" id="jackpotDisplayCofre">0,00</span>
+      </div>
+      <div>
+        <button class="jackpot-history-btn" onclick="document.getElementById('cofreHistModal').classList.add('open')">Ver histórico →</button>
+      </div>
+      <div class="jackpot-week-info">+€2,00 por semana sem vencedor · <span id="weeksNoWinner">1</span> semana(s) acumulada(s)</div>
+    </div>
+
+    <!-- PLAYER SELECT -->
+    <div class="player-select-wrap">
+      <label class="player-select-label">O teu nome</label>
+      <select class="player-select" id="playerSelect" onchange="renderVaultStatus()">
+        <option value="">— Escolhe o teu nome —</option>
+      </select>
+    </div>
+
+    <!-- VAULT -->
+    <div class="vault-section">
+      <div class="vault-wrap">
+        <!-- VAULT DOOR -->
+        <div class="vault-door">
+          <div class="vault-door-outer" id="vaultDoorCofre">
+            <div class="vault-ring"></div>
+            <div class="vault-ring-inner"></div>
+            <div class="vault-spokes" id="vaultSpokesCofre"></div>
+            <div class="vault-notches" id="vaultNotches"></div>
+            <div class="vault-handle">
+              <div class="vault-lock-icon" id="lockIconCofre">🔒</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMBO DISPLAY -->
+        <div class="combo-display" id="comboDisplay">
+          <div class="combo-digit" id="cd0">—</div>
+          <div class="combo-digit" id="cd1">—</div>
+          <div class="combo-digit" id="cd2">—</div>
+          <div class="combo-digit" id="cd3">—</div>
+        </div>
+
+        <!-- NUMPAD -->
+        <div class="numpad" id="numpadCofre"></div>
+
+        <!-- HINT ROW -->
+        <div class="hint-row">
+          <div class="hint-dot"><span class="dot" style="background:#22C55E"></span> Número correto e posição certa</div>
+          <div class="hint-dot"><span class="dot" style="background:#F59E0B"></span> Número certo, posição errada</div>
+        </div>
+
+        <!-- VAULT STATUS -->
+        <div id="vaultStatusMsg"></div>
+
+        <!-- ATTEMPTS -->
+        <div class="attempts-section">
+          <div class="attempts-label" id="attemptsLabel">TENTATIVAS</div>
+          <div id="attemptsList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ELIGIBILITY -->
+    <div class="eligibility-section">
+      <div class="elig-card">
+        <div class="elig-header">
+          <div class="elig-header-icon">🏆</div>
+          <div class="elig-header-text">
+            <div class="elig-title">QUEM PODE JOGAR</div>
+            <div class="elig-sub">Top 3 do mês têm direito a jogar</div>
+          </div>
+        </div>
+        <div class="elig-list" id="eligListCofre"></div>
+      </div>
+    </div>
+
+    <!-- RULES -->
+    <div class="rules-section">
+      <div class="rules-card">
+        <div class="rules-title">COMO FUNCIONA</div>
+        <div class="rule-item"><div class="rule-num">1</div><div class="rule-text">Os 3 melhores vendedores do mês têm direito a tentar adivinhar o código secreto de 4 dígitos.</div></div>
+        <div class="rule-item"><div class="rule-num">2</div><div class="rule-text">Cada jogador tem <strong>3 tentativas por semana</strong>. O código muda semanalmente.</div></div>
+        <div class="rule-item"><div class="rule-num">3</div><div class="rule-text">O prémio aumenta <strong>€2,00 por semana</strong> sem vencedor. Se ninguém acertar, acumula para a semana seguinte.</div></div>
+        <div class="rule-item"><div class="rule-num">4</div><div class="rule-text">Quem adivinhar o código ganha o prémio acumulado e o cofre reinicia.</div></div>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="admin-section">
+      <button class="admin-toggle" onclick="cofreToggleAdmin()">
+        <span>⚙️ ADMIN</span>
+        <span id="adminArrow">▼</span>
+      </button>
+      <div class="admin-panel" id="adminPanelCofre">
+        <div id="adminContentCofre" style="display:none">
+          <div class="admin-row">
+            <span class="admin-label">Código atual:</span>
+            <strong id="adminShowCode" style="color:#C9A84C;font-size:22px;letter-spacing:4px;font-family:'Bebas Neue',sans-serif;">——</strong>
+          </div>
+          <div class="admin-row">
+            <span class="admin-label">Top 3 (nome + pontos):</span>
+          </div>
+          <div id="adminTop3Wrap" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;"></div>
+          <div class="admin-row">
+            <button class="admin-btn" onclick="adminSaveTop3()">💾 Guardar Top 3</button>
+            <button class="admin-btn red" onclick="adminResetWeek()">🔄 Nova Semana</button>
+          </div>
+          <div class="admin-row">
+            <button class="admin-btn red" onclick="adminResetAll()">🗑 Reset Total</button>
+          </div>
+        </div>
+        <div id="adminLoginCofre" style="display:block">
+          <div class="admin-pin-row">
+            <input class="admin-pin-input" id="adminPinInput" type="tel" maxlength="4" placeholder="PIN" style="letter-spacing:6px;text-align:center;">
+            <button class="admin-btn" onclick="verificarAdminPin()">ENTRAR</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .app -->
+
+  <!-- HISTORY MODAL -->
+  <div class="modal-overlay" id="cofreHistModal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal-box">
+      <div class="modal-title">📜 HISTÓRICO</div>
+      <div id="cofreHistList"></div>
+    </div>
+  </div>
+
+  <!-- WIN OVERLAY -->
+  <div class="win-overlay" id="cofreWinOv">
+    <div class="win-box">
+      <div class="win-confetti">🎉</div>
+      <div class="win-label">PARABÉNS</div>
+      <div class="win-title">ABRISTE O COFRE!</div>
+      <div class="win-name" id="cofreWinName"></div>
+      <div class="win-amount" id="cofreWinAmt"></div>
+      <button class="win-close" onclick="document.getElementById('cofreWinOv').classList.remove('open');fecharCofre()">FECHAR</button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="cofreToastEl"></div>
+</div><!-- end #cofreOverlay -->
