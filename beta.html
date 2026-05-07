@@ -5663,6 +5663,8 @@ function renderDesafiosMedalhas() {
   background:var(--card2);border:1px solid var(--border);border-radius:12px 12px 12px 0;
   padding:7px 10px;flex:1;min-width:0;
 }
+.comment-bubble.own-comment { cursor:pointer; }
+.comment-bubble.own-comment:active { opacity:0.85; }
 .comment-author { font-size:11px;font-weight:700;color:#C9A84C;margin-bottom:2px; }
 .comment-text {
   font-size:13px;color:rgba(255,255,255,0.8);line-height:1.4;
@@ -5729,7 +5731,7 @@ function renderDesafiosMedalhas() {
 
 
 /* ── EMOJI PICKER ── */
-.compose-emoji-btn, .comment-emoji-btn {
+.compose-emoji-btn {
   width:32px;height:32px;border-radius:50%;background:var(--card2);
   border:1px solid var(--border);font-size:16px;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
@@ -7665,6 +7667,9 @@ function renderFeed() {
 
   list.innerHTML = posts.map(p => renderPost(p)).join('');
 
+  // Attach hold listeners after render
+  setTimeout(attachCommentHoldListeners, 0);
+
   // Welcome card: só aparece uma vez por sessão, desaparece após 10s
   const welcomeEl = document.getElementById('post_auto_welcome');
   if (welcomeEl) {
@@ -7709,14 +7714,10 @@ function renderPost(p) {
   const comments = p.comments || [];
   const commentsHtml = comments.slice(-3).map(c => {
     const isOwn = c.author === user;
-    const holdAttr = isOwn
-      ? `ontouchstart="startCommentHold('${p.id}','${c.id}',this)" ontouchend="cancelCommentHold()" ontouchcancel="cancelCommentHold()" onmousedown="startCommentHold('${p.id}','${c.id}',this)" onmouseup="cancelCommentHold()" onmouseleave="cancelCommentHold()"`
-      : '';
-    const ownStyle = isOwn ? 'cursor:pointer;' : '';
     return `
     <div class="comment-item" id="ci_item_${c.id}">
       <div class="comment-avatar" style="${typeof getFoto==='function' && getFoto(c.author) ? 'padding:0;overflow:hidden;background:none;' : ''}">${typeof getFoto==='function' && getFoto(c.author) ? `<img src="${getFoto(c.author)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${c.author}">` : avatarLetter(c.author)}</div>
-      <div class="comment-bubble" style="${ownStyle}" ${holdAttr}>
+      <div class="comment-bubble${isOwn ? ' own-comment' : ''}" data-postid="${p.id}" data-commentid="${c.id}" data-own="${isOwn}">
         <div class="comment-author">${c.author.split(' ')[0]}${isOwn ? ' <span style="font-size:9px;color:rgba(201,168,76,0.5);letter-spacing:1px">· segura para apagar</span>' : ''}</div>
         <div class="comment-text">${escapeHtml(c.text)}</div>
         <div class="comment-time">${relativeTime(c.ts)}</div>
@@ -7755,7 +7756,6 @@ function renderPost(p) {
       <div class="comment-input-row">
         <div class="comment-avatar" style="${typeof getFoto==='function' && user && getFoto(user) ? 'padding:0;overflow:hidden;background:none;' : ''}">${typeof getFoto==='function' && user && getFoto(user) ? `<img src="${getFoto(user)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : (user ? avatarLetter(user) : '?')}</div>
         <input class="comment-input" id="ci_${p.id}" placeholder="Comenta..." type="text" maxlength="200" onkeydown="if(event.key==='Enter'){feedCommentSubmit('${p.id}');event.preventDefault()}">
-        <button class="comment-emoji-btn" onclick="toggleEmojiPicker('comment','${p.id}')" title="Emoji">😊</button>
         <button class="comment-send-btn" onclick="feedCommentSubmit('${p.id}')">↑</button>
       </div>
     </div>` : ''}
@@ -7917,23 +7917,44 @@ window.selectEmoji = function(emoji) {
 };
 
 
-// ── DELETE COMMENT ──
+// ── DELETE COMMENT — event delegation on feedList ──
 let _holdTimer = null;
-let _delTarget = null; // {postId, commentId, bubbleEl}
+let _holdEl = null;
+let _delTarget = null;
 
-window.startCommentHold = function(postId, commentId, bubbleEl) {
-  cancelCommentHold();
-  bubbleEl.classList.add('holding');
-  _holdTimer = setTimeout(() => {
-    _holdTimer = null;
-    bubbleEl.classList.remove('holding');
-    showDeleteCommentModal(postId, commentId);
-  }, 600);
-};
-window.cancelCommentHold = function() {
-  if (_holdTimer) { clearTimeout(_holdTimer); _holdTimer = null; }
-  document.querySelectorAll('.comment-bubble.holding').forEach(el => el.classList.remove('holding'));
-};
+function attachCommentHoldListeners() {
+  const list = document.getElementById('feedList');
+  if (!list || list._holdAttached) return;
+  list._holdAttached = true;
+
+  function startHold(e) {
+    const bubble = e.target.closest('.comment-bubble.own-comment');
+    if (!bubble) return;
+    if (e.type === 'touchstart') e.preventDefault();
+    cancelHold();
+    _holdEl = bubble;
+    bubble.classList.add('holding');
+    _holdTimer = setTimeout(() => {
+      _holdTimer = null;
+      if (_holdEl) { _holdEl.classList.remove('holding'); _holdEl = null; }
+      const postId = bubble.dataset.postid;
+      const commentId = bubble.dataset.commentid;
+      if (postId && commentId) showDeleteCommentModal(postId, commentId);
+    }, 600);
+  }
+  function cancelHold() {
+    if (_holdTimer) { clearTimeout(_holdTimer); _holdTimer = null; }
+    if (_holdEl) { _holdEl.classList.remove('holding'); _holdEl = null; }
+  }
+
+  list.addEventListener('touchstart', startHold, { passive: false });
+  list.addEventListener('touchend', cancelHold, { passive: true });
+  list.addEventListener('touchcancel', cancelHold, { passive: true });
+  list.addEventListener('touchmove', cancelHold, { passive: true });
+  list.addEventListener('mousedown', startHold);
+  list.addEventListener('mouseup', cancelHold);
+  list.addEventListener('mouseleave', cancelHold);
+}
 
 function showDeleteCommentModal(postId, commentId) {
   // Find comment text
@@ -8002,15 +8023,18 @@ window.feedExpandComments = function(postId) {
   const wrap = el.querySelector('.post-comments-wrap');
   if (!wrap) return;
   const user = getFeedUser();
-  const allComments = (post.comments||[]).map(c => `
-    <div class="comment-item">
+  const allComments = (post.comments||[]).map(c => {
+    const isOwn = c.author === user;
+    return `
+    <div class="comment-item" id="ci_item_${c.id}">
       <div class="comment-avatar" style="${typeof getFoto==='function' && getFoto(c.author) ? 'padding:0;overflow:hidden;background:none;' : ''}">${typeof getFoto==='function' && getFoto(c.author) ? `<img src="${getFoto(c.author)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${c.author}">` : avatarLetter(c.author)}</div>
-      <div class="comment-bubble">
-        <div class="comment-author">${c.author.split(' ')[0]}</div>
+      <div class="comment-bubble${isOwn ? ' own-comment' : ''}" data-postid="${postId}" data-commentid="${c.id}" data-own="${isOwn}">
+        <div class="comment-author">${c.author.split(' ')[0]}${isOwn ? ' <span style="font-size:9px;color:rgba(201,168,76,0.5);letter-spacing:1px">· segura para apagar</span>' : ''}</div>
         <div class="comment-text">${escapeHtml(c.text)}</div>
         <div class="comment-time">${relativeTime(c.ts)}</div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   wrap.innerHTML = allComments + `
     <div class="comment-input-row">
       <div class="comment-avatar">${user ? avatarLetter(user) : '?'}</div>
