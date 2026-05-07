@@ -59,7 +59,7 @@ body { background: var(--dark); background-image: radial-gradient(ellipse at 50%
 .f-title { font-family: 'Bebas Neue', sans-serif; font-size: 54px; letter-spacing: 3px; line-height: 1; color: #fff; text-shadow: 0 3px 0 rgba(0,0,0,0.2); }
 .f-sub { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-top: 6px; }
 
-.form-wrap { max-width: 900px; margin: 0 auto; padding: 28px 14px calc(100px + env(safe-area-inset-bottom, 0px)); }
+.form-wrap { max-width: 900px; margin: 0 auto; padding: 28px 14px calc(140px + env(safe-area-inset-bottom, 0px)); }
 .sec-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--orange); margin-bottom: 10px; margin-top: 28px; }
 .sec-label:first-of-type { margin-top: 0; }
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 12px; margin-bottom: 8px; }
@@ -90,11 +90,11 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .prod-hint { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.3; white-space: normal; }
 
 .counter { display: flex; align-items: center; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
-.cbtn { width: 48px; height: 58px; background: transparent; border: none; color: var(--text); font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.08s; -webkit-user-select: none; user-select: none; touch-action: manipulation; padding: 0; }
+.cbtn { width: 40px; height: 52px; background: transparent; border: none; color: var(--text); font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.08s; -webkit-user-select: none; user-select: none; touch-action: manipulation; padding: 0; }
 .cbtn:active { background: var(--border); }
 .cbtn.minus { color: var(--muted); }
 .cbtn.plus { color: var(--orange); }
-.cval { min-width: 34px; text-align: center; font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 1px; transition: transform 0.12s cubic-bezier(0.34,1.56,0.64,1); }
+.cval { min-width: 26px; text-align: center; font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 1px; transition: transform 0.12s cubic-bezier(0.34,1.56,0.64,1); }
 .cval.nz { color: var(--orange); }
 .cval.bump { transform: scale(1.5); }
 
@@ -482,8 +482,8 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .rank-countdown{background:rgba(255,255,255,0.12);border-radius:20px;padding:4px 12px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;white-space:nowrap;}
 
 /* RANKING ANIMATION */
-.rank-table tbody tr{opacity:0;transform:translateY(8px);}
-.rank-table tbody tr.row-visible{opacity:1;transform:translateY(0);transition:opacity 0.35s ease,transform 0.35s ease;}
+.rank-table tbody tr{opacity:1;transform:translateY(0);}
+.rank-table tbody tr.row-visible{opacity:1;transform:translateY(0);transition:none;}
 
 /* STREAK FIRE */
 .streak-fire { display:inline-block; animation: firePulse 0.9s ease-in-out infinite alternate; transform-origin: bottom center; cursor:default; }
@@ -763,7 +763,7 @@ button:active { transform: scale(0.96); transition: transform 0.1s; }
 .bar-fill { animation: barFill 0.9s cubic-bezier(0.34,1.1,0.64,1) both; }
 
 /* Rank row entrance */
-.rank-row { animation: fadeSlideUp 0.2s ease both; }
+.rank-row { opacity:1; }
 
 /* Medal pop */
 .medalha-item.unlocked { animation: medalPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
@@ -1136,9 +1136,9 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
   border-color:var(--gold); color:#fff;
   box-shadow:0 0 16px rgba(201,168,76,0.3);
 }
-#cofreOverlay .combo-digit.correct { border-color:var(--green); color:var(--green); background:rgba(34,197,94,0.08); box-shadow:0 0 16px rgba(34,197,94,0.3); }
-#cofreOverlay .combo-digit.wrong { border-color:var(--red); color:var(--red); background:rgba(239,68,68,0.08); box-shadow:0 0 16px rgba(239,68,68,0.3); }
-#cofreOverlay .combo-digit.partial { border-color:#F59E0B; color:#F59E0B; background:rgba(245,158,11,0.08); box-shadow:0 0 16px rgba(245,158,11,0.3); }
+#cofreOverlay .combo-digit.correct { border-color:#00FF44; color:#00FF44; background:rgba(0,255,68,0.18); box-shadow:0 0 20px rgba(0,255,68,0.6); }
+#cofreOverlay .combo-digit.wrong { border-color:#FF1A1A; color:#FF1A1A; background:rgba(255,26,26,0.18); box-shadow:0 0 20px rgba(255,26,26,0.6); }
+#cofreOverlay .combo-digit.partial { border-color:#FFB800; color:#FFB800; background:rgba(255,184,0,0.18); box-shadow:0 0 20px rgba(255,184,0,0.5); }
 @keyframes digitFlip { 0%{transform:rotateX(90deg);opacity:0} 100%{transform:rotateX(0);opacity:1} }
 #cofreOverlay .combo-digit.flip { animation:digitFlip 0.2s ease both; }
 
@@ -1153,8 +1153,8 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 }
 #cofreOverlay .numpad-key:active, #cofreOverlay .numpad-key.pressed { background:rgba(201,168,76,0.15); border-color:var(--gold); transform:scale(0.93); }
 #cofreOverlay .numpad-key.del { color:var(--muted); font-size:18px; }
-#cofreOverlay .numpad-key.submit-key { background:linear-gradient(135deg,var(--gold3),var(--gold)); color:#090909; font-weight:900; border-color:var(--gold); }
-#cofreOverlay .numpad-key.submit-key:active { background:var(--gold2); }
+#cofreOverlay .numpad-key.submit-key { background:linear-gradient(135deg,var(--gold3),var(--gold)); color:#fff; font-weight:900; border-color:var(--gold); font-size:22px; }
+#cofreOverlay .numpad-key.submit-key:active { background:var(--gold2); color:#fff; }
 
 /* HINT ROW */
 #cofreOverlay .hint-row { display:flex; gap:8px; justify-content:center; font-size:12px; color:var(--muted); margin-bottom:16px; flex-wrap:wrap; }
@@ -1171,8 +1171,8 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 }
 #cofreOverlay .attempt-digits { display:flex; gap:5px; flex:1; }
 #cofreOverlay .attempt-digit { width:24px; height:28px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:13px; }
-#cofreOverlay .attempt-digit.c { background:rgba(34,197,94,0.15); color:var(--green); border:1px solid rgba(34,197,94,0.3); }
-#cofreOverlay .attempt-digit.p { background:rgba(245,158,11,0.15); color:#F59E0B; border:1px solid rgba(245,158,11,0.3); }
+#cofreOverlay .attempt-digit.c { background:rgba(0,255,68,0.2); color:#00FF44; border:1px solid rgba(0,255,68,0.6); }
+#cofreOverlay .attempt-digit.p { background:rgba(255,184,0,0.2); color:#FFB800; border:1px solid rgba(255,184,0,0.6); }
 #cofreOverlay .attempt-digit.x { background:rgba(255,255,255,0.05); color:var(--muted); border:1px solid var(--border); }
 #cofreOverlay .attempt-info { font-size:11px; color:var(--muted); text-align:right; line-height:1.3; }
 
@@ -1219,8 +1219,8 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 #cofreOverlay .admin-row { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
 #cofreOverlay .admin-label { font-size:12px; color:var(--muted); letter-spacing:1px; flex:1; min-width:120px; }
 #cofreOverlay .admin-input { background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:8px 12px; color:var(--text); font-size:14px; outline:none; width:120px; }
-#cofreOverlay .admin-btn { background:linear-gradient(135deg,var(--gold3),var(--gold)); border:none; border-radius:8px; padding:9px 16px; color:#090909; font-family:'Bebas Neue',sans-serif; font-size:15px; letter-spacing:2px; cursor:pointer; white-space:nowrap; }
-#cofreOverlay .admin-btn.red { background:rgba(239,68,68,0.15); color:var(--red); border:1px solid rgba(239,68,68,0.3); }
+#cofreOverlay .admin-btn { background:linear-gradient(135deg,var(--gold3),var(--gold)); border:none; border-radius:8px; padding:9px 16px; color:#fff; font-family:'Bebas Neue',sans-serif; font-size:15px; letter-spacing:2px; cursor:pointer; white-space:nowrap; font-weight:900; }
+#cofreOverlay .admin-btn.red { background:rgba(239,68,68,0.15); color:#FF4444; border:1px solid rgba(239,68,68,0.5); }
 #cofreOverlay .admin-pin-row { display:flex; gap:8px; margin-bottom:12px; }
 #cofreOverlay .admin-pin-input { background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:8px 12px; color:var(--text); font-size:16px; outline:none; width:100px; letter-spacing:4px; }
 
@@ -1739,7 +1739,7 @@ const categorias = [
   { key:'szclub',    label:'SZClub',              emoji:'🎫' },
 ];
 
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzEFAMnkvjueKCrbj-zksBs-159QQ4PTrGqykfC0mHPDt7l8DdWM-fPnNYe0R--LFMj/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxpnTHL-_VI1WrxzVD5H5uSciwJZHVGHW__jH0I4JBMjYBfzxQAcAK0oKFU8728OzJQ/exec';
 
 const vals = {onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0,szclub:0};
 let nomeSel = null, equipaAtiva = null;
@@ -2275,7 +2275,7 @@ function catBlock(emoji, label, rows, agora, delay) {
   // Count total rows to decide if expand button is needed
   const totalRows = (rows.match(/class="rank-extra"/g) || []).length;
   const expandBtn = totalRows > 0
-    ? `<button class="rank-expand-btn" onclick="rankExpandir(this)" style="width:100%;background:transparent;border:none;border-top:1px solid var(--border);padding:9px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+    ? `<button class="rank-expand-btn" onclick="rankExpandir(this)" style="width:100%;background:transparent;border:none;border-top:1px solid var(--border);padding:9px;color:#C9A84C;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
         <span class="rank-expand-icon">▼</span> Ver mais ${totalRows} →
       </button>`
     : '';
@@ -2887,10 +2887,10 @@ function startChange(campo,delta,e){
     setTimeout(()=>document.removeEventListener('touchmove',tm),800);
   }
   if(e&&e.type==='mousedown')e.preventDefault();
-  const now=Date.now(); if(now-lastChangeTime<200)return; lastChangeTime=now;
+  const now=Date.now(); if(now-lastChangeTime<50)return; lastChangeTime=now;
   if(touchMoved)return;
   const isSacos = campo==='sacos';
-  const firstDelay = (e&&e.type==='touchstart') ? 90 : 0;
+  const firstDelay = 0;
   // Track this timeout so stopChange can cancel it
   clearTimeout(changeFirstTo);
   changeFirstTo = setTimeout(()=>{
@@ -2902,8 +2902,8 @@ function startChange(campo,delta,e){
         if(touchMoved){stopChange();return;}
         lastChangeTime=Date.now();
         change(campo,delta);
-      }, isSacos?60:150);
-    }, isSacos?200:500);
+      }, isSacos?40:80);
+    }, isSacos?150:300);
   }, firstDelay);
 }
 function stopChange(e){
@@ -3900,7 +3900,7 @@ function calcularMedalhas(dados) {
     { icon:'👕', name:'Camisolas Pro',     desc:tCamisolas+' camisolas este mês',  earned: camisolasMes >= tCamisolas },
     { icon:'🛍️', name:'Eco Champion',     desc:tSacos+' sacos este mês',          earned: sacosMes     >= tSacos },
     { icon:'💧', name:'Hydration Boss',    desc:tGarrafas+' garrafas este mês',    earned: garrafasMes  >= tGarrafas },
-    { icon:'⭐', name:'Favorito',          desc:'3 elogios este mês',              earned: elogiosMes   >= 3 },
+    { icon:'⭐', name:'Favorito',          desc:'3 elogios este mês',              earned: elogiosMes >= 3 && nome !== 'Dário Santos' },
     { icon:'🎫', name:'SZClub Star',       desc:(isCaixa?100:isCalcadoSneaker2?50:30)+' adesões SZClub este mês', earned: szclubMes >= (isCaixa ? (medalhasConfig.tSZClub_caixa||100) : isCalcadoSneaker2 ? (medalhasConfig.tSZClub_calcado||50) : (medalhasConfig.tSZClub_normal||30)) },
     { icon:'📅', name:'Consistente',       desc:th.consistente+' registos este mês', earned: diasComRegisto >= th.consistente },
     { icon:'🌟', name:'Super Online',      desc:'8 onlines num dia',                  earned: false }, // verificado em slotVerificarMedalhas
@@ -3986,6 +3986,21 @@ function lancarConfettiRecorde() {
     wrap.appendChild(el);
   }
   setTimeout(() => { wrap.innerHTML = ''; }, 4000);
+}
+
+function lancarConfettiSucesso() {
+  const wrap = document.querySelector('.success-confetti-wrap');
+  if (!wrap) return;
+  const colors = ['#C9A84C','#F5D87E','#FF6B00','#fff','#E8C97A','#FFD700','#22C55E','#60A5FA','#F472B6'];
+  wrap.innerHTML = '';
+  for (let i = 0; i < 120; i++) {
+    const el = document.createElement('div');
+    const size = 4 + Math.random() * 10;
+    const isRect = Math.random() > 0.3;
+    el.style.cssText = `position:absolute;left:${Math.random()*100}%;top:-10px;width:${size}px;height:${size * (isRect?0.4:1)}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${isRect?'2px':'50%'};transform:rotate(${Math.random()*360}deg);animation:confettiFall ${1.2+Math.random()*2.5}s ease-in ${Math.random()*1.2}s forwards;`;
+    wrap.appendChild(el);
+  }
+  setTimeout(() => { wrap.innerHTML = ''; }, 5000);
 }
 
 // Legacy alias
@@ -5411,19 +5426,15 @@ function renderDesafiosMedalhas() {
     </div>
   </div>
   <div style="overflow-y:auto;flex:1;padding:16px 16px 100px;max-width:700px;margin:0 auto">
-    <div id="desafiosMedalhasLista"></div>
 
-    <div style="margin-top:20px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:12px">🎰 Máquina de Prémios</div>
-      <div style="background:var(--card);border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:20px;text-align:center">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#C9A84C;letter-spacing:3px;margin-bottom:8px">MODO DEMONSTRAÇÃO</div>
-        <div style="font-size:13px;color:var(--muted);margin-bottom:16px">A máquina de prémios é desbloqueada ao conquistar uma medalha. Experimenta a sorte!</div>
-        <button onclick="slotAbrir('Demonstração','Medalha Demo')" style="background:linear-gradient(135deg,#C9A84C,#F5D87E);border:none;border-radius:12px;padding:14px 32px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#090909;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4)">🎰 GIRAR</button>
-      </div>
+    <!-- JOGO 1: COFRE -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <div style="background:linear-gradient(135deg,#a07820,#C9A84C);border-radius:8px;padding:3px 10px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#fff">JOGO 1</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#C9A84C">O COFRE</div>
     </div>
 
     <!-- COFRE BUTTON -->
-    <div style="margin-top:20px;margin-bottom:8px" id="cofreBannerWrap">
+    <div style="margin-bottom:8px" id="cofreBannerWrap">
       <button onclick="abrirCofre()" id="cofreBtn" style="width:100%;background:linear-gradient(135deg,#0d0c08,#1c1a0e,#0d0c08);border:2px solid rgba(201,168,76,0.45);border-radius:20px;padding:0;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative;box-shadow:0 12px 40px rgba(201,168,76,0.18),0 4px 16px rgba(0,0,0,0.6);">
         <!-- Shimmer sweep -->
         <div style="position:absolute;top:0;bottom:0;left:-80%;width:60%;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.08),transparent);transform:skewX(-15deg);animation:cofreShimmer 2.8s ease-in-out infinite;pointer-events:none;"></div>
@@ -5437,7 +5448,7 @@ function renderDesafiosMedalhas() {
             <div style="text-align:left;">
               <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:rgba(201,168,76,0.55);margin-bottom:3px;">PRÉMIO EXCLUSIVO · SUPER LIGA</div>
               <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:3px;color:#fff;line-height:1;">O COFRE</div>
-              <div style="font-size:12px;color:rgba(255,255,255,0.45);letter-spacing:1px;margin-top:2px;font-style:italic;">Só os melhores chegam aqui</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.55);margin-top:4px;line-height:1.4;">Só jogam os <strong style="color:#C9A84C">líderes de cada categoria</strong> no final de cada semana</div>
             </div>
           </div>
           <!-- Jackpot display -->
@@ -5455,6 +5466,32 @@ function renderDesafiosMedalhas() {
         </div>
       </button>
     </div>
+
+    <!-- SEPARADOR -->
+    <div style="display:flex;align-items:center;gap:12px;margin:20px 0 16px">
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--border))"></div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted)">SUPER LIGA 2026</div>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)"></div>
+    </div>
+
+    <!-- JOGO 2: MEDALHAS -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+      <div style="background:linear-gradient(135deg,#FF6B00,#FF8C00);border-radius:8px;padding:3px 10px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#fff">JOGO 2</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:var(--orange)">MEDALHAS</div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.4;">Desbloqueia as medalhas e vai à Slot Machine</div>
+
+    <div id="desafiosMedalhasLista"></div>
+
+    <div style="margin-top:20px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:12px">🎰 Máquina de Prémios</div>
+      <div style="background:var(--card);border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:20px;text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#C9A84C;letter-spacing:3px;margin-bottom:8px">MODO DEMONSTRAÇÃO</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:16px">A máquina de prémios é desbloqueada ao conquistar uma medalha. Experimenta a sorte!</div>
+        <button onclick="slotAbrir('Demonstração','Medalha Demo')" style="background:linear-gradient(135deg,#C9A84C,#F5D87E);border:none;border-radius:12px;padding:14px 32px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#090909;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4)">🎰 GIRAR</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -5895,6 +5932,7 @@ function _abrirCofreDirecto() {
   document.getElementById('cofreOverlay').style.display = 'block';
   document.body.style.overflow = 'hidden';
   if (!window._cofreInitDone) { window._cofreInitDone = true; cofreInit(); }
+  else { window.cofreRefreshDados && window.cofreRefreshDados(); }
   // Sync jackpot
   try {
     const s = JSON.parse(localStorage.getItem('cofreState2') || localStorage.getItem('cofreState') || '{}');
@@ -5987,7 +6025,49 @@ function cofreInit() {
   buildVaultVisuals();
   buildNumpad();
   buildComboDisplay();
-  renderAll();
+  renderJackpot();
+  renderVaultStatus();
+  updateStatusBar();
+  // Buscar dados primeiro, depois renderizar nomes
+  cofreRefreshDados();
+}
+
+function cofreRefreshDados() {
+  const sel = document.getElementById('playerSelect');
+  if (sel) sel.innerHTML = '<option value="">⏳ A carregar...</option>';
+
+  const sheetsUrl = 'https://script.google.com/macros/s/AKfycbxpnTHL-_VI1WrxzVD5H5uSciwJZHVGHW__jH0I4JBMjYBfzxQAcAK0oKFU8728OzJQ/exec';
+  const url = sheetsUrl + '?action=getTodos';
+  const proxy = 'https://corsproxy.io/?' + encodeURIComponent(url);
+
+  const normalize = arr => arr.map(r => {
+    if (r && r.data && typeof r.data === 'string' && (r.data.includes('T') || r.data.includes('Z'))) {
+      return {...r, data: r.data.substring(0,10)};
+    }
+    return r;
+  });
+
+  const aplicar = td => {
+    if (Array.isArray(td) && td.length) {
+      window.dashAllDados = normalize(td);
+      renderPlayerSelect();
+      renderEligibility();
+    } else {
+      if (sel) sel.innerHTML = '<option value="">⚠️ Sem dados</option>';
+    }
+  };
+
+  fetch(url, {cache:'no-store'})
+    .then(r => r.json())
+    .then(aplicar)
+    .catch(() => {
+      fetch(proxy, {cache:'no-store'})
+        .then(r => r.json())
+        .then(aplicar)
+        .catch(() => {
+          if (sel) sel.innerHTML = '<option value="">⚠️ Erro ao carregar</option>';
+        });
+    });
 }
 
 function renderAll() {
@@ -6059,22 +6139,73 @@ function updateStatusBar() {
 }
 
 // ── PLAYER SELECT ──
+// ── ELEGÍVEIS: 1º de cada categoria do ranking do mês ──
+function getCofreElegiveis() {
+  const todos = window.dashAllDados || [];
+  const mesAtual = new Date().getMonth();
+  const anoAtual = new Date().getFullYear();
+  const cats = ['onlines','sprays','palmilhas','camisolas','sacos','garrafas','elogios','szclub'];
+  const catLabels = {onlines:'🖥️ Onlines',sprays:'🧴 Sprays',palmilhas:'🦶 Palmilhas',camisolas:'👕 Camisolas',sacos:'🛍️ Sacos',garrafas:'💧 Garrafas',elogios:'⭐ Elogios',szclub:'🎫 SZClub'};
+
+  // Agregar mês atual
+  const agg = {};
+  todos.forEach(d => {
+    const dt = new Date((d.data||'')+'T12:00:00');
+    if (isNaN(dt) || dt.getMonth()!==mesAtual || dt.getFullYear()!==anoAtual) return;
+    if (!agg[d.nome]) agg[d.nome] = {nome:d.nome,onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0,szclub:0};
+    cats.forEach(k => { agg[d.nome][k] += (Number(d[k])||0); });
+  });
+  const ranking = Object.values(agg);
+
+  // 1º de cada categoria (com pelo menos 1)
+  const nomes = new Map(); // nome -> lista de categorias ganhas
+  cats.forEach(k => {
+    const sorted = ranking.filter(r=>(r[k]||0)>0).sort((a,b)=>b[k]-a[k]);
+    if (!sorted.length) return;
+    const lider = sorted[0];
+    if (!nomes.has(lider.nome)) nomes.set(lider.nome, []);
+    nomes.get(lider.nome).push(catLabels[k]);
+  });
+
+  // Converter para array com estado do cofre
+  return Array.from(nomes.entries()).map(([nome, cats]) => {
+    const existing = state.top3.find(p=>p.nome===nome);
+    return {
+      nome,
+      cats,
+      attempts: existing ? existing.attempts : 0,
+      usedThisWeek: existing ? existing.usedThisWeek : false
+    };
+  });
+}
+
 function renderPlayerSelect() {
   const sel = document.getElementById('playerSelect');
   const current = sel.value;
   sel.innerHTML = '<option value="">— Seleciona o teu nome —</option>';
-  state.top3.forEach((p,i) => {
+  const elegiveis = getCofreElegiveis();
+  elegiveis.forEach(p => {
     const opt = document.createElement('option');
     opt.value = p.nome;
     opt.textContent = p.nome;
     sel.appendChild(opt);
   });
-  if(current) sel.value = current;
+  if (current) sel.value = current;
 }
 
 function onPlayerChange() {
   const sel = document.getElementById('playerSelect');
-  currentPlayer = state.top3.find(p=>p.nome===sel.value) || null;
+  const elegiveis = getCofreElegiveis();
+  currentPlayer = elegiveis.find(p=>p.nome===sel.value) || null;
+  // Sync with state.top3 for persistence
+  if (currentPlayer) {
+    let existing = state.top3.find(p=>p.nome===currentPlayer.nome);
+    if (!existing) {
+      existing = {nome:currentPlayer.nome,score:0,attempts:0,usedThisWeek:false};
+      state.top3.push(existing);
+    }
+    currentPlayer = existing;
+  }
   currentEntry = '';
   sessionAttempts = [];
   updateComboDisplay();
@@ -6086,19 +6217,25 @@ function onPlayerChange() {
 // ── ELIGIBILITY ──
 function renderEligibility() {
   const list = document.getElementById('eligListCofre');
-  const medals = ['r1','r2','r3'];
-  const pos = ['👑 1º','🥈 2º','🥉 3º'];
-  list.innerHTML = state.top3.map((p,i) => {
-    const attLeft = MAX_ATTEMPTS - (p.attempts||0);
-    const badge = p.usedThisWeek
+  const elegiveis = getCofreElegiveis();
+  if (!elegiveis.length) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px">Sem dados do ranking ainda — abre o Ranking primeiro.</div>';
+    return;
+  }
+  list.innerHTML = elegiveis.map((p, i) => {
+    const existing = state.top3.find(s=>s.nome===p.nome) || p;
+    const attLeft = MAX_ATTEMPTS - (existing.attempts||0);
+    const badge = existing.usedThisWeek
       ? `<span class="elig-badge used">Jogou</span>`
       : attLeft > 0
         ? `<span class="elig-badge eligible">${attLeft} tent.</span>`
         : `<span class="elig-badge used">Esgotado</span>`;
+    const catsLabel = p.cats.join(' · ');
     return `<div class="elig-item">
-      <div class="elig-rank ${medals[i]}">${pos[i]}</div>
-      <div class="elig-name">${p.nome}</div>
-      <div class="elig-score">${p.score} pts</div>
+      <div style="flex:1">
+        <div class="elig-name">${p.nome}</div>
+        <div style="font-size:10px;color:var(--gold);margin-top:2px">${catsLabel}</div>
+      </div>
       ${badge}
     </div>`;
   }).join('');
@@ -6149,6 +6286,7 @@ function handleKey(k) {
   } else {
     if (currentEntry.length >= CODE_LENGTH) return;
     currentEntry += k;
+    cofreSom('click');
     updateComboDisplay();
     // Spin vault dial
     const door = document.getElementById('vaultDoorCofre');
@@ -6210,6 +6348,7 @@ function submitAttempt() {
   if (isWin) {
     setTimeout(()=>handleWin(), 800);
   } else {
+    cofreSom('errado');
     if (attLeft <= 0) {
       state.top3[pidx].usedThisWeek = true;
       cofreToast('Sem mais tentativas! Tenta na semana seguinte.', 'red');
@@ -6293,6 +6432,7 @@ function handleWin() {
 
   // Update vault door
   const door = document.getElementById('vaultDoorCofre');
+  cofreSom('abrir');
   door.classList.add('open-vault');
   document.getElementById('lockIconCofre').textContent = '🔓';
   document.getElementById('lockIconCofre').classList.add('unlocked');
@@ -6345,6 +6485,7 @@ function verificarAdminPin() {
   if(pin === ADMIN_PIN_COFRE) {
     adminUnlocked = true;
     document.getElementById('adminContentCofre').style.display = 'block';
+    document.getElementById('adminLoginCofre').style.display = 'none';
     document.getElementById('adminShowCode').textContent = state.secretCode;
     buildAdminTop3();
     cofreToast('Admin desbloqueado', 'green');
@@ -6420,6 +6561,50 @@ function cofreAdminReset() {
 }
 
 // ── TOAST ──
+// ── SONS DO COFRE ──
+function cofreSom(tipo) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (tipo === 'click') {
+      // Click mecânico ao rodar
+      const buf = ctx.createBuffer(1, ctx.sampleRate * 0.06, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random()*2-1) * Math.exp(-i/(ctx.sampleRate*0.015));
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      const g = ctx.createGain(); g.gain.value = 0.4;
+      src.connect(g); g.connect(ctx.destination);
+      src.start();
+    } else if (tipo === 'abrir') {
+      // Som dramático de cofre a abrir
+      [200, 280, 380, 520].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
+        g.gain.setValueAtTime(0, ctx.currentTime + i * 0.12);
+        g.gain.linearRampToValueAtTime(0.5, ctx.currentTime + i * 0.12 + 0.05);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.4);
+        osc.connect(g); g.connect(ctx.destination);
+        osc.start(ctx.currentTime + i * 0.12);
+        osc.stop(ctx.currentTime + i * 0.12 + 0.5);
+      });
+    } else if (tipo === 'errado') {
+      // Tom descendente de erro
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(300, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(120, ctx.currentTime + 0.3);
+      g.gain.setValueAtTime(0.3, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + 0.35);
+    }
+    setTimeout(() => ctx.close(), 2000);
+  } catch(e) {}
+}
+
 function cofreToast(msg, type='') {
   const t = document.getElementById('cofreToastEl');
   t.textContent = msg;
@@ -6429,10 +6614,186 @@ function cofreToast(msg, type='') {
 }
 
 // Expose only the entry point
+window.getCofreElegiveis = getCofreElegiveis;
+window.cofreRefreshDados = cofreRefreshDados;
 window.cofreInit = cofreInit;
+window.cofreToggleAdmin = cofreToggleAdmin;
+window.verificarAdminPin = verificarAdminPin;
+window.adminSaveTop3 = adminSaveTop3;
+window.adminResetWeek = cofreAdminNextWeek;
+window.adminResetAll = cofreAdminReset;
+window.buildAdminTop3 = buildAdminTop3;
+window.onPlayerChange = onPlayerChange;
+window.cofreSom = cofreSom;
 // Do NOT auto-run — waits for user action
 
 })(); // end IIFE
 
 
 </script>
+
+<!-- COFRE OVERLAY -->
+<div id="cofreOverlay" style="display:none;position:fixed;inset:0;z-index:99990;background:#080808;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div class="app">
+    <!-- STATUS BAR -->
+    <div class="status-bar">
+      <div class="status-week" id="statusWeekCofre">SEMANA —</div>
+      <div class="status-jackpot" id="statusJackpotCofre">€ 0,00</div>
+      <button onclick="fecharCofre()" style="background:transparent;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;padding:4px 8px;-webkit-tap-highlight-color:transparent;">✕</button>
+    </div>
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="header-eyebrow">SUPER LIGA</div>
+      <div class="header-title">O <span>COFRE</span></div>
+      <div class="header-sub">Adivinhas o código e ganhas o prémio acumulado</div>
+    </div>
+
+    <!-- JACKPOT -->
+    <div class="jackpot-section">
+      <div class="jackpot-label">PRÉMIO ACUMULADO</div>
+      <div class="jackpot-amount-wrap">
+        <span class="jackpot-currency">€</span>
+        <span class="jackpot-amount" id="jackpotDisplayCofre">0,00</span>
+      </div>
+      <div>
+        <button class="jackpot-history-btn" onclick="document.getElementById('cofreHistModal').classList.add('open')">Ver histórico →</button>
+      </div>
+      <div class="jackpot-week-info">+€2,00 por semana sem vencedor · <span id="weeksNoWinner">1</span> semana(s) acumulada(s)</div>
+    </div>
+
+    <!-- PLAYER SELECT -->
+    <div class="player-select-wrap">
+      <label class="player-select-label">O teu nome</label>
+      <select class="player-select" id="playerSelect" onchange="onPlayerChange()">
+        <option value="">— Escolhe o teu nome —</option>
+      </select>
+    </div>
+
+    <!-- VAULT -->
+    <div class="vault-section">
+      <div class="vault-wrap">
+        <!-- VAULT DOOR -->
+        <div class="vault-door">
+          <div class="vault-door-outer" id="vaultDoorCofre">
+            <div class="vault-ring"></div>
+            <div class="vault-ring-inner"></div>
+            <div class="vault-spokes" id="vaultSpokesCofre"></div>
+            <div class="vault-notches" id="vaultNotches"></div>
+            <div class="vault-handle">
+              <div class="vault-lock-icon" id="lockIconCofre">🔒</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMBO DISPLAY -->
+        <div class="combo-display" id="comboDisplay">
+          <div class="combo-digit" id="cd0">—</div>
+          <div class="combo-digit" id="cd1">—</div>
+          <div class="combo-digit" id="cd2">—</div>
+          <div class="combo-digit" id="cd3">—</div>
+        </div>
+
+        <!-- NUMPAD -->
+        <div class="numpad" id="numpadCofre"></div>
+
+        <!-- HINT ROW -->
+        <div class="hint-row">
+          <div class="hint-dot"><span class="dot" style="background:#22C55E"></span> Número correto e posição certa</div>
+          <div class="hint-dot"><span class="dot" style="background:#F59E0B"></span> Número certo, posição errada</div>
+        </div>
+
+        <!-- VAULT STATUS -->
+        <div id="vaultStatusMsg"></div>
+
+        <!-- ATTEMPTS -->
+        <div class="attempts-section">
+          <div class="attempts-label" id="attemptsLabel">TENTATIVAS</div>
+          <div id="attemptsList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ELIGIBILITY -->
+    <div class="eligibility-section">
+      <div class="elig-card">
+        <div class="elig-header">
+          <div class="elig-header-icon">🏆</div>
+          <div class="elig-header-text">
+            <div class="elig-title">QUEM PODE JOGAR</div>
+            <div class="elig-sub">1º lugar de cada categoria do ranking</div>
+          </div>
+        </div>
+        <div class="elig-list" id="eligListCofre"></div>
+      </div>
+    </div>
+
+    <!-- RULES -->
+    <div class="rules-section">
+      <div class="rules-card">
+        <div class="rules-title">COMO FUNCIONA</div>
+        <div class="rule-item"><div class="rule-num">1</div><div class="rule-text">Os líderes de cada categoria têm direito a tentar adivinhar o código secreto de 4 dígitos.</div></div>
+        <div class="rule-item"><div class="rule-num">2</div><div class="rule-text">Cada jogador tem <strong>3 tentativas por semana</strong>. O código muda semanalmente.</div></div>
+        <div class="rule-item"><div class="rule-num">3</div><div class="rule-text">O prémio aumenta <strong>€2,00 por semana</strong> sem vencedor. Se ninguém acertar, acumula para a semana seguinte.</div></div>
+        <div class="rule-item"><div class="rule-num">4</div><div class="rule-text">Quem adivinhar o código ganha o prémio acumulado e o cofre reinicia.</div></div>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="admin-section">
+      <button class="admin-toggle" onclick="cofreToggleAdmin()">
+        <span>⚙️ ADMIN</span>
+        <span id="adminArrow">▼</span>
+      </button>
+      <div class="admin-panel" id="adminPanelCofre">
+        <div id="adminContentCofre" style="display:none">
+          <div class="admin-row">
+            <span class="admin-label">Código atual:</span>
+            <strong id="adminShowCode" style="color:#C9A84C;font-size:22px;letter-spacing:4px;font-family:'Bebas Neue',sans-serif;">——</strong>
+          </div>
+          <div class="admin-row">
+            <span class="admin-label">Top 3 (nome + pontos):</span>
+          </div>
+          <div id="adminTop3Wrap" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;"></div>
+          <div class="admin-row">
+            <button class="admin-btn" onclick="adminSaveTop3()">💾 Guardar Top 3</button>
+            <button class="admin-btn red" onclick="adminResetWeek()">🔄 Nova Semana</button>
+          </div>
+          <div class="admin-row">
+            <button class="admin-btn red" onclick="adminResetAll()">🗑 Reset Total</button>
+          </div>
+        </div>
+        <div id="adminLoginCofre" style="display:block">
+          <div class="admin-pin-row">
+            <input class="admin-pin-input" id="adminPinInput" type="tel" maxlength="4" placeholder="PIN" style="letter-spacing:6px;text-align:center;">
+            <button class="admin-btn" onclick="verificarAdminPin()">ENTRAR</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .app -->
+
+  <!-- HISTORY MODAL -->
+  <div class="modal-overlay" id="cofreHistModal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal-box">
+      <div class="modal-title">📜 HISTÓRICO</div>
+      <div id="cofreHistList"></div>
+    </div>
+  </div>
+
+  <!-- WIN OVERLAY -->
+  <div class="win-overlay" id="cofreWinOv">
+    <div class="win-box">
+      <div class="win-confetti">🎉</div>
+      <div class="win-label">PARABÉNS</div>
+      <div class="win-title">ABRISTE O COFRE!</div>
+      <div class="win-name" id="cofreWinName"></div>
+      <div class="win-amount" id="cofreWinAmt"></div>
+      <button class="win-close" onclick="document.getElementById('cofreWinOv').classList.remove('open');fecharCofre()">FECHAR</button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="cofreToastEl"></div>
+</div><!-- end #cofreOverlay -->
