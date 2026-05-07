@@ -1043,14 +1043,23 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 #cofreOverlay .jackpot-label { font-size:10px; font-weight:700; letter-spacing:5px; text-transform:uppercase; color:rgba(201,168,76,0.5); margin-bottom:12px; }
 #cofreOverlay .jackpot-amount-wrap { position:relative; display:inline-block; }
 #cofreOverlay .jackpot-amount {
-  font-family:'Bebas Neue',sans-serif; font-size:88px; letter-spacing:2px;
-  background: linear-gradient(135deg, var(--gold3), var(--gold), var(--gold2), var(--gold));
+  font-family:'Bebas Neue',sans-serif; font-size:108px; letter-spacing:2px;
+  background: linear-gradient(90deg, #7a5c18 0%, #C9A84C 25%, #F5D87E 45%, #fff8e7 50%, #F5D87E 55%, #C9A84C 75%, #7a5c18 100%);
+  background-size: 200% auto;
   -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-  line-height:1; filter:drop-shadow(0 0 20px rgba(201,168,76,0.3));
-  animation: jackpotPulse 3s ease-in-out infinite;
+  line-height:1;
+  animation: jackpotShimmer 2.5s linear infinite, jackpotGlow 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 28px rgba(201,168,76,0.5));
 }
-@keyframes jackpotPulse { 0%,100%{filter:drop-shadow(0 0 20px rgba(201,168,76,0.3))} 50%{filter:drop-shadow(0 0 40px rgba(201,168,76,0.6))} }
-#cofreOverlay .jackpot-currency { font-family:'Bebas Neue',sans-serif; font-size:32px; color:rgba(201,168,76,0.6); vertical-align:top; margin-top:14px; display:inline-block; }
+@keyframes jackpotShimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+@keyframes jackpotGlow {
+  0%,100% { filter: drop-shadow(0 0 20px rgba(201,168,76,0.4)) drop-shadow(0 0 8px rgba(255,220,100,0.2)); }
+  50% { filter: drop-shadow(0 0 50px rgba(201,168,76,0.9)) drop-shadow(0 0 20px rgba(255,220,100,0.6)); }
+}
+#cofreOverlay .jackpot-currency { font-family:'Bebas Neue',sans-serif; font-size:44px; color:rgba(201,168,76,0.7); vertical-align:top; margin-top:18px; display:inline-block; }
 #cofreOverlay .jackpot-history-btn { font-size:11px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; background:none; border:none; cursor:pointer; margin-top:4px; text-decoration:underline; text-underline-offset:3px; }
 #cofreOverlay .jackpot-history-btn:hover { color:var(--gold); }
 #cofreOverlay .jackpot-week-info { font-size:12px; color:rgba(255,255,255,0.35); margin-top:6px; }
@@ -1071,7 +1080,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 
 /* VAULT DOOR */
 #cofreOverlay .vault-door {
-  width:160px; height:160px; margin:0 auto 24px;
+  width:220px; height:220px; margin:0 auto 24px;
   position:relative; cursor:default;
 }
 #cofreOverlay .vault-door-outer {
@@ -1117,7 +1126,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
   width:3px; height:8px; background:rgba(201,168,76,0.3);
   transform-origin:50% 62px; border-radius:2px;
 }
-#cofreOverlay .vault-lock-icon { font-size:32px; position:relative; z-index:2; transition:all 0.3s; }
+#cofreOverlay .vault-lock-icon { font-size:52px; position:relative; z-index:2; transition:all 0.3s; }
 #cofreOverlay .vault-lock-icon.unlocked { animation:unlockPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
 @keyframes unlockPop { 0%{transform:scale(0.5);opacity:0} 100%{transform:scale(1);opacity:1} }
 
@@ -1223,6 +1232,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 #cofreOverlay .admin-btn.red { background:rgba(239,68,68,0.15); color:#FF4444; border:1px solid rgba(239,68,68,0.5); }
 #cofreOverlay .admin-pin-row { display:flex; gap:8px; margin-bottom:12px; }
 #cofreOverlay .admin-pin-input { background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:8px 12px; color:var(--text); font-size:16px; outline:none; width:100px; letter-spacing:4px; }
+#cofreOverlay .admin-pin-row .admin-btn { border:2px solid rgba(201,168,76,0.8) !important; box-shadow: 0 0 12px rgba(201,168,76,0.3), inset 0 1px 0 rgba(255,255,255,0.15); }
 
 /* ── HISTORY MODAL ── */
 #cofreOverlay .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:1000; display:none; align-items:flex-end; justify-content:center; padding:20px; }
@@ -1268,7 +1278,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 
 /* RESPONSIVE */
 @media(max-width:480px){
-#cofreOverlay .vault-door {width:140px;height:140px;}
+#cofreOverlay .vault-door {width:200px;height:200px;}
 #cofreOverlay .jackpot-amount {font-size:72px;}
 }
 
@@ -5455,7 +5465,7 @@ function renderDesafiosMedalhas() {
           <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);border-radius:14px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
             <div>
               <div style="font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(201,168,76,0.5);margin-bottom:2px;">PRÉMIO ACUMULADO</div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;background:linear-gradient(135deg,#a07820,#C9A84C,#E8C97A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;" id="cofreBtnJackpot">€ 2,00</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;background:linear-gradient(135deg,#a07820,#C9A84C,#E8C97A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;" id="cofreBtnJackpot">€ 10,00</div>
             </div>
             <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
               <div style="background:linear-gradient(135deg,#a07820,#C9A84C);border-radius:10px;padding:10px 16px;">
@@ -5974,6 +5984,7 @@ const ADMIN_PIN_COFRE = '1313';
 const CODE_LENGTH = 4;
 const MAX_ATTEMPTS = 3;
 const WEEKLY_ADD = 2.00;
+const BASE_JACKPOT = 10.00;
 
 // ── STATE (persiste em localStorage) ──
 function loadState() {
@@ -5987,18 +5998,40 @@ function getWeekNum() {
   return Math.floor((d-jan1)/86400000/7) - 3;
 }
 
+// ── AUTO ACUMULAÇÃO SEMANAL (segunda-feira) ──
+function getMondayKey() {
+  const d = new Date();
+  const day = d.getDay(); // 0=Dom, 1=Seg
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(d.setDate(diff));
+  return monday.getFullYear() + '-' + String(monday.getMonth()+1).padStart(2,'0') + '-' + String(monday.getDate()).padStart(2,'0');
+}
+function checkWeeklyAccumulation() {
+  const currentMonday = getMondayKey();
+  if (state.lastMondayAccum !== currentMonday) {
+    // Só acumula se o estado já existia (não é primeira vez)
+    if (state.lastMondayAccum) {
+      state.jackpot = Math.round((state.jackpot + WEEKLY_ADD) * 100) / 100;
+      state.weeksNoWinner = (state.weeksNoWinner || 0) + 1;
+      state.week = (state.week || getWeekNum()) + 1;
+      state.weekLabel = 'Semana ' + state.week;
+      state.top3 = (state.top3 || []).map(p => ({...p, attempts: 0, usedThisWeek: false}));
+      state.secretCode = generateCode();
+    }
+    state.lastMondayAccum = currentMonday;
+    saveState();
+  }
+}
+
 // Default state
 const defaultState = () => ({
-  jackpot: 2.00,
+  jackpot: BASE_JACKPOT,
   week: getWeekNum(),
   weekLabel: 'Semana ' + getWeekNum(),
   weeksNoWinner: 1,
   secretCode: generateCode(),
-  top3: [
-    { nome: 'João Ferreira', score: 42, attempts: 0, usedThisWeek: false },
-    { nome: 'Ricardo Pereira', score: 38, attempts: 0, usedThisWeek: false },
-    { nome: 'Nicole Pinto', score: 31, attempts: 0, usedThisWeek: false },
-  ],
+  lastMondayAccum: getMondayKey(),
+  top3: [],
   history: []
 });
 
@@ -6006,6 +6039,11 @@ let state = loadState() || defaultState();
 // Migrate old state missing fields
 if (!state.history) state.history = [];
 if (state.weeksNoWinner === undefined) state.weeksNoWinner = 1;
+if (!state.lastMondayAccum) state.lastMondayAccum = getMondayKey();
+// Migrate: se jackpot ainda for 2€ (valor antigo default), forçar para 10€ base
+if (state.jackpot < BASE_JACKPOT && state.weeksNoWinner <= 1) state.jackpot = BASE_JACKPOT;
+// Verificar acumulação semanal automática
+checkWeeklyAccumulation();
 
 function generateCode() {
   // 4 digit code, digits can repeat, but first digit isn't 0
@@ -6419,8 +6457,8 @@ function handleWin() {
   });
 
   // Reset jackpot and generate new code
-  state.jackpot = 0;
-  state.weeksNoWinner = 0;
+  state.jackpot = BASE_JACKPOT;
+  state.weeksNoWinner = 1;
   state.secretCode = generateCode();
 
   saveState();
@@ -6487,35 +6525,27 @@ function verificarAdminPin() {
     document.getElementById('adminContentCofre').style.display = 'block';
     document.getElementById('adminLoginCofre').style.display = 'none';
     document.getElementById('adminShowCode').textContent = state.secretCode;
-    buildAdminTop3();
+    document.getElementById('adminJackpotEdit').value = state.jackpot.toFixed(2);
     cofreToast('Admin desbloqueado', 'green');
   } else {
     cofreToast('PIN incorreto', 'red');
   }
 }
 
-function buildAdminTop3() {
-  const wrap = document.getElementById('adminTop3Wrap');
-  wrap.innerHTML = state.top3.map((p,i)=>`
-    <div style="display:flex;gap:8px;align-items:center">
-      <span style="color:var(--gold);font-family:'Bebas Neue',sans-serif;min-width:24px">${i+1}º</span>
-      <input class="admin-input" id="adminTop3_${i}" value="${p.nome}" style="flex:1">
-      <input class="admin-input" id="adminScore_${i}" value="${p.score}" style="width:70px">
-    </div>`).join('');
-}
 
-function adminSaveTop3() {
+function adminSetJackpot() {
   if(!adminUnlocked) return;
-  state.top3 = state.top3.map((p,i)=>({
-    ...p,
-    nome: document.getElementById('adminTop3_'+i)?.value || p.nome,
-    score: parseInt(document.getElementById('adminScore_'+i)?.value)||p.score,
-    attempts: 0,
-    usedThisWeek: false
-  }));
+  const v = parseFloat(document.getElementById('adminJackpotEdit').value);
+  if(isNaN(v) || v < 0) { cofreToast('Valor inválido', 'red'); return; }
+  state.jackpot = Math.round(v * 100) / 100;
   saveState();
-  renderAll();
-  cofreToast('Top 3 guardado!', 'green');
+  renderJackpot();
+  // Update the button in main screen too
+  try {
+    const el = document.getElementById('cofreBtnJackpot');
+    if(el) el.textContent = '€ ' + state.jackpot.toFixed(2).replace('.',',');
+  } catch(e) {}
+  cofreToast('Valor atualizado: €' + state.jackpot.toFixed(2).replace('.',','), 'gold');
 }
 
 function adminAddJackpot() {
@@ -6619,10 +6649,9 @@ window.cofreRefreshDados = cofreRefreshDados;
 window.cofreInit = cofreInit;
 window.cofreToggleAdmin = cofreToggleAdmin;
 window.verificarAdminPin = verificarAdminPin;
-window.adminSaveTop3 = adminSaveTop3;
+window.adminSetJackpot = adminSetJackpot;
 window.adminResetWeek = cofreAdminNextWeek;
 window.adminResetAll = cofreAdminReset;
-window.buildAdminTop3 = buildAdminTop3;
 window.onPlayerChange = onPlayerChange;
 window.cofreSom = cofreSom;
 // Do NOT auto-run — waits for user action
@@ -6659,7 +6688,7 @@ window.cofreSom = cofreSom;
       <div>
         <button class="jackpot-history-btn" onclick="document.getElementById('cofreHistModal').classList.add('open')">Ver histórico →</button>
       </div>
-      <div class="jackpot-week-info">+€2,00 por semana sem vencedor · <span id="weeksNoWinner">1</span> semana(s) acumulada(s)</div>
+      <div class="jackpot-week-info">Base €10,00 · +€2,00 por semana sem vencedor · <span id="weeksNoWinner">1</span> semana(s) acumulada(s)</div>
     </div>
 
     <!-- PLAYER SELECT -->
@@ -6734,7 +6763,7 @@ window.cofreSom = cofreSom;
         <div class="rules-title">COMO FUNCIONA</div>
         <div class="rule-item"><div class="rule-num">1</div><div class="rule-text">Os líderes de cada categoria têm direito a tentar adivinhar o código secreto de 4 dígitos.</div></div>
         <div class="rule-item"><div class="rule-num">2</div><div class="rule-text">Cada jogador tem <strong>3 tentativas por semana</strong>. O código muda semanalmente.</div></div>
-        <div class="rule-item"><div class="rule-num">3</div><div class="rule-text">O prémio aumenta <strong>€2,00 por semana</strong> sem vencedor. Se ninguém acertar, acumula para a semana seguinte.</div></div>
+        <div class="rule-item"><div class="rule-num">3</div><div class="rule-text">O prémio começa em <strong>€10,00</strong> e aumenta <strong>€2,00 por semana</strong> sem vencedor. Se ninguém acertar, acumula para a semana seguinte.</div></div>
         <div class="rule-item"><div class="rule-num">4</div><div class="rule-text">Quem adivinhar o código ganha o prémio acumulado e o cofre reinicia.</div></div>
       </div>
     </div>
@@ -6751,13 +6780,15 @@ window.cofreSom = cofreSom;
             <span class="admin-label">Código atual:</span>
             <strong id="adminShowCode" style="color:#C9A84C;font-size:22px;letter-spacing:4px;font-family:'Bebas Neue',sans-serif;">——</strong>
           </div>
-          <div class="admin-row">
-            <span class="admin-label">Top 3 (nome + pontos):</span>
+          <div class="admin-row" style="margin-top:12px;">
+            <span class="admin-label" style="font-size:12px;color:var(--muted);">Editar valor do cofre (€):</span>
           </div>
-          <div id="adminTop3Wrap" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;"></div>
           <div class="admin-row">
-            <button class="admin-btn" onclick="adminSaveTop3()">💾 Guardar Top 3</button>
-            <button class="admin-btn red" onclick="adminResetWeek()">🔄 Nova Semana</button>
+            <input class="admin-input" id="adminJackpotEdit" type="number" step="0.01" min="0" placeholder="ex: 14.00" style="flex:1;max-width:140px;">
+            <button class="admin-btn" onclick="adminSetJackpot()">💰 Definir Valor</button>
+          </div>
+          <div class="admin-row" style="margin-top:4px;">
+            <button class="admin-btn red" onclick="adminResetWeek()">🔄 Nova Semana +2€</button>
           </div>
           <div class="admin-row">
             <button class="admin-btn red" onclick="adminResetAll()">🗑 Reset Total</button>
