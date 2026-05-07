@@ -59,7 +59,7 @@ body { background: var(--dark); background-image: radial-gradient(ellipse at 50%
 .f-title { font-family: 'Bebas Neue', sans-serif; font-size: 54px; letter-spacing: 3px; line-height: 1; color: #fff; text-shadow: 0 3px 0 rgba(0,0,0,0.2); }
 .f-sub { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-top: 6px; }
 
-.form-wrap { max-width: 900px; margin: 0 auto; padding: 28px 40px calc(100px + env(safe-area-inset-bottom, 0px)); }
+.form-wrap { max-width: 900px; margin: 0 auto; padding: 28px 16px calc(100px + env(safe-area-inset-bottom, 0px)); }
 .sec-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--orange); margin-bottom: 10px; margin-top: 28px; }
 .sec-label:first-of-type { margin-top: 0; }
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin-bottom: 8px; }
@@ -90,7 +90,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .prod-hint { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.3; white-space: normal; }
 
 .counter { display: flex; align-items: center; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
-.cbtn { width: 64px; height: 64px; background: transparent; border: none; color: var(--text); font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.08s; -webkit-user-select: none; user-select: none; touch-action: manipulation; padding: 0; }
+.cbtn { width: 52px; height: 60px; background: transparent; border: none; color: var(--text); font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.08s; -webkit-user-select: none; user-select: none; touch-action: manipulation; padding: 0; }
 .cbtn:active { background: var(--border); }
 .cbtn.minus { color: var(--muted); }
 .cbtn.plus { color: var(--orange); }
@@ -2353,7 +2353,7 @@ async function carregarRanking() {
       const r = await fetch(SHEETS_URL + '?action=getTodos', {signal});
       const td = await r.json();
       if (!signal.aborted && Array.isArray(td)) {
-        dashAllDados = td;
+        dashAllDados = normalizarDatasArray(td);
         if (!signal.aborted) renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []);
       }
     } catch(e) {}
@@ -2633,7 +2633,7 @@ function mostrarProgressoRegisto(nome, payload) {
   if (!dashAllDados.length) {
     fetch(SHEETS_URL + '?action=getTodos').then(r=>r.json()).then(td=>{
       if (Array.isArray(td) && td.length) {
-        dashAllDados = td;
+        dashAllDados = normalizarDatasArray(td);
         const p2 = document.getElementById('successProgress');
         if (p2) renderHistorico();
       }
@@ -3472,12 +3472,28 @@ function mostrarDash(nome) {
 
 let dashAllDados = [];
 
+function normalizarDatasArray(arr) {
+  if (!Array.isArray(arr)) return arr;
+  return arr.map(r => {
+    if (r && r.data && typeof r.data === 'string' && (r.data.includes('T') || r.data.includes('Z'))) {
+      const d = new Date(r.data);
+      if (!isNaN(d)) {
+        const yr = d.getFullYear();
+        const mo = String(d.getMonth()+1).padStart(2,'0');
+        const dy = String(d.getDate()).padStart(2,'0');
+        return {...r, data: `${yr}-${mo}-${dy}`};
+      }
+    }
+    return r;
+  });
+}
+
 async function carregarDashboard() {
   const todosNomes = [...new Set(equipas.flatMap(e=>e.nomes))];
   buildVgrid(todosNomes.map(n=>({nome:n})));
   try {
     const res = await fetch(SHEETS_URL + '?action=getTodos');
-    dashAllDados = await res.json();
+    dashAllDados = normalizarDatasArray(await res.json());
     if (!Array.isArray(dashAllDados)) dashAllDados = [];
     renderDashDefault(); renderTop3Consistencia();
   } catch(e) {
@@ -3485,7 +3501,7 @@ async function carregarDashboard() {
       const proxy = 'https://corsproxy.io/?';
       const url = encodeURIComponent(SHEETS_URL + '?action=getTodos');
       const res2 = await fetch(proxy + url);
-      dashAllDados = await res2.json();
+      dashAllDados = normalizarDatasArray(await res2.json());
       if (!Array.isArray(dashAllDados)) dashAllDados = [];
       renderDashDefault(); renderTop3Consistencia();
     } catch(e2) {
@@ -3514,7 +3530,7 @@ function renderDashDefault() {
     categorias.forEach(cat => { agg[d.nome][cat.key] += (d[cat.key]||0); });
   });
   const vendedores = Object.values(agg);
-  const hoje5 = new Date().toISOString().split('T')[0];
+  const _h5=new Date(); const hoje5 = `${_h5.getFullYear()}-${String(_h5.getMonth()+1).padStart(2,'0')}-${String(_h5.getDate()).padStart(2,'0')}`;
   const hojeCount = dadosMes.filter(d=>d.data===hoje5).length;
   const totalUnidades = dadosMes.reduce((s,d)=>s+categorias.reduce((ss,c)=>ss+(d[c.key]||0),0),0);
   const totalVendedores = new Set(dadosMes.map(d=>d.nome)).size;
@@ -4100,27 +4116,36 @@ async function carregarAdmin() {
   content.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted)"><div style="font-size:28px;margin-bottom:8px">⏳</div><p>A carregar...</p></div>';
 
   function normData(r) {
-    if (r.data && r.data.includes('T')) r.data = r.data.split('T')[0];
+    if (r.data && typeof r.data === 'string') {
+      if (r.data.includes('T') || r.data.includes('Z')) {
+        // Parse as local date to avoid UTC offset shifting the day
+        const d = new Date(r.data);
+        if (!isNaN(d)) {
+          const yr = d.getFullYear();
+          const mo = String(d.getMonth()+1).padStart(2,'0');
+          const dy = String(d.getDate()).padStart(2,'0');
+          r.data = `${yr}-${mo}-${dy}`;
+        } else {
+          r.data = r.data.split('T')[0];
+        }
+      }
+    }
     return r;
   }
 
   try {
-    // Use dashAllDados if already loaded, otherwise fetch
+    // Always fetch fresh data from Sheets for admin — never use stale dashAllDados cache
     let todos = [];
-    if (dashAllDados && dashAllDados.length) {
-      todos = dashAllDados.map(r => normData({...r}));
-    } else {
-      try {
-        const res = await fetch(SHEETS_URL + '?action=getTodos');
-        const raw = await res.json();
-        if (Array.isArray(raw)) todos = raw.map(normData);
-      } catch(e) {
-        const proxy = 'https://corsproxy.io/?';
-        const url = encodeURIComponent(SHEETS_URL + '?action=getTodos');
-        const res2 = await fetch(proxy + url);
-        const raw2 = await res2.json();
-        if (Array.isArray(raw2)) todos = raw2.map(normData);
-      }
+    try {
+      const res = await fetch(SHEETS_URL + '?action=getTodos', {cache:'no-store'});
+      const raw = await res.json();
+      if (Array.isArray(raw)) todos = raw.map(normData);
+    } catch(e) {
+      const proxy = 'https://corsproxy.io/?';
+      const url = encodeURIComponent(SHEETS_URL + '?action=getTodos');
+      const res2 = await fetch(proxy + url, {cache:'no-store'});
+      const raw2 = await res2.json();
+      if (Array.isArray(raw2)) todos = raw2.map(normData);
     }
     if (!Array.isArray(todos)) throw new Error('Resposta inválida');
 
