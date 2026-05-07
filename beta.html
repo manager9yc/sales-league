@@ -5683,12 +5683,7 @@ function renderDesafiosMedalhas() {
   -webkit-user-select:text;user-select:text;
 }
 .comment-input::placeholder { color:var(--muted); }
-.comment-gif-btn {
-  width:32px;height:32px;border-radius:50%;background:var(--card2);
-  border:1px solid var(--border);color:var(--muted);font-size:14px;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;-webkit-tap-highlight-color:transparent;
-}
+
 .comment-send-btn {
   width:32px;height:32px;border-radius:50%;
   background:linear-gradient(135deg,#a07820,#C9A84C);border:none;
@@ -5719,13 +5714,7 @@ function renderDesafiosMedalhas() {
   -webkit-user-select:text;user-select:text;
 }
 .compose-input::placeholder { color:var(--muted); }
-.compose-gif-btn {
-  width:36px;height:36px;border-radius:50%;background:var(--card);
-  border:1px solid var(--border);color:var(--muted);font-size:16px;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;-webkit-tap-highlight-color:transparent;font-weight:700;
-  font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;
-}
+
 .compose-send-btn {
   width:36px;height:36px;border-radius:50%;
   background:linear-gradient(135deg,#a07820,#C9A84C);border:none;
@@ -5736,35 +5725,34 @@ function renderDesafiosMedalhas() {
 }
 
 /* GIF PICKER */
-.gif-picker {
+
+
+
+/* ── EMOJI PICKER ── */
+.compose-emoji-btn, .comment-emoji-btn {
+  width:32px;height:32px;border-radius:50%;background:var(--card2);
+  border:1px solid var(--border);font-size:16px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;-webkit-tap-highlight-color:transparent;
+}
+.emoji-panel {
   position:fixed;bottom:0;left:0;right:0;z-index:10000;
   background:var(--card);border-top:1px solid rgba(201,168,76,0.3);
   border-radius:20px 20px 0 0;
-  padding:16px 12px calc(16px + env(safe-area-inset-bottom,0px));
-  transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.25,0.85,0.3,1);
-  max-height:70vh;display:flex;flex-direction:column;
+  padding:14px 12px calc(14px + env(safe-area-inset-bottom,0px));
+  transform:translateY(100%);transition:transform 0.25s cubic-bezier(0.25,0.85,0.3,1);
 }
-.gif-picker.open { transform:translateY(0); }
-.gif-picker-drag { width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.2);margin:0 auto 12px; }
-.gif-search {
-  width:100%;background:var(--card2);border:1px solid var(--border);border-radius:12px;
-  padding:10px 14px;color:var(--text);font-size:14px;outline:none;
-  font-family:'DM Sans',sans-serif;margin-bottom:10px;
-  -webkit-user-select:text;user-select:text;
+.emoji-panel.open { transform:translateY(0); }
+.emoji-panel-drag { width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.2);margin:0 auto 12px; }
+.emoji-grid {
+  display:flex;flex-wrap:wrap;gap:4px;justify-content:center;
 }
-.gif-search::placeholder { color:var(--muted); }
-.gif-grid {
-  display:grid;grid-template-columns:repeat(2,1fr);gap:6px;
-  overflow-y:auto;flex:1;scrollbar-width:none;
-}
-.gif-grid::-webkit-scrollbar { display:none; }
-.gif-item {
-  border-radius:10px;overflow:hidden;cursor:pointer;aspect-ratio:4/3;
-  background:var(--card2);
+.emoji-opt {
+  font-size:26px;cursor:pointer;padding:6px;border-radius:8px;
   -webkit-tap-highlight-color:transparent;
+  transition:transform 0.1s;
 }
-.gif-item img { width:100%;height:100%;object-fit:cover; }
-.gif-powered { text-align:center;font-size:10px;color:var(--muted);margin-top:8px; }
+.emoji-opt:active { transform:scale(1.3); }
 
 /* ONBOARD NAME MODAL */
 .feed-onboard {
@@ -5839,8 +5827,8 @@ function renderDesafiosMedalhas() {
   <div class="feed-compose">
     <div class="compose-row">
       <div class="compose-avatar" id="composeAvatar">?</div>
-      <input class="compose-input" id="composeInput" placeholder="Diz algo ao teu staff..." type="text" maxlength="280" onkeydown="if(event.key==='Enter'){feedPostSubmit();event.preventDefault()}">
-      <button class="compose-gif-btn" onclick="openGifPicker('post',null)">GIF</button>
+      <input class="compose-input" id="composeInput" placeholder="Escreve aqui algo..." type="text" maxlength="280" onkeydown="if(event.key==='Enter'){feedPostSubmit();event.preventDefault()}">
+      <button class="compose-emoji-btn" onclick="toggleEmojiPicker('post',null)" title="Emoji">😊</button>
       <button class="compose-send-btn" onclick="feedPostSubmit()">↑</button>
     </div>
   </div>
@@ -5865,14 +5853,15 @@ function renderDesafiosMedalhas() {
 
 </div>
 
-<!-- GIF PICKER OVERLAY -->
-<div class="gif-picker" id="gifPicker">
-  <div class="gif-picker-drag"></div>
-  <input class="gif-search" id="gifSearch" placeholder="Pesquisa GIFs..." type="text">
-  <div class="gif-grid" id="gifGrid"></div>
-  <div class="gif-powered">Powered by Tenor</div>
+
+
+
+<!-- EMOJI PICKER -->
+<div class="emoji-panel" id="emojiPanel">
+  <div class="emoji-panel-drag"></div>
+  <div class="emoji-grid" id="emojiGrid"></div>
 </div>
-<div id="gifPickerBackdrop" onclick="closeGifPicker()" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5)"></div>
+<div id="emojiBackdrop" onclick="closeEmojiPicker()" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.3)"></div>
 
 <!-- REACTION PICKER -->
 <div class="react-picker" id="reactPicker">
@@ -7228,7 +7217,6 @@ window.cofreSom = cofreSom;
 
 // ── CONFIG ──
 const FEED_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZ7J7wCftImXw40mXQ7fM-DBMLOngZe9a95liYQ3Q4qaBSnYWot8gDiFqxzIB5cPFEwQ/exec';
-const TENOR_KEY = 'AIzaSyAyimkuYQYF_FuasThVpfdsHd5-GNHaAek';
 const REACTIONS_LIST = ['🔥','💪','😂','👑','🤙','💀'];
 
 // ── USER IDENTITY ──
@@ -7251,9 +7239,7 @@ function avatarLetter(name) {
 let feedFilter = 'all';
 let feedPosts = [];
 let feedLoaded = false;
-let gifTarget = null; // {type:'post'} or {type:'comment', postId}
 let reactTarget = null; // postId
-let _gifSearchTimer = null;
 
 // ── INIT ──
 window.feedInit = function() {
@@ -7627,17 +7613,23 @@ function renderFeed() {
 
   list.innerHTML = posts.map(p => renderPost(p)).join('');
 
-  // Welcome card desaparece após 10s
+  // Welcome card: só aparece uma vez por sessão, desaparece após 10s
   const welcomeEl = document.getElementById('post_auto_welcome');
   if (welcomeEl) {
-    setTimeout(() => {
-      welcomeEl.style.transition = 'opacity 0.8s ease, max-height 0.8s ease, margin 0.8s ease';
-      welcomeEl.style.opacity = '0';
-      welcomeEl.style.maxHeight = '0';
-      welcomeEl.style.overflow = 'hidden';
-      welcomeEl.style.marginBottom = '0';
-      setTimeout(() => welcomeEl.remove(), 800);
-    }, 10000);
+    if (sessionStorage.getItem('feedWelcomeSeen')) {
+      welcomeEl.remove();
+    } else {
+      sessionStorage.setItem('feedWelcomeSeen', '1');
+      setTimeout(() => {
+        welcomeEl.style.transition = 'opacity 0.8s ease, max-height 0.8s ease, margin 0.8s ease, padding 0.8s ease';
+        welcomeEl.style.opacity = '0';
+        welcomeEl.style.maxHeight = '0';
+        welcomeEl.style.overflow = 'hidden';
+        welcomeEl.style.marginBottom = '0';
+        welcomeEl.style.padding = '0';
+        setTimeout(() => welcomeEl.remove(), 850);
+      }, 10000);
+    }
   }
 }
 
@@ -7669,7 +7661,6 @@ function renderPost(p) {
       <div class="comment-bubble">
         <div class="comment-author">${c.author.split(' ')[0]}</div>
         <div class="comment-text">${escapeHtml(c.text)}</div>
-        ${c.gif ? `<div class="comment-gif"><img src="${c.gif}" loading="lazy" alt="gif"></div>` : ''}
         <div class="comment-time">${relativeTime(c.ts)}</div>
       </div>
     </div>`).join('');
@@ -7697,7 +7688,6 @@ function renderPost(p) {
     <div class="post-body">
       ${p.highlight ? `<div class="post-highlight">${p.highlight}</div>` : ''}
       <div class="post-text">${processText(p.text || '')}</div>
-      ${p.gif ? `<div class="post-gif"><img src="${p.gif}" loading="lazy" alt="gif"></div>` : ''}
     </div>
     ${reactHtml ? `<div class="post-reactions">${reactHtml}</div>` : ''}
     ${p.id !== 'auto_welcome' ? `<div class="post-comments-wrap">
@@ -7706,7 +7696,7 @@ function renderPost(p) {
       <div class="comment-input-row">
         <div class="comment-avatar" style="${typeof getFoto==='function' && user && getFoto(user) ? 'padding:0;overflow:hidden;background:none;' : ''}">${typeof getFoto==='function' && user && getFoto(user) ? `<img src="${getFoto(user)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : (user ? avatarLetter(user) : '?')}</div>
         <input class="comment-input" id="ci_${p.id}" placeholder="Comenta..." type="text" maxlength="200" onkeydown="if(event.key==='Enter'){feedCommentSubmit('${p.id}');event.preventDefault()}">
-        <button class="comment-gif-btn" onclick="openGifPicker('comment','${p.id}')">GIF</button>
+        <button class="comment-emoji-btn" onclick="toggleEmojiPicker('comment','${p.id}')" title="Emoji">😊</button>
         <button class="comment-send-btn" onclick="feedCommentSubmit('${p.id}')">↑</button>
       </div>
     </div>` : ''}
@@ -7741,8 +7731,7 @@ window.feedPostSubmit = function() {
   if (!user) { feedShowOnboard(); return; }
   const input = document.getElementById('composeInput');
   const text = (input.value || '').trim();
-  const pendingGif = window._pendingPostGif || null;
-  if (!text && !pendingGif) { feedToast('Escreve algo primeiro'); return; }
+  if (!text) { feedToast('Escreve algo primeiro'); return; }
 
   const post = {
     id: 'staff_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
@@ -7756,7 +7745,6 @@ window.feedPostSubmit = function() {
   };
 
   input.value = '';
-  window._pendingPostGif = null;
 
   feedPosts.unshift(post);
   renderFeed();
@@ -7770,8 +7758,7 @@ window.feedCommentSubmit = function(postId) {
   if (!user) { feedShowOnboard(); return; }
   const input = document.getElementById('ci_' + postId);
   const text = (input ? input.value : '').trim();
-  const pendingGif = window['_pendingCommentGif_' + postId] || null;
-  if (!text && !pendingGif) return;
+  if (!text) return;
 
   const post = feedPosts.find(p => p.id === postId);
   if (!post) return;
@@ -7781,13 +7768,12 @@ window.feedCommentSubmit = function(postId) {
     author: user,
     ts: new Date().toISOString(),
     text: text,
-    gif: pendingGif
+    gif: null
   };
 
   if (!post.comments) post.comments = [];
   post.comments.push(comment);
   if (input) input.value = '';
-  window['_pendingCommentGif_' + postId] = null;
 
   renderFeed();
   feedSaveCommentToSheets(postId, comment);
@@ -7837,96 +7823,39 @@ window.pickReact = function(emoji) {
   closeReactPicker();
 };
 
-// ── GIF PICKER ──
-window.openGifPicker = function(type, postId) {
-  const user = getFeedUser();
-  if (!user) { feedShowOnboard(); return; }
-  gifTarget = {type, postId};
-  const picker = document.getElementById('gifPicker');
-  const backdrop = document.getElementById('gifPickerBackdrop');
-  picker.classList.add('open');
+
+
+
+// ── EMOJI PICKER ──
+const FEED_EMOJIS = ['😂','🔥','💪','👑','🤙','💀','😅','🎉','😏','🤡','😤','🥹','😍','🤣','😭','👀','🫡','💯','🏆','⚡','🧠','🫶','😬','🤦','🤷','😴','👎','🤌','🍕','💸'];
+let _emojiTarget = null;
+
+window.toggleEmojiPicker = function(type, postId) {
+  const panel = document.getElementById('emojiPanel');
+  const backdrop = document.getElementById('emojiBackdrop');
+  if (panel.classList.contains('open')) { closeEmojiPicker(); return; }
+  _emojiTarget = {type, postId};
+  const grid = document.getElementById('emojiGrid');
+  grid.innerHTML = FEED_EMOJIS.map(e => `<div class="emoji-opt" onclick="selectEmoji('${e}')">${e}</div>`).join('');
+  panel.classList.add('open');
   backdrop.style.display = 'block';
-  const search = document.getElementById('gifSearch');
-  if (search) { search.value = ''; fetchGifs('reação'); }
-  setTimeout(() => { if (search) search.focus(); }, 300);
 };
-window.closeGifPicker = function() {
-  document.getElementById('gifPicker').classList.remove('open');
-  document.getElementById('gifPickerBackdrop').style.display = 'none';
-  gifTarget = null;
+window.closeEmojiPicker = function() {
+  document.getElementById('emojiPanel').classList.remove('open');
+  document.getElementById('emojiBackdrop').style.display = 'none';
+  _emojiTarget = null;
 };
-
-function fetchGifs(query) {
-  const grid = document.getElementById('gifGrid');
-  grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">A carregar GIFs...</div>';
-
-  // Tenor v2 via corsproxy para evitar CORS
-  const tenorUrl = `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(query)}&key=${TENOR_KEY}&limit=16&media_filter=gif,tinygif`;
-  const proxiedUrl = 'https://corsproxy.io/?' + encodeURIComponent(tenorUrl);
-
-  const renderGifs = (urls) => {
-    if (!urls.length) {
-      grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">Sem resultados para "' + query + '"</div>';
-      return;
-    }
-    grid.innerHTML = urls.map(({url, preview}) =>
-      `<div class="gif-item" onclick="selectGif(${JSON.stringify(url)})"><img src="${preview || url}" loading="lazy" alt="gif"></div>`
-    ).join('');
-  };
-
-  const parseTenor = (data) => {
-    if (!data.results || !data.results.length) return [];
-    return data.results.map(r => {
-      const gif = r.media_formats?.gif?.url || r.media_formats?.tinygif?.url || '';
-      const preview = r.media_formats?.tinygif?.url || r.media_formats?.nanogif?.url || gif;
-      return { url: gif, preview };
-    }).filter(r => r.url);
-  };
-
-  // Try direct first, then proxy
-  fetch(tenorUrl, { mode: 'cors' })
-    .then(r => { if (!r.ok) throw new Error('cors'); return r.json(); })
-    .then(data => renderGifs(parseTenor(data)))
-    .catch(() => {
-      fetch(proxiedUrl)
-        .then(r => r.json())
-        .then(data => renderGifs(parseTenor(data)))
-        .catch(() => {
-          // Last resort: Giphy public beta
-          const giphyUrl = `https://api.giphy.com/v1/gifs/search?api_key=dc6zaTOxFJmzC&q=${encodeURIComponent(query)}&limit=16&rating=g`;
-          fetch(giphyUrl)
-            .then(r => r.json())
-            .then(data => {
-              if (!data.data || !data.data.length) { grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">Sem resultados</div>'; return; }
-              const urls = data.data.map(g => ({ url: g.images.original.url, preview: g.images.fixed_height_small.url }));
-              renderGifs(urls);
-            })
-            .catch(() => { grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">Erro a carregar GIFs. Verifica a ligação.</div>'; });
-        });
-    });
-}
-
-window.selectGif = function(url) {
-  if (!gifTarget) return;
-  if (gifTarget.type === 'post') {
-    window._pendingPostGif = url;
-    feedToast('GIF selecionado — carrega ↑ para publicar', 'gold');
-  } else if (gifTarget.type === 'comment') {
-    window['_pendingCommentGif_' + gifTarget.postId] = url;
-    feedToast('GIF selecionado — carrega ↑ para comentar', 'gold');
+window.selectEmoji = function(emoji) {
+  if (!_emojiTarget) return;
+  if (_emojiTarget.type === 'post') {
+    const inp = document.getElementById('composeInput');
+    if (inp) { const pos = inp.selectionStart || inp.value.length; inp.value = inp.value.slice(0,pos) + emoji + inp.value.slice(pos); inp.focus(); }
+  } else if (_emojiTarget.type === 'comment') {
+    const inp = document.getElementById('ci_' + _emojiTarget.postId);
+    if (inp) { const pos = inp.selectionStart || inp.value.length; inp.value = inp.value.slice(0,pos) + emoji + inp.value.slice(pos); inp.focus(); }
   }
-  closeGifPicker();
+  closeEmojiPicker();
 };
-
-// GIF search debounce
-document.addEventListener('DOMContentLoaded', () => {
-  const gs = document.getElementById('gifSearch');
-  if (gs) gs.addEventListener('input', () => {
-    clearTimeout(_gifSearchTimer);
-    const q = gs.value.trim() || 'reação';
-    _gifSearchTimer = setTimeout(() => fetchGifs(q), 400);
-  });
-});
 
 // ── FILTER ──
 window.feedSetFilter = function(filter, btn) {
@@ -7958,7 +7887,6 @@ window.feedExpandComments = function(postId) {
       <div class="comment-bubble">
         <div class="comment-author">${c.author.split(' ')[0]}</div>
         <div class="comment-text">${escapeHtml(c.text)}</div>
-        ${c.gif ? `<div class="comment-gif"><img src="${c.gif}" loading="lazy" alt="gif"></div>` : ''}
         <div class="comment-time">${relativeTime(c.ts)}</div>
       </div>
     </div>`).join('');
@@ -7966,7 +7894,6 @@ window.feedExpandComments = function(postId) {
     <div class="comment-input-row">
       <div class="comment-avatar">${user ? avatarLetter(user) : '?'}</div>
       <input class="comment-input" id="ci_${postId}" placeholder="Comenta..." type="text" maxlength="200" onkeydown="if(event.key==='Enter'){feedCommentSubmit('${postId}');event.preventDefault()}">
-      <button class="comment-gif-btn" onclick="openGifPicker('comment','${postId}')">GIF</button>
       <button class="comment-send-btn" onclick="feedCommentSubmit('${postId}')">↑</button>
     </div>`;
 };
