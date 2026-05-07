@@ -5659,12 +5659,19 @@ function renderDesafiosMedalhas() {
   display:flex;align-items:center;justify-content:center;
   font-family:'Bebas Neue',sans-serif;font-size:12px;color:#C9A84C;
 }
+
+.comment-del-btn {
+  background:none;border:none;color:rgba(239,68,68,0.5);font-size:14px;
+  cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;align-self:flex-start;
+  -webkit-tap-highlight-color:transparent;margin-top:1px;
+  transition:color 0.15s;
+}
+.comment-del-btn:active { color:#EF4444; transform:scale(1.2); }
+
 .comment-bubble {
   background:var(--card2);border:1px solid var(--border);border-radius:12px 12px 12px 0;
   padding:7px 10px;flex:1;min-width:0;
 }
-.comment-bubble.own-comment { cursor:pointer; }
-.comment-bubble.own-comment:active { opacity:0.85; }
 .comment-author { font-size:11px;font-weight:700;color:#C9A84C;margin-bottom:2px; }
 .comment-text {
   font-size:13px;color:rgba(255,255,255,0.8);line-height:1.4;
@@ -5790,12 +5797,7 @@ function renderDesafiosMedalhas() {
   -webkit-tap-highlight-color:transparent;
 }
 /* Hold animation on comment bubble */
-@keyframes holdPulse {
-  0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
-  50%  { box-shadow: 0 0 0 4px rgba(239,68,68,0.3); }
-  100% { box-shadow: 0 0 0 8px rgba(239,68,68,0); background:rgba(239,68,68,0.08); }
-}
-.comment-bubble.holding { animation: holdPulse 0.6s ease forwards; }
+
 
 /* ONBOARD NAME MODAL */
 .feed-onboard {
@@ -7667,9 +7669,6 @@ function renderFeed() {
 
   list.innerHTML = posts.map(p => renderPost(p)).join('');
 
-  // Attach hold listeners after render
-  setTimeout(attachCommentHoldListeners, 0);
-
   // Welcome card: só aparece uma vez por sessão, desaparece após 10s
   const welcomeEl = document.getElementById('post_auto_welcome');
   if (welcomeEl) {
@@ -7717,11 +7716,12 @@ function renderPost(p) {
     return `
     <div class="comment-item" id="ci_item_${c.id}">
       <div class="comment-avatar" style="${typeof getFoto==='function' && getFoto(c.author) ? 'padding:0;overflow:hidden;background:none;' : ''}">${typeof getFoto==='function' && getFoto(c.author) ? `<img src="${getFoto(c.author)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${c.author}">` : avatarLetter(c.author)}</div>
-      <div class="comment-bubble${isOwn ? ' own-comment' : ''}" data-postid="${p.id}" data-commentid="${c.id}" data-own="${isOwn}">
-        <div class="comment-author">${c.author.split(' ')[0]}${isOwn ? ' <span style="font-size:9px;color:rgba(201,168,76,0.5);letter-spacing:1px">· segura para apagar</span>' : ''}</div>
+      <div class="comment-bubble" data-postid="${p.id}" data-commentid="${c.id}">
+        <div class="comment-author">${c.author.split(' ')[0]}</div>
         <div class="comment-text">${escapeHtml(c.text)}</div>
         <div class="comment-time">${relativeTime(c.ts)}</div>
       </div>
+      ${isOwn ? `<button class="comment-del-btn" onclick="showDeleteCommentModal('${p.id}','${c.id}')" title="Apagar">🗑</button>` : ''}
     </div>`;
   }).join('');
 
@@ -7917,46 +7917,9 @@ window.selectEmoji = function(emoji) {
 };
 
 
-// ── DELETE COMMENT — event delegation on feedList ──
-let _holdTimer = null;
-let _holdEl = null;
 let _delTarget = null;
 
-function attachCommentHoldListeners() {
-  const list = document.getElementById('feedList');
-  if (!list || list._holdAttached) return;
-  list._holdAttached = true;
-
-  function startHold(e) {
-    const bubble = e.target.closest('.comment-bubble.own-comment');
-    if (!bubble) return;
-    if (e.type === 'touchstart') e.preventDefault();
-    cancelHold();
-    _holdEl = bubble;
-    bubble.classList.add('holding');
-    _holdTimer = setTimeout(() => {
-      _holdTimer = null;
-      if (_holdEl) { _holdEl.classList.remove('holding'); _holdEl = null; }
-      const postId = bubble.dataset.postid;
-      const commentId = bubble.dataset.commentid;
-      if (postId && commentId) showDeleteCommentModal(postId, commentId);
-    }, 600);
-  }
-  function cancelHold() {
-    if (_holdTimer) { clearTimeout(_holdTimer); _holdTimer = null; }
-    if (_holdEl) { _holdEl.classList.remove('holding'); _holdEl = null; }
-  }
-
-  list.addEventListener('touchstart', startHold, { passive: false });
-  list.addEventListener('touchend', cancelHold, { passive: true });
-  list.addEventListener('touchcancel', cancelHold, { passive: true });
-  list.addEventListener('touchmove', cancelHold, { passive: true });
-  list.addEventListener('mousedown', startHold);
-  list.addEventListener('mouseup', cancelHold);
-  list.addEventListener('mouseleave', cancelHold);
-}
-
-function showDeleteCommentModal(postId, commentId) {
+window.showDeleteCommentModal = function(postId, commentId) {
   // Find comment text
   let previewText = '';
   const post = feedPosts.find(p => p.id === postId);
@@ -7967,7 +7930,7 @@ function showDeleteCommentModal(postId, commentId) {
   _delTarget = { postId, commentId };
   document.getElementById('delCommentPreview').textContent = previewText;
   document.getElementById('delCommentModal').style.display = 'flex';
-}
+};
 
 window.cancelDeleteComment = function() {
   document.getElementById('delCommentModal').style.display = 'none';
@@ -8028,11 +7991,12 @@ window.feedExpandComments = function(postId) {
     return `
     <div class="comment-item" id="ci_item_${c.id}">
       <div class="comment-avatar" style="${typeof getFoto==='function' && getFoto(c.author) ? 'padding:0;overflow:hidden;background:none;' : ''}">${typeof getFoto==='function' && getFoto(c.author) ? `<img src="${getFoto(c.author)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${c.author}">` : avatarLetter(c.author)}</div>
-      <div class="comment-bubble${isOwn ? ' own-comment' : ''}" data-postid="${postId}" data-commentid="${c.id}" data-own="${isOwn}">
-        <div class="comment-author">${c.author.split(' ')[0]}${isOwn ? ' <span style="font-size:9px;color:rgba(201,168,76,0.5);letter-spacing:1px">· segura para apagar</span>' : ''}</div>
+      <div class="comment-bubble" data-postid="${postId}" data-commentid="${c.id}">
+        <div class="comment-author">${c.author.split(' ')[0]}</div>
         <div class="comment-text">${escapeHtml(c.text)}</div>
         <div class="comment-time">${relativeTime(c.ts)}</div>
       </div>
+      ${isOwn ? `<button class="comment-del-btn" onclick="showDeleteCommentModal('${postId}','${c.id}')" title="Apagar">🗑</button>` : ''}
     </div>`;
   }).join('');
   wrap.innerHTML = allComments + `
