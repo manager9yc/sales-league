@@ -5427,15 +5427,21 @@ function renderDesafiosMedalhas() {
   </div>
   <div style="overflow-y:auto;flex:1;padding:16px 16px 100px;max-width:700px;margin:0 auto">
 
+    <!-- JOGO 1: COFRE -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div style="background:linear-gradient(135deg,#a07820,#C9A84C);border-radius:8px;padding:4px 10px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#fff">JOGO 1</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#C9A84C">O COFRE</div>
+    </div>
+
     <!-- COFRE BUTTON — topo da página -->
-    <div style="margin-bottom:20px" id="cofreBannerWrap">
-      <button onclick="abrirCofre()" id="cofreBtn" style="width:100%;background:linear-gradient(135deg,#0d0c08,#1c1a0e,#0d0c08);border:2px solid rgba(201,168,76,0.45);border-radius:20px;padding:0;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative;box-shadow:0 12px 40px rgba(201,168,76,0.18),0 4px 16px rgba(0,0,0,0.6);">
+    <div style="margin-bottom:24px" id="cofreBannerWrap">
+      <div onclick="abrirCofre()" id="cofreBtn" style="width:100%;background:linear-gradient(135deg,#0d0c08,#1c1a0e,#0d0c08);border:2px solid rgba(201,168,76,0.45);border-radius:20px;padding:0;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative;box-shadow:0 12px 40px rgba(201,168,76,0.18),0 4px 16px rgba(0,0,0,0.6);user-select:none;">
         <!-- Shimmer sweep -->
         <div style="position:absolute;top:0;bottom:0;left:-80%;width:60%;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.08),transparent);transform:skewX(-15deg);animation:cofreShimmer 2.8s ease-in-out infinite;pointer-events:none;"></div>
         <!-- Top accent line -->
-        <div style="position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.6),transparent);"></div>
+        <div style="position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.6),transparent);pointer-events:none;"></div>
         <!-- Content -->
-        <div style="padding:22px 22px 18px;position:relative;">
+        <div style="padding:22px 22px 18px;position:relative;pointer-events:none;">
           <!-- Icon + title row -->
           <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
             <div style="font-size:46px;animation:cofrePulse 2s ease-in-out infinite;filter:drop-shadow(0 0 14px rgba(201,168,76,0.7));flex-shrink:0;">🔒</div>
@@ -5451,14 +5457,25 @@ function renderDesafiosMedalhas() {
               <div style="font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(201,168,76,0.5);margin-bottom:2px;">PRÉMIO ACUMULADO</div>
               <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;background:linear-gradient(135deg,#a07820,#C9A84C,#E8C97A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;" id="cofreBtnJackpot">€ 2,00</div>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-              <div style="background:linear-gradient(135deg,#a07820,#C9A84C);border-radius:10px;padding:10px 16px;">
-                <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#fff;">JOGAR →</div>
-              </div>
+            <div style="background:linear-gradient(135deg,#a07820,#C9A84C);border-radius:10px;padding:10px 16px;">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#fff;">JOGAR →</div>
             </div>
           </div>
         </div>
-      </button>
+      </div>
+    </div>
+
+    <!-- SEPARADOR -->
+    <div style="display:flex;align-items:center;gap:12px;margin:4px 0 20px">
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--border))"></div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted)">SUPER LIGA 2026</div>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)"></div>
+    </div>
+
+    <!-- JOGO 2: MEDALHAS -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div style="background:linear-gradient(135deg,#FF6B00,#FF8C00);border-radius:8px;padding:4px 10px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#fff">JOGO 2</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--orange)">MEDALHAS</div>
     </div>
 
     <div id="desafiosMedalhasLista"></div>
@@ -5856,7 +5873,6 @@ function limparRegistosHoje(){var hoje=localDateStr();var k=[];for(var i=0;i<loc
 // ── COFRE OVERLAY ──
 function abrirCofre() {
   if (!window._cofreAccessGranted) {
-    // Mostrar modal de PIN em vez de prompt() (bloqueado em iOS Safari)
     _mostrarCofrePinModal();
     return;
   }
