@@ -7314,9 +7314,14 @@ window.feedInit = function() {
   if (!feedLoaded) {
     feedLoaded = true;
     feedLoad();
+    // Generate auto events after data is ready
+    setTimeout(() => generateAutoFeedEvents(), 3000);
     // Auto-refresh every 30s while on feed screen
     window._feedInterval = setInterval(() => {
-      if (document.getElementById('screen-feed').classList.contains('active')) feedLoad();
+      if (document.getElementById('screen-feed').classList.contains('active')) {
+        feedLoad();
+        generateAutoFeedEvents();
+      }
     }, 30000);
   }
 
@@ -7413,6 +7418,194 @@ function feedLoad() {
 }
 
 // ── AUTO-GENERATE EVENTS FROM RANKING DATA ──
+
+// ── AUTO EVENTS → SHEETS ──
+// Generates contextual auto posts and saves them to Sheets (once per session per event)
+function generateAutoFeedEvents() {
+  const todos = window.dashAllDados || [];
+  if (!todos.length) return;
+  const now = new Date();
+  const today = now.toISOString().slice(0,10);
+  const mesAtual = now.getMonth();
+  const anoAtual = now.getFullYear();
+  const cats = ['onlines','sprays','palmilhas','camisolas','sacos','garrafas','elogios','szclub'];
+
+  // Aggregate month
+  const agg = {};
+  const todayAgg = {};
+  todos.forEach(d => {
+    const dt = new Date((d.data||'')+'T12:00:00');
+    const isMonth = !isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual;
+    const isToday = (d.data||'').slice(0,10) === today;
+    if (!isMonth) return;
+    if (!agg[d.nome]) agg[d.nome] = {nome:d.nome, total:0};
+    cats.forEach(k => { agg[d.nome].total += (Number(d[k])||0); agg[d.nome][k] = (agg[d.nome][k]||0)+(Number(d[k])||0); });
+    if (isToday) {
+      if (!todayAgg[d.nome]) todayAgg[d.nome] = {nome:d.nome, total:0};
+      cats.forEach(k => { todayAgg[d.nome].total += (Number(d[k])||0); todayAgg[d.nome][k] = (todayAgg[d.nome][k]||0)+(Number(d[k])||0); });
+    }
+  });
+  const ranking = Object.values(agg).sort((a,b) => b.total - a.total);
+  const todayRanking = Object.values(todayAgg).sort((a,b) => b.total - a.total);
+  const allNames = typeof equipas !== 'undefined' ? equipas.flatMap(e=>e.nomes||[]) : ranking.map(r=>r.nome);
+
+  function tryPost(key, postObj) {
+    const ssKey = 'feedAutoPosted_' + key + '_' + today;
+    if (sessionStorage.getItem(ssKey)) return;
+    sessionStorage.setItem(ssKey, '1');
+    // Add to local feed
+    feedPosts.unshift(postObj);
+    // Save to Sheets
+    feedSaveToSheets(postObj);
+  }
+
+  function makeAutoPost(id, tag, highlight, text) {
+    return {
+      id, type: 'auto', tag,
+      author: 'Super Liga',
+      ts: new Date().toISOString(),
+      highlight: highlight || null,
+      text, gif: null,
+      reactions: {}, comments: [], pinned: false
+    };
+  }
+
+  // ── EVENT: LÍDER DO DIA ──
+  if (todayRanking[0] && todayRanking[0].total > 0) {
+    const p = todayRanking[0];
+    const frases = [
+      `${p.nome} está em modo turbo hoje com ${p.total} registos. 🔥`,
+      `${p.nome.split(' ')[0]} lidera o dia! ${p.total} registos até agora. Quem chega perto? 👀`,
+      `Atenção ao ${p.nome.split(' ')[0]}! ${p.total} registos hoje. Alguém quer responder? 💪`,
+    ];
+    tryPost('lider_dia', makeAutoPost(
+      'auto_lider_dia_' + today, 'ranking',
+      '⚡ LÍDER DE HOJE: ' + p.nome.split(' ')[0].toUpperCase(),
+      frases[now.getHours() % frases.length]
+    ));
+  }
+
+  // ── EVENT: ULTRAPASSAGEM no ranking ──
+  if (ranking.length >= 2) {
+    for (let i = 1; i < Math.min(ranking.length, 5); i++) {
+      const atual = ranking[i];
+      const acima = ranking[i-1];
+      const diff = acima.total - atual.total;
+      if (diff <= 2) {
+        tryPost('ultrapass_' + atual.nome.replace(/\s/g,''), makeAutoPost(
+          'auto_ultrapass_' + atual.nome.replace(/\s/g,'_') + '_' + today,
+          'ranking',
+          '📈 IMINENTE: ' + atual.nome.split(' ')[0].toUpperCase(),
+          `${atual.nome.split(' ')[0]} está a apenas ${diff === 0 ? 'empatar' : diff + ' registo(s) de ultrapassar'} ${acima.nome.split(' ')[0]} no ranking geral! Vai acontecer? 🤔`
+        ));
+        break;
+      }
+    }
+  }
+
+  // ── EVENT: SEM REGISTOS HÁ 2+ DIAS ÚTEIS ──
+  allNames.forEach(nome => {
+    if (!agg[nome] || agg[nome].total === 0) return;
+    const byDay = {};
+    todos.forEach(d => { if (d.nome === nome) byDay[(d.data||'').slice(0,10)] = true; });
+    let diasSem = 0;
+    const d = new Date(now);
+    while (diasSem < 5) {
+      const key = d.toISOString().slice(0,10);
+      const dow = d.getDay();
+      if (dow !== 0 && dow !== 6) {
+        if (byDay[key]) break;
+        diasSem++;
+      }
+      d.setDate(d.getDate()-1);
+    }
+    if (diasSem >= 2) {
+      const msgs = [
+        `${nome.split(' ')[0]} desapareceu! ${diasSem} dias úteis sem registo. Tudo bem? 😅`,
+        `${diasSem} dias sem ver ${nome.split(' ')[0]} nos registos... férias não avisadas? 😂`,
+        `${nome.split(' ')[0]}, o ranking sente a tua falta há ${diasSem} dias! 👀`,
+      ];
+      tryPost('nosales_' + nome.replace(/\s/g,''), makeAutoPost(
+        'auto_nosales_' + nome.replace(/\s/g,'_') + '_' + today,
+        'ranking', null,
+        msgs[diasSem % msgs.length]
+      ));
+    }
+  });
+
+  // ── EVENT: PROXIMIDADE DE MEDALHA (≤ 3 do objetivo) ──
+  if (typeof calcularMedalhas === 'function') {
+    const catKeys = {onlines:'🖥️ Onlines',sprays:'🧴 Sprays',palmilhas:'🦶 Palmilhas',camisolas:'👕 Camisolas',sacos:'🛍️ Sacos',garrafas:'💧 Garrafas'};
+    Object.values(agg).forEach(r => {
+      try {
+        const dadosNome = todos.filter(d => {
+          const dt = new Date((d.data||'')+'T12:00:00');
+          return d.nome === r.nome && !isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual;
+        });
+        const meds = calcularMedalhas(dadosNome);
+        meds.forEach(m => {
+          if (m.earned) return;
+          // Check proximity: parse threshold from desc
+          const match = m.desc.match(/(\d+)/);
+          if (!match) return;
+          const target = parseInt(match[1]);
+          // Find current value for this medal
+          const catMap = {
+            'Rei dos Onlines': r.onlines||0,
+            'Spray King': r.sprays||0,
+            'Palmilhas Master': r.palmilhas||0,
+            'Camisolas Pro': r.camisolas||0,
+            'Eco Champion': r.sacos||0,
+            'Hydration Boss': r.garrafas||0,
+            'Consistente': new Set(dadosNome.map(d=>d.data)).size,
+            'SZClub Star': r.szclub||0,
+          };
+          const current = catMap[m.name];
+          if (current === undefined) return;
+          const faltam = target - current;
+          if (faltam > 0 && faltam <= 3) {
+            tryPost('medal_prox_' + r.nome.replace(/\s/g,'') + '_' + m.name.replace(/\s/g,''), makeAutoPost(
+              'auto_medal_prox_' + r.nome.replace(/\s/g,'_') + '_' + m.name.replace(/\s/g,'_') + '_' + today,
+              'medals',
+              '🏅 ' + r.nome.split(' ')[0].toUpperCase() + ' QUASE LÁ!',
+              `${r.nome.split(' ')[0]} está a apenas ${faltam} de conquistar a medalha ${m.icon} ${m.name}! Vai com tudo! 🔥`
+            ));
+          }
+        });
+      } catch(e) {}
+    });
+  }
+
+  // ── EVENT: COFRE — novo código semanal ──
+  try {
+    const cofreState = JSON.parse(localStorage.getItem('cofreState')||'{}');
+    if (cofreState.jackpot !== undefined) {
+      const cofreKey = 'cofre_week_' + (cofreState.week || 0);
+      tryPost(cofreKey, makeAutoPost(
+        'auto_cofre_' + (cofreState.week||0),
+        'medals',
+        '🔒 NOVO CÓDIGO DO COFRE DISPONÍVEL!',
+        `O cofre desta semana tem €${Number(cofreState.jackpot).toFixed(2).replace('.',',')} em prémio! Os líderes de cada categoria têm ${3} tentativas para descobrir o código. Quem vai ser o sortudo? 🤑`
+      ));
+    }
+  } catch(e) {}
+
+  // ── EVENT: PÓDIO DO MÊS ──
+  if (ranking.length >= 3) {
+    const mesLabel = now.toLocaleDateString('pt-PT', {month:'long'});
+    const podio = ranking.slice(0,3).map((r,i)=>['🥇','🥈','🥉'][i]+' '+r.nome.split(' ')[0]+' — '+r.total+' pts').join(' · ');
+    tryPost('podium_' + today.slice(0,7), makeAutoPost(
+      'auto_podium_' + today.slice(0,7),
+      'ranking',
+      '🏟️ PÓDIO DE ' + mesLabel.toUpperCase(),
+      podio + ' · Ainda há tempo para subir! 💪'
+    ));
+  }
+
+  // Re-render after all posts
+  renderFeed();
+}
+
 function mergeAutoEvents() {
   const todos = window.dashAllDados || [];
   const autoEvents = [];
@@ -7712,7 +7905,9 @@ function renderPost(p) {
   // Comments HTML
   const comments = p.comments || [];
   const commentsHtml = comments.slice(-3).map(c => {
-    const isOwn = c.author === user;
+    const isOwn = user && c.author === user;
+    const isAdmin = typeof adminUnlocked !== 'undefined' && adminUnlocked;
+    const canDel = isOwn || isAdmin;
     return `
     <div class="comment-item" id="ci_item_${c.id}">
       <div class="comment-avatar" style="${typeof getFoto==='function' && getFoto(c.author) ? 'padding:0;overflow:hidden;background:none;' : ''}">${typeof getFoto==='function' && getFoto(c.author) ? `<img src="${getFoto(c.author)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${c.author}">` : avatarLetter(c.author)}</div>
@@ -7721,7 +7916,7 @@ function renderPost(p) {
         <div class="comment-text">${escapeHtml(c.text)}</div>
         <div class="comment-time">${relativeTime(c.ts)}</div>
       </div>
-      ${isOwn ? `<button class="comment-del-btn" onclick="showDeleteCommentModal('${p.id}','${c.id}')" title="Apagar">🗑</button>` : ''}
+      ${canDel ? `<button class="comment-del-btn" onclick="showDeleteCommentModal('${p.id}','${c.id}')" title="Apagar">🗑</button>` : ''}
     </div>`;
   }).join('');
 
@@ -7743,7 +7938,10 @@ function renderPost(p) {
         </div>
         <div class="post-time">${timeStr}</div>
       </div>
-      <button class="reaction-add-btn" onclick="openReactPicker('${p.id}',this)" style="flex-shrink:0">+</button>
+      <div style="display:flex;gap:4px;align-items:center;flex-shrink:0">
+        ${(user === p.author || (typeof adminUnlocked !== 'undefined' && adminUnlocked)) && p.type !== 'auto' ? `<button class="post-pin-btn" onclick="feedTogglePin('${p.id}')" title="${isPinned ? 'Desafixar' : 'Fixar'}" style="background:none;border:none;font-size:16px;cursor:pointer;padding:2px 4px;opacity:${isPinned ? '1' : '0.35'};-webkit-tap-highlight-color:transparent;">📌</button>` : ''}
+        <button class="reaction-add-btn" onclick="openReactPicker('${p.id}',this)">+</button>
+      </div>
     </div>
     <div class="post-body">
       ${p.highlight ? `<div class="post-highlight">${p.highlight}</div>` : ''}
@@ -7962,6 +8160,23 @@ window.confirmDeleteComment = function() {
   feedToast('Comentário apagado', 'red');
 };
 
+
+// ── PIN POST ──
+window.feedTogglePin = function(postId) {
+  const post = feedPosts.find(p => p.id === postId);
+  if (!post) return;
+  post.pinned = !post.pinned;
+  // Re-sort pinned to top
+  feedPosts.sort((a,b) => {
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    return new Date(b.ts) - new Date(a.ts);
+  });
+  renderFeed();
+  feedApiCall({ action: 'pinPost', postId, pinned: post.pinned });
+  feedToast(post.pinned ? '📌 Post fixado!' : 'Post desafixado', 'gold');
+};
+
 // ── FILTER ──
 window.feedSetFilter = function(filter, btn) {
   feedFilter = filter;
@@ -8070,10 +8285,12 @@ if (typeof _origCarregarRanking === 'function') {
   window.carregarRanking = function() {
     const result = _origCarregarRanking.apply(this, arguments);
     setTimeout(() => {
+      mergeAutoEvents();
       if (document.getElementById('screen-feed').classList.contains('active')) {
-        mergeAutoEvents(); renderFeed();
+        renderFeed();
+        generateAutoFeedEvents();
       }
-    }, 2000);
+    }, 2500);
     return result;
   };
 }
