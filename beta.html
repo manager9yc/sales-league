@@ -1749,10 +1749,14 @@ function localDateStr(d) {
   const dt = d || new Date();
   return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
 }
-// Normaliza datas vindas do Sheets (ex: "2026-05-06T00:00:00.000Z") para data local
+// Normaliza datas vindas do Sheets (ex: "2026-05-07T00:00:00.000Z") para data local
+// IMPORTANTE: não usa new Date() para não perder 1 dia por desfasamento UTC↔Lisboa
 function normalizarData(str) {
   if (!str || typeof str !== 'string') return str;
   if (!str.includes('T') && !str.includes('Z')) return str;
+  // Extrai sempre a parte YYYY-MM-DD diretamente, sem converter via UTC
+  const datePart = str.substring(0, 10);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return datePart;
   const d = new Date(str);
   return isNaN(d) ? str.split('T')[0] : localDateStr(d);
 }
@@ -4120,7 +4124,7 @@ async function carregarAdmin() {
   const data = dateInput.value;
   if (!data) return;
   document.getElementById('adminDataLabel').textContent = new Date(data+'T12:00:00').toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'long'});
-  const content = document.getElementById('adminContentCofre');
+  const content = document.getElementById('adminContent');
   content.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted)"><div style="font-size:28px;margin-bottom:8px">⏳</div><p>A carregar...</p></div>';
 
   function normData(r) {
