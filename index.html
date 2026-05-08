@@ -1344,7 +1344,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 </div>
 
 <!-- FORM BACKDROP -->
-<div id="formOverlayBackdrop" onclick="fecharFormOverlay()" style="display:none;position:fixed;inset:0;z-index:449;background:rgba(0,0,0,0.65);backdrop-filter:blur(2px)"></div>
+<div id="formOverlayBackdrop" onclick="fecharFormOverlay()" style="display:none;position:fixed;inset:0;z-index:599;background:rgba(0,0,0,0.65);backdrop-filter:blur(2px)"></div>
 
 <div class="nav" id="mainNav">
   <button class="nav-btn" id="navBtnDesafios" onclick="goTo('desafios',this)"><span class="nav-icon">🎮</span><span>Jogos</span></button>
@@ -1357,7 +1357,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 </div>
 
 <!-- FORM -->
-<div class="screen" id="screen-form" style="position:fixed;bottom:0;left:0;right:0;z-index:450;border-radius:0;max-height:100dvh;overflow-y:auto;transform:translateY(110%);transition:transform 0.65s cubic-bezier(0.25,0.85,0.3,1);display:block!important;box-shadow:0 -8px 48px rgba(0,0,0,0.8);background:var(--dark)">
+<div class="screen" id="screen-form" style="position:fixed;bottom:0;left:0;right:0;z-index:600;border-radius:0;max-height:100dvh;overflow-y:auto;transform:translateY(110%);transition:transform 0.65s cubic-bezier(0.25,0.85,0.3,1);display:block!important;box-shadow:0 -8px 48px rgba(0,0,0,0.8);background:var(--dark)">
   <div style="display:flex;justify-content:center;padding:10px 0 2px"><div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.2)"></div></div>
   <div class="screen-banner">
     <div class="screen-banner-inner">
@@ -2724,13 +2724,9 @@ function fecharSplash(){
   s.classList.add('out');
   setTimeout(()=>{
     s.classList.add('hidden');
-    if (typeof feedFabToggle === 'function') {
-      feedFabToggle();
-    } else if (typeof feedInit === 'function') {
-      const feedScreen = document.getElementById('screen-feed');
-      if (feedScreen) feedScreen.classList.add('active');
-      feedInit();
-    }
+    const rankBtn = document.getElementById('navBtnRanking');
+    if(rankBtn) { goTo('ranking', rankBtn); }
+    setTimeout(() => abrirFormOverlay(), 50);
   },600);
 }
 iniciarSplash();
@@ -8430,7 +8426,7 @@ document.addEventListener('feedDataUpdated', () => {
   position: fixed !important;
   top: 0 !important; left: 0 !important; right: 0 !important;
   bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
-  z-index: 8000 !important;
+  z-index: 500 !important;
   background: var(--dark) !important;
   display: flex !important;
   flex-direction: column !important;
@@ -8470,6 +8466,10 @@ function feedFabToggle() {
 }
 
 function _feedFabOpenFn() {
+  // Fechar o form de registo se estiver aberto
+  if (typeof fecharFormOverlay === 'function' && typeof formOverlayOpen !== 'undefined' && formOverlayOpen) {
+    fecharFormOverlay();
+  }
   _feedFabIsOpen = true;
   const activeScreen = document.querySelector('.screen.active:not(#screen-form):not(#screen-feed)');
   if (activeScreen) _feedPrevScreen = activeScreen.id.replace('screen-','');
@@ -8477,13 +8477,13 @@ function _feedFabOpenFn() {
   document.querySelectorAll('.screen.active').forEach(s => { if (s.id !== 'screen-form') s.classList.remove('active'); });
   document.getElementById('screen-feed').classList.add('active');
   const btn = document.getElementById('feedFabBtn');
-  const icon = document.getElementById('feedFabIcon');
   if (btn) btn.classList.add('feed-open');
-  if (icon) icon.textContent = '✕';
+  // Ícone mantém-se 💬 — o X está no header do feed
   _feedUnread = 0;
   _updateFeedBadge();
   try { localStorage.setItem('feedLastSeen', new Date().toISOString()); } catch(e) {}
   if (typeof feedInit === 'function') feedInit();
+  // Injectar botão X no header (só uma vez)
   setTimeout(() => {
     const header = document.querySelector('#screen-feed .feed-header > div:last-child');
     if (header && !document.getElementById('feedHeaderClose')) {
@@ -8502,7 +8502,7 @@ function _feedFabClose() {
   const btn = document.getElementById('feedFabBtn');
   const icon = document.getElementById('feedFabIcon');
   if (btn) btn.classList.remove('feed-open');
-  if (icon) icon.textContent = '💬';
+  // Ícone mantém-se 💬
   const prevEl = document.getElementById('screen-' + _feedPrevScreen);
   if (prevEl) prevEl.classList.add('active');
   if (_feedPrevBtn) _feedPrevBtn.classList.add('active');
