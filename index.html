@@ -2726,6 +2726,7 @@ function fecharSplash(){
     s.classList.add('hidden');
     const feedBtn = document.getElementById('navBtnFeed');
     if(feedBtn) { goTo('feed', feedBtn); feedInit(); }
+    setTimeout(() => abrirFormOverlay(), 50);
   },600);
 }
 iniciarSplash();
