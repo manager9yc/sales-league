@@ -1786,6 +1786,10 @@ const minDate = `${ontem.getFullYear()}-${pad(ontem.getMonth()+1)}-${pad(ontem.g
 selecionarData('hoje');
 
 function goTo(screen, btn) {
+  // Fechar o form de registo se estiver aberto ao navegar para outra tab
+  if (typeof fecharFormOverlay === 'function' && typeof formOverlayOpen !== 'undefined' && formOverlayOpen) {
+    fecharFormOverlay();
+  }
   document.querySelectorAll('.screen').forEach(s => { if(s.id !== 'screen-form') s.classList.remove('active'); });
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   const _se=document.getElementById('screen-'+screen); if(_se) _se.classList.add('active'); else return;
