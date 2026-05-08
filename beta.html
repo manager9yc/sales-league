@@ -1353,7 +1353,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
     <button class="nav-center-btn" id="navCenterBtn" onclick="toggleFormOverlay()">+</button>
   </div>
   <button class="nav-btn" id="navBtnDash" onclick="goTo('dash',this)"><span class="nav-icon">📊</span><span>Dashboard</span></button>
-  <button class="nav-btn" id="navBtnFeed" onclick="goTo('feed',this);feedInit()" style="position:relative"><span class="nav-icon">💬</span><span>Feed</span><span id="feedNavBadge" style="display:none;position:absolute;top:8px;right:calc(50% - 16px);width:8px;height:8px;background:#FF4444;border-radius:50%;border:1.5px solid #080808"></span></button>
+  <button class="nav-btn" id="navBtnInfo" onclick="goTo('info',this);renderInfo();renderSugestoes();populateSugestaoNomes();gerarQR()"><span class="nav-icon">📋</span><span>Info</span></button>
 </div>
 
 <!-- FORM -->
@@ -2724,8 +2724,9 @@ function fecharSplash(){
   s.classList.add('out');
   setTimeout(()=>{
     s.classList.add('hidden');
-    const feedBtn = document.getElementById('navBtnFeed');
-    if(feedBtn) { goTo('feed', feedBtn); feedInit(); }
+    const rankBtn = document.getElementById('navBtnRanking');
+    if(rankBtn) { goTo('ranking', rankBtn); }
+    setTimeout(() => abrirFormOverlay(), 50);
   },600);
 }
 iniciarSplash();
@@ -2848,7 +2849,7 @@ atualizarMesLabels();
 // ── SWIPE LATERAL ENTRE MENUS ──
 (function() {
   const SCREENS = ['desafios', 'ranking', 'dash', 'info'];
-  const BTN_IDS  = ['navBtnDesafios', 'navBtnRanking', 'navBtnDash', 'navBtnFeed'];
+  const BTN_IDS  = ['navBtnDesafios', 'navBtnRanking', 'navBtnDash', 'navBtnInfo'];
   let tsX = 0, tsY = 0, tId = null;
 
   function currentIdx() {
@@ -6429,6 +6430,26 @@ function loadState() {
 function saveState() {
   localStorage.setItem('cofreState', JSON.stringify(state));
 }
+
+// ── PERSISTÊNCIA POR JOGADOR (sobrevive a fechar o browser) ──
+function getMondayKeyPersist() {
+  const d = new Date();
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(d.getFullYear(), d.getMonth(), diff);
+  return monday.getFullYear() + '-' +
+    String(monday.getMonth()+1).padStart(2,'0') + '-' +
+    String(monday.getDate()).padStart(2,'0');
+}
+function playerPersistKey(nome) {
+  return 'cofrePlayer_' + getMondayKeyPersist() + '_' + nome.replace(/\s+/g,'_');
+}
+function loadPlayerState(nome) {
+  try { return JSON.parse(localStorage.getItem(playerPersistKey(nome)) || '{}'); } catch(e) { return {}; }
+}
+function savePlayerState(nome, data) {
+  try { localStorage.setItem(playerPersistKey(nome), JSON.stringify(data)); } catch(e) {}
+}
 function getWeekNum() {
   const d = new Date(); const jan1 = new Date(d.getFullYear(),0,1);
   return Math.floor((d-jan1)/86400000/7) - 3;
@@ -6499,11 +6520,35 @@ function cofreInit() {
   buildVaultVisuals();
   buildNumpad();
   buildComboDisplay();
+  // Sincronizar estado dos jogadores do localStorage para o state.top3
+  syncPlayersFromLocalStorage();
   renderJackpot();
   renderVaultStatus();
   updateStatusBar();
-  // Buscar dados primeiro, depois renderizar nomes
   cofreRefreshDados();
+}
+
+function syncPlayersFromLocalStorage() {
+  // Para cada jogador com estado guardado nesta semana, actualizar state.top3
+  const prefix = 'cofrePlayer_' + getMondayKeyPersist() + '_';
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k || !k.startsWith(prefix)) continue;
+    try {
+      const nome = k.replace(prefix, '').replace(/_/g, ' ');
+      const data = JSON.parse(localStorage.getItem(k) || '{}');
+      // Procurar nome real (pode ter espaços)
+      // Primeiro tentamos match exacto, depois por chave normalizada
+      let existing = state.top3 ? state.top3.find(p => p.nome.replace(/\s+/g,'_') === k.replace(prefix,'')) : null;
+      if (!existing) {
+        if (!state.top3) state.top3 = [];
+        existing = { nome, score:0, attempts:0, usedThisWeek:false };
+        state.top3.push(existing);
+      }
+      existing.attempts = data.attempts || 0;
+      existing.usedThisWeek = data.usedThisWeek || false;
+    } catch(e) {}
+  }
 }
 
 function cofreRefreshDados() {
@@ -6671,13 +6716,17 @@ function onPlayerChange() {
   const sel = document.getElementById('playerSelect');
   const elegiveis = getCofreElegiveis();
   currentPlayer = elegiveis.find(p=>p.nome===sel.value) || null;
-  // Sync with state.top3 for persistence
   if (currentPlayer) {
+    // Carregar estado persistido do localStorage para este vendedor e semana
+    const persisted = loadPlayerState(currentPlayer.nome);
     let existing = state.top3.find(p=>p.nome===currentPlayer.nome);
     if (!existing) {
-      existing = {nome:currentPlayer.nome,score:0,attempts:0,usedThisWeek:false};
+      existing = {nome:currentPlayer.nome, score:0, attempts:0, usedThisWeek:false};
       state.top3.push(existing);
     }
+    // Sobrescrever com dados persistidos (mais fiáveis que o state em memória)
+    existing.attempts = persisted.attempts || 0;
+    existing.usedThisWeek = persisted.usedThisWeek || false;
     currentPlayer = existing;
   }
   currentEntry = '';
@@ -6829,6 +6878,11 @@ function submitAttempt() {
     } else {
       cofreToast(`${attLeft} tentativa${attLeft!==1?'s':''} restante${attLeft!==1?'s':''}`, 'gold');
     }
+    // Persistir estado no localStorage
+    savePlayerState(currentPlayer.nome, {
+      attempts: currentPlayer.attempts,
+      usedThisWeek: currentPlayer.usedThisWeek
+    });
     saveState();
     renderEligibility();
     renderVaultStatus();
@@ -6883,6 +6937,9 @@ function handleWin() {
 
   const prize = state.jackpot;
   const winner = currentPlayer.nome;
+
+  // Persistir vitória no localStorage
+  savePlayerState(winner, { attempts: state.top3[pidx].attempts, usedThisWeek: true });
 
   // Add to history
   state.history.unshift({
@@ -7003,15 +7060,29 @@ function cofreAdminNextWeek() {
   state.secretCode = generateCode();
   state.top3 = state.top3.map(p=>({...p, attempts:0, usedThisWeek:false}));
   saveState();
+  // Limpar estados persistidos de jogadores para forçar novo ciclo
+  const toRemove = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('cofrePlayer_')) toRemove.push(k);
+  }
+  toRemove.forEach(k => localStorage.removeItem(k));
   document.getElementById('adminShowCode').textContent = state.secretCode;
   renderAll();
-  cofreToast('Semana avançada! +2€ ao jackpot', 'gold');
+  cofreToast('Semana avançada! +2€ ao jackpot · Jogadores resetados', 'gold');
 }
 
 function cofreAdminReset() {
   if(!adminUnlocked) return;
   if(!confirm('Reset completo? Perdes todo o histórico.')) return;
   localStorage.removeItem('cofreState');
+  // Limpar todos os estados persistidos de jogadores
+  const toRemove = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('cofrePlayer_')) toRemove.push(k);
+  }
+  toRemove.forEach(k => localStorage.removeItem(k));
   state = defaultState();
   saveState();
   sessionAttempts = [];
@@ -7023,7 +7094,7 @@ function cofreAdminReset() {
   document.getElementById('vaultDoorCofre').classList.remove('open-vault');
   document.getElementById('lockIconCofre').textContent = '🔒';
   renderAll();
-  cofreToast('Reset efectuado', 'red');
+  cofreToast('Reset efectuado — todos os jogadores resetados', 'red');
 }
 
 // ── TOAST ──
@@ -7311,13 +7382,27 @@ window.feedInit = function() {
     }
   }
 
+  // Gerar eventos auto IMEDIATAMENTE com dados locais (não espera Sheets)
+  mergeAutoEvents();
+  renderFeed();
+
   if (!feedLoaded) {
     feedLoaded = true;
     feedLoad();
+    // Segunda passagem após dados carregarem
+    setTimeout(() => { generateAutoFeedEvents(); renderFeed(); }, 2000);
+    // Terceira passagem — para quando dashAllDados demora
+    setTimeout(() => { generateAutoFeedEvents(); renderFeed(); }, 5000);
     // Auto-refresh every 30s while on feed screen
     window._feedInterval = setInterval(() => {
-      if (document.getElementById('screen-feed').classList.contains('active')) feedLoad();
+      if (document.getElementById('screen-feed').classList.contains('active')) {
+        feedLoad();
+        generateAutoFeedEvents();
+      }
     }, 30000);
+  } else {
+    // Feed já foi carregado — só re-gerar eventos com dados actuais
+    setTimeout(() => { generateAutoFeedEvents(); renderFeed(); }, 500);
   }
 
   // Show onboard if no user
@@ -7413,6 +7498,194 @@ function feedLoad() {
 }
 
 // ── AUTO-GENERATE EVENTS FROM RANKING DATA ──
+
+// ── AUTO EVENTS → SHEETS ──
+// Generates contextual auto posts and saves them to Sheets (once per session per event)
+function generateAutoFeedEvents() {
+  const todos = window.dashAllDados || [];
+  if (!todos.length) return;
+  const now = new Date();
+  const today = now.toISOString().slice(0,10);
+  const mesAtual = now.getMonth();
+  const anoAtual = now.getFullYear();
+  const cats = ['onlines','sprays','palmilhas','camisolas','sacos','garrafas','elogios','szclub'];
+
+  // Aggregate month
+  const agg = {};
+  const todayAgg = {};
+  todos.forEach(d => {
+    const dt = new Date((d.data||'')+'T12:00:00');
+    const isMonth = !isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual;
+    const isToday = (d.data||'').slice(0,10) === today;
+    if (!isMonth) return;
+    if (!agg[d.nome]) agg[d.nome] = {nome:d.nome, total:0};
+    cats.forEach(k => { agg[d.nome].total += (Number(d[k])||0); agg[d.nome][k] = (agg[d.nome][k]||0)+(Number(d[k])||0); });
+    if (isToday) {
+      if (!todayAgg[d.nome]) todayAgg[d.nome] = {nome:d.nome, total:0};
+      cats.forEach(k => { todayAgg[d.nome].total += (Number(d[k])||0); todayAgg[d.nome][k] = (todayAgg[d.nome][k]||0)+(Number(d[k])||0); });
+    }
+  });
+  const ranking = Object.values(agg).sort((a,b) => b.total - a.total);
+  const todayRanking = Object.values(todayAgg).sort((a,b) => b.total - a.total);
+  const allNames = typeof equipas !== 'undefined' ? equipas.flatMap(e=>e.nomes||[]) : ranking.map(r=>r.nome);
+
+  function tryPost(key, postObj) {
+    const ssKey = 'feedAutoPosted_' + key + '_' + today;
+    if (sessionStorage.getItem(ssKey)) return;
+    sessionStorage.setItem(ssKey, '1');
+    // Add to local feed
+    feedPosts.unshift(postObj);
+    // Save to Sheets
+    feedSaveToSheets(postObj);
+  }
+
+  function makeAutoPost(id, tag, highlight, text) {
+    return {
+      id, type: 'auto', tag,
+      author: 'Super Liga',
+      ts: new Date().toISOString(),
+      highlight: highlight || null,
+      text, gif: null,
+      reactions: {}, comments: [], pinned: false
+    };
+  }
+
+  // ── EVENT: LÍDER DO DIA ──
+  if (todayRanking[0] && todayRanking[0].total > 0) {
+    const p = todayRanking[0];
+    const frases = [
+      `${p.nome} está em modo turbo hoje com ${p.total} registos. 🔥`,
+      `${p.nome.split(' ')[0]} lidera o dia! ${p.total} registos até agora. Quem chega perto? 👀`,
+      `Atenção ao ${p.nome.split(' ')[0]}! ${p.total} registos hoje. Alguém quer responder? 💪`,
+    ];
+    tryPost('lider_dia', makeAutoPost(
+      'auto_lider_dia_' + today, 'ranking',
+      '⚡ LÍDER DE HOJE: ' + p.nome.split(' ')[0].toUpperCase(),
+      frases[now.getHours() % frases.length]
+    ));
+  }
+
+  // ── EVENT: ULTRAPASSAGEM no ranking ──
+  if (ranking.length >= 2) {
+    for (let i = 1; i < Math.min(ranking.length, 5); i++) {
+      const atual = ranking[i];
+      const acima = ranking[i-1];
+      const diff = acima.total - atual.total;
+      if (diff <= 2) {
+        tryPost('ultrapass_' + atual.nome.replace(/\s/g,''), makeAutoPost(
+          'auto_ultrapass_' + atual.nome.replace(/\s/g,'_') + '_' + today,
+          'ranking',
+          '📈 IMINENTE: ' + atual.nome.split(' ')[0].toUpperCase(),
+          `${atual.nome.split(' ')[0]} está a apenas ${diff === 0 ? 'empatar' : diff + ' registo(s) de ultrapassar'} ${acima.nome.split(' ')[0]} no ranking geral! Vai acontecer? 🤔`
+        ));
+        break;
+      }
+    }
+  }
+
+  // ── EVENT: SEM REGISTOS HÁ 2+ DIAS ÚTEIS ──
+  allNames.forEach(nome => {
+    if (!agg[nome] || agg[nome].total === 0) return;
+    const byDay = {};
+    todos.forEach(d => { if (d.nome === nome) byDay[(d.data||'').slice(0,10)] = true; });
+    let diasSem = 0;
+    const d = new Date(now);
+    while (diasSem < 5) {
+      const key = d.toISOString().slice(0,10);
+      const dow = d.getDay();
+      if (dow !== 0 && dow !== 6) {
+        if (byDay[key]) break;
+        diasSem++;
+      }
+      d.setDate(d.getDate()-1);
+    }
+    if (diasSem >= 2) {
+      const msgs = [
+        `${nome.split(' ')[0]} desapareceu! ${diasSem} dias úteis sem registo. Tudo bem? 😅`,
+        `${diasSem} dias sem ver ${nome.split(' ')[0]} nos registos... férias não avisadas? 😂`,
+        `${nome.split(' ')[0]}, o ranking sente a tua falta há ${diasSem} dias! 👀`,
+      ];
+      tryPost('nosales_' + nome.replace(/\s/g,''), makeAutoPost(
+        'auto_nosales_' + nome.replace(/\s/g,'_') + '_' + today,
+        'ranking', null,
+        msgs[diasSem % msgs.length]
+      ));
+    }
+  });
+
+  // ── EVENT: PROXIMIDADE DE MEDALHA (≤ 3 do objetivo) ──
+  if (typeof calcularMedalhas === 'function') {
+    const catKeys = {onlines:'🖥️ Onlines',sprays:'🧴 Sprays',palmilhas:'🦶 Palmilhas',camisolas:'👕 Camisolas',sacos:'🛍️ Sacos',garrafas:'💧 Garrafas'};
+    Object.values(agg).forEach(r => {
+      try {
+        const dadosNome = todos.filter(d => {
+          const dt = new Date((d.data||'')+'T12:00:00');
+          return d.nome === r.nome && !isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual;
+        });
+        const meds = calcularMedalhas(dadosNome);
+        meds.forEach(m => {
+          if (m.earned) return;
+          // Check proximity: parse threshold from desc
+          const match = m.desc.match(/(\d+)/);
+          if (!match) return;
+          const target = parseInt(match[1]);
+          // Find current value for this medal
+          const catMap = {
+            'Rei dos Onlines': r.onlines||0,
+            'Spray King': r.sprays||0,
+            'Palmilhas Master': r.palmilhas||0,
+            'Camisolas Pro': r.camisolas||0,
+            'Eco Champion': r.sacos||0,
+            'Hydration Boss': r.garrafas||0,
+            'Consistente': new Set(dadosNome.map(d=>d.data)).size,
+            'SZClub Star': r.szclub||0,
+          };
+          const current = catMap[m.name];
+          if (current === undefined) return;
+          const faltam = target - current;
+          if (faltam > 0 && faltam <= 3) {
+            tryPost('medal_prox_' + r.nome.replace(/\s/g,'') + '_' + m.name.replace(/\s/g,''), makeAutoPost(
+              'auto_medal_prox_' + r.nome.replace(/\s/g,'_') + '_' + m.name.replace(/\s/g,'_') + '_' + today,
+              'medals',
+              '🏅 ' + r.nome.split(' ')[0].toUpperCase() + ' QUASE LÁ!',
+              `${r.nome.split(' ')[0]} está a apenas ${faltam} de conquistar a medalha ${m.icon} ${m.name}! Vai com tudo! 🔥`
+            ));
+          }
+        });
+      } catch(e) {}
+    });
+  }
+
+  // ── EVENT: COFRE — novo código semanal ──
+  try {
+    const cofreState = JSON.parse(localStorage.getItem('cofreState')||'{}');
+    if (cofreState.jackpot !== undefined) {
+      const cofreKey = 'cofre_week_' + (cofreState.week || 0);
+      tryPost(cofreKey, makeAutoPost(
+        'auto_cofre_' + (cofreState.week||0),
+        'medals',
+        '🔒 NOVO CÓDIGO DO COFRE DISPONÍVEL!',
+        `O cofre desta semana tem €${Number(cofreState.jackpot).toFixed(2).replace('.',',')} em prémio! Os líderes de cada categoria têm ${3} tentativas para descobrir o código. Quem vai ser o sortudo? 🤑`
+      ));
+    }
+  } catch(e) {}
+
+  // ── EVENT: PÓDIO DO MÊS ──
+  if (ranking.length >= 3) {
+    const mesLabel = now.toLocaleDateString('pt-PT', {month:'long'});
+    const podio = ranking.slice(0,3).map((r,i)=>['🥇','🥈','🥉'][i]+' '+r.nome.split(' ')[0]+' — '+r.total+' pts').join(' · ');
+    tryPost('podium_' + today.slice(0,7), makeAutoPost(
+      'auto_podium_' + today.slice(0,7),
+      'ranking',
+      '🏟️ PÓDIO DE ' + mesLabel.toUpperCase(),
+      podio + ' · Ainda há tempo para subir! 💪'
+    ));
+  }
+
+  // Re-render after all posts
+  renderFeed();
+}
+
 function mergeAutoEvents() {
   const todos = window.dashAllDados || [];
   const autoEvents = [];
@@ -7712,7 +7985,9 @@ function renderPost(p) {
   // Comments HTML
   const comments = p.comments || [];
   const commentsHtml = comments.slice(-3).map(c => {
-    const isOwn = c.author === user;
+    const isOwn = user && c.author === user;
+    const isAdmin = typeof adminUnlocked !== 'undefined' && adminUnlocked;
+    const canDel = isOwn || isAdmin;
     return `
     <div class="comment-item" id="ci_item_${c.id}">
       <div class="comment-avatar" style="${typeof getFoto==='function' && getFoto(c.author) ? 'padding:0;overflow:hidden;background:none;' : ''}">${typeof getFoto==='function' && getFoto(c.author) ? `<img src="${getFoto(c.author)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${c.author}">` : avatarLetter(c.author)}</div>
@@ -7721,7 +7996,7 @@ function renderPost(p) {
         <div class="comment-text">${escapeHtml(c.text)}</div>
         <div class="comment-time">${relativeTime(c.ts)}</div>
       </div>
-      ${isOwn ? `<button class="comment-del-btn" onclick="showDeleteCommentModal('${p.id}','${c.id}')" title="Apagar">🗑</button>` : ''}
+      ${canDel ? `<button class="comment-del-btn" onclick="showDeleteCommentModal('${p.id}','${c.id}')" title="Apagar">🗑</button>` : ''}
     </div>`;
   }).join('');
 
@@ -7743,21 +8018,16 @@ function renderPost(p) {
         </div>
         <div class="post-time">${timeStr}</div>
       </div>
-      <button class="reaction-add-btn" onclick="openReactPicker('${p.id}',this)" style="flex-shrink:0">+</button>
+
     </div>
     <div class="post-body">
       ${p.highlight ? `<div class="post-highlight">${p.highlight}</div>` : ''}
       <div class="post-text">${processText(p.text || '')}</div>
     </div>
     ${reactHtml ? `<div class="post-reactions">${reactHtml}</div>` : ''}
-    ${p.id !== 'auto_welcome' ? `<div class="post-comments-wrap">
+    ${p.id !== 'auto_welcome' && commentsHtml ? `<div class="post-comments-wrap">
       ${showMoreComments}
       ${commentsHtml}
-      <div class="comment-input-row">
-        <div class="comment-avatar" style="${typeof getFoto==='function' && user && getFoto(user) ? 'padding:0;overflow:hidden;background:none;' : ''}">${typeof getFoto==='function' && user && getFoto(user) ? `<img src="${getFoto(user)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : (user ? avatarLetter(user) : '?')}</div>
-        <input class="comment-input" id="ci_${p.id}" placeholder="Comenta..." type="text" maxlength="200" onkeydown="if(event.key==='Enter'){feedCommentSubmit('${p.id}');event.preventDefault()}">
-        <button class="comment-send-btn" onclick="feedCommentSubmit('${p.id}')">↑</button>
-      </div>
     </div>` : ''}
   </div>`;
 }
@@ -7962,6 +8232,23 @@ window.confirmDeleteComment = function() {
   feedToast('Comentário apagado', 'red');
 };
 
+
+// ── PIN POST ──
+window.feedTogglePin = function(postId) {
+  const post = feedPosts.find(p => p.id === postId);
+  if (!post) return;
+  post.pinned = !post.pinned;
+  // Re-sort pinned to top
+  feedPosts.sort((a,b) => {
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    return new Date(b.ts) - new Date(a.ts);
+  });
+  renderFeed();
+  feedApiCall({ action: 'pinPost', postId, pinned: post.pinned });
+  feedToast(post.pinned ? '📌 Post fixado!' : 'Post desafixado', 'gold');
+};
+
 // ── FILTER ──
 window.feedSetFilter = function(filter, btn) {
   feedFilter = filter;
@@ -8070,10 +8357,12 @@ if (typeof _origCarregarRanking === 'function') {
   window.carregarRanking = function() {
     const result = _origCarregarRanking.apply(this, arguments);
     setTimeout(() => {
+      mergeAutoEvents();
       if (document.getElementById('screen-feed').classList.contains('active')) {
-        mergeAutoEvents(); renderFeed();
+        renderFeed();
+        generateAutoFeedEvents();
       }
-    }, 2000);
+    }, 2500);
     return result;
   };
 }
@@ -8086,4 +8375,168 @@ document.addEventListener('feedDataUpdated', () => {
 });
 
 })(); // end IIFE
+</script>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- FEED FAB — Botão flutuante estilo WhatsApp              -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<style>
+#feedFab {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  right: 14px;
+  z-index: 8500;
+}
+#feedFabBtn {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #1a1410, #0d0d0d);
+  border: 1.5px solid rgba(201,168,76,0.45);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.55);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative;
+  -webkit-tap-highlight-color: transparent;
+  animation: fabGlow 3s ease-in-out infinite;
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+#feedFabBtn:active { transform: scale(0.9); }
+@keyframes fabGlow {
+  0%,100% { box-shadow: 0 4px 18px rgba(0,0,0,0.55); border-color: rgba(201,168,76,0.4); }
+  50%      { box-shadow: 0 4px 28px rgba(201,168,76,0.3), 0 0 0 3px rgba(201,168,76,0.07); border-color: rgba(201,168,76,0.85); }
+}
+#feedFabBtn.feed-open {
+  background: linear-gradient(135deg, #C9A84C, #a07820);
+  border-color: #C9A84C;
+  animation: none;
+  box-shadow: 0 4px 20px rgba(201,168,76,0.45);
+}
+#feedFabIcon { font-size: 21px; line-height: 1; display: block; }
+#feedFabBadge {
+  position: absolute; top: -5px; right: -5px;
+  min-width: 18px; height: 18px; padding: 0 4px;
+  background: #FF4444; color: #fff;
+  border-radius: 9px; border: 2px solid #080808;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  animation: badgePop 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes badgePop { from { transform: scale(0); } to { transform: scale(1); } }
+#screen-feed.active {
+  position: fixed !important;
+  top: 0 !important; left: 0 !important; right: 0 !important;
+  bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
+  z-index: 8000 !important;
+  background: var(--dark) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  animation: feedSlideIn 0.28s cubic-bezier(0.25,0.85,0.3,1) both;
+}
+@keyframes feedSlideIn {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+#feedHeaderClose {
+  width:34px; height:34px; border-radius:50%;
+  background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.55); font-size:16px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  -webkit-tap-highlight-color:transparent;
+}
+#feedHeaderClose:active { background:rgba(255,255,255,0.15); }
+</style>
+
+<div id="feedFab">
+  <button id="feedFabBtn" onclick="feedFabToggle()" aria-label="Feed">
+    <span id="feedFabIcon">💬</span>
+    <span id="feedFabBadge" style="display:none">0</span>
+  </button>
+</div>
+
+<script>
+// ── FEED FAB ──
+let _feedFabIsOpen = false;
+let _feedUnread = 0;
+let _feedPrevScreen = 'ranking';
+let _feedPrevBtn = null;
+
+function feedFabToggle() {
+  iniciarAudio && iniciarAudio();
+  _feedFabIsOpen ? _feedFabClose() : _feedFabOpenFn();
+}
+
+function _feedFabOpenFn() {
+  _feedFabIsOpen = true;
+  const activeScreen = document.querySelector('.screen.active:not(#screen-form):not(#screen-feed)');
+  if (activeScreen) _feedPrevScreen = activeScreen.id.replace('screen-','');
+  _feedPrevBtn = document.querySelector('.nav-btn.active');
+  document.querySelectorAll('.screen.active').forEach(s => { if (s.id !== 'screen-form') s.classList.remove('active'); });
+  document.getElementById('screen-feed').classList.add('active');
+  const btn = document.getElementById('feedFabBtn');
+  const icon = document.getElementById('feedFabIcon');
+  if (btn) btn.classList.add('feed-open');
+  if (icon) icon.textContent = '✕';
+  _feedUnread = 0;
+  _updateFeedBadge();
+  try { localStorage.setItem('feedLastSeen', new Date().toISOString()); } catch(e) {}
+  if (typeof feedInit === 'function') feedInit();
+  setTimeout(() => {
+    const header = document.querySelector('#screen-feed .feed-header > div:last-child');
+    if (header && !document.getElementById('feedHeaderClose')) {
+      const closeBtn = document.createElement('button');
+      closeBtn.id = 'feedHeaderClose';
+      closeBtn.innerHTML = '✕';
+      closeBtn.onclick = _feedFabClose;
+      header.insertBefore(closeBtn, header.firstChild);
+    }
+  }, 100);
+}
+
+function _feedFabClose() {
+  _feedFabIsOpen = false;
+  document.getElementById('screen-feed').classList.remove('active');
+  const btn = document.getElementById('feedFabBtn');
+  const icon = document.getElementById('feedFabIcon');
+  if (btn) btn.classList.remove('feed-open');
+  if (icon) icon.textContent = '💬';
+  const prevEl = document.getElementById('screen-' + _feedPrevScreen);
+  if (prevEl) prevEl.classList.add('active');
+  if (_feedPrevBtn) _feedPrevBtn.classList.add('active');
+  else {
+    const rb = document.getElementById('navBtnRanking');
+    if (rb) rb.classList.add('active');
+    const rs = document.getElementById('screen-ranking');
+    if (rs) rs.classList.add('active');
+  }
+}
+
+function _updateFeedBadge() {
+  const badge = document.getElementById('feedFabBadge');
+  if (!badge) return;
+  if (_feedUnread > 0) {
+    badge.textContent = _feedUnread > 9 ? '9+' : _feedUnread;
+    badge.style.display = 'flex';
+    badge.style.animation = 'none';
+    void badge.offsetWidth;
+    badge.style.animation = 'badgePop 0.35s cubic-bezier(0.34,1.56,0.64,1) both';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+window._feedAddUnread = function(n) {
+  if (_feedFabIsOpen) return;
+  _feedUnread = (_feedUnread || 0) + (n || 1);
+  _updateFeedBadge();
+};
+
+// Badge quando chega dados novos do ranking/dashboard
+const _origCarregarDashPatch = window.carregarDashboard;
+if (typeof _origCarregarDashPatch === 'function') {
+  window.carregarDashboard = async function() {
+    const r = await _origCarregarDashPatch.apply(this, arguments);
+    if (!_feedFabIsOpen) { _feedUnread = (_feedUnread||0)+1; _updateFeedBadge(); }
+    return r;
+  };
+}
 </script>
