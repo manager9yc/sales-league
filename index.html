@@ -7949,14 +7949,9 @@ function renderPost(p) {
       <div class="post-text">${processText(p.text || '')}</div>
     </div>
     ${reactHtml ? `<div class="post-reactions">${reactHtml}</div>` : ''}
-    ${p.id !== 'auto_welcome' ? `<div class="post-comments-wrap">
+    ${p.id !== 'auto_welcome' && commentsHtml ? `<div class="post-comments-wrap">
       ${showMoreComments}
       ${commentsHtml}
-      <div class="comment-input-row">
-        <div class="comment-avatar" style="${typeof getFoto==='function' && user && getFoto(user) ? 'padding:0;overflow:hidden;background:none;' : ''}">${typeof getFoto==='function' && user && getFoto(user) ? `<img src="${getFoto(user)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : (user ? avatarLetter(user) : '?')}</div>
-        <input class="comment-input" id="ci_${p.id}" placeholder="Comenta..." type="text" maxlength="200" onkeydown="if(event.key==='Enter'){feedCommentSubmit('${p.id}');event.preventDefault()}">
-        <button class="comment-send-btn" onclick="feedCommentSubmit('${p.id}')">↑</button>
-      </div>
     </div>` : ''}
   </div>`;
 }
