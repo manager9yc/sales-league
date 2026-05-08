@@ -8544,6 +8544,10 @@ function _feedFabClose() {
     const rs = document.getElementById('screen-ranking');
     if (rs) rs.classList.add('active');
   }
+  // Abrir o formulário de registo ao fechar o feed
+  if (typeof abrirFormOverlay === 'function') {
+    setTimeout(() => abrirFormOverlay(), 50);
+  }
 }
 
 function _updateFeedBadge() {
