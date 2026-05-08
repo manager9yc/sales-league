@@ -7968,11 +7968,16 @@ function renderFeed() {
   }
 
   if (!posts.length) {
-    list.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--muted)"><div style="font-size:28px;margin-bottom:8px">🏜️</div><div style="font-size:13px">Nada por aqui ainda</div></div>';
+    const emptyHTML = '<div style="text-align:center;padding:40px 20px;color:var(--muted)"><div style="font-size:28px;margin-bottom:8px">🏜️</div><div style="font-size:13px">Nada por aqui ainda</div></div>';
+    if (list.innerHTML !== emptyHTML) list.innerHTML = emptyHTML;
     return;
   }
 
-  list.innerHTML = posts.map(p => renderPost(p)).join('');
+  // Only re-render if posts actually changed (avoids flicker from frequent interval)
+  const newHTML = posts.map(p => renderPost(p)).join('');
+  if (list.dataset.lastHash === String(newHTML.length) + '_' + posts.map(p=>p.id+(p.reactions?Object.values(p.reactions).join(''):'')).join(',')) return;
+  list.dataset.lastHash = String(newHTML.length) + '_' + posts.map(p=>p.id+(p.reactions?Object.values(p.reactions).join(''):'')).join(',');
+  list.innerHTML = newHTML;
 
   // Welcome card: só aparece uma vez por sessão, desaparece após 10s
   const welcomeEl = document.getElementById('post_auto_welcome');
@@ -8517,8 +8522,6 @@ function _feedFabOpenFn() {
   const icon = document.getElementById('feedFabIcon');
   if (btn) btn.classList.add('feed-open');
   if (icon) icon.textContent = '✕';
-  const nav = document.getElementById('mainNav');
-  if (nav) { nav.style.transition = 'transform 0.3s ease, opacity 0.3s ease'; nav.style.transform = 'translateY(120%)'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
   _feedUnread = 0;
   _updateFeedBadge();
   try { localStorage.setItem('feedLastSeen', new Date().toISOString()); } catch(e) {}
@@ -8532,8 +8535,6 @@ function _feedFabClose() {
   const icon = document.getElementById('feedFabIcon');
   if (btn) btn.classList.remove('feed-open');
   if (icon) icon.textContent = '💬';
-  const nav = document.getElementById('mainNav');
-  if (nav) { nav.style.transform = ''; nav.style.opacity = ''; nav.style.pointerEvents = ''; }
   const prevEl = document.getElementById('screen-' + _feedPrevScreen);
   if (prevEl) prevEl.classList.add('active');
   if (_feedPrevBtn) _feedPrevBtn.classList.add('active');
