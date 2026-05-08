@@ -7939,10 +7939,7 @@ function renderPost(p) {
         </div>
         <div class="post-time">${timeStr}</div>
       </div>
-      <div style="display:flex;gap:4px;align-items:center;flex-shrink:0">
-        ${(user === p.author || (typeof adminUnlocked !== 'undefined' && adminUnlocked)) && p.type !== 'auto' ? `<button class="post-pin-btn" onclick="feedTogglePin('${p.id}')" title="${isPinned ? 'Desafixar' : 'Fixar'}" style="background:none;border:none;font-size:16px;cursor:pointer;padding:2px 4px;opacity:${isPinned ? '1' : '0.35'};-webkit-tap-highlight-color:transparent;">📌</button>` : ''}
-        <button class="reaction-add-btn" onclick="openReactPicker('${p.id}',this)">+</button>
-      </div>
+
     </div>
     <div class="post-body">
       ${p.highlight ? `<div class="post-highlight">${p.highlight}</div>` : ''}
