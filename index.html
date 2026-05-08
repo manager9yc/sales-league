@@ -486,13 +486,12 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .rank-table tbody tr.row-visible{opacity:1;transform:translateY(0);transition:none;}
 
 /* STREAK FIRE */
-.streak-fire { display:inline-block; animation: firePulse 0.9s ease-in-out infinite alternate; transform-origin: bottom center; cursor:default; }
-@keyframes firePulse {
-  0%   { transform: scaleY(1)    scaleX(1)    rotate(-2deg); filter: brightness(1);   }
-  25%  { transform: scaleY(1.15) scaleX(0.95) rotate(1deg);  filter: brightness(1.3); }
-  50%  { transform: scaleY(0.95) scaleX(1.05) rotate(-1deg); filter: brightness(1.1); }
-  75%  { transform: scaleY(1.1)  scaleX(0.97) rotate(2deg);  filter: brightness(1.4); }
-  100% { transform: scaleY(1.05) scaleX(1.02) rotate(-2deg); filter: brightness(1.2); }
+.streak-fire { display:inline-block; animation: rocketFloat 1.4s ease-in-out infinite; transform-origin: bottom center; cursor:default; }
+@keyframes rocketFloat {
+  0%   { transform: translateY(0px)  rotate(-8deg) scale(1);    filter: brightness(1); }
+  35%  { transform: translateY(-5px) rotate(0deg)  scale(1.12); filter: brightness(1.4) drop-shadow(0 0 5px rgba(255,107,0,0.7)); }
+  65%  { transform: translateY(-8px) rotate(8deg)  scale(1.08); filter: brightness(1.6) drop-shadow(0 0 9px rgba(255,140,0,0.9)); }
+  100% { transform: translateY(0px)  rotate(-8deg) scale(1);    filter: brightness(1); }
 }
 .streak-badge { display:inline-flex; align-items:center; gap:2px; background:rgba(255,107,0,0.15); border:1px solid rgba(255,107,0,0.4); border-radius:8px; padding:1px 5px; font-size:10px; font-weight:800; color:#FF6B00; letter-spacing:0.5px; vertical-align:middle; margin-left:4px; }
 
@@ -1344,10 +1343,10 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 </div>
 
 <!-- FORM BACKDROP -->
-<div id="formOverlayBackdrop" onclick="fecharFormOverlay()" style="display:none;position:fixed;inset:0;z-index:599;background:rgba(0,0,0,0.65);backdrop-filter:blur(2px)"></div>
+<div id="formOverlayBackdrop" onclick="fecharFormOverlay()" style="display:none;position:fixed;inset:0;z-index:799;background:rgba(0,0,0,0.65);backdrop-filter:blur(2px)"></div>
 
 <div class="nav" id="mainNav">
-  <button class="nav-btn" id="navBtnDesafios" onclick="goTo('desafios',this)"><span class="nav-icon">🎮</span><span>Jogos</span></button>
+  <button class="nav-btn" id="navBtnDesafios" onclick="goTo('desafios',this)"><span class="nav-icon">🏅</span><span>Jogos</span></button>
   <button class="nav-btn" id="navBtnRanking" onclick="goTo('ranking',this)"><span class="nav-icon">🏆</span><span>Ranking</span></button>
   <div style="position:relative;width:72px;flex-shrink:0;display:flex;align-items:center;justify-content:center">
     <button class="nav-center-btn" id="navCenterBtn" onclick="toggleFormOverlay()">+</button>
@@ -1357,7 +1356,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 </div>
 
 <!-- FORM -->
-<div class="screen" id="screen-form" style="position:fixed;bottom:0;left:0;right:0;z-index:600;border-radius:0;max-height:100dvh;overflow-y:auto;transform:translateY(110%);transition:transform 0.65s cubic-bezier(0.25,0.85,0.3,1);display:block!important;box-shadow:0 -8px 48px rgba(0,0,0,0.8);background:var(--dark)">
+<div class="screen" id="screen-form" style="position:fixed;bottom:0;left:0;right:0;z-index:800;border-radius:0;max-height:100dvh;overflow-y:auto;transform:translateY(110%);transition:transform 0.65s cubic-bezier(0.25,0.85,0.3,1);display:block!important;box-shadow:0 -8px 48px rgba(0,0,0,0.8);background:var(--dark)">
   <div style="display:flex;justify-content:center;padding:10px 0 2px"><div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.2)"></div></div>
   <div class="screen-banner">
     <div class="screen-banner-inner">
@@ -1786,6 +1785,9 @@ const minDate = `${ontem.getFullYear()}-${pad(ontem.getMonth()+1)}-${pad(ontem.g
 selecionarData('hoje');
 
 function goTo(screen, btn) {
+  if (typeof fecharFormOverlay === 'function' && typeof formOverlayOpen !== 'undefined' && formOverlayOpen) {
+    fecharFormOverlay();
+  }
   document.querySelectorAll('.screen').forEach(s => { if(s.id !== 'screen-form') s.classList.remove('active'); });
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   const _se=document.getElementById('screen-'+screen); if(_se) _se.classList.add('active'); else return;
@@ -2269,7 +2271,7 @@ function buildRows(sorted, key) {
       : `<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--orange);align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#fff;margin-right:8px;flex-shrink:0;vertical-align:middle">${nome.split(' ').map(x=>x[0]).slice(0,2).join('')}</span>`;
     const secaoVendedor = (()=>{ for(const e of equipas){ if(e.nomes&&e.nomes.includes(nome)) return e.label.replace(/^\S+\s/,''); } return ''; })();
     const streak = streakMap[nome] || 0;
-    const streakHtml = streak >= 3 ? `<span class="streak-badge"><span class="streak-fire">🔥</span>${streak}</span>` : '';
+    const streakHtml = streak >= 3 ? `<span class="streak-badge"><span class="streak-fire">🚀</span>${streak}</span>` : '';
     const fire1Html = i === 0 ? `<span class="rank-1-fire">🔥</span>` : '';
     // Rows 6-10 hidden by default
     const hiddenStyle = i >= 5 ? ' class="rank-extra" style="display:none"' : '';
@@ -2724,9 +2726,13 @@ function fecharSplash(){
   s.classList.add('out');
   setTimeout(()=>{
     s.classList.add('hidden');
-    const rankBtn = document.getElementById('navBtnRanking');
-    if(rankBtn) { goTo('ranking', rankBtn); }
-    setTimeout(() => abrirFormOverlay(), 50);
+    if (typeof feedFabToggle === 'function') {
+      feedFabToggle();
+    } else if (typeof feedInit === 'function') {
+      const feedScreen = document.getElementById('screen-feed');
+      if (feedScreen) feedScreen.classList.add('active');
+      feedInit();
+    }
   },600);
 }
 iniciarSplash();
@@ -7389,17 +7395,15 @@ window.feedInit = function() {
   if (!feedLoaded) {
     feedLoaded = true;
     feedLoad();
-    // Segunda passagem após dados carregarem
-    setTimeout(() => { generateAutoFeedEvents(); renderFeed(); }, 2000);
-    // Terceira passagem — para quando dashAllDados demora
-    setTimeout(() => { generateAutoFeedEvents(); renderFeed(); }, 5000);
-    // Auto-refresh every 30s while on feed screen
+    setTimeout(() => { mergeAutoEvents(); generateAutoFeedEvents(); renderFeed(); }, 400);
+    setTimeout(() => { mergeAutoEvents(); generateAutoFeedEvents(); renderFeed(); }, 1000);
+    setTimeout(() => { mergeAutoEvents(); generateAutoFeedEvents(); renderFeed(); }, 2000);
+    setTimeout(() => { mergeAutoEvents(); generateAutoFeedEvents(); renderFeed(); }, 4000);
     window._feedInterval = setInterval(() => {
       if (document.getElementById('screen-feed').classList.contains('active')) {
-        feedLoad();
-        generateAutoFeedEvents();
+        mergeAutoEvents(); generateAutoFeedEvents(); renderFeed();
       }
-    }, 30000);
+    }, 4000);
   } else {
     // Feed já foi carregado — só re-gerar eventos com dados actuais
     setTimeout(() => { generateAutoFeedEvents(); renderFeed(); }, 500);
@@ -7901,11 +7905,39 @@ function mergeAutoEvents() {
     }
 
   } else {
-    // Sem dados — evento de boas-vindas
+    // Sem dados — mostrar múltiplas notícias estáticas para o feed nunca abrir vazio
+    const now2 = new Date();
+    const mesLabel2 = now2.toLocaleDateString('pt-PT', {month:'long', year:'numeric'});
+    const diaLabel2 = now2.toLocaleDateString('pt-PT', {weekday:'long', day:'numeric', month:'long'});
     autoEvents.push(ev('auto_welcome','ranking',
       '👋 BEM-VINDOS AO BALNEÁRIO',
       'O feed atualiza automaticamente com eventos do ranking, medalhas, cofre e muito mais. Carrega o Ranking para começar! 🏆',
       'T07:00:00'
+    ));
+    autoEvents.push(ev('auto_static_1','ranking',
+      '📅 ' + diaLabel2.toUpperCase(),
+      'Hoje é ' + diaLabel2 + '. Novo dia, novas oportunidades de registo! Quem vai liderar hoje? 💪',
+      'T07:05:00'
+    ));
+    autoEvents.push(ev('auto_static_2','ranking',
+      '🏆 COMPETIÇÃO DO MÊS DE ' + (now2.toLocaleDateString('pt-PT',{month:'long'}).toUpperCase()),
+      'A corrida de ' + mesLabel2 + ' está em aberto! Regista as tuas vendas para entrares no ranking e conquistares medalhas. 🎯',
+      'T07:10:00'
+    ));
+    autoEvents.push(ev('auto_static_3','medals',
+      '🏅 COMO GANHAR MEDALHAS',
+      'Acumula registos nas categorias (Onlines, Sprays, Palmilhas, Camisolas...) para desbloquear medalhas mensais e ativar a Slot Machine! 🎰',
+      'T07:15:00'
+    ));
+    autoEvents.push(ev('auto_static_4','ranking',
+      '🔒 O COFRE ESTÁ À ESPERA',
+      'Os líderes de cada categoria têm tentativas para descobrir o código do cofre semanal. Lidera a tua categoria para teres essa chance! 💰',
+      'T07:20:00'
+    ));
+    autoEvents.push(ev('auto_static_5','ranking',
+      '📊 DICA: REGISTA TODOS OS DIAS',
+      'Consistência é tudo! Vendedores que registam diariamente sobem mais depressa no ranking e têm mais chances de medalhas. 📈',
+      'T07:25:00'
     ));
   }
 
@@ -8408,7 +8440,13 @@ document.addEventListener('feedDataUpdated', () => {
   background: linear-gradient(135deg, #C9A84C, #a07820);
   border-color: #C9A84C;
   animation: none;
-  box-shadow: 0 4px 20px rgba(201,168,76,0.45);
+  box-shadow: 0 4px 24px rgba(201,168,76,0.6), 0 0 0 3px rgba(201,168,76,0.15);
+}
+#feedFabBtn.feed-open #feedFabIcon {
+  font-size: 17px;
+  font-weight: 900;
+  color: #090909;
+  line-height: 1;
 }
 #feedFabIcon { font-size: 21px; line-height: 1; display: block; }
 #feedFabBadge {
@@ -8466,7 +8504,6 @@ function feedFabToggle() {
 }
 
 function _feedFabOpenFn() {
-  // Fechar o form de registo se estiver aberto
   if (typeof fecharFormOverlay === 'function' && typeof formOverlayOpen !== 'undefined' && formOverlayOpen) {
     fecharFormOverlay();
   }
@@ -8477,23 +8514,15 @@ function _feedFabOpenFn() {
   document.querySelectorAll('.screen.active').forEach(s => { if (s.id !== 'screen-form') s.classList.remove('active'); });
   document.getElementById('screen-feed').classList.add('active');
   const btn = document.getElementById('feedFabBtn');
+  const icon = document.getElementById('feedFabIcon');
   if (btn) btn.classList.add('feed-open');
-  // Ícone mantém-se 💬 — o X está no header do feed
+  if (icon) icon.textContent = '✕';
+  const nav = document.getElementById('mainNav');
+  if (nav) { nav.style.transition = 'transform 0.3s ease, opacity 0.3s ease'; nav.style.transform = 'translateY(120%)'; nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
   _feedUnread = 0;
   _updateFeedBadge();
   try { localStorage.setItem('feedLastSeen', new Date().toISOString()); } catch(e) {}
   if (typeof feedInit === 'function') feedInit();
-  // Injectar botão X no header (só uma vez)
-  setTimeout(() => {
-    const header = document.querySelector('#screen-feed .feed-header > div:last-child');
-    if (header && !document.getElementById('feedHeaderClose')) {
-      const closeBtn = document.createElement('button');
-      closeBtn.id = 'feedHeaderClose';
-      closeBtn.innerHTML = '✕';
-      closeBtn.onclick = _feedFabClose;
-      header.insertBefore(closeBtn, header.firstChild);
-    }
-  }, 100);
 }
 
 function _feedFabClose() {
@@ -8502,7 +8531,9 @@ function _feedFabClose() {
   const btn = document.getElementById('feedFabBtn');
   const icon = document.getElementById('feedFabIcon');
   if (btn) btn.classList.remove('feed-open');
-  // Ícone mantém-se 💬
+  if (icon) icon.textContent = '💬';
+  const nav = document.getElementById('mainNav');
+  if (nav) { nav.style.transform = ''; nav.style.opacity = ''; nav.style.pointerEvents = ''; }
   const prevEl = document.getElementById('screen-' + _feedPrevScreen);
   if (prevEl) prevEl.classList.add('active');
   if (_feedPrevBtn) _feedPrevBtn.classList.add('active');
