@@ -6707,7 +6707,7 @@ function cofreRefreshDados() {
   const proxy = 'https://corsproxy.io/?' + encodeURIComponent(url);
 
   // Também buscar estados dos jogadores das Sheets (cross-device)
-  const cofreFeedUrl = 'https://script.google.com/macros/s/AKfycbxZ7J7wCftImXw40mXQ7fM-DBMLOngZe9a95liYQ3Q4qaBSnYWot8gDiFqxzIB5cPFEwQ/exec';
+  const cofreFeedUrl = 'https://script.google.com/macros/s/AKfycbynMupMy_AmdB0Q8AzzN2ndA68coQg_DdEjNaDzE_PpWVf2M1kKvZr0Zi9tPpg-hYXSjg/exec';
   const weekKey = getMondayKeyPersist();
   fetch(cofreFeedUrl + '?action=getCofrePlayers&weekKey=' + weekKey, {cache:'no-store'})
     .then(r => r.json())
