@@ -6592,7 +6592,7 @@ function savePlayerState(nome, data) {
   // Guardar também nas Sheets para sincronização entre dispositivos
   const weekKey = getMondayKeyPersist();
   const payload = { action: 'setCofrePlayer', weekKey, nome, data: JSON.stringify(data) };
-  const url = 'https://script.google.com/macros/s/AKfycbxZ7J7wCftImXw40mXQ7fM-DBMLOngZe9a95liYQ3Q4qaBSnYWot8gDiFqxzIB5cPFEwQ/exec';
+  const url = 'https://script.google.com/macros/s/AKfycbyoYJM1sQ2vuJ80F7894yLdUgxhgJI0FoEMuFa606g2mElZ8kS3XW7t_z1EhY7-vjnBpg/exec';
   try {
     fetch(url, { method:'POST', body: JSON.stringify(payload), mode:'no-cors' }).catch(()=>{});
   } catch(e) {}
@@ -6707,7 +6707,7 @@ function cofreRefreshDados() {
   const proxy = 'https://corsproxy.io/?' + encodeURIComponent(url);
 
   // Também buscar estados dos jogadores das Sheets (cross-device)
-  const cofreFeedUrl = 'https://script.google.com/macros/s/AKfycbynMupMy_AmdB0Q8AzzN2ndA68coQg_DdEjNaDzE_PpWVf2M1kKvZr0Zi9tPpg-hYXSjg/exec';
+  const cofreFeedUrl = 'https://script.google.com/macros/s/AKfycbyoYJM1sQ2vuJ80F7894yLdUgxhgJI0FoEMuFa606g2mElZ8kS3XW7t_z1EhY7-vjnBpg/exec';
   const weekKey = getMondayKeyPersist();
   fetch(cofreFeedUrl + '?action=getCofrePlayers&weekKey=' + weekKey, {cache:'no-store'})
     .then(r => r.json())
@@ -7568,7 +7568,7 @@ window.cofreSom = cofreSom;
 (function() {
 
 // ── CONFIG ──
-const FEED_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZ7J7wCftImXw40mXQ7fM-DBMLOngZe9a95liYQ3Q4qaBSnYWot8gDiFqxzIB5cPFEwQ/exec';
+const FEED_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyoYJM1sQ2vuJ80F7894yLdUgxhgJI0FoEMuFa606g2mElZ8kS3XW7t_z1EhY7-vjnBpg/exec';
 const REACTIONS_LIST = ['🔥','💪','😂','👑','🤙','💀'];
 
 // ── USER IDENTITY ──
