@@ -2350,25 +2350,24 @@ function secDiv(icon, title) {
 // ── FILTRO SEMANAL RANKING ──
 let _rankFilter = 'mes'; // 'mes' | 'semana_N'
 
+function _localDateStr(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+
 function _getSemanaAnterior() {
-  // Devolve semana atual e semana anterior, ambas dom→sab
+  // Devolve semana atual e semana anterior, ambas dom→sab, em hora local (sem UTC)
   const now = new Date();
   const diaSemana = now.getDay(); // 0=Dom ... 6=Sab
 
-  // Domingo da semana atual
-  const domAtual = new Date(now);
-  domAtual.setDate(now.getDate() - diaSemana);
-  domAtual.setHours(0,0,0,0);
+  // Domingo da semana atual em hora local
+  const domAtual = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diaSemana);
+  const sabAtual  = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diaSemana + 6);
 
-  // Sábado da semana atual
-  const sabAtual = new Date(domAtual);
-  sabAtual.setDate(domAtual.getDate() + 6);
-
-  // Domingo da semana anterior
-  const domAnterior = new Date(domAtual);
-  domAnterior.setDate(domAtual.getDate() - 7);
-  const sabAnterior = new Date(domAnterior);
-  sabAnterior.setDate(domAnterior.getDate() + 6);
+  // Domingo da semana anterior em hora local
+  const domAnterior = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diaSemana - 7);
+  const sabAnterior  = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diaSemana - 1);
 
   return [
     { dom: domAtual,    sab: sabAtual,    label: '🔥 Esta semana' },
@@ -2381,8 +2380,8 @@ function _buildWeekChips() {
   if (!wrap) return;
   const semanas = _getSemanaAnterior();
   wrap.innerHTML = semanas.map(s => {
-    const domStr = s.dom.toISOString().slice(0,10);
-    const sabStr = s.sab.toISOString().slice(0,10);
+    const domStr = _localDateStr(s.dom);
+    const sabStr = _localDateStr(s.sab);
     const key = 'semana_' + domStr;
     const datas = s.dom.getDate() + '/' + (s.dom.getMonth()+1) + ' – ' + s.sab.getDate() + '/' + (s.sab.getMonth()+1);
     return `<button class="rank-filter-chip${_rankFilter===key?' active':''}" onclick="setRankFilter('${key}',this)" data-dom="${domStr}" data-sab="${sabStr}">${s.label} <span style="opacity:0.65;font-size:11px">${datas}</span></button>`;
@@ -2986,44 +2985,6 @@ atualizarMesLabels();
   window.addEventListener('online', updateOfflineIndicator);
   window.addEventListener('offline', updateOfflineIndicator);
   updateOfflineIndicator();
-})();
-
-// ── SWIPE LATERAL ENTRE MENUS ──
-(function() {
-  const SCREENS = ['desafios', 'ranking', 'dash', 'info'];
-  const BTN_IDS  = ['navBtnDesafios', 'navBtnRanking', 'navBtnDash', 'navBtnInfo'];
-  let tsX = 0, tsY = 0, tId = null;
-
-  function currentIdx() {
-    return SCREENS.findIndex(s => {
-      const el = document.getElementById('screen-' + s);
-      return el && el.classList.contains('active');
-    });
-  }
-
-  document.addEventListener('touchstart', function(e) {
-    // Ignore if form is open, swipe-btn, or modals
-    if (document.getElementById('screen-form')?.style.transform === 'translateY(0)') return;
-    if (e.target.closest('#swipeBtnWrap,#slotOverlay,.modal-overlay,.pin-overlay')) return;
-    const t = e.touches[0];
-    tsX = t.clientX; tsY = t.clientY; tId = t.identifier;
-  }, { passive: true });
-
-  document.addEventListener('touchend', function(e) {
-    const t = [...e.changedTouches].find(t => t.identifier === tId);
-    if (!t) return;
-    const dx = t.clientX - tsX;
-    const dy = t.clientY - tsY;
-    // Only horizontal swipes (dx bigger than dy, and > 55px)
-    if (Math.abs(dx) < 55 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
-    const idx = currentIdx();
-    if (idx < 0) return;
-    let next = idx + (dx < 0 ? 1 : -1); // swipe left → next, swipe right → prev
-    next = Math.max(0, Math.min(SCREENS.length - 1, next));
-    if (next === idx) return;
-    const btn = document.getElementById(BTN_IDS[next]);
-    goTo(SCREENS[next], btn);
-  }, { passive: true });
 })();
 
 // ── HOLD TO REPEAT ──
@@ -6602,16 +6563,22 @@ function loadPlayerState(nome) {
 function savePlayerState(nome, data) {
   // Guardar localmente
   try { localStorage.setItem(playerPersistKey(nome), JSON.stringify(data)); } catch(e) {}
-  // Guardar nas Sheets para sincronização entre dispositivos
+  // Guardar nas Sheets via GET (params) — funciona com no-cors sem precisar de CORS headers
   const weekKey = getMondayKeyPersist();
-  const payload = { action: 'setCofrePlayer', weekKey, nome, data: JSON.stringify(data) };
-  const url = 'https://script.google.com/macros/s/AKfycbyoYJM1sQ2vuJ80F7894yLdUgxhgJI0FoEMuFa606g2mElZ8kS3XW7t_z1EhY7-vjnBpg/exec';
-  const proxy = 'https://corsproxy.io/?' + encodeURIComponent(url);
-  // Tenta direto (no-cors), depois proxy com CORS
-  fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload), mode:'no-cors' })
+  const base = 'https://script.google.com/macros/s/AKfycbyoYJM1sQ2vuJ80F7894yLdUgxhgJI0FoEMuFa606g2mElZ8kS3XW7t_z1EhY7-vjnBpg/exec';
+  const params = new URLSearchParams({
+    action: 'setCofrePlayer',
+    weekKey,
+    nome,
+    data: JSON.stringify(data)
+  });
+  const urlGet = base + '?' + params.toString();
+  // Tenta GET direto (no-cors não precisa CORS headers)
+  fetch(urlGet, { mode: 'no-cors', cache: 'no-store' })
     .catch(() => {
-      fetch(proxy, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) })
-        .catch(()=>{});
+      // Fallback: proxy com CORS completo
+      const proxy = 'https://corsproxy.io/?' + encodeURIComponent(urlGet);
+      fetch(proxy, { cache: 'no-store' }).catch(() => {});
     });
 }
 function getWeekNum() {
