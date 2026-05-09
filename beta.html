@@ -486,28 +486,38 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .rank-table tbody tr.row-visible{opacity:1;transform:translateY(0);transition:none;}
 
 /* STREAK FIRE */
-.streak-fire { display:inline-block; animation: rocketBoost 1.2s ease-in-out infinite; transform-origin: bottom center; cursor:default; }
-@keyframes rocketBoost {
-  0%   { transform: translateY(0)     rotate(-8deg)  scale(1);    filter: brightness(1);   }
-  25%  { transform: translateY(-4px)  rotate(0deg)   scale(1.15); filter: brightness(1.3); }
-  50%  { transform: translateY(-8px)  rotate(8deg)   scale(1.1);  filter: brightness(1.5) drop-shadow(0 0 6px rgba(255,107,0,0.8)); }
-  75%  { transform: translateY(-3px)  rotate(-4deg)  scale(1.05); filter: brightness(1.2); }
-  100% { transform: translateY(0)     rotate(-8deg)  scale(1);    filter: brightness(1);   }
+.streak-fire { display:inline-block; animation: rocketFloat 1.4s ease-in-out infinite; transform-origin: bottom center; cursor:default; }
+@keyframes rocketFloat {
+  0%   { transform: translateY(0px)  rotate(-8deg) scale(1);    filter: brightness(1); }
+  35%  { transform: translateY(-5px) rotate(0deg)  scale(1.12); filter: brightness(1.4) drop-shadow(0 0 5px rgba(255,107,0,0.7)); }
+  65%  { transform: translateY(-8px) rotate(8deg)  scale(1.08); filter: brightness(1.6) drop-shadow(0 0 9px rgba(255,140,0,0.9)); }
+  100% { transform: translateY(0px)  rotate(-8deg) scale(1);    filter: brightness(1); }
 }
 .streak-badge { display:inline-flex; align-items:center; gap:2px; background:rgba(255,107,0,0.15); border:1px solid rgba(255,107,0,0.4); border-radius:8px; padding:1px 5px; font-size:10px; font-weight:800; color:#FF6B00; letter-spacing:0.5px; vertical-align:middle; margin-left:4px; }
 
-/* ROCKET #1 em cada categoria do ranking */
-.rank-1-fire { display:inline-block; animation: rocket1Launch 0.9s ease-in-out infinite; transform-origin: bottom center; margin-left:5px; font-size:16px; }
-@keyframes rocket1Launch {
-  0%   { transform: translateY(0)     rotate(-10deg) scale(1);    filter: drop-shadow(0 0 4px rgba(255,107,0,0.5))  brightness(1);   }
-  30%  { transform: translateY(-6px)  rotate(0deg)   scale(1.2);  filter: drop-shadow(0 0 12px rgba(255,107,0,0.9)) brightness(1.5); }
-  60%  { transform: translateY(-11px) rotate(10deg)  scale(1.1);  filter: drop-shadow(0 0 18px rgba(255,140,0,1))   brightness(1.7); }
-  100% { transform: translateY(0)     rotate(-10deg) scale(1);    filter: drop-shadow(0 0 4px rgba(255,107,0,0.5))  brightness(1);   }
+/* FIRE #1 em cada categoria do ranking */
+.rank-1-fire { display:inline-block; animation: fire1Burn 0.7s ease-in-out infinite alternate; transform-origin: bottom center; margin-left:5px; font-size:16px; }
+@keyframes fire1Burn {
+  0%   { transform: scaleY(1)    scaleX(1)    rotate(-3deg); filter: drop-shadow(0 0 3px #FF6B00) brightness(1);   }
+  30%  { transform: scaleY(1.2)  scaleX(0.93) rotate(2deg);  filter: drop-shadow(0 0 8px #FF8C00) brightness(1.4); }
+  60%  { transform: scaleY(0.93) scaleX(1.07) rotate(-2deg); filter: drop-shadow(0 0 5px #FF6B00) brightness(1.2); }
+  100% { transform: scaleY(1.12) scaleX(0.96) rotate(3deg);  filter: drop-shadow(0 0 10px #FFA500) brightness(1.5); }
 }
 
 /* NAV TAP BURST */
 @keyframes navTap { 0%{transform:scale(1)} 30%{transform:scale(1.35)} 60%{transform:scale(0.92)} 100%{transform:scale(1)} }
 .nav-icon-tap { animation: navTap 0.38s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+/* RANK FILTER CHIPS */
+#rankFilterWrap::-webkit-scrollbar { display:none; }
+.rank-filter-chip {
+  background:var(--card);border:1px solid var(--border);border-radius:100px;
+  padding:5px 14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;
+  font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);
+  white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:all 0.15s;flex-shrink:0;
+}
+.rank-filter-chip.active { background:rgba(201,168,76,0.15);border-color:#C9A84C;color:#C9A84C; }
 
 /* RANKING POPUP SUBIU */
 @keyframes slideUpBounce { 0%{transform:translateY(60px);opacity:0} 70%{transform:translateY(-6px)} 100%{transform:translateY(0);opacity:1} }
@@ -1344,10 +1354,10 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 </div>
 
 <!-- FORM BACKDROP -->
-<div id="formOverlayBackdrop" onclick="fecharFormOverlay()" style="display:none;position:fixed;inset:0;z-index:9099;background:rgba(0,0,0,0.65);backdrop-filter:blur(2px)"></div>
+<div id="formOverlayBackdrop" onclick="fecharFormOverlay()" style="display:none;position:fixed;inset:0;z-index:799;background:rgba(0,0,0,0.65);backdrop-filter:blur(2px)"></div>
 
 <div class="nav" id="mainNav">
-  <button class="nav-btn" id="navBtnDesafios" onclick="goTo('desafios',this)"><span class="nav-icon">🎮</span><span>Jogos</span></button>
+  <button class="nav-btn" id="navBtnDesafios" onclick="goTo('desafios',this)"><span class="nav-icon">🏅</span><span>Jogos</span></button>
   <button class="nav-btn" id="navBtnRanking" onclick="goTo('ranking',this)"><span class="nav-icon">🏆</span><span>Ranking</span></button>
   <div style="position:relative;width:72px;flex-shrink:0;display:flex;align-items:center;justify-content:center">
     <button class="nav-center-btn" id="navCenterBtn" onclick="toggleFormOverlay()">+</button>
@@ -1357,7 +1367,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 </div>
 
 <!-- FORM -->
-<div class="screen" id="screen-form" style="position:fixed;bottom:0;left:0;right:0;z-index:9100;border-radius:0;max-height:100dvh;overflow-y:auto;transform:translateY(110%);transition:transform 0.65s cubic-bezier(0.25,0.85,0.3,1);display:block!important;box-shadow:0 -8px 48px rgba(0,0,0,0.8);background:var(--dark)">
+<div class="screen" id="screen-form" style="position:fixed;bottom:0;left:0;right:0;z-index:800;border-radius:0;max-height:100dvh;overflow-y:auto;transform:translateY(110%);transition:transform 0.65s cubic-bezier(0.25,0.85,0.3,1);display:block!important;box-shadow:0 -8px 48px rgba(0,0,0,0.8);background:var(--dark)">
   <div style="display:flex;justify-content:center;padding:10px 0 2px"><div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.2)"></div></div>
   <div class="screen-banner">
     <div class="screen-banner-inner">
@@ -1511,6 +1521,13 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
     </div>
 
   <div style="text-align:center;padding:2px 16px 0;font-size:11px;color:var(--muted);letter-spacing:1px" id="rankLastUpdate"></div>
+
+  <!-- FILTRO MENSAL/SEMANAL -->
+  <div id="rankFilterWrap" style="padding:8px 12px 4px;display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;">
+    <button id="rankFilterMes" onclick="setRankFilter('mes',this)" class="rank-filter-chip active">📅 Mês</button>
+    <div id="rankWeekChips" style="display:flex;gap:6px;flex-shrink:0"></div>
+  </div>
+
   <div id="liderBannerWrap"></div>
   <div class="rank-main" id="rankMain"></div>
 <div class="record-toast" id="recordToast"></div>
@@ -1786,6 +1803,9 @@ const minDate = `${ontem.getFullYear()}-${pad(ontem.getMonth()+1)}-${pad(ontem.g
 selecionarData('hoje');
 
 function goTo(screen, btn) {
+  if (typeof fecharFormOverlay === 'function' && typeof formOverlayOpen !== 'undefined' && formOverlayOpen) {
+    fecharFormOverlay();
+  }
   document.querySelectorAll('.screen').forEach(s => { if(s.id !== 'screen-form') s.classList.remove('active'); });
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   const _se=document.getElementById('screen-'+screen); if(_se) _se.classList.add('active'); else return;
@@ -2270,7 +2290,7 @@ function buildRows(sorted, key) {
     const secaoVendedor = (()=>{ for(const e of equipas){ if(e.nomes&&e.nomes.includes(nome)) return e.label.replace(/^\S+\s/,''); } return ''; })();
     const streak = streakMap[nome] || 0;
     const streakHtml = streak >= 3 ? `<span class="streak-badge"><span class="streak-fire">🚀</span>${streak}</span>` : '';
-    const fire1Html = i === 0 ? `<span class="rank-1-fire">🚀</span>` : '';
+    const fire1Html = i === 0 ? `<span class="rank-1-fire">🔥</span>` : '';
     // Rows 6-10 hidden by default
     const hiddenStyle = i >= 5 ? ' class="rank-extra" style="display:none"' : '';
     return `<tr${hiddenStyle}>
@@ -2327,8 +2347,84 @@ function secDiv(icon, title) {
 }
 
 
+// ── FILTRO SEMANAL RANKING ──
+let _rankFilter = 'mes'; // 'mes' | 'semana_N'
+
+function _getSemanas() {
+  // Gera as semanas do mês atual (dom→sab), da mais recente para a mais antiga
+  const now = new Date();
+  const ano = now.getFullYear();
+  const mes = now.getMonth();
+  const semanas = [];
+  // Primeiro dia do mês
+  const d = new Date(ano, mes, 1);
+  // Avança até ao início da primeira semana (domingo anterior ou próprio dia)
+  while (d.getDay() !== 0) d.setDate(d.getDate() - 1);
+  // Gera semanas enquanto não ultrapassar o mês
+  while (true) {
+    const domingo = new Date(d);
+    const sabado = new Date(d); sabado.setDate(sabado.getDate() + 6);
+    // Só inclui semanas que têm algum dia no mês atual
+    if (domingo.getMonth() > mes && domingo.getFullYear() >= ano) break;
+    semanas.push({ dom: new Date(domingo), sab: new Date(sabado) });
+    d.setDate(d.getDate() + 7);
+    if (d.getMonth() > mes && d.getFullYear() >= ano) break;
+  }
+  return semanas.reverse(); // mais recente primeiro
+}
+
+function _buildWeekChips() {
+  const wrap = document.getElementById('rankWeekChips');
+  if (!wrap) return;
+  const semanas = _getSemanas();
+  const now = new Date();
+  wrap.innerHTML = semanas.map((s, i) => {
+    const isCurrentWeek = now >= s.dom && now <= s.sab;
+    const label = (isCurrentWeek ? '🔥 ' : '') + s.dom.getDate() + '/' + (s.dom.getMonth()+1) + ' – ' + s.sab.getDate() + '/' + (s.sab.getMonth()+1);
+    const key = 'semana_' + s.dom.toISOString().slice(0,10);
+    return `<button class="rank-filter-chip${_rankFilter===key?' active':''}" onclick="setRankFilter('${key}',this)" data-dom="${s.dom.toISOString().slice(0,10)}" data-sab="${s.sab.toISOString().slice(0,10)}">${label}</button>`;
+  }).join('');
+}
+
+function setRankFilter(key, btn) {
+  _rankFilter = key;
+  document.querySelectorAll('.rank-filter-chip').forEach(c => c.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  _buildWeekChips();
+  if (key === 'mes') {
+    document.getElementById('rankFilterMes').classList.add('active');
+    if (window._rankingCache) renderRanking(window._rankingCache);
+  } else {
+    // Filtrar dashAllDados pela semana selecionada
+    const chip = document.querySelector(`[data-dom="${key.replace('semana_','')}"]`);
+    if (!chip) return;
+    const dom = chip.dataset.dom;
+    const sab = chip.dataset.sab;
+    _renderRankingPorSemana(dom, sab);
+  }
+}
+
+function _renderRankingPorSemana(domStr, sabStr) {
+  const fonte = dashAllDados.length ? dashAllDados : (window._rankingCache || []);
+  if (!fonte.length) { showToast('📊 Carrega o ranking primeiro'); return; }
+  const agg = {};
+  fonte.forEach(d => {
+    const data = (d.data || '').slice(0,10);
+    if (data < domStr || data > sabStr) return;
+    if (!agg[d.nome]) agg[d.nome] = {nome:d.nome, equipa:d.equipa||'', onlines:0, sprays:0, palmilhas:0, camisolas:0, sacos:0, garrafas:0, elogios:0, szclub:0};
+    categorias.forEach(cat => { agg[d.nome][cat.key] += (d[cat.key]||0); });
+  });
+  const dadosSemana = Object.values(agg);
+  renderRanking(dadosSemana, true);
+}
+
+let _rankingIsSemana = false;
+
 let _rankingAbort = null;
 async function carregarRanking() {
+  // Construir chips de semana sempre que o ranking é carregado
+  _buildWeekChips();
+
   // Cancel any in-flight fetch from previous load
   if (_rankingAbort) { _rankingAbort.abort(); }
   _rankingAbort = new AbortController();
@@ -2374,7 +2470,12 @@ async function carregarRanking() {
     if (Array.isArray(result) && result.length) {
       window._rankingCache = result;
       try { localStorage.setItem('rankingCache', JSON.stringify(result)); localStorage.setItem('rankingCacheTime', Date.now().toString()); } catch(e2) {}
-      if (!signal.aborted) { renderRanking(result); }
+      if (!signal.aborted) {
+        if (_rankFilter === 'mes') {
+          renderRanking(result);
+        }
+        // Se filtro de semana ativo, não sobrescreve a vista semanal com dados mensais
+      }
       const elU = document.getElementById('rankLastUpdate');
       if (elU && !signal.aborted) elU.textContent = '✓ Atualizado agora';
     }
@@ -2386,7 +2487,13 @@ async function carregarRanking() {
       const td = await r.json();
       if (!signal.aborted && Array.isArray(td)) {
         dashAllDados = normalizarDatasArray(td);
-        if (!signal.aborted) renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []);
+        if (!signal.aborted && _rankFilter === 'mes') {
+          renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []);
+        } else if (!signal.aborted && _rankFilter !== 'mes') {
+          // Re-aplicar filtro semanal com dados frescos
+          const chip = document.querySelector('.rank-filter-chip.active[data-dom]');
+          if (chip) _renderRankingPorSemana(chip.dataset.dom, chip.dataset.sab);
+        }
       }
     } catch(e) {}
   }
@@ -2411,7 +2518,7 @@ function verificarMedalhasRanking() {
   // Desativado: medalhas só aparecem para o vendedor que acabou de registar
 }
 
-function renderRanking(dados) {
+function renderRanking(dados, isSemana) {
   const rm = document.getElementById('rankMain');
   if (!rm) return;
 
@@ -2424,6 +2531,16 @@ function renderRanking(dados) {
 
   // Build ALL html off-DOM in one go, then write once — no flicker
   let html = '';
+
+  // Contexto semanal
+  if (isSemana || (_rankFilter && _rankFilter !== 'mes')) {
+    const chip = document.querySelector('.rank-filter-chip.active[data-dom]');
+    if (chip) {
+      const domD = new Date(chip.dataset.dom+'T12:00:00').toLocaleDateString('pt-PT',{day:'numeric',month:'short'});
+      const sabD = new Date(chip.dataset.sab+'T12:00:00').toLocaleDateString('pt-PT',{day:'numeric',month:'short'});
+      html += `<div style="margin:0 12px 4px;padding:8px 14px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C9A84C;text-align:center">📅 Semana ${domD} – ${sabD}</div>`;
+    }
+  }
 
   // Ranking por produto
   html += secDiv('🎯', 'Ranking por Produto');
@@ -2686,6 +2803,24 @@ function mostrarProgressoRegisto(nome, payload) {
 
 
 // ── SPLASH ──
+// Limpeza de medalhas inválidas: remove "Favorito" do Dário Santos (era teste, foi apagada no Sheets)
+(function _limparMedalhasInvalidas() {
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k || !k.startsWith('medalhasCache_')) continue;
+      const cache = JSON.parse(localStorage.getItem(k) || '{}');
+      let changed = false;
+      if (cache['Dário Santos']) {
+        const antes = cache['Dário Santos'].length;
+        cache['Dário Santos'] = cache['Dário Santos'].filter(m => m.name !== 'Favorito');
+        if (cache['Dário Santos'].length !== antes) changed = true;
+      }
+      if (changed) localStorage.setItem(k, JSON.stringify(cache));
+    }
+  } catch(e) {}
+})();
+
 let splashProg = 0, splashIv = null;
 function iniciarSplash() {
 
@@ -2724,9 +2859,13 @@ function fecharSplash(){
   s.classList.add('out');
   setTimeout(()=>{
     s.classList.add('hidden');
-    const rankBtn = document.getElementById('navBtnRanking');
-    if(rankBtn) { goTo('ranking', rankBtn); }
-    setTimeout(() => abrirFormOverlay(), 50);
+    if (typeof feedFabToggle === 'function') {
+      feedFabToggle();
+    } else if (typeof feedInit === 'function') {
+      const feedScreen = document.getElementById('screen-feed');
+      if (feedScreen) feedScreen.classList.add('active');
+      feedInit();
+    }
   },600);
 }
 iniciarSplash();
@@ -6417,7 +6556,7 @@ function syncCofreJackpot() {
 // SUPER LIGA — O COFRE  (versão demo)
 // ══════════════════════════════════════════════
 
-const ADMIN_PIN_COFRE = '1313';
+const ADMIN_PIN_COFRE = '1011';
 const CODE_LENGTH = 4;
 const MAX_ATTEMPTS = 3;
 const WEEKLY_ADD = 2.00;
@@ -6448,7 +6587,15 @@ function loadPlayerState(nome) {
   try { return JSON.parse(localStorage.getItem(playerPersistKey(nome)) || '{}'); } catch(e) { return {}; }
 }
 function savePlayerState(nome, data) {
+  // Guardar localmente
   try { localStorage.setItem(playerPersistKey(nome), JSON.stringify(data)); } catch(e) {}
+  // Guardar também nas Sheets para sincronização entre dispositivos
+  const weekKey = getMondayKeyPersist();
+  const payload = { action: 'setCofrePlayer', weekKey, nome, data: JSON.stringify(data) };
+  const url = 'https://script.google.com/macros/s/AKfycbxZ7J7wCftImXw40mXQ7fM-DBMLOngZe9a95liYQ3Q4qaBSnYWot8gDiFqxzIB5cPFEwQ/exec';
+  try {
+    fetch(url, { method:'POST', body: JSON.stringify(payload), mode:'no-cors' }).catch(()=>{});
+  } catch(e) {}
 }
 function getWeekNum() {
   const d = new Date(); const jan1 = new Date(d.getFullYear(),0,1);
@@ -6558,6 +6705,44 @@ function cofreRefreshDados() {
   const sheetsUrl = 'https://script.google.com/macros/s/AKfycbxpnTHL-_VI1WrxzVD5H5uSciwJZHVGHW__jH0I4JBMjYBfzxQAcAK0oKFU8728OzJQ/exec';
   const url = sheetsUrl + '?action=getTodos';
   const proxy = 'https://corsproxy.io/?' + encodeURIComponent(url);
+
+  // Também buscar estados dos jogadores das Sheets (cross-device)
+  const cofreFeedUrl = 'https://script.google.com/macros/s/AKfycbxZ7J7wCftImXw40mXQ7fM-DBMLOngZe9a95liYQ3Q4qaBSnYWot8gDiFqxzIB5cPFEwQ/exec';
+  const weekKey = getMondayKeyPersist();
+  fetch(cofreFeedUrl + '?action=getCofrePlayers&weekKey=' + weekKey, {cache:'no-store'})
+    .then(r => r.json())
+    .then(players => {
+      if (Array.isArray(players)) {
+        players.forEach(p => {
+          if (!p.nome || !p.data) return;
+          try {
+            const pData = typeof p.data === 'string' ? JSON.parse(p.data) : p.data;
+            // Só aplica se o estado das sheets for mais restritivo (usedThisWeek ou mais tentativas)
+            const localKey = playerPersistKey(p.nome);
+            let localState = {};
+            try { localState = JSON.parse(localStorage.getItem(localKey) || '{}'); } catch(e2) {}
+            const merged = {
+              attempts: Math.max(pData.attempts || 0, localState.attempts || 0),
+              usedThisWeek: (pData.usedThisWeek || false) || (localState.usedThisWeek || false)
+            };
+            localStorage.setItem(localKey, JSON.stringify(merged));
+          } catch(e) {}
+        });
+        syncPlayersFromLocalStorage();
+        renderEligibility();
+        if (currentPlayer) {
+          const persisted = loadPlayerState(currentPlayer.nome);
+          const pidx = state.top3.findIndex(p => p.nome === currentPlayer.nome);
+          if (pidx >= 0) {
+            state.top3[pidx].attempts = persisted.attempts || 0;
+            state.top3[pidx].usedThisWeek = persisted.usedThisWeek || false;
+            currentPlayer = state.top3[pidx];
+            renderVaultStatus();
+          }
+        }
+      }
+    })
+    .catch(() => {}); // silencioso se action não existir ainda no script
 
   const normalize = arr => arr.map(r => {
     if (r && r.data && typeof r.data === 'string' && (r.data.includes('T') || r.data.includes('Z'))) {
@@ -6728,6 +6913,17 @@ function onPlayerChange() {
     existing.attempts = persisted.attempts || 0;
     existing.usedThisWeek = persisted.usedThisWeek || false;
     currentPlayer = existing;
+
+    // Carregar código específico deste jogador (muda a cada tentativa)
+    if (!state.playerCodes) state.playerCodes = {};
+    const pKey = currentPlayer.nome + '_' + getMondayKeyPersist();
+    if (state.playerCodes[pKey]) {
+      state.secretCode = state.playerCodes[pKey];
+    } else if (currentPlayer.attempts > 0) {
+      // Já tentou — gerar código para este jogador baseado nas tentativas actuais
+      _rotateCodeForPlayer(currentPlayer.nome, currentPlayer.attempts);
+    }
+    // Se 0 tentativas, usa o código global da semana (state.secretCode original)
   }
   currentEntry = '';
   sessionAttempts = [];
@@ -6883,10 +7079,39 @@ function submitAttempt() {
       attempts: currentPlayer.attempts,
       usedThisWeek: currentPlayer.usedThisWeek
     });
+    // Mudar código após cada tentativa falhada de um jogador
+    // O código é único por jogador+semana+tentativa, para que outros jogadores vejam código diferente
+    _rotateCodeForPlayer(currentPlayer.nome, currentPlayer.attempts);
     saveState();
     renderEligibility();
     renderVaultStatus();
   }
+}
+
+// Gera um código determinístico baseado no nome do jogador, semana e nº de tentativas
+// Assim cada jogador vê sempre um código diferente, mas o código não muda ao reabrir o cofre
+function _rotateCodeForPlayer(nome, attempts) {
+  const weekKey = getMondayKeyPersist();
+  // Guarda o código actual antes de rodar
+  if (!state.playerCodes) state.playerCodes = {};
+  const pKey = nome + '_' + weekKey;
+  // Gerar novo código pseudoaleatório mas determinístico
+  let hash = 0;
+  const seed = pKey + '_att_' + attempts;
+  for (let i = 0; i < seed.length; i++) {
+    hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+  }
+  hash = Math.abs(hash);
+  let code = '';
+  code += ((hash % 9) + 1).toString(); // primeiro dígito 1-9
+  hash = Math.floor(hash / 9);
+  for (let i = 1; i < CODE_LENGTH; i++) {
+    code += (hash % 10).toString();
+    hash = Math.floor(hash / 10);
+    if (hash === 0) hash = Math.abs((i * 73856093 + attempts * 19349663) | 0) + 1;
+  }
+  state.playerCodes[pKey] = code;
+  state.secretCode = code;
 }
 
 function gradeGuess(guess, secret) {
@@ -7389,17 +7614,15 @@ window.feedInit = function() {
   if (!feedLoaded) {
     feedLoaded = true;
     feedLoad();
-    // Segunda passagem após dados carregarem
-    setTimeout(() => { mergeAutoEvents(); generateAutoFeedEvents(); renderFeed(); }, 800);
-    // Terceira passagem — para quando dashAllDados demora
-    setTimeout(() => { mergeAutoEvents(); generateAutoFeedEvents(); renderFeed(); }, 2500);
-    // Auto-refresh every 30s while on feed screen
+    setTimeout(() => { mergeAutoEvents(); generateAutoFeedEvents(); renderFeed(); }, 400);
+    setTimeout(() => { mergeAutoEvents(); generateAutoFeedEvents(); renderFeed(); }, 1000);
+    setTimeout(() => { mergeAutoEvents(); generateAutoFeedEvents(); renderFeed(); }, 2000);
+    setTimeout(() => { mergeAutoEvents(); generateAutoFeedEvents(); renderFeed(); }, 4000);
     window._feedInterval = setInterval(() => {
       if (document.getElementById('screen-feed').classList.contains('active')) {
-        feedLoad();
-        generateAutoFeedEvents();
+        mergeAutoEvents(); generateAutoFeedEvents(); renderFeed();
       }
-    }, 30000);
+    }, 4000);
   } else {
     // Feed já foi carregado — só re-gerar eventos com dados actuais
     setTimeout(() => { generateAutoFeedEvents(); renderFeed(); }, 500);
@@ -7555,8 +7778,8 @@ function generateAutoFeedEvents() {
     const p = todayRanking[0];
     const frases = [
       `${p.nome} está em modo turbo hoje com ${p.total} registos. 🔥`,
-      `${p.nome.split(' ')[0]} lidera o dia! ${p.total} registos até agora. Quem chega perto? 👀`,
-      `Atenção ao ${p.nome.split(' ')[0]}! ${p.total} registos hoje. Alguém quer responder? 💪`,
+      `${p.nome} lidera o dia! ${p.total} registos até agora. Quem chega perto? 👀`,
+      `Atenção a ${p.nome}! ${p.total} registos hoje. Alguém quer responder? 💪`,
     ];
     tryPost('lider_dia', makeAutoPost(
       'auto_lider_dia_' + today, 'ranking',
@@ -7576,7 +7799,7 @@ function generateAutoFeedEvents() {
           'auto_ultrapass_' + atual.nome.replace(/\s/g,'_') + '_' + today,
           'ranking',
           '📈 IMINENTE: ' + atual.nome.split(' ')[0].toUpperCase(),
-          `${atual.nome.split(' ')[0]} está a apenas ${diff === 0 ? 'empatar' : diff + ' registo(s) de ultrapassar'} ${acima.nome.split(' ')[0]} no ranking geral! Vai acontecer? 🤔`
+          `${atual.nome} está a apenas ${diff === 0 ? 'empatar' : diff + ' registo(s) de ultrapassar'} ${acima.nome} no ranking geral! Vai acontecer? 🤔`
         ));
         break;
       }
@@ -7601,9 +7824,9 @@ function generateAutoFeedEvents() {
     }
     if (diasSem >= 2) {
       const msgs = [
-        `${nome.split(' ')[0]} desapareceu! ${diasSem} dias úteis sem registo. Tudo bem? 😅`,
-        `${diasSem} dias sem ver ${nome.split(' ')[0]} nos registos... férias não avisadas? 😂`,
-        `${nome.split(' ')[0]}, o ranking sente a tua falta há ${diasSem} dias! 👀`,
+        `${nome} desapareceu! ${diasSem} dias úteis sem registo. Tudo bem? 😅`,
+        `${diasSem} dias sem ver ${nome} nos registos... férias não avisadas? 😂`,
+        `${nome}, o ranking sente a tua falta há ${diasSem} dias! 👀`,
       ];
       tryPost('nosales_' + nome.replace(/\s/g,''), makeAutoPost(
         'auto_nosales_' + nome.replace(/\s/g,'_') + '_' + today,
@@ -7648,7 +7871,7 @@ function generateAutoFeedEvents() {
               'auto_medal_prox_' + r.nome.replace(/\s/g,'_') + '_' + m.name.replace(/\s/g,'_') + '_' + today,
               'medals',
               '🏅 ' + r.nome.split(' ')[0].toUpperCase() + ' QUASE LÁ!',
-              `${r.nome.split(' ')[0]} está a apenas ${faltam} de conquistar a medalha ${m.icon} ${m.name}! Vai com tudo! 🔥`
+              `${r.nome} está a apenas ${faltam} de conquistar a medalha ${m.icon} ${m.name}! Vai com tudo! 🔥`
             ));
           }
         });
@@ -7673,7 +7896,7 @@ function generateAutoFeedEvents() {
   // ── EVENT: PÓDIO DO MÊS ──
   if (ranking.length >= 3) {
     const mesLabel = now.toLocaleDateString('pt-PT', {month:'long'});
-    const podio = ranking.slice(0,3).map((r,i)=>['🥇','🥈','🥉'][i]+' '+r.nome.split(' ')[0]+' — '+r.total+' pts').join(' · ');
+    const podio = ranking.slice(0,3).map((r,i)=>['🥇','🥈','🥉'][i]+' '+r.nome+' — '+r.total+' pts').join(' · ');
     tryPost('podium_' + today.slice(0,7), makeAutoPost(
       'auto_podium_' + today.slice(0,7),
       'ranking',
@@ -7734,7 +7957,7 @@ function mergeAutoEvents() {
       autoEvents.push(ev('auto_leader_month','ranking',
         '🏆 ' + ranking[0].nome.split(' ')[0].toUpperCase() + ' LIDERA O MÊS',
         ranking[0].nome + ' está no topo com ' + ranking[0].total + ' registos este mês.' +
-        (diff !== null ? (diff > 5 ? ' Margem confortável de ' + diff + ' pontos sobre ' + segundo.nome.split(' ')[0] + '.' : ' ' + segundo.nome.split(' ')[0] + ' está só a ' + diff + ' de distância! 🔥') : ''),
+        (diff !== null ? (diff > 5 ? ' Margem confortável de ' + diff + ' pontos sobre ' + segundo.nome + '.' : ' ' + segundo.nome + ' está só a ' + diff + ' de distância! 🔥') : ''),
         'T09:00:00'
       ));
     }
@@ -7745,7 +7968,7 @@ function mergeAutoEvents() {
       for (let i = 0; i < Math.min(ranking.length-1, 4); i++) {
         const diff = ranking[i].total - ranking[i+1].total;
         if (diff <= 3 && diff >= 0) {
-          pares.push(ranking[i].nome.split(' ')[0] + ' (' + ranking[i].total + ') vs ' + ranking[i+1].nome.split(' ')[0] + ' (' + ranking[i+1].total + ')');
+          pares.push(ranking[i].nome + ' (' + ranking[i].total + ') vs ' + ranking[i+1].nome + ' (' + ranking[i+1].total + ')');
         }
       }
       if (pares.length) {
@@ -7762,7 +7985,7 @@ function mergeAutoEvents() {
       autoEvents.push(ev('auto_leader_today','ranking',
         '⚡ LÍDER DE HOJE: ' + todayRanking[0].nome.split(' ')[0].toUpperCase(),
         todayRanking[0].nome + ' já tem ' + todayRanking[0].total + ' registos hoje!' +
-        (todayRanking[1] ? ' ' + todayRanking[1].nome.split(' ')[0] + ' está a ' + (todayRanking[0].total - todayRanking[1].total) + ' atrás.' : ' O resto da equipa a dormir? 😴'),
+        (todayRanking[1] ? ' ' + todayRanking[1].nome + ' está a ' + (todayRanking[0].total - todayRanking[1].total) + ' atrás.' : ' O resto da equipa a dormir? 😴'),
         'T08:30:00'
       ));
     }
@@ -7770,7 +7993,7 @@ function mergeAutoEvents() {
     // ── 4. RESUMO DO DIA ──
     if (todayRanking.length) {
       const totalHoje = todayRanking.reduce((s,p)=>s+p.total,0);
-      const nomes = todayRanking.slice(0,3).map(p=>p.nome.split(' ')[0]+'('+p.total+')').join(' · ');
+      const nomes = todayRanking.slice(0,3).map(p=>p.nome+'('+p.total+')').join(' · ');
       autoEvents.push(ev('auto_today_summary_'+today,'ranking',
         '📊 RESUMO DE ' + new Date(today+'T12:00:00').toLocaleDateString('pt-PT',{weekday:'long'}).toUpperCase(),
         totalHoje + ' registos no total hoje. Destaques: ' + nomes + '. 💪',
@@ -7780,7 +8003,7 @@ function mergeAutoEvents() {
 
     // ── 5. SEM REGISTOS HOJE ──
     const comRegistos = new Set(Object.keys(todayAgg));
-    const semHoje = allNames.filter(n => !comRegistos.has(n) && agg[n] && agg[n].total > 0).map(n=>n.split(' ')[0]);
+    const semHoje = allNames.filter(n => !comRegistos.has(n) && agg[n] && agg[n].total > 0);
     if (semHoje.length) {
       const msgs = ['Acordem! 😅','O que se passa? 🤔','Vão ao trabalho! 😂','Toca a trabalhar! 💀'];
       const msg = msgs[Math.floor(today.slice(-1) % msgs.length)];
@@ -7804,7 +8027,7 @@ function mergeAutoEvents() {
         const ganhouHoje = (todayAgg[atual.nome]||{total:0}).total;
         const anteriorHoje = (todayAgg[anterior.nome]||{total:0}).total;
         if (ganhouHoje > anteriorHoje + 2) {
-          subidas.push(atual.nome.split(' ')[0] + ' está a ganhar terreno a ' + anterior.nome.split(' ')[0]);
+          subidas.push(atual.nome + ' está a ganhar terreno a ' + anterior.nome);
         }
       }
       if (subidas.length) {
@@ -7822,7 +8045,7 @@ function mergeAutoEvents() {
       if (!sorted.length) return;
       autoEvents.push(ev('auto_cat_'+k,'ranking', null,
         catEmojis[k] + ' ' + catLabels[k] + ': ' + sorted[0].nome + ' lidera com ' + sorted[0][k] +
-        (sorted[1] ? ' · ' + sorted[1].nome.split(' ')[0] + ' em 2.º com ' + sorted[1][k] : '') + ' 🔥',
+        (sorted[1] ? ' · ' + sorted[1].nome + ' em 2.º com ' + sorted[1][k] : '') + ' 🔥',
         'T07:30:00'
       ));
     });
@@ -7844,9 +8067,9 @@ function mergeAutoEvents() {
       }
       if (diasSem >= 3) {
         const mensagens = [
-          nome.split(' ')[0] + ' não regista há ' + diasSem + ' dias úteis. Está tudo bem? 🤔',
-          nome.split(' ')[0] + ' desapareceu do radar há ' + diasSem + ' dias. SOS! 📡',
-          diasSem + ' dias sem ver ' + nome.split(' ')[0] + ' nos registos... voltou de férias sem avisar? 😅'
+          nome + ' não regista há ' + diasSem + ' dias úteis. Está tudo bem? 🤔',
+          nome + ' desapareceu do radar há ' + diasSem + ' dias. SOS! 📡',
+          diasSem + ' dias sem ver ' + nome + ' nos registos... voltou de férias sem avisar? 😅'
         ];
         autoEvents.push(ev('auto_nosales_'+nome.replace(/\s/g,'_'),  'ranking', null,
           mensagens[diasSem % mensagens.length], 'T10:30:00'
@@ -7892,7 +8115,7 @@ function mergeAutoEvents() {
 
     // ── 11. TOP 3 GERAL — pódio ──
     if (ranking.length >= 3) {
-      const podio = ['🥇','🥈','🥉'].map((m,i)=> m + ' ' + ranking[i].nome.split(' ')[0] + ' — ' + ranking[i].total).join('\n');
+      const podio = ['🥇','🥈','🥉'].map((m,i)=> m + ' ' + ranking[i].nome + ' — ' + ranking[i].total).join('\n');
       autoEvents.push(ev('auto_podium_'+today.slice(0,7),'ranking',
         '🏟️ PÓDIO DO MÊS',
         podio,
@@ -7901,11 +8124,39 @@ function mergeAutoEvents() {
     }
 
   } else {
-    // Sem dados — evento de boas-vindas
+    // Sem dados — mostrar múltiplas notícias estáticas para o feed nunca abrir vazio
+    const now2 = new Date();
+    const mesLabel2 = now2.toLocaleDateString('pt-PT', {month:'long', year:'numeric'});
+    const diaLabel2 = now2.toLocaleDateString('pt-PT', {weekday:'long', day:'numeric', month:'long'});
     autoEvents.push(ev('auto_welcome','ranking',
       '👋 BEM-VINDOS AO BALNEÁRIO',
       'O feed atualiza automaticamente com eventos do ranking, medalhas, cofre e muito mais. Carrega o Ranking para começar! 🏆',
       'T07:00:00'
+    ));
+    autoEvents.push(ev('auto_static_1','ranking',
+      '📅 ' + diaLabel2.toUpperCase(),
+      'Hoje é ' + diaLabel2 + '. Novo dia, novas oportunidades de registo! Quem vai liderar hoje? 💪',
+      'T07:05:00'
+    ));
+    autoEvents.push(ev('auto_static_2','ranking',
+      '🏆 COMPETIÇÃO DO MÊS DE ' + (now2.toLocaleDateString('pt-PT',{month:'long'}).toUpperCase()),
+      'A corrida de ' + mesLabel2 + ' está em aberto! Regista as tuas vendas para entrares no ranking e conquistares medalhas. 🎯',
+      'T07:10:00'
+    ));
+    autoEvents.push(ev('auto_static_3','medals',
+      '🏅 COMO GANHAR MEDALHAS',
+      'Acumula registos nas categorias (Onlines, Sprays, Palmilhas, Camisolas...) para desbloquear medalhas mensais e ativar a Slot Machine! 🎰',
+      'T07:15:00'
+    ));
+    autoEvents.push(ev('auto_static_4','ranking',
+      '🔒 O COFRE ESTÁ À ESPERA',
+      'Os líderes de cada categoria têm tentativas para descobrir o código do cofre semanal. Lidera a tua categoria para teres essa chance! 💰',
+      'T07:20:00'
+    ));
+    autoEvents.push(ev('auto_static_5','ranking',
+      '📊 DICA: REGISTA TODOS OS DIAS',
+      'Consistência é tudo! Vendedores que registam diariamente sobem mais depressa no ranking e têm mais chances de medalhas. 📈',
+      'T07:25:00'
     ));
   }
 
@@ -7936,11 +8187,16 @@ function renderFeed() {
   }
 
   if (!posts.length) {
-    list.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--muted)"><div style="font-size:28px;margin-bottom:8px">🏜️</div><div style="font-size:13px">Nada por aqui ainda</div></div>';
+    const emptyHTML = '<div style="text-align:center;padding:40px 20px;color:var(--muted)"><div style="font-size:28px;margin-bottom:8px">🏜️</div><div style="font-size:13px">Nada por aqui ainda</div></div>';
+    if (list.innerHTML !== emptyHTML) list.innerHTML = emptyHTML;
     return;
   }
 
-  list.innerHTML = posts.map(p => renderPost(p)).join('');
+  // Only re-render if posts actually changed (avoids flicker from frequent interval)
+  const newHTML = posts.map(p => renderPost(p)).join('');
+  if (list.dataset.lastHash === String(newHTML.length) + '_' + posts.map(p=>p.id+(p.reactions?Object.values(p.reactions).join(''):'')).join(',')) return;
+  list.dataset.lastHash = String(newHTML.length) + '_' + posts.map(p=>p.id+(p.reactions?Object.values(p.reactions).join(''):'')).join(',');
+  list.innerHTML = newHTML;
 
   // Welcome card: só aparece uma vez por sessão, desaparece após 10s
   const welcomeEl = document.getElementById('post_auto_welcome');
@@ -8408,7 +8664,13 @@ document.addEventListener('feedDataUpdated', () => {
   background: linear-gradient(135deg, #C9A84C, #a07820);
   border-color: #C9A84C;
   animation: none;
-  box-shadow: 0 4px 20px rgba(201,168,76,0.45);
+  box-shadow: 0 4px 24px rgba(201,168,76,0.6), 0 0 0 3px rgba(201,168,76,0.15);
+}
+#feedFabBtn.feed-open #feedFabIcon {
+  font-size: 17px;
+  font-weight: 900;
+  color: #090909;
+  line-height: 1;
 }
 #feedFabIcon { font-size: 21px; line-height: 1; display: block; }
 #feedFabBadge {
@@ -8426,7 +8688,7 @@ document.addEventListener('feedDataUpdated', () => {
   position: fixed !important;
   top: 0 !important; left: 0 !important; right: 0 !important;
   bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
-  z-index: 8000 !important;
+  z-index: 500 !important;
   background: var(--dark) !important;
   display: flex !important;
   flex-direction: column !important;
@@ -8466,6 +8728,9 @@ function feedFabToggle() {
 }
 
 function _feedFabOpenFn() {
+  if (typeof fecharFormOverlay === 'function' && typeof formOverlayOpen !== 'undefined' && formOverlayOpen) {
+    fecharFormOverlay();
+  }
   _feedFabIsOpen = true;
   const activeScreen = document.querySelector('.screen.active:not(#screen-form):not(#screen-feed)');
   if (activeScreen) _feedPrevScreen = activeScreen.id.replace('screen-','');
@@ -8480,7 +8745,6 @@ function _feedFabOpenFn() {
   _updateFeedBadge();
   try { localStorage.setItem('feedLastSeen', new Date().toISOString()); } catch(e) {}
   if (typeof feedInit === 'function') feedInit();
-  // Sem botão X extra no header — o FAB já mostra ✕ quando aberto
 }
 
 function _feedFabClose() {
@@ -8498,6 +8762,10 @@ function _feedFabClose() {
     if (rb) rb.classList.add('active');
     const rs = document.getElementById('screen-ranking');
     if (rs) rs.classList.add('active');
+  }
+  // Abrir o formulário de registo ao fechar o feed
+  if (typeof abrirFormOverlay === 'function') {
+    setTimeout(() => abrirFormOverlay(), 50);
   }
 }
 
@@ -8520,22 +8788,6 @@ window._feedAddUnread = function(n) {
   _feedUnread = (_feedUnread || 0) + (n || 1);
   _updateFeedBadge();
 };
-
-// Mostrar badge assim que o ranking carregar
-(function() {
-  const _origRank = window.carregarRanking;
-  if (typeof _origRank === 'function') {
-    window.carregarRanking = async function() {
-      const r = await _origRank.apply(this, arguments);
-      if (!_feedFabIsOpen) { _feedUnread = (_feedUnread||0)+1; _updateFeedBadge(); }
-      return r;
-    };
-  }
-  // Badge inicial após 2s (posts auto já gerados)
-  setTimeout(function() {
-    if (!_feedFabIsOpen && _feedUnread === 0) { _feedUnread = 1; _updateFeedBadge(); }
-  }, 2000);
-})();
 
 // Badge quando chega dados novos do ranking/dashboard
 const _origCarregarDashPatch = window.carregarDashboard;
