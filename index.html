@@ -2370,7 +2370,7 @@ function _getSemanaAnterior() {
   const sabAnterior  = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diaSemana - 1);
 
   return [
-    { dom: domAtual,    sab: sabAtual,    label: '🔥 Esta semana' },
+    { dom: domAtual,    sab: sabAtual,    label: '📅 Esta semana' },
     { dom: domAnterior, sab: sabAnterior, label: '📆 Semana anterior' }
   ];
 }
@@ -2383,8 +2383,7 @@ function _buildWeekChips() {
     const domStr = _localDateStr(s.dom);
     const sabStr = _localDateStr(s.sab);
     const key = 'semana_' + domStr;
-    const datas = s.dom.getDate() + '/' + (s.dom.getMonth()+1) + ' – ' + s.sab.getDate() + '/' + (s.sab.getMonth()+1);
-    return `<button class="rank-filter-chip${_rankFilter===key?' active':''}" onclick="setRankFilter('${key}',this)" data-dom="${domStr}" data-sab="${sabStr}">${s.label} <span style="opacity:0.65;font-size:11px">${datas}</span></button>`;
+    return `<button class="rank-filter-chip${_rankFilter===key?' active':''}" onclick="setRankFilter('${key}',this)" data-dom="${domStr}" data-sab="${sabStr}">${s.label}</button>`;
   }).join('');
 }
 
@@ -2397,12 +2396,39 @@ function setRankFilter(key, btn) {
     document.getElementById('rankFilterMes').classList.add('active');
     if (window._rankingCache) renderRanking(window._rankingCache);
   } else {
-    // Filtrar dashAllDados pela semana selecionada
     const chip = document.querySelector(`[data-dom="${key.replace('semana_','')}"]`);
     if (!chip) return;
     const dom = chip.dataset.dom;
     const sab = chip.dataset.sab;
-    _renderRankingPorSemana(dom, sab);
+    // Se já há dados em memória, renderiza imediatamente
+    if (dashAllDados.length) {
+      _renderRankingPorSemana(dom, sab);
+    } else {
+      // Tenta cache localStorage
+      try {
+        const cached = localStorage.getItem('todosCache');
+        const cachedTime = parseInt(localStorage.getItem('todosCacheTime')||'0');
+        if (cached && (Date.now() - cachedTime) < 30*60*1000) {
+          dashAllDados = normalizarDatasArray(JSON.parse(cached));
+          _renderRankingPorSemana(dom, sab);
+          return; // render imediato, não espera rede
+        }
+      } catch(e) {}
+      // Sem cache — mostra spinner e faz fetch
+      const rm = document.getElementById('rankMain');
+      if (rm) rm.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted);font-family:\'Barlow Condensed\',sans-serif;letter-spacing:2px">A CARREGAR...</div>';
+      const sheetsUrl = 'https://script.google.com/macros/s/AKfycbxpnTHL-_VI1WrxzVD5H5uSciwJZHVGHW__jH0I4JBMjYBfzxQAcAK0oKFU8728OzJQ/exec';
+      const proxy = 'https://corsproxy.io/?' + encodeURIComponent(sheetsUrl + '?action=getTodos');
+      fetch(proxy, {cache:'no-store'})
+        .then(r => r.json())
+        .then(td => {
+          if (Array.isArray(td)) {
+            dashAllDados = normalizarDatasArray(td);
+            try { localStorage.setItem('todosCache', JSON.stringify(td)); localStorage.setItem('todosCacheTime', Date.now().toString()); } catch(e) {}
+            if (_rankFilter === key) _renderRankingPorSemana(dom, sab);
+          }
+        }).catch(() => { if (rm) rm.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted);font-family:\'Barlow Condensed\',sans-serif;letter-spacing:2px">Erro a carregar dados</div>'; });
+    }
   }
 }
 
@@ -2418,6 +2444,8 @@ function _renderRankingPorSemana(domStr, sabStr) {
   });
   const dadosSemana = Object.values(agg);
   renderRanking(dadosSemana, true);
+  // Guardar em localStorage para a próxima vez
+  try { localStorage.setItem('todosCache', JSON.stringify(fonte)); localStorage.setItem('todosCacheTime', Date.now().toString()); } catch(e) {}
 }
 
 let _rankingIsSemana = false;
@@ -2485,14 +2513,20 @@ async function carregarRanking() {
 
   if (!dashAllDados.length && !signal.aborted) {
     try {
-      const r = await fetch(SHEETS_URL + '?action=getTodos', {signal});
-      const td = await r.json();
+      const todosUrl = SHEETS_URL + '?action=getTodos';
+      const todosProxy = 'https://corsproxy.io/?' + encodeURIComponent(todosUrl);
+      const td = await Promise.race([
+        fetch(todosUrl, {signal}).then(r=>r.json()).catch(()=>Promise.reject()),
+        fetch(todosProxy, {signal}).then(r=>r.json()).catch(()=>Promise.reject()),
+        new Promise((_,reject) => setTimeout(()=>reject('timeout'), 8000))
+      ]);
       if (!signal.aborted && Array.isArray(td)) {
         dashAllDados = normalizarDatasArray(td);
+        // Guardar em localStorage para acesso instantâneo no filtro semanal
+        try { localStorage.setItem('todosCache', JSON.stringify(td)); localStorage.setItem('todosCacheTime', Date.now().toString()); } catch(e2) {}
         if (!signal.aborted && _rankFilter === 'mes') {
           renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []);
         } else if (!signal.aborted && _rankFilter !== 'mes') {
-          // Re-aplicar filtro semanal com dados frescos
           const chip = document.querySelector('.rank-filter-chip.active[data-dom]');
           if (chip) _renderRankingPorSemana(chip.dataset.dom, chip.dataset.sab);
         }
@@ -5993,7 +6027,7 @@ function renderDesafiosMedalhas() {
   <!-- POSTS LIST -->
   <div class="feed-list" id="feedList">
     <div style="text-align:center;padding:40px 20px;color:var(--muted)">
-      <div style="font-size:32px;margin-bottom:12px">💬</div>
+      <div style="font-size:32px;margin-bottom:12px">🔔</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff;margin-bottom:6px">O BALNEÁRIO</div>
       <div style="font-size:13px;line-height:1.5">A carregar...</div>
     </div>
@@ -6900,36 +6934,82 @@ function onPlayerChange() {
   const sel = document.getElementById('playerSelect');
   const elegiveis = getCofreElegiveis();
   currentPlayer = elegiveis.find(p=>p.nome===sel.value) || null;
-  if (currentPlayer) {
-    // Carregar estado persistido do localStorage para este vendedor e semana
-    const persisted = loadPlayerState(currentPlayer.nome);
-    let existing = state.top3.find(p=>p.nome===currentPlayer.nome);
-    if (!existing) {
-      existing = {nome:currentPlayer.nome, score:0, attempts:0, usedThisWeek:false};
-      state.top3.push(existing);
-    }
-    // Sobrescrever com dados persistidos (mais fiáveis que o state em memória)
-    existing.attempts = persisted.attempts || 0;
-    existing.usedThisWeek = persisted.usedThisWeek || false;
-    currentPlayer = existing;
-
-    // Carregar código específico deste jogador (muda a cada tentativa)
-    if (!state.playerCodes) state.playerCodes = {};
-    const pKey = currentPlayer.nome + '_' + getMondayKeyPersist();
-    if (state.playerCodes[pKey]) {
-      state.secretCode = state.playerCodes[pKey];
-    } else if (currentPlayer.attempts > 0) {
-      // Já tentou — gerar código para este jogador baseado nas tentativas actuais
-      _rotateCodeForPlayer(currentPlayer.nome, currentPlayer.attempts);
-    }
-    // Se 0 tentativas, usa o código global da semana (state.secretCode original)
+  if (!currentPlayer) {
+    currentEntry = '';
+    sessionAttempts = [];
+    updateComboDisplay();
+    renderVaultStatus();
+    document.getElementById('attemptsList').innerHTML = '';
+    document.getElementById('attemptsLabel').style.display = 'none';
+    return;
   }
+
+  // Mostrar estado do localStorage imediatamente (sem esperar rede)
+  _aplicarEstadoJogador(currentPlayer.nome);
+
+  // Buscar estado atualizado do servidor (fonte de verdade)
+  const weekKey = getMondayKeyPersist();
+  const base = 'https://script.google.com/macros/s/AKfycbyoYJM1sQ2vuJ80F7894yLdUgxhgJI0FoEMuFa606g2mElZ8kS3XW7t_z1EhY7-vjnBpg/exec';
+  const url = `${base}?action=getCofrePlayers&weekKey=${weekKey}`;
+  const proxy = 'https://corsproxy.io/?' + encodeURIComponent(url);
+
+  function aplicarDoServidor(players) {
+    if (!Array.isArray(players)) return;
+    // Atualizar localStorage com dados do servidor
+    players.forEach(p => {
+      if (!p.nome) return;
+      try {
+        const pData = typeof p.data === 'string' ? JSON.parse(p.data) : (p.data || {});
+        const localKey = playerPersistKey(p.nome);
+        let localState = {};
+        try { localState = JSON.parse(localStorage.getItem(localKey) || '{}'); } catch(e2) {}
+        const merged = {
+          attempts:     Math.max(pData.attempts || 0, localState.attempts || 0),
+          usedThisWeek: (pData.usedThisWeek || false) || (localState.usedThisWeek || false)
+        };
+        localStorage.setItem(localKey, JSON.stringify(merged));
+      } catch(e) {}
+    });
+    // Re-aplicar estado do jogador atual com dados frescos do servidor
+    if (currentPlayer && currentPlayer.nome === sel.value) {
+      _aplicarEstadoJogador(currentPlayer.nome);
+    }
+    // Atualizar lista de elegíveis visualmente
+    renderEligibility();
+  }
+
+  fetch(url, {cache:'no-store'})
+    .then(r => r.json())
+    .then(aplicarDoServidor)
+    .catch(() => fetch(proxy, {cache:'no-store'}).then(r=>r.json()).then(aplicarDoServidor).catch(()=>{}));
+
   currentEntry = '';
   sessionAttempts = [];
-  updateComboDisplay();
-  renderVaultStatus();
   document.getElementById('attemptsList').innerHTML = '';
   document.getElementById('attemptsLabel').style.display = 'none';
+}
+
+function _aplicarEstadoJogador(nome) {
+  const persisted = loadPlayerState(nome);
+  let existing = state.top3.find(p => p.nome === nome);
+  if (!existing) {
+    existing = {nome, score:0, attempts:0, usedThisWeek:false};
+    state.top3.push(existing);
+  }
+  existing.attempts = persisted.attempts || 0;
+  existing.usedThisWeek = persisted.usedThisWeek || false;
+  currentPlayer = existing;
+
+  // Código específico deste jogador
+  if (!state.playerCodes) state.playerCodes = {};
+  const pKey = nome + '_' + getMondayKeyPersist();
+  if (state.playerCodes[pKey]) {
+    state.secretCode = state.playerCodes[pKey];
+  } else if (existing.attempts > 0) {
+    _rotateCodeForPlayer(nome, existing.attempts);
+  }
+  updateComboDisplay();
+  renderVaultStatus();
 }
 
 // ── ELIGIBILITY ──
@@ -7722,17 +7802,18 @@ function feedLoad() {
 // ── AUTO-GENERATE EVENTS FROM RANKING DATA ──
 
 // ── AUTO EVENTS → SHEETS ──
-// Generates contextual auto posts and saves them to Sheets (once per session per event)
+// Generates contextual auto posts and saves them to Sheets
+// Frequência: por bloco de 2 horas (em vez de 1x por dia)
 function generateAutoFeedEvents() {
   const todos = window.dashAllDados || [];
   if (!todos.length) return;
   const now = new Date();
   const today = now.toISOString().slice(0,10);
+  const bloco2h = today + '_h' + Math.floor(now.getHours() / 2); // muda a cada 2 horas
   const mesAtual = now.getMonth();
   const anoAtual = now.getFullYear();
   const cats = ['onlines','sprays','palmilhas','camisolas','sacos','garrafas','elogios','szclub'];
 
-  // Aggregate month
   const agg = {};
   const todayAgg = {};
   todos.forEach(d => {
@@ -7750,62 +7831,106 @@ function generateAutoFeedEvents() {
   const ranking = Object.values(agg).sort((a,b) => b.total - a.total);
   const todayRanking = Object.values(todayAgg).sort((a,b) => b.total - a.total);
   const allNames = typeof equipas !== 'undefined' ? equipas.flatMap(e=>e.nomes||[]) : ranking.map(r=>r.nome);
+  const hora = now.getHours();
 
   function tryPost(key, postObj) {
-    const ssKey = 'feedAutoPosted_' + key + '_' + today;
+    // Chave por bloco de 2h — gera novo post a cada 2 horas
+    const ssKey = 'feedAutoPosted_' + key + '_' + bloco2h;
     if (sessionStorage.getItem(ssKey)) return;
     sessionStorage.setItem(ssKey, '1');
-    // Add to local feed
     feedPosts.unshift(postObj);
-    // Save to Sheets
     feedSaveToSheets(postObj);
   }
 
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
   function makeAutoPost(id, tag, highlight, text) {
-    return {
-      id, type: 'auto', tag,
-      author: 'Super Liga',
-      ts: new Date().toISOString(),
-      highlight: highlight || null,
-      text, gif: null,
-      reactions: {}, comments: [], pinned: false
-    };
+    return { id, type:'auto', tag, author:'Super Liga', ts:new Date().toISOString(),
+      highlight:highlight||null, text, gif:null, reactions:{}, comments:[], pinned:false };
   }
 
-  // ── EVENT: LÍDER DO DIA ──
+  // ── LÍDER DO DIA ──
   if (todayRanking[0] && todayRanking[0].total > 0) {
     const p = todayRanking[0];
+    const seg = todayRanking[1];
+    const diff = seg ? p.total - seg.total : null;
     const frases = [
       `${p.nome} está em modo turbo hoje com ${p.total} registos. 🔥`,
-      `${p.nome} lidera o dia! ${p.total} registos até agora. Quem chega perto? 👀`,
-      `Atenção a ${p.nome}! ${p.total} registos hoje. Alguém quer responder? 💪`,
-    ];
+      `${p.nome} lidera o dia! ${p.total} registos até agora. Quem trava isto? 👀`,
+      `Atenção a ${p.nome}! ${p.total} registos hoje e a crescer. 💪`,
+      `${p.nome} não para! ${p.total} registos e a dominar o dia. 🚀`,
+      `Dia de ${p.nome}! Já tem ${p.total} registos nas primeiras horas. 🎯`,
+      diff !== null && diff <= 3 ? `${p.nome} lidera mas ${seg.nome} está a ${diff} atrás. Tensão máxima! ⚡` : null,
+      diff !== null && diff > 5 ? `${p.nome} está a fugir hoje com ${diff} de vantagem. Quem responde? 😤` : null,
+    ].filter(Boolean);
     tryPost('lider_dia', makeAutoPost(
-      'auto_lider_dia_' + today, 'ranking',
-      '⚡ LÍDER DE HOJE: ' + p.nome.split(' ')[0].toUpperCase(),
-      frases[now.getHours() % frases.length]
+      'auto_lider_dia_' + bloco2h, 'ranking',
+      pick(['⚡ LÍDER DE HOJE: ','🔥 DESTAQUE: ','💥 EM FORMA: ']) + p.nome.split(' ')[0].toUpperCase(),
+      pick(frases)
     ));
   }
 
-  // ── EVENT: ULTRAPASSAGEM no ranking ──
+  // ── BATALHA NO TOPO ──
+  if (todayRanking.length >= 2 && todayRanking[0].total > 0) {
+    const [p1, p2] = todayRanking;
+    const diff = p1.total - p2.total;
+    if (diff <= 3) {
+      const frases = [
+        `${p1.nome} e ${p2.nome} em guerra total hoje! ${p1.total} vs ${p2.total}. Vai ser renhido! ⚔️`,
+        `Só ${diff === 0 ? 'empate' : diff + ' registo(s)'} separa ${p1.nome} de ${p2.nome}. Épico! 🏟️`,
+        `Tensão lá no topo entre ${p1.nome} e ${p2.nome}. Ninguém cede! 🔥`,
+      ];
+      tryPost('batalha_dia', makeAutoPost(
+        'auto_batalha_dia_' + bloco2h, 'ranking',
+        '⚔️ BATALHA ABERTA',
+        pick(frases)
+      ));
+    }
+  }
+
+  // ── ULTRAPASSAGEM NO RANKING MENSAL ──
   if (ranking.length >= 2) {
     for (let i = 1; i < Math.min(ranking.length, 5); i++) {
       const atual = ranking[i];
       const acima = ranking[i-1];
       const diff = acima.total - atual.total;
-      if (diff <= 2) {
+      if (diff <= 3) {
+        const frases = [
+          `${atual.nome} está a ${diff === 0 ? 'empatar com' : diff + ' registo(s) de ultrapassar'} ${acima.nome} no ranking! 📈`,
+          `Cuidado ${acima.nome}! ${atual.nome} está a chegar com tudo! 🚨`,
+          `A ${diff === 0 ? 'igualdade' : 'diferença de ' + diff} entre ${atual.nome} e ${acima.nome} é quase nula. 🎯`,
+        ];
         tryPost('ultrapass_' + atual.nome.replace(/\s/g,''), makeAutoPost(
-          'auto_ultrapass_' + atual.nome.replace(/\s/g,'_') + '_' + today,
+          'auto_ultrapass_' + atual.nome.replace(/\s/g,'_') + '_' + bloco2h,
           'ranking',
           '📈 IMINENTE: ' + atual.nome.split(' ')[0].toUpperCase(),
-          `${atual.nome} está a apenas ${diff === 0 ? 'empatar' : diff + ' registo(s) de ultrapassar'} ${acima.nome} no ranking geral! Vai acontecer? 🤔`
+          pick(frases)
         ));
         break;
       }
     }
   }
 
-  // ── EVENT: SEM REGISTOS HÁ 2+ DIAS ÚTEIS ──
+  // ── DESTAQUE POR CATEGORIA ──
+  const catEmjs = {onlines:'🖥️',sprays:'🧴',palmilhas:'🦶',camisolas:'👕',sacos:'🛍️',garrafas:'💧',elogios:'⭐',szclub:'🎫'};
+  const catNomes = {onlines:'Onlines',sprays:'Sprays',palmilhas:'Palmilhas',camisolas:'Camisolas',sacos:'Sacos Eco',garrafas:'Garrafas',elogios:'Elogios',szclub:'SZClub'};
+  const catRandKey = cats[Math.floor((hora / 2) % cats.length)]; // categoria diferente a cada 2h
+  const sortedCat = Object.values(agg).filter(r=>(r[catRandKey]||0)>0).sort((a,b)=>b[catRandKey]-a[catRandKey]);
+  if (sortedCat[0]) {
+    const lider = sortedCat[0];
+    const frases = [
+      `${lider.nome} domina em ${catEmjs[catRandKey]} ${catNomes[catRandKey]} com ${lider[catRandKey]} este mês! 🏅`,
+      `${lider[catRandKey]} ${catNomes[catRandKey]} de ${lider.nome}. Alguém bate isto? 🎯`,
+      `No ranking de ${catNomes[catRandKey]}, ${lider.nome} está imbatível com ${lider[catRandKey]}! ${catEmjs[catRandKey]}`,
+    ];
+    tryPost('cat_destaque_' + catRandKey, makeAutoPost(
+      'auto_cat_' + catRandKey + '_' + bloco2h, 'ranking',
+      catEmjs[catRandKey] + ' LÍDER EM ' + catNomes[catRandKey].toUpperCase(),
+      pick(frases)
+    ));
+  }
+
+  // ── SEM REGISTOS HÁ 2+ DIAS ÚTEIS ──
   allNames.forEach(nome => {
     if (!agg[nome] || agg[nome].total === 0) return;
     const byDay = {};
@@ -7823,21 +7948,37 @@ function generateAutoFeedEvents() {
     }
     if (diasSem >= 2) {
       const msgs = [
-        `${nome} desapareceu! ${diasSem} dias úteis sem registo. Tudo bem? 😅`,
+        `${nome} desapareceu do radar! ${diasSem} dias úteis sem registo. Tudo bem? 😅`,
         `${diasSem} dias sem ver ${nome} nos registos... férias não avisadas? 😂`,
         `${nome}, o ranking sente a tua falta há ${diasSem} dias! 👀`,
+        `Onde está ${nome}? ${diasSem} dias de silêncio no ranking. 🔍`,
+        `Alguém viu ${nome}? Ausência de ${diasSem} dias a preocupar a equipa! 😬`,
       ];
       tryPost('nosales_' + nome.replace(/\s/g,''), makeAutoPost(
-        'auto_nosales_' + nome.replace(/\s/g,'_') + '_' + today,
-        'ranking', null,
-        msgs[diasSem % msgs.length]
+        'auto_nosales_' + nome.replace(/\s/g,'_') + '_' + bloco2h,
+        'ranking', null, pick(msgs)
       ));
     }
   });
 
-  // ── EVENT: PROXIMIDADE DE MEDALHA (≤ 3 do objetivo) ──
+  // ── RESUMO DO DIA (tarde/noite) ──
+  if (hora >= 17 && todayRanking.length >= 2) {
+    const top3hoje = todayRanking.slice(0,3);
+    const resumo = top3hoje.map((p,i) => (i===0?'🥇':i===1?'🥈':'🥉') + ' ' + p.nome + ' (' + p.total + ')').join(' · ');
+    const frases = [
+      `Resumo de hoje: ${resumo}. Dia a sério! 💪`,
+      `Como está o dia? ${resumo}. Ainda há tempo para subir! ⏱️`,
+      `Top 3 de hoje: ${resumo}. Amanhã recomeça! 🔄`,
+    ];
+    tryPost('resumo_dia', makeAutoPost(
+      'auto_resumo_dia_' + bloco2h, 'ranking',
+      '📋 RESUMO DO DIA',
+      pick(frases)
+    ));
+  }
+
+  // ── PROXIMIDADE DE MEDALHA ──
   if (typeof calcularMedalhas === 'function') {
-    const catKeys = {onlines:'🖥️ Onlines',sprays:'🧴 Sprays',palmilhas:'🦶 Palmilhas',camisolas:'👕 Camisolas',sacos:'🛍️ Sacos',garrafas:'💧 Garrafas'};
     Object.values(agg).forEach(r => {
       try {
         const dadosNome = todos.filter(d => {
@@ -7847,30 +7988,29 @@ function generateAutoFeedEvents() {
         const meds = calcularMedalhas(dadosNome);
         meds.forEach(m => {
           if (m.earned) return;
-          // Check proximity: parse threshold from desc
           const match = m.desc.match(/(\d+)/);
           if (!match) return;
           const target = parseInt(match[1]);
-          // Find current value for this medal
           const catMap = {
-            'Rei dos Onlines': r.onlines||0,
-            'Spray King': r.sprays||0,
-            'Palmilhas Master': r.palmilhas||0,
-            'Camisolas Pro': r.camisolas||0,
-            'Eco Champion': r.sacos||0,
-            'Hydration Boss': r.garrafas||0,
-            'Consistente': new Set(dadosNome.map(d=>d.data)).size,
-            'SZClub Star': r.szclub||0,
+            'Rei dos Onlines': r.onlines||0, 'Spray King': r.sprays||0,
+            'Palmilhas Master': r.palmilhas||0, 'Camisolas Pro': r.camisolas||0,
+            'Eco Champion': r.sacos||0, 'Hydration Boss': r.garrafas||0,
+            'Consistente': new Set(dadosNome.map(d=>d.data)).size, 'SZClub Star': r.szclub||0,
           };
           const current = catMap[m.name];
           if (current === undefined) return;
           const faltam = target - current;
           if (faltam > 0 && faltam <= 3) {
+            const msgs = [
+              `${r.nome} está a apenas ${faltam} de conquistar a medalha ${m.icon} ${m.name}! Vai com tudo! 🔥`,
+              `${faltam} registos separam ${r.nome} da medalha ${m.icon} ${m.name}. Hoje pode ser o dia! 🎖️`,
+              `Tão perto! ${r.nome} precisa de mais ${faltam} para a ${m.name}. 🏅`,
+            ];
             tryPost('medal_prox_' + r.nome.replace(/\s/g,'') + '_' + m.name.replace(/\s/g,''), makeAutoPost(
-              'auto_medal_prox_' + r.nome.replace(/\s/g,'_') + '_' + m.name.replace(/\s/g,'_') + '_' + today,
+              'auto_medal_prox_' + r.nome.replace(/\s/g,'_') + '_' + m.name.replace(/\s/g,'_') + '_' + bloco2h,
               'medals',
               '🏅 ' + r.nome.split(' ')[0].toUpperCase() + ' QUASE LÁ!',
-              `${r.nome} está a apenas ${faltam} de conquistar a medalha ${m.icon} ${m.name}! Vai com tudo! 🔥`
+              pick(msgs)
             ));
           }
         });
@@ -8709,7 +8849,7 @@ document.addEventListener('feedDataUpdated', () => {
 
 <div id="feedFab">
   <button id="feedFabBtn" onclick="feedFabToggle()" aria-label="Feed">
-    <span id="feedFabIcon">💬</span>
+    <span id="feedFabIcon">🔔</span>
     <span id="feedFabBadge" style="display:none">0</span>
   </button>
 </div>
@@ -8752,7 +8892,7 @@ function _feedFabClose() {
   const btn = document.getElementById('feedFabBtn');
   const icon = document.getElementById('feedFabIcon');
   if (btn) btn.classList.remove('feed-open');
-  if (icon) icon.textContent = '💬';
+  if (icon) icon.textContent = '🔔';
   const prevEl = document.getElementById('screen-' + _feedPrevScreen);
   if (prevEl) prevEl.classList.add('active');
   if (_feedPrevBtn) _feedPrevBtn.classList.add('active');
