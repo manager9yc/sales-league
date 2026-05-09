@@ -8465,7 +8465,8 @@ window.feedPostSubmit = function() {
     text: text,
     gif: null,
     reactions: {}, comments: [],
-    pinned: false
+    pinned: false,
+    popup: true  // flag: mostrar popup em todos os dispositivos
   };
 
   input.value = '';
@@ -8474,6 +8475,8 @@ window.feedPostSubmit = function() {
   renderFeed();
   feedSaveToSheets(post);
   feedToast('Publicado! 🔥', 'gold');
+  // Mostrar popup no próprio dispositivo imediatamente
+  _showFeedPopup(post);
 };
 
 // ── COMMENT SUBMIT ──
@@ -8769,6 +8772,91 @@ document.addEventListener('feedDataUpdated', () => {
   mergeAutoEvents(); renderFeed();
 });
 
+// ── FEED POPUP SYSTEM ──
+// Mostra popup para todos quando alguém publica uma mensagem nova
+
+let _feedSeenPopups = new Set(
+  JSON.parse(localStorage.getItem('feedSeenPopups') || '[]')
+);
+
+function _showFeedPopup(post) {
+  if (!post || !post.text) return;
+  if (_feedSeenPopups.has(post.id)) return;
+  _feedSeenPopups.add(post.id);
+  try { localStorage.setItem('feedSeenPopups', JSON.stringify([..._feedSeenPopups].slice(-50))); } catch(e) {}
+
+  const overlay = document.getElementById('feedPopupOverlay');
+  const avatar = document.getElementById('feedPopupAvatar');
+  const author = document.getElementById('feedPopupAuthor');
+  const text = document.getElementById('feedPopupText');
+  const time = document.getElementById('feedPopupTime');
+  if (!overlay) return;
+
+  const letra = (post.author || '?')[0].toUpperCase();
+  avatar.textContent = letra;
+  author.textContent = post.author || 'Alguém';
+  text.textContent = post.text;
+  const d = new Date(post.ts);
+  time.textContent = 'agora mesmo';
+
+  overlay.style.display = 'flex';
+  overlay.classList.remove('fp-hide');
+  overlay.classList.add('fp-show');
+
+  // Reset barra de progresso (restart animation)
+  const bar = document.getElementById('feedPopupProgressBar');
+  if (bar) { bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = 'fpProgress 6s linear both'; }
+
+  // Auto-fechar em 6 segundos
+  clearTimeout(window._feedPopupTimer);
+  window._feedPopupTimer = setTimeout(() => _closeFeedPopup(), 6000);
+}
+
+window._closeFeedPopup = function() {
+  const overlay = document.getElementById('feedPopupOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('fp-show');
+  overlay.classList.add('fp-hide');
+  setTimeout(() => { overlay.style.display = 'none'; overlay.classList.remove('fp-hide'); }, 350);
+};
+
+// Polling: verifica novos posts a cada 30s, mostra popup se houver com flag popup:true nas últimas 24h
+let _feedPollLastCheck = Date.now();
+function _feedPollForPopups() {
+  const url = FEED_SCRIPT_URL + '?action=getFeed';
+  const proxy = 'https://corsproxy.io/?' + encodeURIComponent(url);
+  const now = Date.now();
+  const oneDayMs = 24 * 60 * 60 * 1000;
+
+  function process(data) {
+    if (!Array.isArray(data)) return;
+    data.forEach(post => {
+      if (!post.popup) return;
+      if (_feedSeenPopups.has(post.id)) return;
+      const postTime = new Date(post.ts).getTime();
+      if (now - postTime > oneDayMs) return; // ignora posts com mais de 24h
+      if (postTime < _feedPollLastCheck - 5000) return; // só posts novos desta sessão
+      _showFeedPopup(post);
+    });
+    _feedPollLastCheck = now;
+    // Atualizar feedPosts silenciosamente
+    feedPosts = data;
+    mergeAutoEvents();
+    const screen = document.getElementById('screen-feed');
+    if (screen && screen.classList.contains('active')) renderFeed();
+  }
+
+  fetch(url, {cache:'no-store'})
+    .then(r=>r.json()).then(process)
+    .catch(() => fetch(proxy, {cache:'no-store'}).then(r=>r.json()).then(process).catch(()=>{}));
+}
+
+// Iniciar polling após 10s (deixa o app carregar primeiro), depois a cada 30s
+setTimeout(() => {
+  _feedPollLastCheck = Date.now();
+  setInterval(_feedPollForPopups, 30000);
+}, 10000);
+
 })(); // end IIFE
 </script>
 
@@ -8938,3 +9026,167 @@ if (typeof _origCarregarDashPatch === 'function') {
   };
 }
 </script>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- FEED POPUP — Notificação instantânea de nova mensagem   -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<style>
+#feedPopupOverlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 99000;
+  background: rgba(0,0,0,0.55);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+#feedPopupOverlay.fp-show {
+  animation: fpFadeIn 0.3s ease both;
+}
+#feedPopupOverlay.fp-hide {
+  animation: fpFadeOut 0.35s ease both;
+}
+@keyframes fpFadeIn {
+  from { opacity:0; transform:scale(0.92); }
+  to   { opacity:1; transform:scale(1); }
+}
+@keyframes fpFadeOut {
+  from { opacity:1; transform:scale(1); }
+  to   { opacity:0; transform:scale(0.94); }
+}
+#feedPopupCard {
+  background: linear-gradient(160deg, #1a1a14 0%, #0d0d0a 100%);
+  border: 1.5px solid rgba(201,168,76,0.4);
+  border-radius: 20px;
+  padding: 0;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,168,76,0.08);
+  overflow: hidden;
+  position: relative;
+}
+#feedPopupHeader {
+  background: linear-gradient(90deg, rgba(201,168,76,0.18) 0%, rgba(201,168,76,0.04) 100%);
+  border-bottom: 1px solid rgba(201,168,76,0.15);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#feedPopupBell {
+  font-size: 18px;
+  animation: bellRing 0.6s ease 0.2s both;
+}
+@keyframes bellRing {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(-20deg); }
+  40%  { transform: rotate(20deg); }
+  60%  { transform: rotate(-10deg); }
+  80%  { transform: rotate(10deg); }
+  100% { transform: rotate(0deg); }
+}
+#feedPopupHeaderText {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #C9A84C;
+  flex: 1;
+}
+#feedPopupClose {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 2px 4px;
+  -webkit-tap-highlight-color: transparent;
+  line-height: 1;
+}
+#feedPopupBody {
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+#feedPopupAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #C9A84C, #8B6914);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  color: #000;
+  flex-shrink: 0;
+}
+#feedPopupContent {
+  flex: 1;
+  min-width: 0;
+}
+#feedPopupAuthor {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: var(--text);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+#feedPopupText {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px;
+  color: rgba(255,255,255,0.88);
+  line-height: 1.4;
+  word-break: break-word;
+}
+#feedPopupTime {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
+#feedPopupProgress {
+  height: 3px;
+  background: rgba(201,168,76,0.15);
+  position: relative;
+  overflow: hidden;
+}
+#feedPopupProgressBar {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  background: linear-gradient(90deg, #C9A84C, #f0d060);
+  animation: fpProgress 6s linear both;
+}
+@keyframes fpProgress {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+</style>
+
+<div id="feedPopupOverlay" onclick="if(event.target===this)_closeFeedPopup()">
+  <div id="feedPopupCard">
+    <div id="feedPopupHeader">
+      <span id="feedPopupBell">🔔</span>
+      <span id="feedPopupHeaderText">Nova mensagem no balneário</span>
+      <button id="feedPopupClose" onclick="_closeFeedPopup()">×</button>
+    </div>
+    <div id="feedPopupBody">
+      <div id="feedPopupAvatar">?</div>
+      <div id="feedPopupContent">
+        <div id="feedPopupAuthor"></div>
+        <div id="feedPopupText"></div>
+        <div id="feedPopupTime"></div>
+      </div>
+    </div>
+    <div id="feedPopupProgress"><div id="feedPopupProgressBar"></div></div>
+  </div>
+</div>
