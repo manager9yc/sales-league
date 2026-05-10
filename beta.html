@@ -2724,8 +2724,8 @@ function fecharSplash(){
   s.classList.add('out');
   setTimeout(()=>{
     s.classList.add('hidden');
-    const feedBtn = document.getElementById('navBtnFeed');
-    if(feedBtn) { goTo('feed', feedBtn); feedInit(); }
+    const desafiosBtn = document.getElementById('navBtnDesafios');
+    if(desafiosBtn) goTo('desafios', desafiosBtn);
   },600);
 }
 iniciarSplash();
@@ -5404,7 +5404,7 @@ function renderDesafiosMedalhas() {
       fecharFormOverlay();
       const adminBtnFake = { classList: { add: ()=>{}, remove: ()=>{} } };
       goTo('admin', adminBtnFake);
-    }, 1000);
+    }, 2000);
   }, {passive:true});
   btn.addEventListener('touchend', () => { if(lp){clearTimeout(lp);lp=null;} });
   btn.addEventListener('touchmove', () => { if(lp){clearTimeout(lp);lp=null;} });
@@ -5414,7 +5414,7 @@ function renderDesafiosMedalhas() {
       fecharFormOverlay();
       const adminBtnFake = { classList: { add: ()=>{}, remove: ()=>{} } };
       goTo('admin', adminBtnFake);
-    }, 1000);
+    }, 2000);
   });
   btn.addEventListener('mouseup', () => { if(lp){clearTimeout(lp);lp=null;} });
   btn.addEventListener('mouseleave', () => { if(lp){clearTimeout(lp);lp=null;} });
@@ -5485,9 +5485,48 @@ function renderDesafiosMedalhas() {
       <div style="flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)"></div>
     </div>
 
-    <!-- JOGO 2: MEDALHAS -->
+    <!-- JOGO 2: RASPADINHA -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <div style="background:linear-gradient(135deg,#a07820,#C9A84C);border-radius:8px;padding:3px 10px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#fff">JOGO 2</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#C9A84C">A RASPADINHA</div>
+    </div>
+
+    <!-- RASPADINHA BUTTON -->
+    <div style="margin-bottom:8px">
+      <button onclick="abrirRaspadinha()" style="width:100%;background:linear-gradient(135deg,#0d0c08,#1c1a0e,#0d0c08);border:2px solid rgba(201,168,76,0.45);border-radius:20px;padding:0;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative;box-shadow:0 12px 40px rgba(201,168,76,0.18),0 4px 16px rgba(0,0,0,0.6);">
+        <div style="position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.6),transparent);"></div>
+        <div style="padding:22px 22px 18px;position:relative;">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+            <div style="font-size:46px;filter:drop-shadow(0 0 14px rgba(201,168,76,0.7));flex-shrink:0;animation:cofrePulse 2.5s ease-in-out infinite;">🎟️</div>
+            <div style="text-align:left;">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:rgba(201,168,76,0.55);margin-bottom:3px;">PRÉMIO SURPRESA · SUPER LIGA</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:3px;color:#fff;line-height:1;">A RASPADINHA</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.55);margin-top:4px;line-height:1.4;">Raspa e descobre o teu <strong style="color:#C9A84C">prémio surpresa</strong> desta semana</div>
+            </div>
+          </div>
+          <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);border-radius:14px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(201,168,76,0.5);margin-bottom:2px;">RASPA PARA GANHAR</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;line-height:1.1;">? ? ? ? ?</div>
+            </div>
+            <div style="background:linear-gradient(135deg,#a07820,#C9A84C);border-radius:10px;padding:10px 16px;">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#090909;">RASPAR →</div>
+            </div>
+          </div>
+        </div>
+      </button>
+    </div>
+
+    <!-- SEPARADOR -->
+    <div style="display:flex;align-items:center;gap:12px;margin:20px 0 16px">
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--border))"></div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted)">SUPER LIGA 2026</div>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)"></div>
+    </div>
+
+    <!-- JOGO 3: MEDALHAS -->
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-      <div style="background:linear-gradient(135deg,#FF6B00,#FF8C00);border-radius:8px;padding:3px 10px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#fff">JOGO 2</div>
+      <div style="background:linear-gradient(135deg,#FF6B00,#FF8C00);border-radius:8px;padding:3px 10px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#fff">JOGO 3</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:var(--orange)">MEDALHAS</div>
     </div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.4;">Desbloqueia as medalhas e vai à Slot Machine</div>
@@ -5512,7 +5551,7 @@ function renderDesafiosMedalhas() {
 <!-- ═══════════════════════════════════════════════════════ -->
 <style>
 /* ══ FEED SCREEN ══ */
-#screen-feed { display:none; flex-direction:column; height:100dvh; overflow:hidden; padding-bottom:calc(68px + env(safe-area-inset-bottom,0px)); }
+#screen-feed { display:none; flex-direction:column; height:calc(100vh - 64px - env(safe-area-inset-bottom,0px)); overflow:hidden; }
 #screen-feed.active { display:flex; }
 
 .feed-header {
@@ -5699,10 +5738,9 @@ function renderDesafiosMedalhas() {
 
 /* COMPOSE POST */
 .feed-compose {
-  flex-shrink:0;border-bottom:1px solid rgba(201,168,76,0.15);
-  background:rgba(8,8,8,0.98);backdrop-filter:blur(16px);
-  padding:10px 12px 10px;
-  position:relative;z-index:10;
+  flex-shrink:0;border-top:1px solid var(--border);
+  background:rgba(8,8,8,0.95);backdrop-filter:blur(12px);
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));
 }
 .compose-row { display:flex;align-items:center;gap:8px; }
 .compose-avatar {
@@ -5831,17 +5869,8 @@ function renderDesafiosMedalhas() {
       <div style="font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:1px">Super Liga · VDG 2026</div>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
+      <div id="feedOnlineCount" style="font-size:11px;color:var(--muted);letter-spacing:1px"></div>
       <button onclick="feedRefresh()" style="background:var(--card);border:1px solid var(--border);border-radius:50%;width:34px;height:34px;color:var(--muted);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;" id="feedRefreshBtn">↻</button>
-    </div>
-  </div>
-
-  <!-- COMPOSE — no topo, logo abaixo do header -->
-  <div class="feed-compose">
-    <div class="compose-row">
-      <div class="compose-avatar" id="composeAvatar">?</div>
-      <input class="compose-input" id="composeInput" placeholder="Diz algo ao teu staff..." type="text" maxlength="280" onkeydown="if(event.key==='Enter'){feedPostSubmit();event.preventDefault()}">
-      <button class="compose-gif-btn" onclick="openGifPicker('post',null)">GIF</button>
-      <button class="compose-send-btn" onclick="feedPostSubmit()">↑</button>
     </div>
   </div>
 
@@ -5859,7 +5888,17 @@ function renderDesafiosMedalhas() {
     <div style="text-align:center;padding:40px 20px;color:var(--muted)">
       <div style="font-size:32px;margin-bottom:12px">💬</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff;margin-bottom:6px">O BALNEÁRIO</div>
-      <div style="font-size:13px;line-height:1.5">A carregar...</div>
+      <div style="font-size:13px;line-height:1.5">A carregar o feed...</div>
+    </div>
+  </div>
+
+  <!-- COMPOSE -->
+  <div class="feed-compose">
+    <div class="compose-row">
+      <div class="compose-avatar" id="composeAvatar">?</div>
+      <input class="compose-input" id="composeInput" placeholder="Diz algo ao teu staff..." type="text" maxlength="280">
+      <button class="compose-gif-btn" onclick="openGifPicker('post',null)">GIF</button>
+      <button class="compose-send-btn" onclick="feedPostSubmit()">↑</button>
     </div>
   </div>
 
@@ -7220,6 +7259,793 @@ window.cofreSom = cofreSom;
   <div class="toast" id="cofreToastEl"></div>
 </div><!-- end #cofreOverlay -->
 
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- RASPADINHA OVERLAY                                       -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<style>
+/* ══ RASPADINHA ══ */
+#raspOverlay {
+  display:none;position:fixed;inset:0;z-index:99990;
+  background:#080808;overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+#raspOverlay .rasp-status-bar {
+  position:sticky;top:0;z-index:100;
+  background:rgba(8,8,8,0.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid #282828;
+  padding:10px 20px;display:flex;align-items:center;justify-content:space-between;
+}
+#raspOverlay .rasp-status-title {
+  font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#C9A84C;
+}
+#raspOverlay .rasp-close-btn {
+  background:transparent;border:none;color:rgba(255,255,255,0.5);
+  font-size:22px;cursor:pointer;padding:4px 8px;-webkit-tap-highlight-color:transparent;
+}
+
+/* HEADER */
+#raspOverlay .rasp-header {
+  text-align:center;padding:32px 20px 24px;position:relative;overflow:hidden;
+}
+#raspOverlay .rasp-header::before {
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 70%);
+  pointer-events:none;
+}
+#raspOverlay .rasp-eyebrow {
+  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:5px;text-transform:uppercase;color:rgba(201,168,76,0.5);margin-bottom:8px;
+}
+#raspOverlay .rasp-title {
+  font-family:'Bebas Neue',sans-serif;font-size:54px;letter-spacing:4px;
+  color:#fff;line-height:1;
+  text-shadow:0 4px 0 rgba(0,0,0,0.3),0 0 40px rgba(201,168,76,0.15);
+}
+#raspOverlay .rasp-title span { color:#C9A84C; }
+#raspOverlay .rasp-sub {
+  font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px;letter-spacing:0.5px;
+}
+
+/* CARD RASPADINHA */
+#raspOverlay .rasp-body {
+  padding:0 20px 120px;max-width:500px;margin:0 auto;
+}
+#raspOverlay .rasp-card {
+  background:linear-gradient(145deg,#161410,#1e1c12,#161410);
+  border:2px solid rgba(201,168,76,0.35);
+  border-radius:24px;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 0 1px rgba(201,168,76,0.06) inset;
+  position:relative;
+}
+#raspOverlay .rasp-card-header {
+  background:linear-gradient(135deg,#a07820,#C9A84C,#E8C97A,#C9A84C,#8a6318);
+  padding:16px 20px;text-align:center;position:relative;overflow:hidden;
+}
+#raspOverlay .rasp-card-header::before {
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(-45deg,transparent,transparent 8px,rgba(255,255,255,0.06) 8px,rgba(255,255,255,0.06) 10px);
+}
+#raspOverlay .rasp-card-header-text {
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:6px;color:#090909;
+  position:relative;z-index:2;text-shadow:0 1px 0 rgba(255,255,255,0.3);
+}
+#raspOverlay .rasp-card-header-sub {
+  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:3px;color:rgba(0,0,0,0.55);position:relative;z-index:2;margin-top:2px;
+}
+
+/* SCRATCH AREA */
+#raspOverlay .rasp-scratch-wrap {
+  padding:24px 20px;position:relative;
+}
+#raspOverlay .rasp-scratch-label {
+  font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;
+  color:rgba(201,168,76,0.5);text-align:center;margin-bottom:14px;
+}
+#raspOverlay .scratch-container {
+  position:relative;border-radius:18px;overflow:hidden;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5),inset 0 1px 0 rgba(201,168,76,0.2);
+  touch-action:none;
+  cursor:crosshair;
+}
+#raspOverlay .scratch-prize {
+  width:100%;height:220px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  background:linear-gradient(135deg,#111109,#1a1812,#111109);
+  border:1px solid rgba(201,168,76,0.2);border-radius:18px;
+  user-select:none;-webkit-user-select:none;
+}
+#raspOverlay .scratch-prize-emoji { font-size:62px;line-height:1; }
+#raspOverlay .scratch-prize-value {
+  font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:3px;
+  background:linear-gradient(90deg,#7a5c18,#C9A84C,#F5D87E,#C9A84C,#7a5c18);
+  background-size:200% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:raspShimmer 2s linear infinite;
+  line-height:1;
+}
+@keyframes raspShimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
+#raspOverlay .scratch-prize-label {
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.5);
+}
+#raspOverlay canvas.scratch-canvas {
+  position:absolute;inset:0;border-radius:18px;
+  touch-action:none;cursor:crosshair;
+  transition:opacity 0.6s ease;
+}
+
+/* PROGRESS */
+#raspOverlay .rasp-progress-wrap {
+  margin-top:16px;text-align:center;
+}
+#raspOverlay .rasp-progress-text {
+  font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:2px;margin-bottom:8px;
+}
+#raspOverlay .rasp-progress-bar {
+  width:100%;height:4px;background:rgba(255,255,255,0.08);border-radius:100px;overflow:hidden;
+}
+#raspOverlay .rasp-progress-fill {
+  height:100%;width:0%;border-radius:100px;
+  background:linear-gradient(90deg,#7a5c18,#C9A84C,#F5D87E);
+  transition:width 0.1s linear;
+  box-shadow:0 0 8px rgba(201,168,76,0.6);
+}
+
+/* RESULT REVEALED */
+#raspOverlay .rasp-result {
+  display:none;padding:20px;text-align:center;
+  animation:raspResultIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes raspResultIn { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }
+#raspOverlay .rasp-result.show { display:block; }
+#raspOverlay .rasp-result-label {
+  font-size:10px;font-weight:700;letter-spacing:5px;text-transform:uppercase;
+  color:rgba(201,168,76,0.6);margin-bottom:6px;
+}
+#raspOverlay .rasp-result-prize {
+  font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;color:#fff;
+}
+#raspOverlay .rasp-result-sub {
+  font-size:13px;color:rgba(255,255,255,0.45);margin-top:4px;line-height:1.4;
+}
+
+/* NOVA RASPADINHA BTN */
+#raspOverlay .rasp-new-btn {
+  display:none;width:100%;
+  background:linear-gradient(135deg,#a07820,#C9A84C,#E8C97A);
+  border:none;border-radius:14px;padding:18px;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#090909;
+  cursor:pointer;margin-top:16px;
+  box-shadow:0 6px 24px rgba(201,168,76,0.4);
+  transition:opacity 0.2s,transform 0.15s;
+  -webkit-tap-highlight-color:transparent;
+}
+#raspOverlay .rasp-new-btn:active { opacity:0.88;transform:scale(0.98); }
+#raspOverlay .rasp-new-btn.show { display:block; }
+
+/* PRIZES LIST */
+#raspOverlay .prizes-section {
+  margin-top:24px;
+}
+#raspOverlay .prizes-title {
+  font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;
+  color:rgba(201,168,76,0.5);margin-bottom:12px;
+}
+#raspOverlay .prizes-grid {
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+}
+#raspOverlay .prize-chip {
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:12px;display:flex;align-items:center;gap:10px;
+}
+#raspOverlay .prize-chip-emoji { font-size:22px;flex-shrink:0; }
+#raspOverlay .prize-chip-info { flex:1;min-width:0; }
+#raspOverlay .prize-chip-name {
+  font-size:13px;font-weight:700;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#raspOverlay .prize-chip-prob {
+  font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:2px;
+}
+#raspOverlay .prize-chip.special { border-color:rgba(201,168,76,0.35);background:rgba(201,168,76,0.05); }
+#raspOverlay .prize-chip.special .prize-chip-name { color:#C9A84C; }
+
+/* ADMIN */
+#raspOverlay .rasp-admin-section { margin-top:24px; }
+#raspOverlay .rasp-admin-toggle {
+  width:100%;background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:12px 16px;color:var(--muted);
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;cursor:pointer;
+  text-align:left;display:flex;align-items:center;justify-content:space-between;
+}
+#raspOverlay .rasp-admin-panel {
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:16px;margin-top:8px;display:none;
+}
+#raspOverlay .rasp-admin-panel.open { display:block; }
+#raspOverlay .rasp-admin-row { display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap; }
+#raspOverlay .rasp-admin-label { font-size:12px;color:var(--muted);letter-spacing:1px;flex:1;min-width:120px; }
+#raspOverlay .rasp-admin-input {
+  background:var(--card2);border:1px solid var(--border);border-radius:8px;
+  padding:8px 12px;color:var(--text);font-size:14px;outline:none;flex:1;min-width:120px;
+}
+#raspOverlay .rasp-admin-btn {
+  background:linear-gradient(135deg,#7a5c18,#C9A84C);border:2px solid rgba(201,168,76,0.8) !important;
+  border-radius:8px;padding:9px 16px;color:#fff;
+  font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;
+  white-space:nowrap;font-weight:900;
+  box-shadow:0 0 12px rgba(201,168,76,0.3),inset 0 1px 0 rgba(255,255,255,0.15);
+}
+#raspOverlay .rasp-admin-btn.red { background:rgba(239,68,68,0.15);color:#FF4444;border:1px solid rgba(239,68,68,0.5) !important; }
+#raspOverlay .rasp-admin-pin-row { display:flex;gap:8px;margin-bottom:12px; }
+#raspOverlay .rasp-admin-pin-input {
+  background:var(--card2);border:1px solid var(--border);border-radius:8px;
+  padding:8px 12px;color:var(--text);font-size:16px;outline:none;
+  width:100px;letter-spacing:4px;text-align:center;
+}
+#raspOverlay .rasp-admin-show-code {
+  color:#C9A84C;font-size:20px;letter-spacing:4px;font-family:'Bebas Neue',sans-serif;
+}
+
+/* WIN OVERLAY */
+#raspWinOv {
+  position:fixed;inset:0;z-index:2000;
+  background:rgba(0,0,0,0.92);
+  display:none;align-items:center;justify-content:center;flex-direction:column;
+  padding:40px 20px;
+}
+#raspWinOv.open { display:flex;animation:fadeIn 0.4s ease; }
+#raspWinOv .rw-confetti { font-size:70px;margin-bottom:16px;animation:bounce 0.7s ease-in-out infinite alternate; }
+#raspWinOv .rw-label { font-size:11px;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:rgba(201,168,76,0.7);margin-bottom:8px; }
+#raspWinOv .rw-title { font-family:'Bebas Neue',sans-serif;font-size:52px;color:#fff;letter-spacing:3px;line-height:1;margin-bottom:12px; }
+#raspWinOv .rw-prize-emoji { font-size:72px;display:block;margin-bottom:8px;animation:trophyBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.2s both; }
+#raspWinOv .rw-prize-name {
+  font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:3px;
+  background:linear-gradient(90deg,#7a5c18,#C9A84C,#F5D87E,#C9A84C,#7a5c18);
+  background-size:200% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:raspShimmer 2s linear infinite;
+  filter:drop-shadow(0 0 20px rgba(201,168,76,0.5));
+}
+#raspWinOv .rw-prize-desc { font-size:15px;color:rgba(255,255,255,0.55);margin-top:8px;line-height:1.4; }
+#raspWinOv .rw-close {
+  margin-top:32px;background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.15);border-radius:12px;
+  padding:14px 40px;color:#fff;font-family:'Bebas Neue',sans-serif;
+  font-size:18px;letter-spacing:3px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* TOAST */
+#raspOverlay .rasp-toast {
+  position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--card);color:var(--text);border:1px solid var(--border);
+  border-radius:12px;padding:12px 20px;font-size:13px;font-weight:700;letter-spacing:1px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.5);
+  transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  z-index:500;white-space:nowrap;pointer-events:none;
+}
+#raspOverlay .rasp-toast.show { transform:translateX(-50%) translateY(0); }
+#raspOverlay .rasp-toast.gold { border-color:#C9A84C;color:#C9A84C; }
+#raspOverlay .rasp-toast.green { border-color:#22C55E;color:#22C55E; }
+#raspOverlay .rasp-toast.red { border-color:#EF4444;color:#EF4444; }
+</style>
+
+<script>
+// ══ RASPADINHA (isolated scope) ══
+(function() {
+
+const RASP_ADMIN_PIN = '1313';
+const RASP_LS_KEY = 'raspState';
+
+// ── PRÉMIOS POSSÍVEIS ──
+const PRIZES = [
+  { id:'cafe',      emoji:'☕', name:'Café',             desc:'1 café no bar da loja',             weight:30, special:false },
+  { id:'pastel',    emoji:'🥐', name:'Pastel + Café',    desc:'Pastel de nata + café',             weight:22, special:false },
+  { id:'alm',       emoji:'🥙', name:'Almoço',           desc:'Almoço cortesia da equipa',          weight:15, special:false },
+  { id:'folga',     emoji:'🌴', name:'Tarde Livre',      desc:'Sai 2h mais cedo um dia à tua escolha', weight:10, special:true  },
+  { id:'vale10',    emoji:'💳', name:'Vale €10',         desc:'Vale de desconto Sport Zone €10',    weight:10, special:true  },
+  { id:'estacion',  emoji:'🅿️',  name:'Lugar Parking',   desc:'Lugar de estacionamento por 1 mês', weight:6,  special:true  },
+  { id:'vale25',    emoji:'💰', name:'Vale €25',         desc:'Vale de desconto Sport Zone €25',    weight:5,  special:true  },
+  { id:'nada',      emoji:'😅', name:'Desta vez não...',  desc:'Melhor sorte na próxima!',           weight:2,  special:false },
+];
+
+function weightedRandom(prizes) {
+  const total = prizes.reduce((s,p)=>s+p.weight,0);
+  let r = Math.random() * total;
+  for (const p of prizes) {
+    r -= p.weight;
+    if (r <= 0) return p;
+  }
+  return prizes[prizes.length-1];
+}
+
+// ── STATE ──
+function loadRaspState() {
+  try { return JSON.parse(localStorage.getItem(RASP_LS_KEY)||'null'); } catch(e) { return null; }
+}
+function saveRaspState() {
+  localStorage.setItem(RASP_LS_KEY, JSON.stringify(raspState));
+}
+const defaultRaspState = () => ({
+  currentPrize: null,
+  scratched: false,
+  history: [],
+  adminPrize: null // override admin
+});
+let raspState = loadRaspState() || defaultRaspState();
+
+// ── SCRATCH ENGINE ──
+let isScratching = false;
+let scratchCanvas = null;
+let scratchCtx = null;
+let scratchRevealPct = 0;
+let scratchDone = false;
+let currentPrize = null;
+
+function raspInit() {
+  buildNewCard();
+}
+
+function buildNewCard() {
+  // Pick prize
+  if (raspState.scratched) {
+    // Already scratched — show result
+    currentPrize = raspState.currentPrize ? PRIZES.find(p=>p.id===raspState.currentPrize) || PRIZES[0] : PRIZES[0];
+    showAlreadyScratched();
+    return;
+  }
+  currentPrize = raspState.adminPrize
+    ? (PRIZES.find(p=>p.id===raspState.adminPrize)||weightedRandom(PRIZES))
+    : weightedRandom(PRIZES);
+  raspState.currentPrize = currentPrize.id;
+  raspState.scratched = false;
+  saveRaspState();
+  renderScratchCard(currentPrize);
+}
+
+function renderScratchCard(prize) {
+  scratchRevealPct = 0;
+  scratchDone = false;
+
+  const prizeEl = document.getElementById('raspPrizeEmoji');
+  const prizeVal = document.getElementById('raspPrizeValue');
+  const prizeLabel = document.getElementById('raspPrizeLabel');
+  if (prizeEl) prizeEl.textContent = prize.emoji;
+  if (prizeVal) prizeVal.textContent = prize.name;
+  if (prizeLabel) prizeLabel.textContent = prize.desc;
+
+  // Setup canvas
+  const container = document.getElementById('raspScratchContainer');
+  const existing = document.getElementById('raspCanvas');
+  if (existing) existing.remove();
+
+  const canvas = document.createElement('canvas');
+  canvas.id = 'raspCanvas';
+  canvas.className = 'scratch-canvas';
+  canvas.width = container.offsetWidth || 340;
+  canvas.height = 220;
+  container.appendChild(canvas);
+
+  scratchCanvas = canvas;
+  scratchCtx = canvas.getContext('2d');
+
+  // Draw silver/gold scratch layer
+  drawScratchSurface();
+
+  // Touch/mouse events
+  canvas.addEventListener('mousedown', onScratchStart);
+  canvas.addEventListener('mousemove', onScratchMove);
+  canvas.addEventListener('mouseup', ()=>{ isScratching=false; });
+  canvas.addEventListener('touchstart', onScratchStart, {passive:false});
+  canvas.addEventListener('touchmove', onScratchMove, {passive:false});
+  canvas.addEventListener('touchend', ()=>{ isScratching=false; });
+
+  // Reset UI
+  document.getElementById('raspResult').classList.remove('show');
+  document.getElementById('raspNewBtn').classList.remove('show');
+  document.getElementById('raspProgressFill').style.width = '0%';
+  document.getElementById('raspProgressText').textContent = 'Raspa para revelar o prémio';
+}
+
+function drawScratchSurface() {
+  const w = scratchCanvas.width;
+  const h = scratchCanvas.height;
+  const ctx = scratchCtx;
+
+  // Gold/silver gradient base
+  const grad = ctx.createLinearGradient(0,0,w,h);
+  grad.addColorStop(0,   '#8a6c20');
+  grad.addColorStop(0.3, '#C9A84C');
+  grad.addColorStop(0.5, '#E8C97A');
+  grad.addColorStop(0.7, '#C9A84C');
+  grad.addColorStop(1,   '#7a5018');
+  ctx.fillStyle = grad;
+  ctx.roundRect(0,0,w,h,18);
+  ctx.fill();
+
+  // Texture lines
+  ctx.globalAlpha = 0.08;
+  for (let i=0; i<h; i+=4) {
+    ctx.beginPath();
+    ctx.moveTo(0,i);ctx.lineTo(w,i);
+    ctx.strokeStyle = i%8===0 ? '#fff' : '#000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // Scratch hint text
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.font = "bold 16px 'Barlow Condensed', sans-serif";
+  ctx.textAlign = 'center';
+  ctx.letterSpacing = '4px';
+  ctx.fillText('RASPA AQUI', w/2, h/2-12);
+  ctx.font = "28px Arial";
+  ctx.fillText('🪙✨🎟️', w/2, h/2+20);
+
+  // Decorative corners
+  ['rgba(255,255,255,0.15)'].forEach(c=>{
+    ctx.strokeStyle=c; ctx.lineWidth=2;
+    [[10,10,40,10],[w-10,10,w-10,40],[10,h-10,40,h-10],[w-10,h-10,w-10,h-40]].forEach(([x1,y1,x2,y2])=>{
+      ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    });
+  });
+}
+
+function getScratchPos(e) {
+  const rect = scratchCanvas.getBoundingClientRect();
+  const scaleX = scratchCanvas.width / rect.width;
+  const scaleY = scratchCanvas.height / rect.height;
+  if (e.touches) {
+    return {
+      x: (e.touches[0].clientX - rect.left) * scaleX,
+      y: (e.touches[0].clientY - rect.top) * scaleY
+    };
+  }
+  return { x:(e.clientX-rect.left)*scaleX, y:(e.clientY-rect.top)*scaleY };
+}
+
+function onScratchStart(e) {
+  if (scratchDone) return;
+  e.preventDefault();
+  isScratching = true;
+  const pos = getScratchPos(e);
+  scratchAt(pos.x, pos.y);
+}
+
+function onScratchMove(e) {
+  if (!isScratching || scratchDone) return;
+  e.preventDefault();
+  const pos = getScratchPos(e);
+  scratchAt(pos.x, pos.y);
+  checkRevealPct();
+}
+
+function scratchAt(x, y) {
+  const ctx = scratchCtx;
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.beginPath();
+  ctx.arc(x, y, 26, 0, Math.PI*2);
+  ctx.fill();
+  // Trail
+  ctx.beginPath();
+  ctx.arc(x, y-4, 18, 0, Math.PI*2);
+  ctx.fill();
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+function checkRevealPct() {
+  const data = scratchCtx.getImageData(0,0,scratchCanvas.width,scratchCanvas.height).data;
+  let transparent = 0;
+  for (let i=3; i<data.length; i+=4) { if(data[i]<128) transparent++; }
+  const pct = Math.round((transparent / (scratchCanvas.width*scratchCanvas.height)) * 100);
+  scratchRevealPct = pct;
+
+  document.getElementById('raspProgressFill').style.width = Math.min(pct,100)+'%';
+  document.getElementById('raspProgressText').textContent = pct < 30
+    ? 'Continua a raspar...'
+    : pct < 60 ? 'Já quase...' : 'Quase revelado!';
+
+  if (pct >= 55 && !scratchDone) {
+    scratchDone = true;
+    revealPrize();
+  }
+}
+
+function revealPrize() {
+  // Fade out canvas
+  scratchCanvas.style.opacity = '0';
+  scratchCanvas.style.pointerEvents = 'none';
+
+  raspState.scratched = true;
+  raspState.currentPrize = currentPrize.id;
+  raspState.history.unshift({ date: new Date().toLocaleDateString('pt-PT'), prize: currentPrize.id, name: currentPrize.name });
+  if (raspState.history.length > 20) raspState.history = raspState.history.slice(0,20);
+  saveRaspState();
+
+  document.getElementById('raspProgressFill').style.width = '100%';
+  document.getElementById('raspProgressText').textContent = '✓ Revelado!';
+
+  setTimeout(()=>{
+    // Show result
+    const res = document.getElementById('raspResult');
+    res.querySelector('.rasp-result-prize').textContent = currentPrize.emoji + ' ' + currentPrize.name;
+    res.querySelector('.rasp-result-sub').textContent = currentPrize.desc;
+    res.classList.add('show');
+
+    // Nova btn
+    document.getElementById('raspNewBtn').classList.add('show');
+
+    // Win overlay (after short delay)
+    setTimeout(()=>showRaspWin(currentPrize), 400);
+  }, 600);
+}
+
+function showAlreadyScratched() {
+  const prize = currentPrize;
+  document.getElementById('raspPrizeEmoji').textContent = prize.emoji;
+  document.getElementById('raspPrizeValue').textContent = prize.name;
+  document.getElementById('raspPrizeLabel').textContent = prize.desc;
+
+  // Show without canvas (already revealed)
+  const container = document.getElementById('raspScratchContainer');
+  const existing = document.getElementById('raspCanvas');
+  if (existing) existing.remove();
+
+  const res = document.getElementById('raspResult');
+  if (res) {
+    res.querySelector('.rasp-result-prize').textContent = prize.emoji + ' ' + prize.name;
+    res.querySelector('.rasp-result-sub').textContent = prize.desc;
+    res.classList.add('show');
+  }
+  document.getElementById('raspNewBtn').classList.add('show');
+  document.getElementById('raspProgressFill').style.width = '100%';
+  document.getElementById('raspProgressText').textContent = '✓ Já revelada!';
+}
+
+function showRaspWin(prize) {
+  document.getElementById('raspWinEmoji').textContent = prize.emoji;
+  document.getElementById('raspWinName').textContent = prize.name;
+  document.getElementById('raspWinDesc').textContent = prize.desc;
+  const ov = document.getElementById('raspWinOv');
+  ov.style.display = 'flex';
+  ov.style.animation = 'fadeIn 0.4s ease';
+  ov.classList.add('open');
+}
+
+function raspNovaRaspadinha() {
+  raspState.currentPrize = null;
+  raspState.scratched = false;
+  raspState.adminPrize = null;
+  saveRaspState();
+  buildNewCard();
+  raspToast('Nova raspadinha gerada!', 'gold');
+}
+
+// ── ADMIN ──
+let raspAdminOpen = false;
+let raspAdminUnlocked = false;
+
+function raspToggleAdmin() {
+  raspAdminOpen = !raspAdminOpen;
+  document.getElementById('raspAdminPanel').classList.toggle('open', raspAdminOpen);
+  document.getElementById('raspAdminArrow').textContent = raspAdminOpen ? '▲' : '▼';
+}
+
+function raspVerificarPin() {
+  const pin = document.getElementById('raspAdminPinInput').value;
+  if (pin === RASP_ADMIN_PIN) {
+    raspAdminUnlocked = true;
+    document.getElementById('raspAdminContent').style.display = 'block';
+    document.getElementById('raspAdminLogin').style.display = 'none';
+    raspToast('Admin desbloqueado', 'green');
+  } else {
+    raspToast('PIN incorreto', 'red');
+  }
+}
+
+function raspAdminSetPrize() {
+  if (!raspAdminUnlocked) return;
+  const sel = document.getElementById('raspAdminPrizeSelect').value;
+  raspState.adminPrize = sel || null;
+  raspState.currentPrize = null;
+  raspState.scratched = false;
+  saveRaspState();
+  buildNewCard();
+  raspToast(sel ? 'Prémio definido: '+PRIZES.find(p=>p.id===sel)?.name : 'Prémio aleatório', 'gold');
+}
+
+function raspAdminReset() {
+  if (!raspAdminUnlocked) return;
+  if (!confirm('Apagar histórico e gerar nova raspadinha?')) return;
+  localStorage.removeItem(RASP_LS_KEY);
+  raspState = defaultRaspState();
+  saveRaspState();
+  buildNewCard();
+  raspToast('Reset efectuado', 'red');
+}
+
+// ── TOAST ──
+function raspToast(msg, type='') {
+  const t = document.getElementById('raspToastEl');
+  t.textContent = msg;
+  t.className = 'rasp-toast show'+(type?' '+type:'');
+  clearTimeout(window._raspToastTimer);
+  window._raspToastTimer = setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+// ── EXPOSE ──
+window.abrirRaspadinha = function() {
+  document.getElementById('raspOverlay').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  if (!window._raspInitDone) { window._raspInitDone = true; raspInit(); }
+};
+window.fecharRaspadinha = function() {
+  document.getElementById('raspOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+};
+window.raspNovaRaspadinha = raspNovaRaspadinha;
+window.raspToggleAdmin = raspToggleAdmin;
+window.raspVerificarPin = raspVerificarPin;
+window.raspAdminSetPrize = raspAdminSetPrize;
+window.raspAdminReset = raspAdminReset;
+window.showRaspWin = showRaspWin;
+window.PRIZES_RASP = PRIZES;
+
+})();
+</script>
+
+<!-- RASPADINHA OVERLAY HTML -->
+<div id="raspOverlay" style="display:none;position:fixed;inset:0;z-index:99990;background:#080808;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+
+  <!-- STATUS BAR -->
+  <div class="rasp-status-bar">
+    <div class="rasp-status-title">🎟️ RASPADINHA</div>
+    <button class="rasp-close-btn" onclick="fecharRaspadinha()">✕</button>
+  </div>
+
+  <!-- HEADER -->
+  <div class="rasp-header">
+    <div class="rasp-eyebrow">SUPER LIGA · VDG 2026</div>
+    <div class="rasp-title">A <span>RASPA</span></div>
+    <div class="rasp-sub">Raspa e descobre o teu prémio desta semana</div>
+  </div>
+
+  <!-- BODY -->
+  <div class="rasp-body">
+
+    <!-- CARD -->
+    <div class="rasp-card">
+      <div class="rasp-card-header">
+        <div class="rasp-card-header-text">SUPER LIGA · RASPADINHA</div>
+        <div class="rasp-card-header-sub">VDG 2026 · PRÉMIO SURPRESA</div>
+      </div>
+
+      <div class="rasp-scratch-wrap">
+        <div class="rasp-scratch-label">RASPA A ÁREA ABAIXO</div>
+
+        <!-- SCRATCH CONTAINER -->
+        <div class="scratch-container" id="raspScratchContainer">
+          <!-- PRIZE BEHIND (always rendered) -->
+          <div class="scratch-prize" id="raspPrizeBehind">
+            <div class="scratch-prize-emoji" id="raspPrizeEmoji">🎁</div>
+            <div class="scratch-prize-value" id="raspPrizeValue">???</div>
+            <div class="scratch-prize-label" id="raspPrizeLabel">Raspa para descobrir</div>
+          </div>
+          <!-- Canvas drawn on top by JS -->
+        </div>
+
+        <!-- PROGRESS -->
+        <div class="rasp-progress-wrap">
+          <div class="rasp-progress-text" id="raspProgressText">Raspa para revelar o prémio</div>
+          <div class="rasp-progress-bar">
+            <div class="rasp-progress-fill" id="raspProgressFill"></div>
+          </div>
+        </div>
+
+        <!-- RESULT (revealed) -->
+        <div class="rasp-result" id="raspResult">
+          <div class="rasp-result-label">O TEU PRÉMIO</div>
+          <div class="rasp-result-prize"></div>
+          <div class="rasp-result-sub"></div>
+        </div>
+
+        <!-- NOVA RASPADINHA BTN -->
+        <button class="rasp-new-btn" id="raspNewBtn" onclick="raspNovaRaspadinha()">🎟️ NOVA RASPADINHA</button>
+      </div>
+    </div>
+
+    <!-- PRÉMIOS POSSÍVEIS -->
+    <div class="prizes-section">
+      <div class="prizes-title">PRÉMIOS POSSÍVEIS</div>
+      <div class="prizes-grid" id="raspPrizesGrid"></div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="rasp-admin-section">
+      <button class="rasp-admin-toggle" onclick="raspToggleAdmin()">
+        <span>⚙️ ADMIN</span>
+        <span id="raspAdminArrow">▼</span>
+      </button>
+      <div class="rasp-admin-panel" id="raspAdminPanel">
+
+        <!-- LOGIN -->
+        <div id="raspAdminLogin" style="display:block">
+          <div class="rasp-admin-pin-row">
+            <input class="rasp-admin-pin-input" id="raspAdminPinInput" type="tel" maxlength="4" placeholder="PIN">
+            <button class="rasp-admin-btn" onclick="raspVerificarPin()">ENTRAR</button>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div id="raspAdminContent" style="display:none">
+          <div class="rasp-admin-row">
+            <span class="rasp-admin-label">Forçar prémio:</span>
+            <select id="raspAdminPrizeSelect" class="rasp-admin-input" style="max-width:180px">
+              <option value="">— Aleatório —</option>
+            </select>
+            <button class="rasp-admin-btn" onclick="raspAdminSetPrize()">💰 Definir</button>
+          </div>
+          <div class="rasp-admin-row" style="margin-top:6px">
+            <button class="rasp-admin-btn red" onclick="raspAdminReset()">🗑 Reset Total</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- end rasp-body -->
+
+  <!-- TOAST -->
+  <div class="rasp-toast" id="raspToastEl"></div>
+
+</div><!-- end #raspOverlay -->
+
+<!-- WIN OVERLAY (outside raspadinha overlay for z-index) -->
+<div id="raspWinOv" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.92);align-items:center;justify-content:center;flex-direction:column;padding:40px 20px;text-align:center;">
+  <div class="rw-confetti">🎉</div>
+  <div class="rw-label">PARABÉNS!</div>
+  <div class="rw-title">GANHASTE!</div>
+  <div class="rw-prize-emoji" id="raspWinEmoji">🎁</div>
+  <div class="rw-prize-name" id="raspWinName"></div>
+  <div class="rw-prize-desc" id="raspWinDesc"></div>
+  <button class="rw-close" onclick="document.getElementById('raspWinOv').style.display='none'">FECHAR</button>
+</div>
+
+<script>
+// Build prizes grid and admin select on DOM ready
+(function() {
+  function initRaspUI() {
+    const grid = document.getElementById('raspPrizesGrid');
+    const sel = document.getElementById('raspAdminPrizeSelect');
+    if (!grid || !window.PRIZES_RASP) return;
+    grid.innerHTML = window.PRIZES_RASP.map(p=>`
+      <div class="prize-chip ${p.special?'special':''}">
+        <div class="prize-chip-emoji">${p.emoji}</div>
+        <div class="prize-chip-info">
+          <div class="prize-chip-name">${p.name}</div>
+          <div class="prize-chip-prob">${p.special?'★ Especial':'Frequente'}</div>
+        </div>
+      </div>`).join('');
+    if (sel) {
+      window.PRIZES_RASP.forEach(p=>{
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = p.emoji + ' ' + p.name;
+        sel.appendChild(opt);
+      });
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initRaspUI);
+  } else {
+    setTimeout(initRaspUI, 100);
+  }
+})();
+</script>
+
 <script>
 // ══════════════════════════════════════════════════════════
 // FEED "O BALNEÁRIO" — Super Liga VDG
@@ -7227,8 +8053,8 @@ window.cofreSom = cofreSom;
 (function() {
 
 // ── CONFIG ──
-const FEED_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZ7J7wCftImXw40mXQ7fM-DBMLOngZe9a95liYQ3Q4qaBSnYWot8gDiFqxzIB5cPFEwQ/exec';
-const TENOR_KEY = 'AIzaSyAyimkuYQYF_FuasThVpfdsHd5-GNHaAek';
+const FEED_SCRIPT_URL = 'COLE_AQUI_URL_DO_APPS_SCRIPT_FEED';
+const TENOR_KEY = 'AIzaSyAyimkuYQYF_FuasThVpfdsHd5-GNHaAek'; // public demo key
 const REACTIONS_LIST = ['🔥','💪','😂','👑','🤙','💀'];
 
 // ── USER IDENTITY ──
@@ -7259,15 +8085,7 @@ let _gifSearchTimer = null;
 window.feedInit = function() {
   const user = getFeedUser();
   const avatar = document.getElementById('composeAvatar');
-  if (avatar) {
-    const foto = user && typeof getFoto === 'function' ? getFoto(user) : null;
-    if (foto) {
-      avatar.innerHTML = `<img src="${foto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${user}">`;
-      avatar.style.padding = '0'; avatar.style.overflow = 'hidden'; avatar.style.background = 'none';
-    } else {
-      avatar.textContent = user ? avatarLetter(user) : '?';
-    }
-  }
+  if (avatar) avatar.textContent = user ? avatarLetter(user) : '?';
 
   if (!feedLoaded) {
     feedLoaded = true;
@@ -7373,6 +8191,8 @@ function feedLoad() {
 // ── AUTO-GENERATE EVENTS FROM RANKING DATA ──
 function mergeAutoEvents() {
   const todos = window.dashAllDados || [];
+  if (!todos.length) return;
+
   const autoEvents = [];
   const now = new Date();
   const mesAtual = now.getMonth();
@@ -7382,226 +8202,114 @@ function mergeAutoEvents() {
   const catLabels = {onlines:'Onlines',sprays:'Sprays',palmilhas:'Palmilhas',camisolas:'Camisolas',sacos:'Sacos',garrafas:'Garrafas',elogios:'Elogios',szclub:'SZClub'};
   const catEmojis = {onlines:'🖥️',sprays:'🧴',palmilhas:'🦶',camisolas:'👕',sacos:'🛍️',garrafas:'💧',elogios:'⭐',szclub:'🎫'};
 
-  function ev(id, tag, highlight, text, tsExtra, extra) {
-    return { id, type:'auto', tag, author:'Super Liga', ts: today + (tsExtra||'T07:00:00'),
-      highlight: highlight||null, text, reactions:{}, comments:[], pinned:false, ...(extra||{}) };
-  }
-
-  if (todos.length) {
-    // ── Aggregate by month and by day ──
-    const agg = {}, todayAgg = {}, byDay = {};
-    todos.forEach(d => {
-      const dt = new Date((d.data||'')+'T12:00:00');
-      const isMonth = !isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual;
-      const dayKey = (d.data||'').slice(0,10);
-      const isToday = dayKey === today;
-      if (!isMonth) return;
-      if (!agg[d.nome]) agg[d.nome] = {nome:d.nome, total:0, dias:new Set()};
-      cats.forEach(k => { agg[d.nome].total += (Number(d[k])||0); agg[d.nome][k] = (agg[d.nome][k]||0)+(Number(d[k])||0); });
-      agg[d.nome].dias.add(dayKey);
-      if (!byDay[dayKey]) byDay[dayKey] = {};
-      if (!byDay[dayKey][d.nome]) byDay[dayKey][d.nome] = {nome:d.nome, total:0};
-      cats.forEach(k => { byDay[dayKey][d.nome].total += (Number(d[k])||0); byDay[dayKey][d.nome][k] = (byDay[dayKey][d.nome][k]||0)+(Number(d[k])||0); });
-      if (isToday) {
-        if (!todayAgg[d.nome]) todayAgg[d.nome] = {nome:d.nome, total:0};
-        cats.forEach(k => { todayAgg[d.nome].total += (Number(d[k])||0); todayAgg[d.nome][k] = (todayAgg[d.nome][k]||0)+(Number(d[k])||0); });
-      }
-    });
-
-    const ranking = Object.values(agg).sort((a,b) => b.total - a.total);
-    const todayRanking = Object.values(todayAgg).sort((a,b) => b.total - a.total);
-    const allNames = typeof equipas !== 'undefined' ? equipas.flatMap(e=>e.nomes||[]) : ranking.map(r=>r.nome);
-
-    // ── 1. LÍDER DO MÊS ──
-    if (ranking[0]) {
-      const segundo = ranking[1];
-      const diff = segundo ? ranking[0].total - segundo.total : null;
-      autoEvents.push(ev('auto_leader_month','ranking',
-        '🏆 ' + ranking[0].nome.split(' ')[0].toUpperCase() + ' LIDERA O MÊS',
-        ranking[0].nome + ' está no topo com ' + ranking[0].total + ' registos este mês.' +
-        (diff !== null ? (diff > 5 ? ' Margem confortável de ' + diff + ' pontos sobre ' + segundo.nome.split(' ')[0] + '.' : ' ' + segundo.nome.split(' ')[0] + ' está só a ' + diff + ' de distância! 🔥') : ''),
-        'T09:00:00'
-      ));
+  // Aggregate month
+  const agg = {};
+  const todayAgg = {};
+  todos.forEach(d => {
+    const dt = new Date((d.data||'') + 'T12:00:00');
+    const isMonth = !isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual;
+    const isToday = (d.data||'').slice(0,10) === today;
+    if (!isMonth) return;
+    if (!agg[d.nome]) agg[d.nome] = {nome:d.nome, total:0};
+    cats.forEach(k => { agg[d.nome].total += (Number(d[k])||0); agg[d.nome][k] = (agg[d.nome][k]||0)+(Number(d[k])||0); });
+    if (isToday) {
+      if (!todayAgg[d.nome]) todayAgg[d.nome] = {nome:d.nome, total:0};
+      cats.forEach(k => { todayAgg[d.nome].total += (Number(d[k])||0); todayAgg[d.nome][k] = (todayAgg[d.nome][k]||0)+(Number(d[k])||0); });
     }
-
-    // ── 2. BATALHA PELO TOP — quem está próximo ──
-    if (ranking.length >= 2) {
-      const pares = [];
-      for (let i = 0; i < Math.min(ranking.length-1, 4); i++) {
-        const diff = ranking[i].total - ranking[i+1].total;
-        if (diff <= 3 && diff >= 0) {
-          pares.push(ranking[i].nome.split(' ')[0] + ' (' + ranking[i].total + ') vs ' + ranking[i+1].nome.split(' ')[0] + ' (' + ranking[i+1].total + ')');
-        }
-      }
-      if (pares.length) {
-        autoEvents.push(ev('auto_battle_top','ranking',
-          '⚔️ BATALHA APERTADA NO RANKING',
-          'Diferenças mínimas no ranking: ' + pares.join(' · ') + '. Tudo pode mudar num único registo!',
-          'T10:00:00'
-        ));
-      }
-    }
-
-    // ── 3. LÍDER DO DIA ──
-    if (todayRanking[0] && todayRanking[0].total > 0) {
-      autoEvents.push(ev('auto_leader_today','ranking',
-        '⚡ LÍDER DE HOJE: ' + todayRanking[0].nome.split(' ')[0].toUpperCase(),
-        todayRanking[0].nome + ' já tem ' + todayRanking[0].total + ' registos hoje!' +
-        (todayRanking[1] ? ' ' + todayRanking[1].nome.split(' ')[0] + ' está a ' + (todayRanking[0].total - todayRanking[1].total) + ' atrás.' : ' O resto da equipa a dormir? 😴'),
-        'T08:30:00'
-      ));
-    }
-
-    // ── 4. RESUMO DO DIA ──
-    if (todayRanking.length) {
-      const totalHoje = todayRanking.reduce((s,p)=>s+p.total,0);
-      const nomes = todayRanking.slice(0,3).map(p=>p.nome.split(' ')[0]+'('+p.total+')').join(' · ');
-      autoEvents.push(ev('auto_today_summary_'+today,'ranking',
-        '📊 RESUMO DE ' + new Date(today+'T12:00:00').toLocaleDateString('pt-PT',{weekday:'long'}).toUpperCase(),
-        totalHoje + ' registos no total hoje. Destaques: ' + nomes + '. 💪',
-        'T08:00:00'
-      ));
-    }
-
-    // ── 5. SEM REGISTOS HOJE ──
-    const comRegistos = new Set(Object.keys(todayAgg));
-    const semHoje = allNames.filter(n => !comRegistos.has(n) && agg[n] && agg[n].total > 0).map(n=>n.split(' ')[0]);
-    if (semHoje.length) {
-      const msgs = ['Acordem! 😅','O que se passa? 🤔','Vão ao trabalho! 😂','Toca a trabalhar! 💀'];
-      const msg = msgs[Math.floor(today.slice(-1) % msgs.length)];
-      autoEvents.push(ev('auto_missing_'+today,'ranking', null,
-        '👀 Ainda sem registos hoje: ' + semHoje.join(', ') + '. ' + msg,
-        'T09:30:00'
-      ));
-    }
-
-    // ── 6. ULTRAPASAGENS — quem subiu de posição vs ontem ──
-    const yesterday = new Date(now); yesterday.setDate(yesterday.getDate()-1);
-    const yesterdayKey = yesterday.toISOString().slice(0,10);
-    if (byDay[yesterdayKey] && byDay[today]) {
-      // Compare totals acumulados até ontem vs hoje
-      const rankOntem = ranking.map((r,i)=>({nome:r.nome,pos:i}));
-      // Simple: quem tem mais registos hoje que ontem (cresceu mais rápido)
-      const subidas = [];
-      for (let i = 1; i < ranking.length; i++) {
-        const atual = ranking[i];
-        const anterior = ranking[i-1];
-        const ganhouHoje = (todayAgg[atual.nome]||{total:0}).total;
-        const anteriorHoje = (todayAgg[anterior.nome]||{total:0}).total;
-        if (ganhouHoje > anteriorHoje + 2) {
-          subidas.push(atual.nome.split(' ')[0] + ' está a ganhar terreno a ' + anterior.nome.split(' ')[0]);
-        }
-      }
-      if (subidas.length) {
-        autoEvents.push(ev('auto_climb_'+today,'ranking',
-          '📈 MOVIMENTO NO RANKING',
-          subidas[0] + '! O ranking pode mudar ainda hoje. 👀',
-          'T11:00:00'
-        ));
-      }
-    }
-
-    // ── 7. CATEGORIAS ──
-    cats.forEach(k => {
-      const sorted = ranking.filter(r=>(r[k]||0)>0).sort((a,b)=>b[k]-a[k]);
-      if (!sorted.length) return;
-      autoEvents.push(ev('auto_cat_'+k,'ranking', null,
-        catEmojis[k] + ' ' + catLabels[k] + ': ' + sorted[0].nome + ' lidera com ' + sorted[0][k] +
-        (sorted[1] ? ' · ' + sorted[1].nome.split(' ')[0] + ' em 2.º com ' + sorted[1][k] : '') + ' 🔥',
-        'T07:30:00'
-      ));
-    });
-
-    // ── 8. DIAS SEM REGISTOS (streak negativo) ──
-    const allDays = Object.keys(byDay).sort().reverse();
-    allNames.forEach(nome => {
-      if (!agg[nome]) return; // nunca registou
-      let diasSem = 0;
-      const d = new Date(now);
-      while (diasSem < 7) {
-        const key = d.toISOString().slice(0,10);
-        const isWeekend = d.getDay()===0 || d.getDay()===6;
-        if (!isWeekend) {
-          if (byDay[key] && byDay[key][nome] && byDay[key][nome].total > 0) break;
-          diasSem++;
-        }
-        d.setDate(d.getDate()-1);
-      }
-      if (diasSem >= 3) {
-        const mensagens = [
-          nome.split(' ')[0] + ' não regista há ' + diasSem + ' dias úteis. Está tudo bem? 🤔',
-          nome.split(' ')[0] + ' desapareceu do radar há ' + diasSem + ' dias. SOS! 📡',
-          diasSem + ' dias sem ver ' + nome.split(' ')[0] + ' nos registos... voltou de férias sem avisar? 😅'
-        ];
-        autoEvents.push(ev('auto_nosales_'+nome.replace(/\s/g,'_'),  'ranking', null,
-          mensagens[diasSem % mensagens.length], 'T10:30:00'
-        ));
-      }
-    });
-
-    // ── 9. MEDALHAS CONQUISTADAS ──
-    if (typeof calcularMedalhas === 'function') {
-      try {
-        const todosMes = todos.filter(d => {
-          const dt = new Date((d.data||'')+'T12:00:00');
-          return !isNaN(dt) && dt.getMonth()===mesAtual && dt.getFullYear()===anoAtual;
-        });
-        const nomesMes = [...new Set(todosMes.map(d=>d.nome))];
-        nomesMes.forEach(nome => {
-          const dadosNome = todosMes.filter(d=>d.nome===nome);
-          const meds = calcularMedalhas(dadosNome).filter(m=>m.earned);
-          if (meds.length) {
-            const medalStr = meds.map(m=>m.icon+' '+m.name).join(', ');
-            autoEvents.push(ev('auto_medal_'+nome.replace(/\s/g,'_'),'medals',
-              '🏅 ' + nome.split(' ')[0].toUpperCase() + ' CONQUISTOU MEDALHA!',
-              nome + ' conquistou: ' + medalStr + ' este mês! 🎉 Vai à Slot Machine buscar o prémio!',
-              'T08:00:00'
-            ));
-          }
-        });
-      } catch(e) {}
-    }
-
-    // ── 10. COFRE — estado atual ──
-    try {
-      const cofreState = JSON.parse(localStorage.getItem('cofreState')||'{}');
-      if (cofreState.jackpot !== undefined) {
-        const semanas = cofreState.weeksNoWinner || 1;
-        autoEvents.push(ev('auto_cofre_estado','medals',
-          '🔒 O COFRE TEM €' + Number(cofreState.jackpot).toFixed(2).replace('.',','),
-          'Já ' + semanas + ' semana(s) sem vencedor. O prémio acumulado é de €' + Number(cofreState.jackpot).toFixed(2).replace('.',',') + '. Os líderes de cada categoria podem tentar o código! 🤑',
-          'T07:00:00'
-        ));
-      }
-    } catch(e) {}
-
-    // ── 11. TOP 3 GERAL — pódio ──
-    if (ranking.length >= 3) {
-      const podio = ['🥇','🥈','🥉'].map((m,i)=> m + ' ' + ranking[i].nome.split(' ')[0] + ' — ' + ranking[i].total).join('\n');
-      autoEvents.push(ev('auto_podium_'+today.slice(0,7),'ranking',
-        '🏟️ PÓDIO DO MÊS',
-        podio,
-        'T07:15:00'
-      ));
-    }
-
-  } else {
-    // Sem dados — evento de boas-vindas
-    autoEvents.push(ev('auto_welcome','ranking',
-      '👋 BEM-VINDOS AO BALNEÁRIO',
-      'O feed atualiza automaticamente com eventos do ranking, medalhas, cofre e muito mais. Carrega o Ranking para começar! 🏆',
-      'T07:00:00'
-    ));
-  }
-
-  // ── Preservar reações/comentários existentes ──
-  const staffPosts = feedPosts.filter(p => p.type !== 'auto');
-  autoEvents.forEach(ae => {
-    const existing = feedPosts.find(p => p.id === ae.id);
-    if (existing) { ae.reactions = existing.reactions||{}; ae.comments = existing.comments||[]; ae.userReactions = existing.userReactions||{}; }
   });
 
-  feedPosts = [...autoEvents, ...staffPosts].sort((a,b) => new Date(b.ts) - new Date(a.ts));
+  const ranking = Object.values(agg).sort((a,b) => b.total - a.total);
+  const todayRanking = Object.values(todayAgg).sort((a,b) => b.total - a.total);
+
+  // 1. LÍDER DO MÊS
+  if (ranking[0]) {
+    autoEvents.push({
+      id: 'auto_leader_month',
+      type: 'auto', tag: 'ranking',
+      author: 'Super Liga',
+      ts: now.toISOString(),
+      highlight: '🏆 ' + ranking[0].nome.split(' ')[0].toUpperCase() + ' LIDERA O MÊS',
+      text: ranking[0].nome + ' está no topo do ranking com ' + ranking[0].total + ' registos este mês. Alguém vai reagir?',
+      reactions: {}, comments: [],
+      pinned: false
+    });
+  }
+
+  // 2. LÍDER DO DIA
+  if (todayRanking[0] && todayRanking[0].total > 0) {
+    autoEvents.push({
+      id: 'auto_leader_today',
+      type: 'auto', tag: 'ranking',
+      author: 'Super Liga',
+      ts: today + 'T08:00:00',
+      highlight: '⚡ LÍDER DE HOJE: ' + todayRanking[0].nome.split(' ')[0].toUpperCase(),
+      text: todayRanking[0].nome + ' já tem ' + todayRanking[0].total + ' registos hoje! ' + (todayRanking[1] ? todayRanking[1].nome.split(' ')[0] + ' está a ' + (todayRanking[0].total - todayRanking[1].total) + ' de distância.' : ''),
+      reactions: {}, comments: [],
+      pinned: false
+    });
+  }
+
+  // 3. CATEGORIAS — líder de cada uma
+  cats.forEach(k => {
+    const sorted = ranking.filter(r=>(r[k]||0)>0).sort((a,b)=>b[k]-a[k]);
+    if (!sorted.length) return;
+    const lider = sorted[0];
+    autoEvents.push({
+      id: 'auto_cat_' + k,
+      type: 'auto', tag: 'ranking',
+      author: 'Super Liga',
+      ts: today + 'T07:30:00',
+      text: catEmojis[k] + ' ' + catLabels[k] + ': ' + lider.nome + ' lidera com ' + lider[k] + (sorted[1] ? ' — ' + sorted[1].nome.split(' ')[0] + ' em 2º com ' + sorted[1][k] : '') + '. 🔥',
+      reactions: {}, comments: [],
+      pinned: false
+    });
+  });
+
+  // 4. REGISTOS DE HOJE (detalhado)
+  if (todayRanking.length) {
+    const hoje = todayRanking.slice(0,3).map(p => p.nome.split(' ')[0] + ' (' + p.total + ')').join(', ');
+    autoEvents.push({
+      id: 'auto_today_summary_' + today,
+      type: 'auto', tag: 'ranking',
+      author: 'Super Liga',
+      ts: now.toISOString(),
+      highlight: '📊 RESUMO DE HOJE',
+      text: 'Registos de hoje: ' + hoje + '. Mantém o ritmo! 💪',
+      reactions: {}, comments: [],
+      pinned: false
+    });
+  }
+
+  // 5. SEM REGISTOS hoje
+  const comRegistos = new Set(Object.keys(todayAgg));
+  const semRegistos = ranking.filter(r => !comRegistos.has(r.nome) && r.total > 0).map(r => r.nome.split(' ')[0]);
+  if (semRegistos.length) {
+    autoEvents.push({
+      id: 'auto_missing_' + today,
+      type: 'auto', tag: 'ranking',
+      author: 'Super Liga',
+      ts: today + 'T09:00:00',
+      text: '👀 Ainda sem registos hoje: ' + semRegistos.join(', ') + '. Acordem! 😅',
+      reactions: {}, comments: [],
+      pinned: false
+    });
+  }
+
+  // Merge: auto events get replaced/kept, staff posts persist
+  const staffPosts = feedPosts.filter(p => p.type !== 'auto');
+  const existingAutoIds = new Set(autoEvents.map(e => e.id));
+
+  // Preserve reactions/comments from existing auto events
+  autoEvents.forEach(ae => {
+    const existing = feedPosts.find(p => p.id === ae.id);
+    if (existing) {
+      ae.reactions = existing.reactions || {};
+      ae.comments = existing.comments || [];
+    }
+  });
+
+  feedPosts = [...autoEvents, ...staffPosts]
+    .sort((a,b) => new Date(b.ts) - new Date(a.ts));
 }
 
 // ── RENDER FEED ──
@@ -7626,19 +8334,6 @@ function renderFeed() {
   }
 
   list.innerHTML = posts.map(p => renderPost(p)).join('');
-
-  // Welcome card desaparece após 10s
-  const welcomeEl = document.getElementById('post_auto_welcome');
-  if (welcomeEl) {
-    setTimeout(() => {
-      welcomeEl.style.transition = 'opacity 0.8s ease, max-height 0.8s ease, margin 0.8s ease';
-      welcomeEl.style.opacity = '0';
-      welcomeEl.style.maxHeight = '0';
-      welcomeEl.style.overflow = 'hidden';
-      welcomeEl.style.marginBottom = '0';
-      setTimeout(() => welcomeEl.remove(), 800);
-    }, 10000);
-  }
 }
 
 function renderPost(p) {
@@ -7665,7 +8360,7 @@ function renderPost(p) {
   const comments = p.comments || [];
   const commentsHtml = comments.slice(-3).map(c => `
     <div class="comment-item">
-      <div class="comment-avatar" style="${typeof getFoto==='function' && getFoto(c.author) ? 'padding:0;overflow:hidden;background:none;' : ''}">${typeof getFoto==='function' && getFoto(c.author) ? `<img src="${getFoto(c.author)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${c.author}">` : avatarLetter(c.author)}</div>
+      <div class="comment-avatar">${avatarLetter(c.author)}</div>
       <div class="comment-bubble">
         <div class="comment-author">${c.author.split(' ')[0]}</div>
         <div class="comment-text">${escapeHtml(c.text)}</div>
@@ -7681,8 +8376,8 @@ function renderPost(p) {
   return `
   <div class="feed-post ${isAuto ? 'auto' : 'staff'} ${p.highlight ? 'top-event' : ''} ${isPinned ? 'pinned' : ''}" id="post_${p.id}">
     <div class="post-header">
-      <div class="post-avatar ${isAuto ? 'system' : ''}" style="${isAuto ? '' : 'padding:0;overflow:hidden;background:none;border-color:rgba(201,168,76,0.3)'}">
-        ${isAuto ? '⚡' : (typeof getFoto==='function' && getFoto(p.author) ? `<img src="${getFoto(p.author)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${p.author}">` : `<span class="post-avatar-letter">${letter}</span>`)}
+      <div class="post-avatar ${isAuto ? 'system' : ''}">
+        ${isAuto ? '⚡' : `<span class="post-avatar-letter">${letter}</span>`}
       </div>
       <div class="post-meta">
         <div class="post-author">
@@ -7700,16 +8395,16 @@ function renderPost(p) {
       ${p.gif ? `<div class="post-gif"><img src="${p.gif}" loading="lazy" alt="gif"></div>` : ''}
     </div>
     ${reactHtml ? `<div class="post-reactions">${reactHtml}</div>` : ''}
-    ${p.id !== 'auto_welcome' ? `<div class="post-comments-wrap">
+    <div class="post-comments-wrap">
       ${showMoreComments}
       ${commentsHtml}
       <div class="comment-input-row">
-        <div class="comment-avatar" style="${typeof getFoto==='function' && user && getFoto(user) ? 'padding:0;overflow:hidden;background:none;' : ''}">${typeof getFoto==='function' && user && getFoto(user) ? `<img src="${getFoto(user)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : (user ? avatarLetter(user) : '?')}</div>
+        <div class="comment-avatar">${user ? avatarLetter(user) : '?'}</div>
         <input class="comment-input" id="ci_${p.id}" placeholder="Comenta..." type="text" maxlength="200" onkeydown="if(event.key==='Enter'){feedCommentSubmit('${p.id}');event.preventDefault()}">
         <button class="comment-gif-btn" onclick="openGifPicker('comment','${p.id}')">GIF</button>
         <button class="comment-send-btn" onclick="feedCommentSubmit('${p.id}')">↑</button>
       </div>
-    </div>` : ''}
+    </div>
   </div>`;
 }
 
@@ -7858,51 +8553,22 @@ window.closeGifPicker = function() {
 
 function fetchGifs(query) {
   const grid = document.getElementById('gifGrid');
-  grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">A carregar GIFs...</div>';
-
-  // Tenor v2 via corsproxy para evitar CORS
-  const tenorUrl = `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(query)}&key=${TENOR_KEY}&limit=16&media_filter=gif,tinygif`;
-  const proxiedUrl = 'https://corsproxy.io/?' + encodeURIComponent(tenorUrl);
-
-  const renderGifs = (urls) => {
-    if (!urls.length) {
-      grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">Sem resultados para "' + query + '"</div>';
-      return;
-    }
-    grid.innerHTML = urls.map(({url, preview}) =>
-      `<div class="gif-item" onclick="selectGif(${JSON.stringify(url)})"><img src="${preview || url}" loading="lazy" alt="gif"></div>`
-    ).join('');
-  };
-
-  const parseTenor = (data) => {
-    if (!data.results || !data.results.length) return [];
-    return data.results.map(r => {
-      const gif = r.media_formats?.gif?.url || r.media_formats?.tinygif?.url || '';
-      const preview = r.media_formats?.tinygif?.url || r.media_formats?.nanogif?.url || gif;
-      return { url: gif, preview };
-    }).filter(r => r.url);
-  };
-
-  // Try direct first, then proxy
-  fetch(tenorUrl, { mode: 'cors' })
-    .then(r => { if (!r.ok) throw new Error('cors'); return r.json(); })
-    .then(data => renderGifs(parseTenor(data)))
+  grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">A carregar...</div>';
+  const url = `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(query)}&key=${TENOR_KEY}&limit=16&media_filter=gif`;
+  fetch(url)
+    .then(r => r.json())
+    .then(data => {
+      if (!data.results || !data.results.length) {
+        grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">Sem resultados</div>';
+        return;
+      }
+      grid.innerHTML = data.results.map(r => {
+        const gifUrl = r.media_formats?.gif?.url || r.media_formats?.tinygif?.url || '';
+        return `<div class="gif-item" onclick="selectGif('${gifUrl}')"><img src="${gifUrl}" loading="lazy" alt="gif"></div>`;
+      }).join('');
+    })
     .catch(() => {
-      fetch(proxiedUrl)
-        .then(r => r.json())
-        .then(data => renderGifs(parseTenor(data)))
-        .catch(() => {
-          // Last resort: Giphy public beta
-          const giphyUrl = `https://api.giphy.com/v1/gifs/search?api_key=dc6zaTOxFJmzC&q=${encodeURIComponent(query)}&limit=16&rating=g`;
-          fetch(giphyUrl)
-            .then(r => r.json())
-            .then(data => {
-              if (!data.data || !data.data.length) { grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">Sem resultados</div>'; return; }
-              const urls = data.data.map(g => ({ url: g.images.original.url, preview: g.images.fixed_height_small.url }));
-              renderGifs(urls);
-            })
-            .catch(() => { grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">Erro a carregar GIFs. Verifica a ligação.</div>'; });
-        });
+      grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--muted)">Erro ao carregar GIFs</div>';
     });
 }
 
@@ -7954,7 +8620,7 @@ window.feedExpandComments = function(postId) {
   const user = getFeedUser();
   const allComments = (post.comments||[]).map(c => `
     <div class="comment-item">
-      <div class="comment-avatar" style="${typeof getFoto==='function' && getFoto(c.author) ? 'padding:0;overflow:hidden;background:none;' : ''}">${typeof getFoto==='function' && getFoto(c.author) ? `<img src="${getFoto(c.author)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${c.author}">` : avatarLetter(c.author)}</div>
+      <div class="comment-avatar">${avatarLetter(c.author)}</div>
       <div class="comment-bubble">
         <div class="comment-author">${c.author.split(' ')[0]}</div>
         <div class="comment-text">${escapeHtml(c.text)}</div>
