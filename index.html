@@ -504,6 +504,8 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
   100% { transform: scaleY(1.12) scaleX(0.96) rotate(3deg);  filter: drop-shadow(0 0 10px #FFA500) brightness(1.5); }
 }
 
+@keyframes cofreSemAnim { from{opacity:0;transform:translateY(20px) scale(0.9)} to{opacity:1;transform:translateY(0) scale(1)} }
+
 /* NAV TAP BURST */
 @keyframes navTap { 0%{transform:scale(1)} 30%{transform:scale(1.35)} 60%{transform:scale(0.92)} 100%{transform:scale(1)} }
 .nav-icon-tap { animation: navTap 0.38s cubic-bezier(0.34,1.56,0.64,1) both; }
@@ -1768,6 +1770,60 @@ const categorias = [
 
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxpnTHL-_VI1WrxzVD5H5uSciwJZHVGHW__jH0I4JBMjYBfzxQAcAK0oKFU8728OzJQ/exec';
 
+// ── PRÉ-CARREGAMENTO em background logo no arranque ──
+// Carrega o ranking e todos os dados em cache para que o ranking abra instantaneamente
+(function _preloadData() {
+  try {
+    const rankCached = localStorage.getItem('rankingCache');
+    const rankAge = Date.now() - parseInt(localStorage.getItem('rankingCacheTime')||'0');
+    const todosCached = localStorage.getItem('todosCache');
+    const todosAge = Date.now() - parseInt(localStorage.getItem('todosCacheTime')||'0');
+    const TTL = 15 * 60 * 1000; // 15 minutos
+
+    // Restaurar cache em memória imediatamente
+    if (rankCached && rankAge < TTL) {
+      try { window._rankingCache = JSON.parse(rankCached); } catch(e) {}
+    }
+    if (todosCached && todosAge < TTL) {
+      try { window._todosPreloaded = JSON.parse(todosCached); } catch(e) {}
+    }
+
+    // Se o cache está velho ou inexistente, buscar em background silenciosamente
+    const needsRank  = !rankCached  || rankAge  > TTL;
+    const needsTodos = !todosCached || todosAge > TTL;
+
+    if (needsRank) {
+      const url = SHEETS_URL + '?action=getRanking';
+      const proxy = 'https://corsproxy.io/?' + encodeURIComponent(url);
+      Promise.race([
+        fetch(url, {cache:'no-store'}).then(r=>r.json()),
+        fetch(proxy, {cache:'no-store'}).then(r=>r.json()),
+        new Promise((_,rej)=>setTimeout(()=>rej('t'),8000))
+      ]).then(data => {
+        if (Array.isArray(data) && data.length) {
+          window._rankingCache = data;
+          try { localStorage.setItem('rankingCache', JSON.stringify(data)); localStorage.setItem('rankingCacheTime', Date.now().toString()); } catch(e) {}
+        }
+      }).catch(()=>{});
+    }
+
+    if (needsTodos) {
+      const url2 = SHEETS_URL + '?action=getTodos';
+      const proxy2 = 'https://corsproxy.io/?' + encodeURIComponent(url2);
+      Promise.race([
+        fetch(url2, {cache:'no-store'}).then(r=>r.json()),
+        fetch(proxy2, {cache:'no-store'}).then(r=>r.json()),
+        new Promise((_,rej)=>setTimeout(()=>rej('t'),10000))
+      ]).then(data => {
+        if (Array.isArray(data)) {
+          window._todosPreloaded = data;
+          try { localStorage.setItem('todosCache', JSON.stringify(data)); localStorage.setItem('todosCacheTime', Date.now().toString()); } catch(e) {}
+        }
+      }).catch(()=>{});
+    }
+  } catch(e) {}
+})();
+
 const vals = {onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0,szclub:0};
 let nomeSel = null, equipaAtiva = null;
 
@@ -2462,8 +2518,8 @@ async function carregarRanking() {
 
   const elU = document.getElementById('rankLastUpdate');
 
-  // Smart cache — skip fetch if data is < 5 minutes old
-  const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  // Smart cache — skip fetch if data is < 15 minutes old
+  const CACHE_TTL = 15 * 60 * 1000; // 15 minutos
   try {
     const cached = localStorage.getItem('rankingCache');
     const cachedTime = parseInt(localStorage.getItem('rankingCacheTime') || '0');
@@ -2512,26 +2568,37 @@ async function carregarRanking() {
   } catch(e) {}
 
   if (!dashAllDados.length && !signal.aborted) {
-    try {
-      const todosUrl = SHEETS_URL + '?action=getTodos';
-      const todosProxy = 'https://corsproxy.io/?' + encodeURIComponent(todosUrl);
-      const td = await Promise.race([
-        fetch(todosUrl, {signal}).then(r=>r.json()).catch(()=>Promise.reject()),
-        fetch(todosProxy, {signal}).then(r=>r.json()).catch(()=>Promise.reject()),
-        new Promise((_,reject) => setTimeout(()=>reject('timeout'), 8000))
-      ]);
-      if (!signal.aborted && Array.isArray(td)) {
-        dashAllDados = normalizarDatasArray(td);
-        // Guardar em localStorage para acesso instantâneo no filtro semanal
-        try { localStorage.setItem('todosCache', JSON.stringify(td)); localStorage.setItem('todosCacheTime', Date.now().toString()); } catch(e2) {}
-        if (!signal.aborted && _rankFilter === 'mes') {
-          renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []);
-        } else if (!signal.aborted && _rankFilter !== 'mes') {
-          const chip = document.querySelector('.rank-filter-chip.active[data-dom]');
-          if (chip) _renderRankingPorSemana(chip.dataset.dom, chip.dataset.sab);
-        }
+    // Usar dados pré-carregados no arranque se disponíveis (evita segundo fetch)
+    if (window._todosPreloaded && Array.isArray(window._todosPreloaded) && window._todosPreloaded.length) {
+      dashAllDados = normalizarDatasArray(window._todosPreloaded);
+      window._todosPreloaded = null;
+      if (!signal.aborted && _rankFilter === 'mes') {
+        renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []);
+      } else if (!signal.aborted && _rankFilter !== 'mes') {
+        const chip = document.querySelector('.rank-filter-chip.active[data-dom]');
+        if (chip) _renderRankingPorSemana(chip.dataset.dom, chip.dataset.sab);
       }
-    } catch(e) {}
+    } else {
+      try {
+        const todosUrl = SHEETS_URL + '?action=getTodos';
+        const todosProxy = 'https://corsproxy.io/?' + encodeURIComponent(todosUrl);
+        const td = await Promise.race([
+          fetch(todosUrl, {signal}).then(r=>r.json()).catch(()=>Promise.reject()),
+          fetch(todosProxy, {signal}).then(r=>r.json()).catch(()=>Promise.reject()),
+          new Promise((_,reject) => setTimeout(()=>reject('timeout'), 8000))
+        ]);
+        if (!signal.aborted && Array.isArray(td)) {
+          dashAllDados = normalizarDatasArray(td);
+          try { localStorage.setItem('todosCache', JSON.stringify(td)); localStorage.setItem('todosCacheTime', Date.now().toString()); } catch(e2) {}
+          if (!signal.aborted && _rankFilter === 'mes') {
+            renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []);
+          } else if (!signal.aborted && _rankFilter !== 'mes') {
+            const chip = document.querySelector('.rank-filter-chip.active[data-dom]');
+            if (chip) _renderRankingPorSemana(chip.dataset.dom, chip.dataset.sab);
+          }
+        }
+      } catch(e) {}
+    }
   }
   if (!signal.aborted) verificarMedalhasRanking();
 }
@@ -2854,6 +2921,28 @@ function mostrarProgressoRegisto(nome, payload) {
       }
       if (changed) localStorage.setItem(k, JSON.stringify(cache));
     }
+  } catch(e) {}
+})();
+
+// ── COFRE: restaurar estado de jogadores (cache limpa acidentalmente) ──
+(function _restaurarEstadoCofre() {
+  try {
+    const d = new Date();
+    const diaSemana = d.getDay();
+    const domingo = new Date(d.getFullYear(), d.getMonth(), d.getDate() - diaSemana);
+    const weekKey = domingo.getFullYear() + '-' +
+      String(domingo.getMonth()+1).padStart(2,'0') + '-' +
+      String(domingo.getDate()).padStart(2,'0');
+    // Jogadores que já jogaram esta semana mas perderam a cache
+    const jaJogaram = [
+      { nome: 'João Ferreira', attempts: 3, usedThisWeek: true }
+    ];
+    jaJogaram.forEach(p => {
+      const key = 'cofrePlayer_' + weekKey + '_' + p.nome.replace(/\s+/g,'_');
+      if (!localStorage.getItem(key)) {
+        localStorage.setItem(key, JSON.stringify({ attempts: p.attempts, usedThisWeek: p.usedThisWeek }));
+      }
+    });
   } catch(e) {}
 })();
 
@@ -3203,6 +3292,7 @@ function renderRegistosPorSeccao(dados) {
   equipas.forEach(function(eq){ eq.nomes.forEach(function(n){ n2e[n]=eq.id; }); });
   var reg = {};
   Object.keys(labels).forEach(function(id){ reg[id]=0; });
+  // Contar número de registos (linhas) por secção
   dados.forEach(function(v){ var id=n2e[v.nome]; if(id&&reg[id]!==undefined) reg[id]++; });
   var list = Object.keys(labels).map(function(id){ return {label:labels[id],v:reg[id]||0}; }).filter(function(e){ return e.v>0; }).sort(function(a,b){ return b.v-a.v; });
   if(!list.length) return '';
@@ -4773,9 +4863,10 @@ const infoSections=[
   {title:'📊 Como ganhar pontos',content:'Os pontos são atribuídos com base no teu desempenho:\n• Unidades vendidas\n• Elogios recebidos\nQuanto melhor o teu desempenho, mais pontos acumulas.'},
   {title:'📈 Ranking e classificação',content:'O ranking atualiza automaticamente.\n• Os melhores destacam-se no topo\n• A classificação muda diariamente\n• Todos têm oportunidade de subir posições'},
   {title:'🥇 Medalhas',content:'As medalhas são ajustadas consoante o horário (full-time e part-time) e equipa.\nAo desbloquear uma medalha, ganhas acesso a rodar um slot machine com prémios aleatórios:\n• Sair 30 min ou 1h mais cedo, um chocolate, um café, um pastel de nata, um saco de gomas, uma raspadinha, pausa extra, etc'},
+  {title:'🔐 Abertura do Cofre',content:'Tentará a abertura do cofre aquele que tiver em primeiro lugar no ranking de cada categoria, com vista semanal, sempre da semana anterior de domingo a sábado.\n\nA abertura do cofre é feita pela seguinte ordem:\n1.º 🖥️ Onlines\n2.º 🧴 Sprays\n3.º 🦶 Palmilhas\n4.º ⭐ Elogios\n5.º 👕 Camisolas\n6.º 🛍️ Sacos\n7.º 💧 Garrafas\n\nCada líder tem 3 tentativas para descobrir o código.'},
   {title:'⚙️ Como usar a app',content:'1. Basta inserires os teus valores diáriamente de forma consistente. Consulta o teu desempenho diariamente\n2. Acompanha o ranking da equipa\n3. Define objetivos pessoais\n4. Foca-te nos indicadores com mais impacto\nA consistência diária faz a diferença.'},
   {title:'📅 Períodos de competição',content:'A liga funciona por ciclos mensais.\nNo final de cada ciclo:\n• O ranking é fechado\n• São atribuídos os prémios\n• Inicia-se uma nova competição'},
-  {title:'⚠️ Regras importantes',content:'• Apenas vendas válidas são contabilizadas\n• Todos os dados devem ser corretos e não devem ser manipulados.\n• Competição saudável e fair play obrigatório'},
+  {title:'⚠️ Regras importantes',content:'• Apenas vendas válidas são contabilizadas\n• Todos os dados devem ser corretos e não devem ser manipulados.\n• Competição saudável e fair play obrigatório\n\n📌 Nota: As regras podem mudar a qualquer momento, tendo em conta que toda esta liga é uma nova experiência. Eventuais ajustes serão comunicados à equipa.'},
   {title:'💡 Dicas para subir no ranking',content:'• Foco nos produtos com maior impacto\n• Abordagem ativa ao cliente\n• Consistência diária\n• Acompanhamento regular dos resultados'},
 ];
 const faqItems=[
@@ -5117,6 +5208,83 @@ function abrirSlotMedalha(nome, primeiraNovaStr) {
   try { localStorage.setItem(storeKey, JSON.stringify(jaAtribuidas)); } catch(e) {}
   // Abrir slot
   slotAbrir(nome, medalhasNovasNomes[0] || 'Medalha');
+}
+
+const SLOT_PIN = '1011'; // mesmo PIN do cofre
+
+function _abrirSlotComPin() {
+  const old = document.getElementById('slotPinModal');
+  if (old) old.remove();
+  const modal = document.createElement('div');
+  modal.id = 'slotPinModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML = `
+    <div style="background:#111111;border:1px solid rgba(201,168,76,0.35);border-radius:20px;padding:28px 24px;width:100%;max-width:320px;text-align:center;">
+      <div style="font-size:36px;margin-bottom:8px;">🎰</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;margin-bottom:4px;">MÁQUINA DE PRÉMIOS</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:1px;margin-bottom:20px;">Código de acesso da chefia</div>
+      <input id="slotPinInput" type="tel" maxlength="6" placeholder="· · ·"
+        style="width:100%;background:#181818;border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:14px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:10px;text-align:center;outline:none;margin-bottom:12px;">
+      <div id="slotPinErr" style="font-size:12px;color:#ef4444;min-height:16px;margin-bottom:8px;"></div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="document.getElementById('slotPinModal').remove()"
+          style="flex:1;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px;color:rgba(255,255,255,0.5);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">CANCELAR</button>
+        <button onclick="_verificarSlotPin()"
+          style="flex:1;background:linear-gradient(135deg,#a07820,#C9A84C);border:none;border-radius:10px;padding:12px;color:#090909;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">ENTRAR</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  setTimeout(()=>{ const inp = document.getElementById('slotPinInput'); if(inp) inp.focus(); }, 100);
+  modal.querySelector('input').addEventListener('keydown', e=>{ if(e.key==='Enter') _verificarSlotPin(); });
+}
+
+function _verificarSlotPin() {
+  const inp = document.getElementById('slotPinInput');
+  const err = document.getElementById('slotPinErr');
+  if (!inp) return;
+  if (inp.value === SLOT_PIN) {
+    document.getElementById('slotPinModal').remove();
+    // Abrir slot para usar na hora — pede nome do premiado
+    _slotEntradaReal();
+  } else {
+    if (err) err.textContent = '❌ Código incorreto. Tenta novamente.';
+    inp.value = '';
+    inp.style.borderColor = '#ef4444';
+    setTimeout(()=>{ if(inp) inp.style.borderColor='rgba(201,168,76,0.3)'; }, 800);
+  }
+}
+
+function _slotEntradaReal() {
+  // Modal para selecionar o nome do vendedor premiado
+  const old = document.getElementById('slotNomeModal');
+  if (old) old.remove();
+  const todosNomes = [...new Set(equipas.flatMap(e=>e.nomes))].sort();
+  const modal = document.createElement('div');
+  modal.id = 'slotNomeModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML = `
+    <div style="background:#111111;border:1px solid rgba(201,168,76,0.35);border-radius:20px;padding:28px 24px;width:100%;max-width:320px;text-align:center;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#C9A84C;margin-bottom:16px;">QUEM VAI GIRAR?</div>
+      <select id="slotNomeSelect" style="width:100%;background:#181818;border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;outline:none;margin-bottom:12px;">
+        <option value="">— Seleciona o nome —</option>
+        ${todosNomes.map(n=>`<option value="${n}">${n}</option>`).join('')}
+      </select>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button onclick="document.getElementById('slotNomeModal').remove()"
+          style="flex:1;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px;color:rgba(255,255,255,0.5);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">CANCELAR</button>
+        <button onclick="_confirmarSlotNome()"
+          style="flex:1;background:linear-gradient(135deg,#C9A84C,#F5D87E);border:none;border-radius:10px;padding:12px;color:#090909;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">🎰 GIRAR</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+function _confirmarSlotNome() {
+  const sel = document.getElementById('slotNomeSelect');
+  const nome = sel ? sel.value : '';
+  if (!nome) { showToast('Seleciona um nome primeiro'); return; }
+  document.getElementById('slotNomeModal').remove();
+  slotAbrir(nome, 'Medalha');
 }
 
 function slotAbrir(nome, medalha) {
@@ -5630,16 +5798,17 @@ function renderDesafiosMedalhas() {
     </div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.4;">Desbloqueia as medalhas e vai à Slot Machine</div>
 
-    <div id="desafiosMedalhasLista"></div>
-
-    <div style="margin-top:20px">
+    <div style="margin-bottom:20px">
       <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:12px">🎰 Máquina de Prémios</div>
       <div style="background:var(--card);border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:20px;text-align:center">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#C9A84C;letter-spacing:3px;margin-bottom:8px">MODO DEMONSTRAÇÃO</div>
-        <div style="font-size:13px;color:var(--muted);margin-bottom:16px">A máquina de prémios é desbloqueada ao conquistar uma medalha. Experimenta a sorte!</div>
-        <button onclick="slotAbrir('Demonstração','Medalha Demo')" style="background:linear-gradient(135deg,#C9A84C,#F5D87E);border:none;border-radius:12px;padding:14px 32px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#090909;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4)">🎰 GIRAR</button>
+        <div style="font-size:36px;margin-bottom:8px">🎰</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#C9A84C;letter-spacing:3px;margin-bottom:8px">MÁQUINA DE PRÉMIOS</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5">Reservada para quem conquistou uma medalha.<br>Acesso autorizado pela chefia com PIN.</div>
+        <button onclick="_abrirSlotComPin()" style="background:linear-gradient(135deg,#C9A84C,#F5D87E);border:none;border-radius:12px;padding:14px 32px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#090909;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4)">🔓 ENTRAR</button>
       </div>
     </div>
+
+    <div id="desafiosMedalhasLista"></div>
 
   </div>
 </div>
@@ -6500,7 +6669,7 @@ function _verificarCofrePin() {
   const inp = document.getElementById('cofrePinInput');
   const err = document.getElementById('cofrePinErr');
   if (!inp) return;
-  if (inp.value === '101') {
+  if (inp.value === '1011') {
     window._cofreAccessGranted = true;
     document.getElementById('cofrePinModal').remove();
     _abrirCofreDirecto();
@@ -6525,18 +6694,11 @@ function _abrirCofreDirecto() {
       if (el) el.textContent = '€ ' + Number(s.jackpot).toFixed(2).replace('.',',');
     }
   } catch(e) {}
-  // Auto-refresh a cada 15s para sincronizar "Jogou" entre dispositivos
-  window._cofreRefreshInterval = setInterval(() => {
-    if (document.getElementById('cofreOverlay').style.display !== 'none') {
-      window.cofreRefreshDados && window.cofreRefreshDados();
-    }
-  }, 15000);
+  // Removido: setInterval de 15s estava a alterar o código durante o jogo
 }
 function fecharCofre() {
   document.getElementById('cofreOverlay').style.display = 'none';
   document.body.style.overflow = '';
-  // Parar auto-refresh
-  if (window._cofreRefreshInterval) { clearInterval(window._cofreRefreshInterval); window._cofreRefreshInterval = null; }
   // Sync jackpot display on button
   try {
     const s = JSON.parse(localStorage.getItem('cofreState2') || '{}');
@@ -6879,24 +7041,33 @@ function updateStatusBar() {
 // ── ELEGÍVEIS: 1º de cada categoria do ranking do mês ──
 function getCofreElegiveis() {
   const todos = window.dashAllDados || [];
-  const mesAtual = new Date().getMonth();
-  const anoAtual = new Date().getFullYear();
-  const cats = ['onlines','sprays','palmilhas','camisolas','sacos','garrafas','elogios','szclub'];
+  // Ordem definida: onlines → sprays → palmilhas → elogios → camisolas → sacos → garrafas
+  const catsOrdem = ['onlines','sprays','palmilhas','elogios','camisolas','sacos','garrafas'];
   const catLabels = {onlines:'🖥️ Onlines',sprays:'🧴 Sprays',palmilhas:'🦶 Palmilhas',camisolas:'👕 Camisolas',sacos:'🛍️ Sacos',garrafas:'💧 Garrafas',elogios:'⭐ Elogios',szclub:'🎫 SZClub'};
 
-  // Agregar mês atual
+  // Calcular semana anterior (dom→sab) em hora local
+  const now = new Date();
+  const diaSemana = now.getDay();
+  const domAtual = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diaSemana);
+  const domAnterior = new Date(domAtual.getFullYear(), domAtual.getMonth(), domAtual.getDate() - 7);
+  const sabAnterior = new Date(domAtual.getFullYear(), domAtual.getMonth(), domAtual.getDate() - 1);
+  const domStr = domAnterior.getFullYear() + '-' + String(domAnterior.getMonth()+1).padStart(2,'0') + '-' + String(domAnterior.getDate()).padStart(2,'0');
+  const sabStr = sabAnterior.getFullYear() + '-' + String(sabAnterior.getMonth()+1).padStart(2,'0') + '-' + String(sabAnterior.getDate()).padStart(2,'0');
+
+  // Agregar dados da semana anterior
   const agg = {};
   todos.forEach(d => {
-    const dt = new Date((d.data||'')+'T12:00:00');
-    if (isNaN(dt) || dt.getMonth()!==mesAtual || dt.getFullYear()!==anoAtual) return;
+    const data = (d.data || '').slice(0,10);
+    if (data < domStr || data > sabStr) return;
     if (!agg[d.nome]) agg[d.nome] = {nome:d.nome,onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0,szclub:0};
-    cats.forEach(k => { agg[d.nome][k] += (Number(d[k])||0); });
+    catsOrdem.forEach(k => { agg[d.nome][k] += (Number(d[k])||0); });
+    agg[d.nome]['szclub'] = (agg[d.nome]['szclub']||0) + (Number(d['szclub'])||0);
   });
   const ranking = Object.values(agg);
 
-  // 1º de cada categoria (com pelo menos 1)
-  const nomes = new Map(); // nome -> lista de categorias ganhas
-  cats.forEach(k => {
+  // 1º de cada categoria na ordem definida
+  const nomes = new Map();
+  catsOrdem.forEach(k => {
     const sorted = ranking.filter(r=>(r[k]||0)>0).sort((a,b)=>b[k]-a[k]);
     if (!sorted.length) return;
     const lider = sorted[0];
@@ -6904,7 +7075,27 @@ function getCofreElegiveis() {
     nomes.get(lider.nome).push(catLabels[k]);
   });
 
-  // Converter para array com estado do cofre
+  // Se não há dados da semana anterior, fallback para o mês atual
+  if (!nomes.size) {
+    const mesAtual = now.getMonth();
+    const anoAtual = now.getFullYear();
+    const aggMes = {};
+    todos.forEach(d => {
+      const dt = new Date((d.data||'')+'T12:00:00');
+      if (isNaN(dt) || dt.getMonth()!==mesAtual || dt.getFullYear()!==anoAtual) return;
+      if (!aggMes[d.nome]) aggMes[d.nome] = {nome:d.nome,onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0,szclub:0};
+      catsOrdem.forEach(k => { aggMes[d.nome][k] += (Number(d[k])||0); });
+    });
+    const rankMes = Object.values(aggMes);
+    catsOrdem.forEach(k => {
+      const sorted = rankMes.filter(r=>(r[k]||0)>0).sort((a,b)=>b[k]-a[k]);
+      if (!sorted.length) return;
+      const lider = sorted[0];
+      if (!nomes.has(lider.nome)) nomes.set(lider.nome, []);
+      nomes.get(lider.nome).push(catLabels[k] + ' (mês)');
+    });
+  }
+
   return Array.from(nomes.entries()).map(([nome, cats]) => {
     const existing = state.top3.find(p=>p.nome===nome);
     return {
@@ -7149,7 +7340,8 @@ function submitAttempt() {
     cofreSom('errado');
     if (attLeft <= 0) {
       state.top3[pidx].usedThisWeek = true;
-      cofreToast('Sem mais tentativas! Tenta na semana seguinte.', 'red');
+      // Popup grande sem tapar a combinação
+      _mostrarCofrePopupSemTentativas(currentPlayer.nome);
     } else {
       cofreToast(`${attLeft} tentativa${attLeft!==1?'s':''} restante${attLeft!==1?'s':''}`, 'gold');
     }
@@ -7191,6 +7383,26 @@ function _rotateCodeForPlayer(nome, attempts) {
   }
   state.playerCodes[pKey] = code;
   state.secretCode = code;
+}
+
+function _mostrarCofrePopupSemTentativas(nome) {
+  const old = document.getElementById('cofreSemTentativasModal');
+  if (old) old.remove();
+  const modal = document.createElement('div');
+  modal.id = 'cofreSemTentativasModal';
+  modal.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:120px;z-index:99998;width:calc(100% - 32px);max-width:360px;pointer-events:none;';
+  modal.innerHTML = `
+    <div style="background:linear-gradient(135deg,#1a0808,#2a0d0d);border:2px solid rgba(239,68,68,0.5);border-radius:20px;padding:24px 20px;text-align:center;box-shadow:0 8px 32px rgba(239,68,68,0.25);animation:cofreSemAnim 0.4s cubic-bezier(0.34,1.56,0.64,1) both">
+      <div style="font-size:40px;margin-bottom:10px">🔒</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#ef4444;margin-bottom:8px">SEM MAIS TENTATIVAS</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.7);line-height:1.5">Esgotaste as tuas ${MAX_ATTEMPTS} tentativas${nome ? ', ' + nome.split(' ')[0] : ''}.<br>Tenta novamente na próxima semana! 💪</div>
+    </div>`;
+  document.body.appendChild(modal);
+  setTimeout(() => {
+    modal.style.transition = 'opacity 0.4s ease';
+    modal.style.opacity = '0';
+    setTimeout(() => modal.remove(), 400);
+  }, 4000);
 }
 
 function gradeGuess(guess, secret) {
@@ -7931,20 +8143,28 @@ function generateAutoFeedEvents() {
   }
 
   // ── SEM REGISTOS HÁ 2+ DIAS ÚTEIS ──
+  // Usa todos os dados disponíveis (não só mês atual) para evitar falsos positivos
+  const todosParaAusencia = window.dashAllDados || todos;
   allNames.forEach(nome => {
     if (!agg[nome] || agg[nome].total === 0) return;
+    // Construir mapa de dias com registo (data local, não UTC)
     const byDay = {};
-    todos.forEach(d => { if (d.nome === nome) byDay[(d.data||'').slice(0,10)] = true; });
+    todosParaAusencia.forEach(d => {
+      if (d.nome !== nome) return;
+      const dataStr = (d.data || '').slice(0, 10);
+      if (dataStr) byDay[dataStr] = true;
+    });
+    // Contar dias úteis consecutivos sem registo a partir de ontem
     let diasSem = 0;
-    const d = new Date(now);
-    while (diasSem < 5) {
-      const key = d.toISOString().slice(0,10);
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1); // começa ontem
+    for (let i = 0; i < 10; i++) {
       const dow = d.getDay();
-      if (dow !== 0 && dow !== 6) {
-        if (byDay[key]) break;
+      const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+      if (dow !== 0 && dow !== 6) { // ignora fins de semana
+        if (byDay[key]) break; // tem registo neste dia útil → parar
         diasSem++;
       }
-      d.setDate(d.getDate()-1);
+      d.setDate(d.getDate() - 1);
     }
     if (diasSem >= 2) {
       const msgs = [
