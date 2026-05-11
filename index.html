@@ -2924,28 +2924,6 @@ function mostrarProgressoRegisto(nome, payload) {
   } catch(e) {}
 })();
 
-// ── COFRE: restaurar estado de jogadores (cache limpa acidentalmente) ──
-(function _restaurarEstadoCofre() {
-  try {
-    const d = new Date();
-    const diaSemana = d.getDay();
-    const domingo = new Date(d.getFullYear(), d.getMonth(), d.getDate() - diaSemana);
-    const weekKey = domingo.getFullYear() + '-' +
-      String(domingo.getMonth()+1).padStart(2,'0') + '-' +
-      String(domingo.getDate()).padStart(2,'0');
-    // Jogadores que já jogaram esta semana mas perderam a cache
-    const jaJogaram = [
-      { nome: 'João Ferreira', attempts: 3, usedThisWeek: true }
-    ];
-    jaJogaram.forEach(p => {
-      const key = 'cofrePlayer_' + weekKey + '_' + p.nome.replace(/\s+/g,'_');
-      if (!localStorage.getItem(key)) {
-        localStorage.setItem(key, JSON.stringify({ attempts: p.attempts, usedThisWeek: p.usedThisWeek }));
-      }
-    });
-  } catch(e) {}
-})();
-
 let splashProg = 0, splashIv = null;
 function iniciarSplash() {
 
@@ -3292,8 +3270,13 @@ function renderRegistosPorSeccao(dados) {
   equipas.forEach(function(eq){ eq.nomes.forEach(function(n){ n2e[n]=eq.id; }); });
   var reg = {};
   Object.keys(labels).forEach(function(id){ reg[id]=0; });
-  // Contar número de registos (linhas) por secção
-  dados.forEach(function(v){ var id=n2e[v.nome]; if(id&&reg[id]!==undefined) reg[id]++; });
+  // Somar total de unidades (todas as categorias) por secção, não apenas contar linhas
+  dados.forEach(function(v){
+    var id = n2e[v.nome];
+    if (id && reg[id] !== undefined) {
+      reg[id] += categorias.reduce(function(s,c){ return s + (Number(v[c.key])||0); }, 0);
+    }
+  });
   var list = Object.keys(labels).map(function(id){ return {label:labels[id],v:reg[id]||0}; }).filter(function(e){ return e.v>0; }).sort(function(a,b){ return b.v-a.v; });
   if(!list.length) return '';
   var maxV = list[0].v;
@@ -3301,7 +3284,7 @@ function renderRegistosPorSeccao(dados) {
     var pct = Math.round(e.v/maxV*100);
     return '<div class="team-bar-row"><div class="team-bar-name">'+e.label+'</div><div class="team-bar-bg"><div class="team-bar-fill" data-pct="'+pct+'" style="width:0%"></div></div><div class="team-bar-val">'+e.v+'</div></div>';
   }).join('');
-  return '<div class="slabel" style="margin-top:24px">Registos por Secção</div><div class="card"><div style="font-size:13px;color:var(--muted);margin-bottom:10px">Nº de registos submetidos</div>'+rows+'</div>';
+  return '<div class="slabel" style="margin-top:24px">Registos por Secção</div><div class="card"><div style="font-size:13px;color:var(--muted);margin-bottom:10px">Total de unidades por secção</div>'+rows+'</div>';
 }
 
 function renderTeamCompare(dados){
@@ -5798,7 +5781,9 @@ function renderDesafiosMedalhas() {
     </div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.4;">Desbloqueia as medalhas e vai à Slot Machine</div>
 
-    <div style="margin-bottom:20px">
+    <div id="desafiosMedalhasLista"></div>
+
+    <div style="margin-top:20px">
       <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:12px">🎰 Máquina de Prémios</div>
       <div style="background:var(--card);border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:20px;text-align:center">
         <div style="font-size:36px;margin-bottom:8px">🎰</div>
@@ -5807,8 +5792,6 @@ function renderDesafiosMedalhas() {
         <button onclick="_abrirSlotComPin()" style="background:linear-gradient(135deg,#C9A84C,#F5D87E);border:none;border-radius:12px;padding:14px 32px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#090909;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4)">🔓 ENTRAR</button>
       </div>
     </div>
-
-    <div id="desafiosMedalhasLista"></div>
 
   </div>
 </div>
@@ -6669,7 +6652,7 @@ function _verificarCofrePin() {
   const inp = document.getElementById('cofrePinInput');
   const err = document.getElementById('cofrePinErr');
   if (!inp) return;
-  if (inp.value === '1011') {
+  if (inp.value === '101') {
     window._cofreAccessGranted = true;
     document.getElementById('cofrePinModal').remove();
     _abrirCofreDirecto();
