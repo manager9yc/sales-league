@@ -2572,6 +2572,8 @@ async function carregarRanking() {
     if (window._todosPreloaded && Array.isArray(window._todosPreloaded) && window._todosPreloaded.length) {
       dashAllDados = normalizarDatasArray(window._todosPreloaded);
       window._todosPreloaded = null;
+      // Patch secção de registos se já renderizado com placeholder
+      _patchSecaoRegistos();
       if (!signal.aborted && _rankFilter === 'mes') {
         renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []);
       } else if (!signal.aborted && _rankFilter !== 'mes') {
@@ -2590,6 +2592,8 @@ async function carregarRanking() {
         if (!signal.aborted && Array.isArray(td)) {
           dashAllDados = normalizarDatasArray(td);
           try { localStorage.setItem('todosCache', JSON.stringify(td)); localStorage.setItem('todosCacheTime', Date.now().toString()); } catch(e2) {}
+          // Patch secção de registos se já renderizado com placeholder
+          _patchSecaoRegistos();
           if (!signal.aborted && _rankFilter === 'mes') {
             renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []);
           } else if (!signal.aborted && _rankFilter !== 'mes') {
@@ -2601,6 +2605,32 @@ async function carregarRanking() {
     }
   }
   if (!signal.aborted) verificarMedalhasRanking();
+}
+
+function _patchSecaoRegistos() {
+  // Substitui o placeholder "a carregar" pela contagem real quando dashAllDados fica disponível
+  const placeholder = document.getElementById('secaoRegistosPlaceholder');
+  if (!placeholder) return; // já tem dados ou não está visível
+  // Encontrar o slabel anterior e o card placeholder, substituir pelo render real
+  const rankMain = document.getElementById('rankMain');
+  if (!rankMain) return;
+  // Re-render só o bloco de secção — substituir no DOM sem reflash do ranking inteiro
+  const fakeHtml = renderRegistosPorSeccao([]);
+  if (!fakeHtml) return;
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = fakeHtml;
+  // Substituir slabel + placeholder
+  const slabel = placeholder.previousElementSibling; // o slabel
+  if (slabel) slabel.remove();
+  placeholder.insertAdjacentHTML('afterend', fakeHtml);
+  placeholder.remove();
+  // Animar as barras novas
+  requestAnimationFrame(() => {
+    rankMain.querySelectorAll('.team-bar-fill[data-pct]').forEach(bar => {
+      bar.style.transition = 'width 0.7s cubic-bezier(0.25,0.46,0.45,0.94)';
+      bar.style.width = bar.dataset.pct + '%';
+    });
+  });
 }
 
 async function getRankingFromDados(todos) {
@@ -2654,7 +2684,7 @@ function renderRanking(dados, isSemana) {
     d += 0.07;
   });
 
-  // Registos por secção
+  // Registos por secção — usa dashAllDados (linhas individuais) para contagem real
   html += renderRegistosPorSeccao(dados);
 
   // Medalhas conquistadas
@@ -2921,6 +2951,28 @@ function mostrarProgressoRegisto(nome, payload) {
       }
       if (changed) localStorage.setItem(k, JSON.stringify(cache));
     }
+  } catch(e) {}
+})();
+
+// ── COFRE: restaurar estado de jogadores (cache limpa acidentalmente) ──
+(function _restaurarEstadoCofre() {
+  try {
+    const d = new Date();
+    const diaSemana = d.getDay();
+    const domingo = new Date(d.getFullYear(), d.getMonth(), d.getDate() - diaSemana);
+    const weekKey = domingo.getFullYear() + '-' +
+      String(domingo.getMonth()+1).padStart(2,'0') + '-' +
+      String(domingo.getDate()).padStart(2,'0');
+    // Jogadores que já jogaram esta semana mas perderam a cache
+    const jaJogaram = [
+      { nome: 'João Ferreira', attempts: 3, usedThisWeek: true }
+    ];
+    jaJogaram.forEach(p => {
+      const key = 'cofrePlayer_' + weekKey + '_' + p.nome.replace(/\s+/g,'_');
+      if (!localStorage.getItem(key)) {
+        localStorage.setItem(key, JSON.stringify({ attempts: p.attempts, usedThisWeek: p.usedThisWeek }));
+      }
+    });
   } catch(e) {}
 })();
 
@@ -3270,13 +3322,33 @@ function renderRegistosPorSeccao(dados) {
   equipas.forEach(function(eq){ eq.nomes.forEach(function(n){ n2e[n]=eq.id; }); });
   var reg = {};
   Object.keys(labels).forEach(function(id){ reg[id]=0; });
-  // Somar total de unidades (todas as categorias) por secção, não apenas contar linhas
-  dados.forEach(function(v){
+
+  var fonte = (window.dashAllDados && window.dashAllDados.length) ? window.dashAllDados : null;
+
+  if (!fonte) {
+    // dashAllDados ainda não carregou — devolver placeholder e auto-actualizar quando chegar
+    return '<div class="slabel" style="margin-top:24px">Registos por Secção</div><div id="secaoRegistosPlaceholder" class="card"><div style="font-size:13px;color:var(--muted)">A carregar contagem...</div></div>';
+  }
+
+  var chip = document.querySelector('.rank-filter-chip.active[data-dom]');
+  var domStr = chip ? chip.dataset.dom : null;
+  var sabStr = chip ? chip.dataset.sab : null;
+  var now = new Date();
+  var mesAtual = now.getMonth(), anoAtual = now.getFullYear();
+
+  fonte.forEach(function(v) {
     var id = n2e[v.nome];
-    if (id && reg[id] !== undefined) {
-      reg[id] += categorias.reduce(function(s,c){ return s + (Number(v[c.key])||0); }, 0);
+    if (!id || reg[id] === undefined) return;
+    var data = (v.data || '').slice(0, 10);
+    if (domStr && sabStr) {
+      if (data < domStr || data > sabStr) return;
+    } else {
+      var dt = new Date(data + 'T12:00:00');
+      if (isNaN(dt) || dt.getMonth() !== mesAtual || dt.getFullYear() !== anoAtual) return;
     }
+    reg[id]++; // 1 linha = 1 registo submetido
   });
+
   var list = Object.keys(labels).map(function(id){ return {label:labels[id],v:reg[id]||0}; }).filter(function(e){ return e.v>0; }).sort(function(a,b){ return b.v-a.v; });
   if(!list.length) return '';
   var maxV = list[0].v;
@@ -3284,7 +3356,7 @@ function renderRegistosPorSeccao(dados) {
     var pct = Math.round(e.v/maxV*100);
     return '<div class="team-bar-row"><div class="team-bar-name">'+e.label+'</div><div class="team-bar-bg"><div class="team-bar-fill" data-pct="'+pct+'" style="width:0%"></div></div><div class="team-bar-val">'+e.v+'</div></div>';
   }).join('');
-  return '<div class="slabel" style="margin-top:24px">Registos por Secção</div><div class="card"><div style="font-size:13px;color:var(--muted);margin-bottom:10px">Total de unidades por secção</div>'+rows+'</div>';
+  return '<div class="slabel" style="margin-top:24px">Registos por Secção</div><div class="card"><div style="font-size:13px;color:var(--muted);margin-bottom:10px">Nº de registos submetidos</div>'+rows+'</div>';
 }
 
 function renderTeamCompare(dados){
@@ -4964,15 +5036,16 @@ function alterarEstadoSugestao(i,estado){sugestoes[i].estado=estado;try{localSto
 function guardarRespostaSugestao(i){const input=document.getElementById('resp_'+i);if(!input)return;sugestoes[i].resposta=input.value.trim();try{localStorage.setItem('sugestoes',JSON.stringify(sugestoes));}catch(e){}renderSugestoes();showToast('✓ Resposta guardada');}
 
 const premiosDefault=[
-  {icon:'☕',nome:'Um café!',prob:0.16,cor:'#4A2C2A'},
-  {icon:'🍫',nome:'Um chocolate!',prob:0.18,cor:'#5C3317'},
-  {icon:'🥐',nome:'Um pastel de nata!',prob:0.09,cor:'#C8963E'},
-  {icon:'🍬',nome:'Um saco de gomas!',prob:0.11,cor:'#E91E8C'},
-  {icon:'⏰',nome:'Sair 30min ou 1h mais cedo!',prob:0.09,cor:'#1565C0'},
-  {icon:'🎰',nome:'Uma raspadinha!',prob:0.16,cor:'#2E7D32'},
-  {icon:'💣',nome:'Boom, que azar!',prob:0.13,cor:'#1a1a2e'},
-  {icon:'❌',nome:'Boom, tiveste azar!',prob:0.05,cor:'#3d0000'},
-  {icon:'😴',nome:'Pausa extra de 15 minutos!',prob:0.03,cor:'#1a3d1a'},
+  {icon:'😴',nome:'Pausa extra de 15 minutos!',prob:0.22,cor:'#1a3d1a'},
+  {icon:'🔐',nome:'Ganhaste uma ida ao cofre!',prob:0.18,cor:'#4A148C'},
+  {icon:'💣',nome:'Boom, que azar!',prob:0.15,cor:'#1a1a2e'},
+  {icon:'⏰',nome:'Sair 30 minutos mais cedo!',prob:0.12,cor:'#1565C0'},
+  {icon:'☕',nome:'Um café!',prob:0.05,cor:'#4A2C2A'},
+  {icon:'🍫',nome:'Um chocolate!',prob:0.02,cor:'#5C3317'},
+  {icon:'🎰',nome:'Uma raspadinha!',prob:0.10,cor:'#2E7D32'},
+  {icon:'🥐',nome:'Um pastel de nata!',prob:0.04,cor:'#C8963E'},
+  {icon:'🍬',nome:'Um saco de gomas!',prob:0.03,cor:'#E91E8C'},
+  {icon:'❌',nome:'Boom, tiveste azar!',prob:0.09,cor:'#3d0000'},
 ];
 let premios = premiosDefault.map(p=>({...p}));
 try {
@@ -5193,6 +5266,167 @@ function abrirSlotMedalha(nome, primeiraNovaStr) {
   slotAbrir(nome, medalhasNovasNomes[0] || 'Medalha');
 }
 
+const RASPADINHA_PIN = '1011';
+
+function _abrirRaspadinhaComPin() {
+  const old = document.getElementById('raspadinhaPinModal');
+  if (old) old.remove();
+  const modal = document.createElement('div');
+  modal.id = 'raspadinhaPinModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML = `
+    <div style="background:#111111;border:1px solid rgba(66,165,245,0.35);border-radius:20px;padding:28px 24px;width:100%;max-width:320px;text-align:center;">
+      <div style="font-size:36px;margin-bottom:8px;">🎟️</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;margin-bottom:4px;">RASPADINHA</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:1px;margin-bottom:20px;">Código de acesso da chefia</div>
+      <input id="raspadinhaPinInput" type="tel" maxlength="6" placeholder="· · ·"
+        style="width:100%;background:#181818;border:1px solid rgba(66,165,245,0.3);border-radius:10px;padding:14px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:10px;text-align:center;outline:none;margin-bottom:12px;">
+      <div id="raspadinhaPinErr" style="font-size:12px;color:#ef4444;min-height:16px;margin-bottom:8px;"></div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="document.getElementById('raspadinhaPinModal').remove()"
+          style="flex:1;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px;color:rgba(255,255,255,0.5);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">CANCELAR</button>
+        <button onclick="_verificarRaspadinhaPin()"
+          style="flex:1;background:linear-gradient(135deg,#1565C0,#42A5F5);border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">ENTRAR</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  setTimeout(()=>{ const inp = document.getElementById('raspadinhaPinInput'); if(inp) inp.focus(); }, 100);
+  modal.querySelector('input').addEventListener('keydown', e=>{ if(e.key==='Enter') _verificarRaspadinhaPin(); });
+}
+
+function _verificarRaspadinhaPin() {
+  const inp = document.getElementById('raspadinhaPinInput');
+  const err = document.getElementById('raspadinhaPinErr');
+  if (!inp) return;
+  if (inp.value === RASPADINHA_PIN) {
+    document.getElementById('raspadinhaPinModal').remove();
+    _abrirRaspadinha();
+  } else {
+    if (err) err.textContent = '❌ Código incorreto. Tenta novamente.';
+    inp.value = '';
+    inp.style.borderColor = '#ef4444';
+    setTimeout(()=>{ if(inp) inp.style.borderColor='rgba(66,165,245,0.3)'; }, 800);
+  }
+}
+
+function _abrirRaspadinha() {
+  const pool = typeof premios !== 'undefined' ? premios : [];
+  let premio = {icon:'🎁', nome:'Surpresa!', cor:'#C9A84C'};
+  if (pool.length) {
+    const rand = Math.random();
+    let acc = 0;
+    for (const p of pool) {
+      acc += (p.prob || 0);
+      if (rand <= acc) { premio = p; break; }
+    }
+    if (!premio.nome) premio = pool[Math.floor(Math.random()*pool.length)];
+  }
+  const overlay = document.getElementById('raspadinhaOverlay');
+  const canvas = document.getElementById('raspadinhaCanvas');
+  if (!overlay || !canvas) return;
+
+  const wrap = document.getElementById('raspadinhaPremioWrap');
+  const wrapW = wrap ? (wrap.offsetWidth || 340) : 340;
+  const wrapH = 200;
+  canvas.width = wrapW * 2; // alta resolução para ecrãs retina
+  canvas.height = wrapH * 2;
+  canvas.style.display = 'block';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(2, 2); // render em 2x
+
+  document.getElementById('raspadinhaPremioText').textContent = premio.nome;
+  document.getElementById('raspadinhaPremioIcon').textContent = premio.icon;
+  document.getElementById('raspadinhaPremioWrap').style.background = 'linear-gradient(135deg,#1a1508,#2a2010)';
+  document.getElementById('raspadinhaRevealBtn').style.display = 'block';
+  document.getElementById('raspadinhaResultado').style.display = 'none';
+  document.getElementById('raspadinhaProgressFill').style.width = '0%';
+
+  // Desenhar camada dourada de raspar
+  const grad = ctx.createLinearGradient(0, 0, wrapW, wrapH);
+  grad.addColorStop(0, '#a07820');
+  grad.addColorStop(0.3, '#C9A84C');
+  grad.addColorStop(0.6, '#F5D87E');
+  grad.addColorStop(1, '#a07820');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, wrapW, wrapH);
+
+  // Padrão decorativo por cima
+  ctx.globalAlpha = 0.15;
+  ctx.fillStyle = '#ffffff';
+  for(let y=0; y<wrapH; y+=20) {
+    for(let x=0; x<wrapW; x+=60) {
+      ctx.font = '13px sans-serif';
+      ctx.fillText('★ RASPA ★', x, y+14);
+    }
+  }
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.font = 'bold 16px Barlow Condensed, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🎟️  RASPA PARA REVELAR  🎟️', wrapW/2, wrapH/2+6);
+  ctx.textAlign = 'left';
+
+  overlay.style.display = 'flex';
+  canvas._premio = premio;
+
+  let scratching = false;
+  let scratchedPixels = 0;
+  const TOTAL = wrapW * wrapH;
+  const REVEAL_THRESHOLD = 0.70; // 70% para ser mais demorado
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = (wrapW) / rect.width; // lógico, não físico
+    const scaleY = (wrapH) / rect.height;
+    const src = e.touches ? e.touches[0] : e;
+    return {x:(src.clientX-rect.left)*scaleX, y:(src.clientY-rect.top)*scaleY};
+  }
+
+  function doScratch(e) {
+    if (!scratching) return;
+    e.preventDefault();
+    const pos = getPos(e);
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    // Brush menor (18px) para obrigar a raspar mais área
+    ctx.arc(pos.x, pos.y, 18, 0, Math.PI*2);
+    ctx.fill();
+    // Atualizar barra de progresso a cada 8 pixels de movimento
+    scratchedPixels += Math.PI * 18 * 18;
+    const pct = Math.min(scratchedPixels / (TOTAL * 1.5), 1); // factor 1.5 = mais lento
+    document.getElementById('raspadinhaProgressFill').style.width = Math.round(pct * 100) + '%';
+    if (pct >= REVEAL_THRESHOLD) _revelarRaspadinha(premio);
+  }
+
+  canvas.onmousedown=(e)=>{scratching=true;doScratch(e);};
+  canvas.onmousemove=doScratch;
+  canvas.onmouseup=()=>{scratching=false;};
+  canvas.ontouchstart=(e)=>{scratching=true;doScratch(e);};
+  canvas.ontouchmove=doScratch;
+  canvas.ontouchend=()=>{scratching=false;};
+}
+
+function _revelarRaspadinha(premio) {
+  const canvas = document.getElementById('raspadinhaCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  canvas.style.display = 'none';
+  document.getElementById('raspadinhaRevealBtn').style.display = 'none';
+  document.getElementById('raspadinhaResultado').style.display = 'flex';
+  if (typeof salvarPremioConcedido === 'function') salvarPremioConcedido('Raspadinha', premio.nome, premio.icon);
+}
+
+window._revelarRaspadinhaBtn = function() {
+  const canvas = document.getElementById('raspadinhaCanvas');
+  if (canvas && canvas._premio) _revelarRaspadinha(canvas._premio);
+};
+window._fecharRaspadinha = function() {
+  document.getElementById('raspadinhaOverlay').style.display = 'none';
+};
+
 const SLOT_PIN = '1011'; // mesmo PIN do cofre
 
 function _abrirSlotComPin() {
@@ -5204,7 +5438,7 @@ function _abrirSlotComPin() {
   modal.innerHTML = `
     <div style="background:#111111;border:1px solid rgba(201,168,76,0.35);border-radius:20px;padding:28px 24px;width:100%;max-width:320px;text-align:center;">
       <div style="font-size:36px;margin-bottom:8px;">🎰</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;margin-bottom:4px;">MÁQUINA DE PRÉMIOS</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;margin-bottom:4px;">SLOT MACHINE</div>
       <div style="font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:1px;margin-bottom:20px;">Código de acesso da chefia</div>
       <input id="slotPinInput" type="tel" maxlength="6" placeholder="· · ·"
         style="width:100%;background:#181818;border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:14px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:10px;text-align:center;outline:none;margin-bottom:12px;">
@@ -5660,26 +5894,35 @@ function renderDesafiosMedalhas() {
     { icon:'🌟', name:'Super Online', desc:'Onlines num único dia', thresholds:[{label:'Qualquer',val:8}] },
     { icon:'💥', name:'Spray Explosion', desc:'Sprays num único dia', thresholds:[{label:'Qualquer',val:10}] },
   ];
+
+  // Estado do acordeão (guardado como índice aberto, -1 = todos fechados)
+  if (typeof window._medalhaAcordeaoIdx === 'undefined') window._medalhaAcordeaoIdx = -1;
+
   el.innerHTML = `
   <div style="background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.04));border:1px solid rgba(201,168,76,0.3);border-radius:14px;padding:16px 18px;margin-bottom:18px;display:flex;gap:12px;align-items:flex-start">
     <div style="font-size:28px;flex-shrink:0">🎰</div>
     <div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:1.55">Ao alcançares uma qualquer medalha, terás a oportunidade junto de um membro da equipa diretiva, para rolar a slot machine de forma a reclamares o prémio!</div>
   </div>
-  <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:14px">Medalhas disponíveis</div>
-  ${todas.map(m=>`
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:10px;position:relative;overflow:hidden">
-    <div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:linear-gradient(180deg,#C9A84C,rgba(201,168,76,0.3))"></div>
-    <div style="display:flex;align-items:flex-start;gap:14px;margin-left:8px">
-      <div style="font-size:36px;flex-shrink:0;filter:drop-shadow(0 2px 8px rgba(201,168,76,0.4))">${m.icon}</div>
-      <div style="flex:1">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:#fff;line-height:1.1">${m.name}</div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;margin-top:2px">${m.desc}</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">
-          ${m.thresholds.map(t=>`<div style="background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:#C9A84C;display:flex;align-items:center;gap:4px"><span>${t.label}</span><span style="font-family:'Bebas Neue',sans-serif;font-size:16px">${t.val}</span></div>`).join('')}
-        </div>
+  <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Medalhas disponíveis</div>
+  <div id="medalhasAcordeao">
+  ${todas.map((m,i)=>`
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:6px;overflow:hidden">
+    <div onclick="window._medalhaAcordeaoIdx=(window._medalhaAcordeaoIdx===${i}?-1:${i});renderDesafiosMedalhas()"
+      style="display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent">
+      <div style="font-size:26px;flex-shrink:0">${m.icon}</div>
+      <div style="flex:1;text-align:left">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1.5px;color:#fff;line-height:1.1">${m.name}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:1px">${m.desc}</div>
+      </div>
+      <div style="font-size:16px;color:var(--orange);transition:transform 0.25s;transform:rotate(${window._medalhaAcordeaoIdx===i?'180':'0'}deg);flex-shrink:0">▾</div>
+    </div>
+    <div style="max-height:${window._medalhaAcordeaoIdx===i?'120px':'0'};overflow:hidden;transition:max-height 0.3s ease">
+      <div style="padding:0 14px 14px;display:flex;flex-wrap:wrap;gap:6px">
+        ${m.thresholds.map(t=>`<div style="background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:#C9A84C;display:flex;align-items:center;gap:4px"><span>${t.label}</span><span style="font-family:'Bebas Neue',sans-serif;font-size:16px">${t.val}</span></div>`).join('')}
       </div>
     </div>
-  </div>`).join('')}`;
+  </div>`).join('')}
+  </div>`;
 }
 
 // ── LONG PRESS + BUTTON FOR ADMIN ──
@@ -5781,16 +6024,29 @@ function renderDesafiosMedalhas() {
     </div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.4;">Desbloqueia as medalhas e vai à Slot Machine</div>
 
-    <div id="desafiosMedalhasLista"></div>
-
-    <div style="margin-top:20px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:12px">🎰 Máquina de Prémios</div>
+    <div style="margin-bottom:20px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:12px">🎰 Slot Machine</div>
       <div style="background:var(--card);border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:20px;text-align:center">
         <div style="font-size:36px;margin-bottom:8px">🎰</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#C9A84C;letter-spacing:3px;margin-bottom:8px">MÁQUINA DE PRÉMIOS</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#C9A84C;letter-spacing:3px;margin-bottom:8px">SLOT MACHINE</div>
         <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5">Reservada para quem conquistou uma medalha.<br>Acesso autorizado pela chefia com PIN.</div>
         <button onclick="_abrirSlotComPin()" style="background:linear-gradient(135deg,#C9A84C,#F5D87E);border:none;border-radius:12px;padding:14px 32px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#090909;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4)">🔓 ENTRAR</button>
       </div>
+    </div>
+
+    <div id="desafiosMedalhasLista"></div>
+
+    <!-- JOGO 3: RASPADINHA -->
+    <div style="margin-top:28px;display:flex;align-items:center;gap:8px;margin-bottom:14px">
+      <div style="background:linear-gradient(135deg,#1565C0,#1976D2);border-radius:8px;padding:3px 10px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#fff">JOGO 3</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#42A5F5">RASPADINHA</div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.4;">Jogo especial para ocasiões criadas no próprio dia. Acesso autorizado pela chefia.</div>
+    <div style="background:var(--card);border:1px solid rgba(66,165,245,0.3);border-radius:16px;padding:20px;text-align:center;margin-bottom:24px">
+      <div style="font-size:36px;margin-bottom:8px">🎟️</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#42A5F5;letter-spacing:3px;margin-bottom:8px">RASPADINHA</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5">Jogo de ocasião especial.<br>Acesso autorizado pela chefia com PIN.</div>
+      <button onclick="_abrirRaspadinhaComPin()" style="background:linear-gradient(135deg,#1565C0,#42A5F5);border:none;border-radius:12px;padding:14px 32px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(66,165,245,0.3)">🔓 ENTRAR</button>
     </div>
 
   </div>
@@ -6652,7 +6908,7 @@ function _verificarCofrePin() {
   const inp = document.getElementById('cofrePinInput');
   const err = document.getElementById('cofrePinErr');
   if (!inp) return;
-  if (inp.value === '101') {
+  if (inp.value === '1011') {
     window._cofreAccessGranted = true;
     document.getElementById('cofrePinModal').remove();
     _abrirCofreDirecto();
@@ -8125,44 +8381,48 @@ function generateAutoFeedEvents() {
     ));
   }
 
-  // ── SEM REGISTOS HÁ 2+ DIAS ÚTEIS ──
-  // Usa todos os dados disponíveis (não só mês atual) para evitar falsos positivos
-  const todosParaAusencia = window.dashAllDados || todos;
-  allNames.forEach(nome => {
-    if (!agg[nome] || agg[nome].total === 0) return;
-    // Construir mapa de dias com registo (data local, não UTC)
-    const byDay = {};
-    todosParaAusencia.forEach(d => {
-      if (d.nome !== nome) return;
-      const dataStr = (d.data || '').slice(0, 10);
-      if (dataStr) byDay[dataStr] = true;
-    });
-    // Contar dias úteis consecutivos sem registo a partir de ontem
-    let diasSem = 0;
-    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1); // começa ontem
-    for (let i = 0; i < 10; i++) {
-      const dow = d.getDay();
-      const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-      if (dow !== 0 && dow !== 6) { // ignora fins de semana
-        if (byDay[key]) break; // tem registo neste dia útil → parar
-        diasSem++;
+  // ── SEM REGISTOS HÁ 4+ DIAS ÚTEIS ──
+  // Só dispara se dashAllDados estiver carregado (evita falsos positivos com dados incompletos)
+  const todosParaAusencia = window.dashAllDados;
+  if (todosParaAusencia && todosParaAusencia.length > 0) {
+    allNames.forEach(nome => {
+      if (!agg[nome] || agg[nome].total === 0) return;
+      // Mapa de todos os dias com registo para este vendedor (independente do mês)
+      const byDay = {};
+      todosParaAusencia.forEach(d => {
+        if (d.nome !== nome) return;
+        const dataStr = (d.data || '').slice(0, 10);
+        if (dataStr) byDay[dataStr] = true;
+      });
+      // Contar dias úteis consecutivos sem registo, começando em hoje (não ontem)
+      // Se hoje não tem registo conta, mas só dispara com 4+ dias para margem de segurança
+      let diasSem = 0;
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      for (let i = 0; i < 12; i++) {
+        const dow = d.getDay();
+        const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        if (dow !== 0 && dow !== 6) {
+          if (byDay[key]) break; // tem registo → parar
+          diasSem++;
+        }
+        d.setDate(d.getDate() - 1);
       }
-      d.setDate(d.getDate() - 1);
-    }
-    if (diasSem >= 2) {
-      const msgs = [
-        `${nome} desapareceu do radar! ${diasSem} dias úteis sem registo. Tudo bem? 😅`,
-        `${diasSem} dias sem ver ${nome} nos registos... férias não avisadas? 😂`,
-        `${nome}, o ranking sente a tua falta há ${diasSem} dias! 👀`,
-        `Onde está ${nome}? ${diasSem} dias de silêncio no ranking. 🔍`,
-        `Alguém viu ${nome}? Ausência de ${diasSem} dias a preocupar a equipa! 😬`,
-      ];
-      tryPost('nosales_' + nome.replace(/\s/g,''), makeAutoPost(
-        'auto_nosales_' + nome.replace(/\s/g,'_') + '_' + bloco2h,
-        'ranking', null, pick(msgs)
-      ));
-    }
-  });
+      // Limiar de 4 dias úteis para evitar falsos positivos
+      if (diasSem >= 4) {
+        const msgs = [
+          `${nome} desapareceu do radar! ${diasSem} dias úteis sem registo. Tudo bem? 😅`,
+          `${diasSem} dias sem ver ${nome} nos registos... férias não avisadas? 😂`,
+          `${nome}, o ranking sente a tua falta há ${diasSem} dias! 👀`,
+          `Onde está ${nome}? ${diasSem} dias de silêncio no ranking. 🔍`,
+          `Alguém viu ${nome}? Ausência de ${diasSem} dias a preocupar a equipa! 😬`,
+        ];
+        tryPost('nosales_' + nome.replace(/\s/g,''), makeAutoPost(
+          'auto_nosales_' + nome.replace(/\s/g,'_') + '_' + bloco2h,
+          'ranking', null, pick(msgs)
+        ));
+      }
+    });
+  }
 
   // ── RESUMO DO DIA (tarde/noite) ──
   if (hora >= 17 && todayRanking.length >= 2) {
@@ -8392,32 +8652,41 @@ function mergeAutoEvents() {
       ));
     });
 
-    // ── 8. DIAS SEM REGISTOS (streak negativo) ──
-    const allDays = Object.keys(byDay).sort().reverse();
-    allNames.forEach(nome => {
-      if (!agg[nome]) return; // nunca registou
-      let diasSem = 0;
-      const d = new Date(now);
-      while (diasSem < 7) {
-        const key = d.toISOString().slice(0,10);
-        const isWeekend = d.getDay()===0 || d.getDay()===6;
-        if (!isWeekend) {
-          if (byDay[key] && byDay[key][nome] && byDay[key][nome].total > 0) break;
-          diasSem++;
+    // ── 8. DIAS SEM REGISTOS (streak negativo) — só com dashAllDados completo ──
+    const todosCompletos = window.dashAllDados;
+    if (todosCompletos && todosCompletos.length > 0) {
+      allNames.forEach(nome => {
+        if (!agg[nome]) return;
+        // Mapa de dias com registo usando todos os dados disponíveis
+        const byDayNome = {};
+        todosCompletos.forEach(d => {
+          if (d.nome !== nome) return;
+          const dataStr = (d.data || '').slice(0, 10);
+          if (dataStr) byDayNome[dataStr] = true;
+        });
+        let diasSem = 0;
+        const d = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // hora local
+        for (let i = 0; i < 12; i++) {
+          const dow = d.getDay();
+          const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+          if (dow !== 0 && dow !== 6) {
+            if (byDayNome[key]) break;
+            diasSem++;
+          }
+          d.setDate(d.getDate() - 1);
         }
-        d.setDate(d.getDate()-1);
-      }
-      if (diasSem >= 3) {
-        const mensagens = [
-          nome + ' não regista há ' + diasSem + ' dias úteis. Está tudo bem? 🤔',
-          nome + ' desapareceu do radar há ' + diasSem + ' dias. SOS! 📡',
-          diasSem + ' dias sem ver ' + nome + ' nos registos... voltou de férias sem avisar? 😅'
-        ];
-        autoEvents.push(ev('auto_nosales_'+nome.replace(/\s/g,'_'),  'ranking', null,
-          mensagens[diasSem % mensagens.length], 'T10:30:00'
-        ));
-      }
-    });
+        if (diasSem >= 4) {
+          const mensagens = [
+            nome + ' não regista há ' + diasSem + ' dias úteis. Está tudo bem? 🤔',
+            nome + ' desapareceu do radar há ' + diasSem + ' dias. SOS! 📡',
+            diasSem + ' dias sem ver ' + nome + ' nos registos... voltou de férias sem avisar? 😅'
+          ];
+          autoEvents.push(ev('auto_nosales_'+nome.replace(/\s/g,'_'), 'ranking', null,
+            mensagens[diasSem % mensagens.length], 'T10:30:00'
+          ));
+        }
+      });
+    }
 
     // ── 9. MEDALHAS CONQUISTADAS ──
     if (typeof calcularMedalhas === 'function') {
@@ -9231,8 +9500,79 @@ if (typeof _origCarregarDashPatch === 'function') {
 </script>
 
 <!-- ═══════════════════════════════════════════════════════ -->
-<!-- FEED POPUP — Notificação instantânea de nova mensagem   -->
+<!-- JOGO 3 — RASPADINHA                                     -->
 <!-- ═══════════════════════════════════════════════════════ -->
+<style>
+#raspadinhaOverlay {
+  display:none;position:fixed;inset:0;z-index:99000;
+  background:rgba(0,0,0,0.96);align-items:center;justify-content:center;
+  flex-direction:column;padding:16px;
+}
+#raspadinhaCard {
+  background:linear-gradient(160deg,#1a1508,#0d0b04);
+  border:2px solid rgba(201,168,76,0.55);border-radius:28px;
+  padding:28px 20px 24px;width:100%;max-width:380px;text-align:center;
+  box-shadow:0 0 60px rgba(201,168,76,0.18),0 20px 60px rgba(0,0,0,0.8);
+}
+#raspadinhaPremioWrap {
+  border-radius:20px;padding:0;margin-bottom:20px;position:relative;
+  height:200px;overflow:hidden;
+  background:linear-gradient(135deg,#1a1508,#2a2010);
+  border:1px solid rgba(201,168,76,0.2);
+}
+#raspadinhaCanvas {
+  position:absolute;inset:0;border-radius:20px;
+  cursor:crosshair;width:100%;height:100%;touch-action:none;
+}
+#raspadinhaResultado {
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;height:100%;padding:16px;
+  animation:raspaReveal 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes raspaReveal {
+  from{opacity:0;transform:scale(0.7) rotate(-3deg)}
+  to{opacity:1;transform:scale(1) rotate(0deg)}
+}
+#raspadinhaPremioIcon { font-size:64px;line-height:1;filter:drop-shadow(0 0 20px rgba(201,168,76,0.6)); }
+#raspadinhaPremioText {
+  font-family:'Bebas Neue',sans-serif;font-size:24px;color:#fff;
+  letter-spacing:2px;text-align:center;padding:0 8px;
+  text-shadow:0 2px 12px rgba(201,168,76,0.4);
+}
+#raspadinhaProgressBar {
+  height:4px;background:rgba(201,168,76,0.15);border-radius:4px;
+  margin-bottom:14px;overflow:hidden;
+}
+#raspadinhaProgressFill {
+  height:100%;background:linear-gradient(90deg,#a07820,#C9A84C,#F5D87E);
+  border-radius:4px;width:0%;transition:width 0.3s ease;
+}
+</style>
+
+<div id="raspadinhaOverlay">
+  <div id="raspadinhaCard">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:5px;color:rgba(201,168,76,0.6);margin-bottom:6px">SUPER LIGA · PRÉMIO ESPECIAL</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;color:#C9A84C;margin-bottom:16px;text-shadow:0 0 20px rgba(201,168,76,0.4)">🎟️ RASPADINHA</div>
+    <div id="raspadinhaProgressBar"><div id="raspadinhaProgressFill"></div></div>
+    <div id="raspadinhaPremioWrap">
+      <div id="raspadinhaResultado">
+        <div id="raspadinhaPremioIcon">🎁</div>
+        <div id="raspadinhaPremioText">Prémio</div>
+      </div>
+      <canvas id="raspadinhaCanvas"></canvas>
+    </div>
+    <button id="raspadinhaRevealBtn" onclick="_revelarRaspadinhaBtn()"
+      style="display:none;width:100%;background:linear-gradient(135deg,#a07820,#C9A84C,#F5D87E);border:none;border-radius:12px;padding:14px;color:#090909;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;cursor:pointer;margin-bottom:10px;box-shadow:0 4px 20px rgba(201,168,76,0.35)">
+      ✨ REVELAR TUDO
+    </button>
+    <button onclick="_fecharRaspadinha()"
+      style="width:100%;background:transparent;border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:12px;color:rgba(201,168,76,0.6);font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;cursor:pointer;">
+      ← FECHAR
+    </button>
+  </div>
+</div>
+
+
 <style>
 #feedPopupOverlay {
   display: none;
