@@ -90,7 +90,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 .prod-hint { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.3; white-space: normal; }
 
 .counter { display: flex; align-items: center; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
-.cbtn { width: 40px; height: 52px; background: transparent; border: none; color: var(--text); font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.08s; -webkit-user-select: none; user-select: none; touch-action: manipulation; padding: 0; }
+.cbtn { width: 52px; height: 60px; background: transparent; border: none; color: var(--text); font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.08s; -webkit-user-select: none; user-select: none; touch-action: manipulation; padding: 0; }
 .cbtn:active { background: var(--border); }
 .cbtn.minus { color: var(--muted); }
 .cbtn.plus { color: var(--orange); }
@@ -1424,48 +1424,48 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
       <div class="card">
         <div class="prod-row">
           <div class="prod-info"><div class="prod-emoji">🖥️</div><div class="prod-text"><div class="prod-name">Onlines</div><div class="prod-hint">Vendas online pagas</div></div></div>
-          <div class="counter"><button class="cbtn minus" onmousedown="startChange('onlines',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',-1,event)" ontouchend="stopChange()" ontouchcancel="stopChange()">−</button><div class="cval" id="onlines">0</div><button class="cbtn plus" onmousedown="startChange('onlines',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',1,event)" ontouchend="stopChange()" ontouchcancel="stopChange()">+</button></div>
+          <div class="counter"><button class="cbtn minus" onmousedown="startChange('onlines',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',-1,event)" ontouchend="tapChange('onlines',-1,event)" ontouchcancel="stopChange()">−</button><div class="cval" id="onlines">0</div><button class="cbtn plus" onmousedown="startChange('onlines',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('onlines',1,event)" ontouchend="tapChange('onlines',1,event)" ontouchcancel="stopChange()">+</button></div>
         </div>
       </div>
       <div class="card">
         <div class="prod-row">
           <div class="prod-info"><div class="prod-emoji">🧴</div><div class="prod-text"><div class="prod-name">Sprays</div><div class="prod-hint">Clean, Aqua, Odor e Kit Limpeza</div></div></div>
-          <div class="counter"><button class="cbtn minus" onmousedown="startChange('sprays',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sprays',-1,event)" ontouchend="stopChange()" ontouchcancel="stopChange()">−</button><div class="cval" id="sprays">0</div><button class="cbtn plus" onmousedown="startChange('sprays',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sprays',1,event)" ontouchend="stopChange()" ontouchcancel="stopChange()">+</button></div>
+          <div class="counter"><button class="cbtn minus" onmousedown="startChange('sprays',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sprays',-1,event)" ontouchend="tapChange('sprays',-1,event)" ontouchcancel="stopChange()">−</button><div class="cval" id="sprays">0</div><button class="cbtn plus" onmousedown="startChange('sprays',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sprays',1,event)" ontouchend="tapChange('sprays',1,event)" ontouchcancel="stopChange()">+</button></div>
         </div>
       </div>
       <div class="card">
         <div class="prod-row">
           <div class="prod-info"><div class="prod-emoji">🦶</div><div class="prod-text"><div class="prod-name">Palmilhas</div><div class="prod-hint">Marca Ignyten e Sofsole</div></div></div>
-          <div class="counter"><button class="cbtn minus" onmousedown="startChange('palmilhas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('palmilhas',-1,event)" ontouchend="stopChange()" ontouchcancel="stopChange()">−</button><div class="cval" id="palmilhas">0</div><button class="cbtn plus" onmousedown="startChange('palmilhas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('palmilhas',1,event)" ontouchend="stopChange()" ontouchcancel="stopChange()">+</button></div>
+          <div class="counter"><button class="cbtn minus" onmousedown="startChange('palmilhas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('palmilhas',-1,event)" ontouchend="tapChange('palmilhas',-1,event)" ontouchcancel="stopChange()">−</button><div class="cval" id="palmilhas">0</div><button class="cbtn plus" onmousedown="startChange('palmilhas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('palmilhas',1,event)" ontouchend="tapChange('palmilhas',1,event)" ontouchcancel="stopChange()">+</button></div>
         </div>
       </div>
       <div class="card">
         <div class="prod-row">
           <div class="prod-info"><div class="prod-emoji">👕</div><div class="prod-text"><div class="prod-name">Camisolas Oficiais</div><div class="prod-hint">Futebol oficial</div></div></div>
-          <div class="counter"><button class="cbtn minus" onmousedown="startChange('camisolas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('camisolas',-1,event)" ontouchend="stopChange()" ontouchcancel="stopChange()">−</button><div class="cval" id="camisolas">0</div><button class="cbtn plus" onmousedown="startChange('camisolas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('camisolas',1,event)" ontouchend="stopChange()" ontouchcancel="stopChange()">+</button></div>
+          <div class="counter"><button class="cbtn minus" onmousedown="startChange('camisolas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('camisolas',-1,event)" ontouchend="tapChange('camisolas',-1,event)" ontouchcancel="stopChange()">−</button><div class="cval" id="camisolas">0</div><button class="cbtn plus" onmousedown="startChange('camisolas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('camisolas',1,event)" ontouchend="tapChange('camisolas',1,event)" ontouchcancel="stopChange()">+</button></div>
         </div>
       </div>
       <div class="card">
         <div class="prod-row">
           <div class="prod-info"><div class="prod-emoji">🛍️</div><div class="prod-text"><div class="prod-name">Sacos Reutilizáveis</div><div class="prod-hint">Eco bags</div></div></div>
-          <div class="counter"><button class="cbtn minus" onmousedown="startChange('sacos',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sacos',-1,event)" ontouchend="stopChange()" ontouchcancel="stopChange()">−</button><div class="cval" id="sacos">0</div><button class="cbtn plus" onmousedown="startChange('sacos',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sacos',1,event)" ontouchend="stopChange()" ontouchcancel="stopChange()">+</button></div>
+          <div class="counter"><button class="cbtn minus" onmousedown="startChange('sacos',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sacos',-1,event)" ontouchend="tapChange('sacos',-1,event)" ontouchcancel="stopChange()">−</button><div class="cval" id="sacos">0</div><button class="cbtn plus" onmousedown="startChange('sacos',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('sacos',1,event)" ontouchend="tapChange('sacos',1,event)" ontouchcancel="stopChange()">+</button></div>
         </div>
       </div>
       <div class="card">
         <div class="prod-row">
           <div class="prod-info"><div class="prod-emoji">💧</div><div class="prod-text"><div class="prod-name">Garrafas</div><div class="prod-hint">Garrafas da liga de vendas</div></div></div>
-          <div class="counter"><button class="cbtn minus" onmousedown="startChange('garrafas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',-1,event)" ontouchend="stopChange()" ontouchcancel="stopChange()">−</button><div class="cval" id="garrafas">0</div><button class="cbtn plus" onmousedown="startChange('garrafas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',1,event)" ontouchend="stopChange()" ontouchcancel="stopChange()">+</button></div>
+          <div class="counter"><button class="cbtn minus" onmousedown="startChange('garrafas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',-1,event)" ontouchend="tapChange('garrafas',-1,event)" ontouchcancel="stopChange()">−</button><div class="cval" id="garrafas">0</div><button class="cbtn plus" onmousedown="startChange('garrafas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',1,event)" ontouchend="tapChange('garrafas',1,event)" ontouchcancel="stopChange()">+</button></div>
         </div>
       </div>
       <div class="sec-label">Outros</div>
       <div class="card">
         <div class="prod-row">
           <div class="prod-info"><div class="prod-emoji">⭐</div><div class="prod-text"><div class="prod-name">Elogios</div><div class="prod-hint">Escritos ou Google Reviews</div></div></div>
-          <div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="stopChange()" ontouchcancel="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="stopChange()" ontouchcancel="stopChange()">+</button></div>
+          <div class="counter"><button class="cbtn minus" onmousedown="startChange('elogios',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',-1,event)" ontouchend="tapChange('elogios',-1,event)" ontouchcancel="stopChange()">−</button><div class="cval" id="elogios">0</div><button class="cbtn plus" onmousedown="startChange('elogios',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('elogios',1,event)" ontouchend="tapChange('elogios',1,event)" ontouchcancel="stopChange()">+</button></div>
         </div>
         <div class="prod-row">
           <div class="prod-info"><div class="prod-emoji">🎫</div><div class="prod-text"><div class="prod-name">SZClub</div><div class="prod-hint">Adesões Sport Zone Club</div></div></div>
-          <div class="counter"><button class="cbtn minus" onmousedown="startChange('szclub',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('szclub',-1,event)" ontouchend="stopChange()" ontouchcancel="stopChange()">−</button><div class="cval" id="szclub">0</div><button class="cbtn plus" onmousedown="startChange('szclub',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('szclub',1,event)" ontouchend="stopChange()" ontouchcancel="stopChange()">+</button></div>
+          <div class="counter"><button class="cbtn minus" onmousedown="startChange('szclub',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('szclub',-1,event)" ontouchend="tapChange('szclub',-1,event)" ontouchcancel="stopChange()">−</button><div class="cval" id="szclub">0</div><button class="cbtn plus" onmousedown="startChange('szclub',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('szclub',1,event)" ontouchend="tapChange('szclub',1,event)" ontouchcancel="stopChange()">+</button></div>
         </div>
       </div>
       <!-- submitBtn hidden — swipe to register handles submission -->
@@ -2518,8 +2518,9 @@ async function carregarRanking() {
 
   const elU = document.getElementById('rankLastUpdate');
 
-  // Smart cache — skip fetch if data is < 15 minutes old
-  const CACHE_TTL = 15 * 60 * 1000; // 15 minutos
+  // Mostrar cache imediatamente (ranking instântaneo)
+  const CACHE_TTL = 15 * 60 * 1000;
+  let hadCache = false;
   try {
     const cached = localStorage.getItem('rankingCache');
     const cachedTime = parseInt(localStorage.getItem('rankingCacheTime') || '0');
@@ -2527,22 +2528,39 @@ async function carregarRanking() {
     if (cached) {
       window._rankingCache = JSON.parse(cached);
       renderRanking(window._rankingCache);
-      const dt = new Date(cachedTime);
-      const label = dt.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+      hadCache = true;
+      const label = new Date(cachedTime).toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
       if (age < CACHE_TTL) {
-        // Fresh cache — skip fetch entirely
         if (elU) elU.textContent = '✓ Atualizado às ' + label;
         if (!signal.aborted) verificarMedalhasRanking();
+        // Mesmo com cache fresco, carregar todosCache para filtro semanal
+        if (!dashAllDados.length) {
+          try {
+            const tc = localStorage.getItem('todosCache');
+            if (tc) { dashAllDados = normalizarDatasArray(JSON.parse(tc)) }
+          } catch(e2) {}
+        }
         return;
       }
-      // Stale cache — show it but fetch in background
-      if (elU) elU.textContent = '⏱ Cache de ' + label + ' — a atualizar...';
+      if (elU) elU.textContent = '⏱ ' + label + ' — a atualizar...';
     } else {
       renderRanking([]);
     }
   } catch(e) { renderRanking([]); }
 
-  if (elU) elU.innerHTML = '<span style="display:inline-flex;align-items:center;gap:5px;color:rgba(201,168,76,0.6)"><span style="width:7px;height:7px;border-radius:50%;background:#C9A84C;display:inline-block;animation:rankDotPulse 0.9s ease-in-out infinite"></span>A carregar dados...</span>';
+  // Carregar todosCache do localStorage para filtro semanal ficar disponível já
+  if (!dashAllDados.length) {
+    try {
+      const tc = localStorage.getItem('todosCache');
+      const tcTime = parseInt(localStorage.getItem('todosCacheTime') || '0');
+      if (tc && (Date.now() - tcTime) < CACHE_TTL) {
+        dashAllDados = normalizarDatasArray(JSON.parse(tc));
+        
+      }
+    } catch(e) {}
+  }
+
+  if (elU && !hadCache) elU.innerHTML = '<span style="display:inline-flex;align-items:center;gap:5px;color:rgba(201,168,76,0.6)"><span style="width:7px;height:7px;border-radius:50%;background:#C9A84C;display:inline-block;animation:rankDotPulse 0.9s ease-in-out infinite"></span>A carregar...</span>';
 
   try {
     const directUrl = SHEETS_URL + '?action=getRanking';
@@ -2550,7 +2568,7 @@ async function carregarRanking() {
     const result = await Promise.race([
       fetch(directUrl, {cache:'no-store', signal}).then(r=>r.json()).catch(()=>Promise.reject()),
       fetch(proxyUrl, {cache:'no-store', signal}).then(r=>r.json()).catch(()=>Promise.reject()),
-      new Promise((_,reject) => setTimeout(()=>reject('timeout'), 6000))
+      new Promise((_,reject) => setTimeout(()=>reject('timeout'), 5000))
     ]);
     if (signal.aborted) return;
     if (Array.isArray(result) && result.length) {
@@ -2560,7 +2578,6 @@ async function carregarRanking() {
         if (_rankFilter === 'mes') {
           renderRanking(result);
         }
-        // Se filtro de semana ativo, não sobrescreve a vista semanal com dados mensais
       }
       const elU = document.getElementById('rankLastUpdate');
       if (elU && !signal.aborted) elU.textContent = '✓ Atualizado agora';
@@ -2573,7 +2590,7 @@ async function carregarRanking() {
       dashAllDados = normalizarDatasArray(window._todosPreloaded);
       window._todosPreloaded = null;
       // Patch secção de registos se já renderizado com placeholder
-      _patchSecaoRegistos();
+      
       if (!signal.aborted && _rankFilter === 'mes') {
         renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []);
       } else if (!signal.aborted && _rankFilter !== 'mes') {
@@ -2593,7 +2610,7 @@ async function carregarRanking() {
           dashAllDados = normalizarDatasArray(td);
           try { localStorage.setItem('todosCache', JSON.stringify(td)); localStorage.setItem('todosCacheTime', Date.now().toString()); } catch(e2) {}
           // Patch secção de registos se já renderizado com placeholder
-          _patchSecaoRegistos();
+          
           if (!signal.aborted && _rankFilter === 'mes') {
             renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []);
           } else if (!signal.aborted && _rankFilter !== 'mes') {
@@ -2684,7 +2701,7 @@ function renderRanking(dados, isSemana) {
     d += 0.07;
   });
 
-  // Registos por secção — usa dashAllDados (linhas individuais) para contagem real
+  // Registos por secção (contagem de linhas individuais)
   html += renderRegistosPorSeccao(dados);
 
   // Medalhas conquistadas
@@ -3144,41 +3161,57 @@ atualizarMesLabels();
 let changeIv=null, changeTo=null, changeFirstTo=null;
 let touchStartY = 0;
 let touchMoved = false;
+let _cbtnHolding = false; // flag: está em hold (não em tap simples)
 
 let lastChangeTime=0;
 function startChange(campo,delta,e){
+  if(e) e.preventDefault(); // previne ghost click no Android
   if(e&&e.type==='touchstart'){
     touchStartY=e.touches[0].clientY;
     touchMoved=false;
-    const tm = (ev)=>{ if(Math.abs(ev.touches[0].clientY-touchStartY)>14){touchMoved=true;stopChange();document.removeEventListener('touchmove',tm);} };
+    _cbtnHolding=false;
+    const tm = (ev)=>{
+      if(Math.abs(ev.touches[0].clientY-touchStartY)>10){
+        touchMoved=true;
+        stopChange();
+        document.removeEventListener('touchmove',tm);
+      }
+    };
     document.addEventListener('touchmove',tm,{passive:true});
-    setTimeout(()=>document.removeEventListener('touchmove',tm),800);
+    setTimeout(()=>document.removeEventListener('touchmove',tm),1000);
   }
-  if(e&&e.type==='mousedown')e.preventDefault();
-  const now=Date.now(); if(now-lastChangeTime<50)return; lastChangeTime=now;
-  if(touchMoved)return;
   const isSacos = campo==='sacos';
-  const firstDelay = 0;
-  // Track this timeout so stopChange can cancel it
   clearTimeout(changeFirstTo);
+  // Hold-to-repeat: dispara após 350ms de pressão
   changeFirstTo = setTimeout(()=>{
-    changeFirstTo = null;
-    if(touchMoved)return;
+    if(touchMoved) return;
+    _cbtnHolding = true;
     change(campo,delta);
-    changeTo=setTimeout(()=>{
-      changeIv=setInterval(()=>{
-        if(touchMoved){stopChange();return;}
-        lastChangeTime=Date.now();
+    changeTo = setTimeout(()=>{
+      changeIv = setInterval(()=>{
+        if(touchMoved){ stopChange(); return; }
+        lastChangeTime = Date.now();
         change(campo,delta);
-      }, isSacos?40:80);
-    }, isSacos?150:300);
-  }, firstDelay);
+      }, isSacos ? 40 : 80);
+    }, isSacos ? 150 : 300);
+  }, 350);
 }
+
 function stopChange(e){
-  // Cancel ALL pending timers including the initial delay
   clearTimeout(changeFirstTo); changeFirstTo=null;
   clearTimeout(changeTo); clearInterval(changeIv);
   changeTo=null; changeIv=null;
+}
+
+// Tap simples no touchend: se não entrou em hold, registar 1 unidade
+function tapChange(campo,delta,e){
+  if(e) e.preventDefault();
+  if(touchMoved) return;
+  if(_cbtnHolding) { _cbtnHolding=false; return; } // já foi tratado pelo hold
+  if(!changeFirstTo) return; // hold já disparou
+  stopChange(); // cancelar o hold pendente
+  change(campo,delta);
+  _cbtnHolding=false;
 }
 
 document.addEventListener('touchmove', function(e) {
@@ -5036,7 +5069,7 @@ function alterarEstadoSugestao(i,estado){sugestoes[i].estado=estado;try{localSto
 function guardarRespostaSugestao(i){const input=document.getElementById('resp_'+i);if(!input)return;sugestoes[i].resposta=input.value.trim();try{localStorage.setItem('sugestoes',JSON.stringify(sugestoes));}catch(e){}renderSugestoes();showToast('✓ Resposta guardada');}
 
 const premiosDefault=[
-  {icon:'😴',nome:'Pausa extra de 15 minutos!',prob:0.22,cor:'#1a3d1a'},
+  {icon:'😴',nome:'Pausa extra de 15 minutos!',prob:0.14,cor:'#1a3d1a'},
   {icon:'🔐',nome:'Ganhaste uma ida ao cofre!',prob:0.18,cor:'#4A148C'},
   {icon:'💣',nome:'Boom, que azar!',prob:0.15,cor:'#1a1a2e'},
   {icon:'⏰',nome:'Sair 30 minutos mais cedo!',prob:0.12,cor:'#1565C0'},
@@ -5373,36 +5406,89 @@ function _abrirRaspadinha() {
   let scratching = false;
   let scratchedPixels = 0;
   const TOTAL = wrapW * wrapH;
-  const REVEAL_THRESHOLD = 0.70; // 70% para ser mais demorado
+  const REVEAL_THRESHOLD = 0.99;
+  const STROKES_NEEDED = 25; // 25 passagens do dedo para revelar
+
+  // Som de vitória ao abrir a raspadinha
+  (function _somVitoria() {
+    try {
+      const ac = new (window.AudioContext || window.webkitAudioContext)();
+      const notas = [523.25, 659.25, 783.99, 1046.50]; // C5 E5 G5 C6
+      notas.forEach((freq, i) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.connect(g); g.connect(ac.destination);
+        o.type = 'sine'; o.frequency.value = freq;
+        const t = ac.currentTime + i * 0.12;
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.18, t + 0.04);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+        o.start(t); o.stop(t + 0.3);
+      });
+    } catch(e) {}
+  })();
+
+  // Contexto de áudio para som de raspar (reutilizado)
+  let _raspaAC = null;
+  function _somRaspar() {
+    try {
+      if (!_raspaAC) _raspaAC = new (window.AudioContext || window.webkitAudioContext)();
+      const ac = _raspaAC;
+      const buf = ac.createBuffer(1, ac.sampleRate * 0.06, ac.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+      const src = ac.createBufferSource();
+      const g = ac.createGain();
+      const f = ac.createBiquadFilter();
+      f.type = 'bandpass'; f.frequency.value = 3000; f.Q.value = 0.8;
+      src.buffer = buf;
+      src.connect(f); f.connect(g); g.connect(ac.destination);
+      g.gain.setValueAtTime(0.12, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.06);
+      src.start();
+    } catch(e) {}
+  }
+  let _rasparSomTimer = 0;
 
   function getPos(e) {
     const rect = canvas.getBoundingClientRect();
-    const scaleX = (wrapW) / rect.width; // lógico, não físico
+    const scaleX = (wrapW) / rect.width;
     const scaleY = (wrapH) / rect.height;
     const src = e.touches ? e.touches[0] : e;
     return {x:(src.clientX-rect.left)*scaleX, y:(src.clientY-rect.top)*scaleY};
   }
 
+  // Verificar cobertura real a cada N operações para não congelar
+  let checkCounter = 0;
+  let strokeCount = 0;
   function doScratch(e) {
     if (!scratching) return;
     e.preventDefault();
     const pos = getPos(e);
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
-    // Brush menor (18px) para obrigar a raspar mais área
     ctx.arc(pos.x, pos.y, 18, 0, Math.PI*2);
     ctx.fill();
-    // Atualizar barra de progresso a cada 8 pixels de movimento
-    scratchedPixels += Math.PI * 18 * 18;
-    const pct = Math.min(scratchedPixels / (TOTAL * 1.5), 1); // factor 1.5 = mais lento
-    document.getElementById('raspadinhaProgressFill').style.width = Math.round(pct * 100) + '%';
-    if (pct >= REVEAL_THRESHOLD) _revelarRaspadinha(premio);
+    // Som de raspar (throttled a cada 80ms)
+    const now2 = Date.now();
+    if (now2 - _rasparSomTimer > 80) { _somRaspar(); _rasparSomTimer = now2; }
+    // Barra de progresso baseada nas passagens (25 = 100%)
+    const strokePct = Math.min(strokeCount / STROKES_NEEDED, 0.98);
+    document.getElementById('raspadinhaProgressFill').style.width = Math.round(strokePct * 100) + '%';
+    // Só verifica pixels após 25 passagens
+    checkCounter++;
+    if (strokeCount >= STROKES_NEEDED && checkCounter % 15 === 0) {
+      const d = ctx.getImageData(0, 0, wrapW, wrapH).data;
+      let transparent = 0;
+      for (let i = 3; i < d.length; i += 4) if (d[i] < 64) transparent++;
+      const realPct = transparent / (wrapW * wrapH);
+      if (realPct >= REVEAL_THRESHOLD) _revelarRaspadinha(premio);
+    }
   }
 
-  canvas.onmousedown=(e)=>{scratching=true;doScratch(e);};
+  canvas.onmousedown=(e)=>{scratching=true;strokeCount++;doScratch(e);};
   canvas.onmousemove=doScratch;
   canvas.onmouseup=()=>{scratching=false;};
-  canvas.ontouchstart=(e)=>{scratching=true;doScratch(e);};
+  canvas.ontouchstart=(e)=>{scratching=true;strokeCount++;doScratch(e);};
   canvas.ontouchmove=doScratch;
   canvas.ontouchend=()=>{scratching=false;};
 }
