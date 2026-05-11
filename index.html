@@ -2527,6 +2527,13 @@ async function carregarRanking() {
     const age = Date.now() - cachedTime;
     if (cached) {
       window._rankingCache = JSON.parse(cached);
+      // Carregar todosCache ANTES de renderRanking para que secção apareça imediatamente
+      if (!dashAllDados.length) {
+        try {
+          const _tc = localStorage.getItem('todosCache');
+          if (_tc) { const _tp = JSON.parse(_tc); if (Array.isArray(_tp) && _tp.length) dashAllDados = normalizarDatasArray(_tp); }
+        } catch(_e) {}
+      }
       renderRanking(window._rankingCache);
       hadCache = true;
       const label = new Date(cachedTime).toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
@@ -2589,6 +2596,7 @@ async function carregarRanking() {
     if (window._todosPreloaded && Array.isArray(window._todosPreloaded) && window._todosPreloaded.length) {
       dashAllDados = normalizarDatasArray(window._todosPreloaded);
       window._todosPreloaded = null;
+      _patchSecaoRegistos();
       // Patch secção de registos se já renderizado com placeholder
       
       if (!signal.aborted && _rankFilter === 'mes') {
@@ -2609,8 +2617,7 @@ async function carregarRanking() {
         if (!signal.aborted && Array.isArray(td)) {
           dashAllDados = normalizarDatasArray(td);
           try { localStorage.setItem('todosCache', JSON.stringify(td)); localStorage.setItem('todosCacheTime', Date.now().toString()); } catch(e2) {}
-          // Patch secção de registos se já renderizado com placeholder
-          
+          _patchSecaoRegistos();
           if (!signal.aborted && _rankFilter === 'mes') {
             renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []);
           } else if (!signal.aborted && _rankFilter !== 'mes') {
@@ -3356,11 +3363,23 @@ function renderRegistosPorSeccao(dados) {
   var reg = {};
   Object.keys(labels).forEach(function(id){ reg[id]=0; });
 
-  var fonte = (window.dashAllDados && window.dashAllDados.length) ? window.dashAllDados : null;
+  // dashAllDados é let no scope global — usar diretamente (não window.)
+  // Se não carregou ainda, usar dados (já agregados) como fallback
+  var fonte = (typeof dashAllDados !== 'undefined' && dashAllDados.length > 0) ? dashAllDados : null;
 
   if (!fonte) {
-    // dashAllDados ainda não carregou — devolver placeholder e auto-actualizar quando chegar
-    return '<div class="slabel" style="margin-top:24px">Registos por Secção</div><div id="secaoRegistosPlaceholder" class="card"><div style="font-size:13px;color:var(--muted)">A carregar contagem...</div></div>';
+    // Ainda sem dados granulares — tentar localStorage
+    try {
+      var tc = localStorage.getItem('todosCache');
+      if (tc) {
+        var parsed = JSON.parse(tc);
+        if (Array.isArray(parsed) && parsed.length) fonte = normalizarDatasArray(parsed);
+      }
+    } catch(e2) {}
+  }
+
+  if (!fonte) {
+    return '';
   }
 
   var chip = document.querySelector('.rank-filter-chip.active[data-dom]');
@@ -3379,7 +3398,7 @@ function renderRegistosPorSeccao(dados) {
       var dt = new Date(data + 'T12:00:00');
       if (isNaN(dt) || dt.getMonth() !== mesAtual || dt.getFullYear() !== anoAtual) return;
     }
-    reg[id]++; // 1 linha = 1 registo submetido
+    reg[id]++;
   });
 
   var list = Object.keys(labels).map(function(id){ return {label:labels[id],v:reg[id]||0}; }).filter(function(e){ return e.v>0; }).sort(function(a,b){ return b.v-a.v; });
@@ -5361,12 +5380,11 @@ function _abrirRaspadinha() {
   const wrap = document.getElementById('raspadinhaPremioWrap');
   const wrapW = wrap ? (wrap.offsetWidth || 340) : 340;
   const wrapH = 200;
-  canvas.width = wrapW * 2; // alta resolução para ecrãs retina
-  canvas.height = wrapH * 2;
+  canvas.width = wrapW;
+  canvas.height = wrapH;
   canvas.style.display = 'block';
 
   const ctx = canvas.getContext('2d');
-  ctx.scale(2, 2); // render em 2x
 
   document.getElementById('raspadinhaPremioText').textContent = premio.nome;
   document.getElementById('raspadinhaPremioIcon').textContent = premio.icon;
@@ -5406,8 +5424,8 @@ function _abrirRaspadinha() {
   let scratching = false;
   let scratchedPixels = 0;
   const TOTAL = wrapW * wrapH;
-  const REVEAL_THRESHOLD = 0.99;
-  const STROKES_NEEDED = 25; // 25 passagens do dedo para revelar
+  const REVEAL_THRESHOLD = 0.50;
+  const STROKES_NEEDED = 25;
 
   // Som de vitória ao abrir a raspadinha
   (function _somVitoria() {
@@ -5460,23 +5478,37 @@ function _abrirRaspadinha() {
   // Verificar cobertura real a cada N operações para não congelar
   let checkCounter = 0;
   let strokeCount = 0;
+  let lastScratchPos = null; // para medir distância percorrida
+  let totalDist = 0;
+  // 25 "passagens" = cada passagem equivale a percorrer a largura do canvas uma vez
+  const DIST_PER_STROKE = wrapW; // 1 passagem = percorrer a largura
+  const TOTAL_DIST_NEEDED = STROKES_NEEDED * DIST_PER_STROKE;
+
   function doScratch(e) {
     if (!scratching) return;
     e.preventDefault();
     const pos = getPos(e);
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
-    ctx.arc(pos.x, pos.y, 18, 0, Math.PI*2);
+    ctx.arc(pos.x, pos.y, 40, 0, Math.PI*2);
     ctx.fill();
+    // Medir distância percorrida (independente de levantar o dedo ou não)
+    if (lastScratchPos) {
+      const dx = pos.x - lastScratchPos.x;
+      const dy = pos.y - lastScratchPos.y;
+      totalDist += Math.sqrt(dx*dx + dy*dy);
+      strokeCount = totalDist / DIST_PER_STROKE;
+    }
+    lastScratchPos = pos;
     // Som de raspar (throttled a cada 80ms)
     const now2 = Date.now();
     if (now2 - _rasparSomTimer > 80) { _somRaspar(); _rasparSomTimer = now2; }
-    // Barra de progresso baseada nas passagens (25 = 100%)
-    const strokePct = Math.min(strokeCount / STROKES_NEEDED, 0.98);
-    document.getElementById('raspadinhaProgressFill').style.width = Math.round(strokePct * 100) + '%';
-    // Só verifica pixels após 25 passagens
+    // Barra de progresso baseada na distância (25 passagens = 100%)
+    const pct = Math.min(strokeCount / STROKES_NEEDED, 0.98);
+    document.getElementById('raspadinhaProgressFill').style.width = Math.round(pct * 100) + '%';
+    // Verificar pixels reais só após 25 passagens equivalentes
     checkCounter++;
-    if (strokeCount >= STROKES_NEEDED && checkCounter % 15 === 0) {
+    if (strokeCount >= STROKES_NEEDED && checkCounter % 3 === 0) {
       const d = ctx.getImageData(0, 0, wrapW, wrapH).data;
       let transparent = 0;
       for (let i = 3; i < d.length; i += 4) if (d[i] < 64) transparent++;
@@ -5485,12 +5517,12 @@ function _abrirRaspadinha() {
     }
   }
 
-  canvas.onmousedown=(e)=>{scratching=true;strokeCount++;doScratch(e);};
+  canvas.onmousedown=(e)=>{scratching=true;lastScratchPos=getPos(e);doScratch(e);};
   canvas.onmousemove=doScratch;
-  canvas.onmouseup=()=>{scratching=false;};
-  canvas.ontouchstart=(e)=>{scratching=true;strokeCount++;doScratch(e);};
+  canvas.onmouseup=()=>{scratching=false;lastScratchPos=null;};
+  canvas.ontouchstart=(e)=>{scratching=true;lastScratchPos=getPos(e);doScratch(e);};
   canvas.ontouchmove=doScratch;
-  canvas.ontouchend=()=>{scratching=false;};
+  canvas.ontouchend=()=>{scratching=false;lastScratchPos=null;};
 }
 
 function _revelarRaspadinha(premio) {
