@@ -5351,7 +5351,7 @@ function _abrirPlinkoComPin() {
       <div style="font-size:36px;margin-bottom:8px;">🎯</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;margin-bottom:4px;">PLINKO DROP</div>
       <div style="font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:1px;margin-bottom:20px;">Código de acesso da chefia</div>
-      <input id="plinkoPinInput" type="tel" maxlength="6" placeholder="· · ·"
+      <input id="plinkoPinInput" type="password" inputmode="numeric" maxlength="6" placeholder="· · · ·"
         style="width:100%;background:#181818;border:1px solid rgba(171,71,188,0.3);border-radius:10px;padding:14px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:10px;text-align:center;outline:none;margin-bottom:12px;">
       <div id="plinkoPinErr" style="font-size:12px;color:#ef4444;min-height:16px;margin-bottom:8px;"></div>
       <div style="display:flex;gap:8px;">
@@ -5430,13 +5430,13 @@ function _plinkoPrizes() {
   return [
     {label:'10 min',mins:10},
     {label:'15 min',mins:15},
-    {label:'20 min',mins:20},
     {label:'30 min',mins:30},
+    {label:'10 min',mins:10},
+    {label:'1 hora', mins:60},
     {label:'45 min',mins:45},
-    {label:'1 hora',mins:60},
-    {label:'45 min',mins:45},
+    {label:'10 min',mins:10},
     {label:'30 min',mins:30},
-    {label:'20 min',mins:20},
+    {label:'15 min',mins:15},
     {label:'10 min',mins:10},
   ];
 }
@@ -5495,10 +5495,8 @@ function _plinkoDrawBoard(ctx, W, H, SLOT_H, PRIZES, result, ball) {
     // Slot text
     ctx.fillStyle = isResult ? '#090909' : '#C9A84C';
     ctx.textAlign = 'center';
-    ctx.font = `bold ${slotW < 38 ? 8 : 9}px sans-serif`;
-    ctx.fillText(pr.label, x + slotW / 2, slotY + 22);
-    ctx.font = `bold ${slotW < 38 ? 10 : 13}px Barlow Condensed, sans-serif`;
-    ctx.fillText(pr.mins + 'm', x + slotW / 2, slotY + 42);
+    ctx.font = `bold ${slotW < 38 ? 14 : 18}px Barlow Condensed, sans-serif`;
+    ctx.fillText(pr.mins + 'm', x + slotW / 2, slotY + SLOT_H / 2 + 7);
   });
 
   // Ball
@@ -5545,7 +5543,7 @@ function _plinkoIniciar() {
 
   function update() {
     if (ball.done) return;
-    ball.vy += 0.4;
+    ball.vy += 0.18;
     ball.vx *= 0.995;
     ball.x += ball.vx;
     ball.y += ball.vy;
@@ -5625,7 +5623,7 @@ function _abrirRaspadinhaComPin() {
       <div style="font-size:36px;margin-bottom:8px;">🎟️</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;margin-bottom:4px;">RASPADINHA</div>
       <div style="font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:1px;margin-bottom:20px;">Código de acesso da chefia</div>
-      <input id="raspadinhaPinInput" type="tel" maxlength="6" placeholder="· · ·"
+      <input id="raspadinhaPinInput" type="password" inputmode="numeric" maxlength="6" placeholder="· · · ·"
         style="width:100%;background:#181818;border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:14px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:10px;text-align:center;outline:none;margin-bottom:12px;">
       <div id="raspadinhaPinErr" style="font-size:12px;color:#ef4444;min-height:16px;margin-bottom:8px;"></div>
       <div style="display:flex;gap:8px;">
@@ -5849,7 +5847,7 @@ function _abrirSlotComPin() {
       <div style="font-size:36px;margin-bottom:8px;">🎰</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;margin-bottom:4px;">SLOT MACHINE</div>
       <div style="font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:1px;margin-bottom:20px;">Código de acesso da chefia</div>
-      <input id="slotPinInput" type="tel" maxlength="6" placeholder="· · ·"
+      <input id="slotPinInput" type="password" inputmode="numeric" maxlength="6" placeholder="· · · ·"
         style="width:100%;background:#181818;border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:14px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:10px;text-align:center;outline:none;margin-bottom:12px;">
       <div id="slotPinErr" style="font-size:12px;color:#ef4444;min-height:16px;margin-bottom:8px;"></div>
       <div style="display:flex;gap:8px;">
@@ -6367,7 +6365,7 @@ function renderDesafiosMedalhas() {
   <div class="screen-banner">
     <div class="screen-banner-inner">
       <div class="ucl-stars-banner" style="display:none">★ ★ ★ ★ ★ ★ ★ ★</div>
-      <div class="screen-banner-title">MEDALHAS</div>
+      <div class="screen-banner-title">JOGOS</div>
       <div class="screen-banner-sub">Medalhas &amp; Objetivos</div>
     </div>
     <div class="screen-banner-bar">
@@ -6463,11 +6461,11 @@ function renderDesafiosMedalhas() {
       <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#CE93D8">DROP GAME</div>
     </div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.4">Jogo de ocasião especial. Larga a bola e ganha tempo extra! Acesso autorizado pela chefia.</div>
-    <div style="background:var(--card);border:1px solid rgba(171,71,188,0.3);border-radius:16px;padding:20px;text-align:center;margin-bottom:24px">
+    <div style="background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03));border:1px solid rgba(201,168,76,0.35);border-radius:16px;padding:20px;text-align:center;margin-bottom:24px">
       <div style="font-size:36px;margin-bottom:8px">🎯</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#CE93D8;letter-spacing:3px;margin-bottom:8px">PLINKO DROP</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#C9A84C;letter-spacing:3px;margin-bottom:8px">PLINKO DROP</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5">Larga a bola e descobre quantos minutos<br>ganhas para sair mais cedo!</div>
-      <button onclick="_abrirPlinkoComPin()" style="background:linear-gradient(135deg,#7B1FA2,#AB47BC);border:none;border-radius:12px;padding:14px 32px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(171,71,188,0.35)">🔓 ENTRAR</button>
+      <button onclick="_abrirPlinkoComPin()" style="background:linear-gradient(135deg,#a07820,#C9A84C,#F5D87E);border:none;border-radius:12px;padding:14px 32px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#090909;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.3)">🔓 ENTRAR</button>
     </div>
 
   </div>
@@ -7305,12 +7303,11 @@ function _mostrarCofrePinModal() {
       <div style="font-size:36px;margin-bottom:8px;">🔒</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;margin-bottom:4px;">ÁREA RESERVADA</div>
       <div style="font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:1px;margin-bottom:20px;">Introduz o código de acesso</div>
-      <input id="cofrePinInput" type="tel" maxlength="6" placeholder="· · ·"
+      <input id="cofrePinInput" type="password" inputmode="numeric" maxlength="6" placeholder="· · · ·"
         style="width:100%;background:#181818;border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:14px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:10px;text-align:center;outline:none;margin-bottom:12px;">
       <div id="cofrePinErr" style="font-size:12px;color:#ef4444;min-height:16px;margin-bottom:4px;"></div>
-      <div id="cofrePinTimer" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#C9A84C;letter-spacing:4px;margin-bottom:10px;min-height:36px;text-align:center"></div>
       <div style="display:flex;gap:8px;">
-        <button onclick="document.getElementById('cofrePinModal').remove();clearInterval(window._cofrePinTimerIv)"
+        <button onclick="document.getElementById('cofrePinModal').remove()"
           style="flex:1;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px;color:rgba(255,255,255,0.5);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">CANCELAR</button>
         <button onclick="_verificarCofrePin()"
           style="flex:1;background:linear-gradient(135deg,#a07820,#C9A84C);border:none;border-radius:10px;padding:12px;color:#090909;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">ENTRAR</button>
@@ -7319,24 +7316,6 @@ function _mostrarCofrePinModal() {
   document.body.appendChild(modal);
   setTimeout(()=>{ const inp = document.getElementById('cofrePinInput'); if(inp) inp.focus(); }, 100);
   modal.querySelector('input').addEventListener('keydown', e=>{ if(e.key==='Enter') _verificarCofrePin(); });
-  // Timer 60s
-  let _cofreTimerSecs = 60;
-  const _timerEl = document.getElementById('cofrePinTimer');
-  if (_timerEl) _timerEl.textContent = '1:00';
-  clearInterval(window._cofrePinTimerIv);
-  window._cofrePinTimerIv = setInterval(() => {
-    _cofreTimerSecs--;
-    const el = document.getElementById('cofrePinTimer');
-    if (el) {
-      el.textContent = _cofreTimerSecs > 0 ? '0:' + String(_cofreTimerSecs).padStart(2,'0') : '0:00';
-      if (_cofreTimerSecs <= 10) el.style.color = '#ef4444';
-    }
-    if (_cofreTimerSecs <= 0) {
-      clearInterval(window._cofrePinTimerIv);
-      const modal = document.getElementById('cofrePinModal');
-      if (modal) modal.remove();
-    }
-  }, 1000);
 }
 
 function _verificarCofrePin() {
