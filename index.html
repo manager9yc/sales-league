@@ -263,6 +263,11 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
   .cat-name { font-size: 28px; }
 }
 @media print {
+  :root { --dark: #fff !important; --card: #f5f5f5 !important; --text: #111 !important; --muted: #555 !important; --border: #ddd !important; }
+  body { background: #fff !important; color: #111 !important; }
+  .rank-hero, .rank-hero::before, .rank-hero::after { background: #f0f0f0 !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
   .nav, .print-btn, .toast, #screen-form { display: none !important; }
   #screen-ranking { position: relative; display: block !important; }
   body { background: #fff !important; color: #000 !important; font-size: 12px; }
@@ -847,7 +852,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
 .swipe-btn-wrap {
   position: relative;
   width: 100%;
-  height: 66px;
+  height: 80px;
   background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(255,107,0,0.08));
   border: 1.5px solid rgba(201,168,76,0.35);
   border-radius: 16px;
@@ -3045,6 +3050,20 @@ function fecharSplash(){
       if (feedScreen) feedScreen.classList.add('active');
       feedInit();
     }
+    // Efeito de entrada bonito após splash
+    const rankBtn = document.getElementById('navBtnRanking');
+    if (rankBtn) { goTo('ranking', rankBtn); }
+    document.querySelectorAll('.screen.active > *, .screen.active .card').forEach((el,i) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(32px) scale(0.97)';
+      el.style.transition = 'none';
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          el.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+          el.style.opacity = ''; el.style.transform = '';
+        }, 60 + i * 45);
+      });
+    });
   },600);
 }
 iniciarSplash();
@@ -3886,7 +3905,7 @@ function renderDashDefault() {
   if (!dadosMes.length) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;font-style:italic">Sem registos este mês ainda</div>'; return; }
   const agg = {};
   dadosMes.forEach(d => {
-    if (!agg[d.nome]) agg[d.nome] = {nome:d.nome,onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0};
+    if (!agg[d.nome]) agg[d.nome] = {nome:d.nome,onlines:0,sprays:0,palmilhas:0,camisolas:0,sacos:0,garrafas:0,elogios:0,szclub:0};
     categorias.forEach(cat => { agg[d.nome][cat.key] += (d[cat.key]||0); });
   });
   const vendedores = Object.values(agg);
@@ -5318,6 +5337,228 @@ function abrirSlotMedalha(nome, primeiraNovaStr) {
   slotAbrir(nome, medalhasNovasNomes[0] || 'Medalha');
 }
 
+// ── JOGO 4: PLINKO DROP GAME ──
+const PLINKO_PIN = '1011';
+
+function _abrirPlinkoComPin() {
+  const old = document.getElementById('plinkoPinModal');
+  if (old) old.remove();
+  const modal = document.createElement('div');
+  modal.id = 'plinkoPinModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML = `
+    <div style="background:#0d0b12;border:1px solid rgba(171,71,188,0.4);border-radius:20px;padding:28px 24px;width:100%;max-width:320px;text-align:center;">
+      <div style="font-size:36px;margin-bottom:8px;">🎯</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;margin-bottom:4px;">PLINKO DROP</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:1px;margin-bottom:20px;">Código de acesso da chefia</div>
+      <input id="plinkoPinInput" type="tel" maxlength="6" placeholder="· · ·"
+        style="width:100%;background:#181818;border:1px solid rgba(171,71,188,0.3);border-radius:10px;padding:14px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:10px;text-align:center;outline:none;margin-bottom:12px;">
+      <div id="plinkoPinErr" style="font-size:12px;color:#ef4444;min-height:16px;margin-bottom:8px;"></div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="document.getElementById('plinkoPinModal').remove()"
+          style="flex:1;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px;color:rgba(255,255,255,0.5);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">CANCELAR</button>
+        <button onclick="_verificarPlinkoPin()"
+          style="flex:1;background:linear-gradient(135deg,#7B1FA2,#AB47BC);border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">ENTRAR</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  setTimeout(() => { const i = document.getElementById('plinkoPinInput'); if(i) i.focus(); }, 100);
+  modal.querySelector('input').addEventListener('keydown', e => { if(e.key==='Enter') _verificarPlinkoPin(); });
+}
+
+function _verificarPlinkoPin() {
+  const inp = document.getElementById('plinkoPinInput');
+  const err = document.getElementById('plinkoPinErr');
+  if (!inp) return;
+  if (inp.value === PLINKO_PIN) {
+    document.getElementById('plinkoPinModal').remove();
+    _abrirPlinko();
+  } else {
+    if (err) err.textContent = '❌ Código incorreto.';
+    inp.value = '';
+    inp.style.borderColor = '#ef4444';
+    setTimeout(() => { if(inp) inp.style.borderColor = 'rgba(171,71,188,0.3)'; }, 800);
+  }
+}
+
+function _abrirPlinko() {
+  const overlay = document.getElementById('plinkoOverlay');
+  if (!overlay) return;
+  overlay.style.display = 'flex';
+  _plinkoIniciar();
+}
+
+function _plinkoIniciar() {
+  const canvas = document.getElementById('plinkoCanvas');
+  if (!canvas) return;
+  const W = canvas.offsetWidth || 340;
+  const H = 480;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  const PRIZES = [
+    {label:'10 min',mins:10,color:'#4CAF50'},
+    {label:'15 min',mins:15,color:'#8BC34A'},
+    {label:'20 min',mins:20,color:'#CDDC39'},
+    {label:'25 min',mins:25,color:'#FFC107'},
+    {label:'30 min',mins:30,color:'#FF9800'},
+    {label:'45 min',mins:45,color:'#FF5722'},
+    {label:'1 hora',mins:60,color:'#E91E63'},
+    {label:'30 min',mins:30,color:'#FF9800'},
+    {label:'20 min',mins:20,color:'#CDDC39'},
+    {label:'10 min',mins:10,color:'#4CAF50'},
+  ];
+
+  const COLS = PRIZES.length;
+  const ROWS = 8;
+  const slotW = W / COLS;
+  const pegR = 5;
+  const ballR = 10;
+
+  // Peg positions
+  const pegs = [];
+  for (let r = 0; r < ROWS; r++) {
+    const cols = r % 2 === 0 ? COLS - 1 : COLS;
+    const offsetX = r % 2 === 0 ? slotW : slotW / 2;
+    for (let c = 0; c < cols; c++) {
+      pegs.push({ x: offsetX + c * slotW, y: 70 + r * (H - 120) / ROWS });
+    }
+  }
+
+  // Ball state
+  let ball = { x: W / 2, y: 20, vx: (Math.random() - 0.5) * 2, vy: 0, done: false };
+  let animFrame = null;
+  let result = null;
+
+  function drawPegs() {
+    pegs.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, pegR, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(206,147,216,0.7)';
+      ctx.fill();
+    });
+  }
+
+  function drawSlots() {
+    const slotY = H - 48;
+    PRIZES.forEach((pr, i) => {
+      const x = i * slotW;
+      const isResult = result === i;
+      ctx.fillStyle = isResult ? pr.color : 'rgba(255,255,255,0.06)';
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(x + 2, slotY, slotW - 4, 44, 6) : ctx.rect(x + 2, slotY, slotW - 4, 44);
+      ctx.fill();
+      ctx.fillStyle = isResult ? '#000' : 'rgba(255,255,255,0.6)';
+      ctx.font = `bold ${W < 320 ? 8 : 9}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(pr.label, x + slotW / 2, slotY + 16);
+      ctx.font = `bold ${W < 320 ? 9 : 11}px sans-serif`;
+      ctx.fillText(pr.mins + 'm', x + slotW / 2, slotY + 32);
+    });
+  }
+
+  function drawBall() {
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ballR, 0, Math.PI * 2);
+    const grad = ctx.createRadialGradient(ball.x - 3, ball.y - 3, 1, ball.x, ball.y, ballR);
+    grad.addColorStop(0, '#fff');
+    grad.addColorStop(1, '#C9A84C');
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+
+  function update() {
+    if (ball.done) return;
+    ball.vy += 0.35; // gravity
+    ball.vx *= 0.99; // friction
+    ball.x += ball.vx;
+    ball.y += ball.vy;
+
+    // Bounce walls
+    if (ball.x - ballR < 0) { ball.x = ballR; ball.vx = Math.abs(ball.vx); }
+    if (ball.x + ballR > W) { ball.x = W - ballR; ball.vx = -Math.abs(ball.vx); }
+
+    // Peg collision
+    pegs.forEach(p => {
+      const dx = ball.x - p.x, dy = ball.y - p.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < ballR + pegR) {
+        const angle = Math.atan2(dy, dx);
+        const speed = Math.sqrt(ball.vx*ball.vx + ball.vy*ball.vy);
+        ball.vx = Math.cos(angle) * speed * 0.8 + (Math.random() - 0.5) * 1.5;
+        ball.vy = Math.sin(angle) * speed * 0.8;
+        ball.x = p.x + Math.cos(angle) * (ballR + pegR + 1);
+        ball.y = p.y + Math.sin(angle) * (ballR + pegR + 1);
+      }
+    });
+
+    // Reached bottom
+    if (ball.y + ballR >= H - 48) {
+      ball.done = true;
+      result = Math.max(0, Math.min(COLS - 1, Math.floor(ball.x / slotW)));
+      const prize = PRIZES[result];
+      setTimeout(() => {
+        const el = document.getElementById('plinkoResultMsg');
+        if (el) {
+          el.textContent = '🎉 ' + prize.label + ' mais cedo!';
+          el.style.color = prize.color;
+          el.style.display = 'block';
+        }
+        document.getElementById('plinkoDropBtn').style.display = 'block';
+        // Victory sound
+        try {
+          const ac = new (window.AudioContext || window.webkitAudioContext)();
+          [523,659,784,1047].forEach((f,i) => {
+            const o=ac.createOscillator(),g=ac.createGain();
+            o.type='sine';o.frequency.value=f;
+            o.connect(g);g.connect(ac.destination);
+            const t=ac.currentTime+i*0.1;
+            g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.2,t+0.05);
+            g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
+            o.start(t);o.stop(t+0.32);
+          });
+        } catch(e) {}
+      }, 200);
+    }
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, W, H);
+    // Background
+    ctx.fillStyle = '#0d0b12';
+    ctx.fillRect(0, 0, W, H);
+    drawPegs();
+    drawSlots();
+    drawBall();
+    if (!ball.done) animFrame = requestAnimationFrame(render);
+    else { update(); drawBall(); drawSlots(); }
+  }
+
+  function loop() {
+    if (!ball.done) { update(); render(); animFrame = requestAnimationFrame(loop); }
+  }
+
+  // Reset
+  ball = { x: W / 2 + (Math.random() - 0.5) * 40, y: 20, vx: (Math.random() - 0.5) * 3, vy: 0, done: false };
+  result = null;
+  const el = document.getElementById('plinkoResultMsg');
+  if (el) { el.textContent = ''; el.style.display = 'none'; }
+  document.getElementById('plinkoDropBtn').style.display = 'none';
+  cancelAnimationFrame(animFrame);
+  animFrame = requestAnimationFrame(loop);
+  canvas._stopAnim = () => cancelAnimationFrame(animFrame);
+}
+
+window._fecharPlinko = function() {
+  const canvas = document.getElementById('plinkoCanvas');
+  if (canvas && canvas._stopAnim) canvas._stopAnim();
+  document.getElementById('plinkoOverlay').style.display = 'none';
+};
+
+window._plinkoLargar = function() {
+  _plinkoIniciar();
+};
+
 const RASPADINHA_PIN = '1011';
 
 function _abrirRaspadinhaComPin() {
@@ -5327,18 +5568,18 @@ function _abrirRaspadinhaComPin() {
   modal.id = 'raspadinhaPinModal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;padding:20px;';
   modal.innerHTML = `
-    <div style="background:#111111;border:1px solid rgba(66,165,245,0.35);border-radius:20px;padding:28px 24px;width:100%;max-width:320px;text-align:center;">
+    <div style="background:#111111;border:1px solid rgba(201,168,76,0.35);border-radius:20px;padding:28px 24px;width:100%;max-width:320px;text-align:center;">
       <div style="font-size:36px;margin-bottom:8px;">🎟️</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;margin-bottom:4px;">RASPADINHA</div>
       <div style="font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:1px;margin-bottom:20px;">Código de acesso da chefia</div>
       <input id="raspadinhaPinInput" type="tel" maxlength="6" placeholder="· · ·"
-        style="width:100%;background:#181818;border:1px solid rgba(66,165,245,0.3);border-radius:10px;padding:14px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:10px;text-align:center;outline:none;margin-bottom:12px;">
+        style="width:100%;background:#181818;border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:14px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:10px;text-align:center;outline:none;margin-bottom:12px;">
       <div id="raspadinhaPinErr" style="font-size:12px;color:#ef4444;min-height:16px;margin-bottom:8px;"></div>
       <div style="display:flex;gap:8px;">
         <button onclick="document.getElementById('raspadinhaPinModal').remove()"
           style="flex:1;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px;color:rgba(255,255,255,0.5);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">CANCELAR</button>
         <button onclick="_verificarRaspadinhaPin()"
-          style="flex:1;background:linear-gradient(135deg,#1565C0,#42A5F5);border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">ENTRAR</button>
+          style="flex:1;background:linear-gradient(135deg,#a07820,#C9A84C);border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">ENTRAR</button>
       </div>
     </div>`;
   document.body.appendChild(modal);
@@ -5424,7 +5665,7 @@ function _abrirRaspadinha() {
   let scratching = false;
   let scratchedPixels = 0;
   const TOTAL = wrapW * wrapH;
-  const REVEAL_THRESHOLD = 0.50;
+  const REVEAL_THRESHOLD = 0.40;
   const STROKES_NEEDED = 25;
 
   // Som de vitória ao abrir a raspadinha
@@ -5535,6 +5776,21 @@ function _revelarRaspadinha(premio) {
   document.getElementById('raspadinhaRevealBtn').style.display = 'none';
   document.getElementById('raspadinhaResultado').style.display = 'flex';
   if (typeof salvarPremioConcedido === 'function') salvarPremioConcedido('Raspadinha', premio.nome, premio.icon);
+  // Som de revelação + fanfarra
+  try {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const fanfare = [[392,0],[494,0.12],[587,0.24],[784,0.36],[987,0.48],[1175,0.55]];
+    fanfare.forEach(([freq,delay]) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'triangle'; o.frequency.value = freq;
+      o.connect(g); g.connect(ac.destination);
+      const t = ac.currentTime + delay;
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(0.22, t+0.04);
+      g.gain.exponentialRampToValueAtTime(0.001, t+0.32);
+      o.start(t); o.stop(t+0.35);
+    });
+  } catch(e) {}
 }
 
 window._revelarRaspadinhaBtn = function() {
@@ -5579,8 +5835,7 @@ function _verificarSlotPin() {
   if (!inp) return;
   if (inp.value === SLOT_PIN) {
     document.getElementById('slotPinModal').remove();
-    // Abrir slot para usar na hora — pede nome do premiado
-    _slotEntradaReal();
+    slotAbrir('Premiado', 'Medalha');
   } else {
     if (err) err.textContent = '❌ Código incorreto. Tenta novamente.';
     inp.value = '';
@@ -6156,23 +6411,32 @@ function renderDesafiosMedalhas() {
 
     <!-- JOGO 3: RASPADINHA -->
     <div style="margin-top:28px;display:flex;align-items:center;gap:8px;margin-bottom:14px">
-      <div style="background:linear-gradient(135deg,#1565C0,#1976D2);border-radius:8px;padding:3px 10px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#fff">JOGO 3</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#42A5F5">RASPADINHA</div>
+      <div style="background:linear-gradient(135deg,#a07820,#C9A84C);border-radius:8px;padding:3px 10px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#fff">JOGO 3</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#C9A84C">RASPADINHA</div>
     </div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.4;">Jogo especial para ocasiões criadas no próprio dia. Acesso autorizado pela chefia.</div>
-    <div style="background:var(--card);border:1px solid rgba(66,165,245,0.3);border-radius:16px;padding:20px;text-align:center;margin-bottom:24px">
+    <div style="background:var(--card);border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:20px;text-align:center;margin-bottom:24px">
       <div style="font-size:36px;margin-bottom:8px">🎟️</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#42A5F5;letter-spacing:3px;margin-bottom:8px">RASPADINHA</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#C9A84C;letter-spacing:3px;margin-bottom:8px">RASPADINHA</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5">Jogo de ocasião especial.<br>Acesso autorizado pela chefia com PIN.</div>
-      <button onclick="_abrirRaspadinhaComPin()" style="background:linear-gradient(135deg,#1565C0,#42A5F5);border:none;border-radius:12px;padding:14px 32px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(66,165,245,0.3)">🔓 ENTRAR</button>
+      <button onclick="_abrirRaspadinhaComPin()" style="background:linear-gradient(135deg,#a07820,#C9A84C);border:none;border-radius:12px;padding:14px 32px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(66,165,245,0.3)">🔓 ENTRAR</button>
+    </div>
+
+    <!-- JOGO 4: PLINKO -->
+    <div style="margin-top:28px;display:flex;align-items:center;gap:8px;margin-bottom:14px">
+      <div style="background:linear-gradient(135deg,#7B1FA2,#AB47BC);border-radius:8px;padding:3px 10px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#fff">JOGO 4</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#CE93D8">DROP GAME</div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.4">Jogo de ocasião especial. Larga a bola e ganha tempo extra! Acesso autorizado pela chefia.</div>
+    <div style="background:var(--card);border:1px solid rgba(171,71,188,0.3);border-radius:16px;padding:20px;text-align:center;margin-bottom:24px">
+      <div style="font-size:36px;margin-bottom:8px">🎯</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#CE93D8;letter-spacing:3px;margin-bottom:8px">PLINKO DROP</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5">Larga a bola e descobre quantos minutos<br>ganhas para sair mais cedo!</div>
+      <button onclick="_abrirPlinkoComPin()" style="background:linear-gradient(135deg,#7B1FA2,#AB47BC);border:none;border-radius:12px;padding:14px 32px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(171,71,188,0.35)">🔓 ENTRAR</button>
     </div>
 
   </div>
 </div>
-
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- FEED CSS                                                 -->
 <!-- ═══════════════════════════════════════════════════════ -->
 <style>
 /* ══ FEED SCREEN ══ */
@@ -7008,9 +7272,10 @@ function _mostrarCofrePinModal() {
       <div style="font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:1px;margin-bottom:20px;">Introduz o código de acesso</div>
       <input id="cofrePinInput" type="tel" maxlength="6" placeholder="· · ·"
         style="width:100%;background:#181818;border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:14px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:10px;text-align:center;outline:none;margin-bottom:12px;">
-      <div id="cofrePinErr" style="font-size:12px;color:#ef4444;min-height:16px;margin-bottom:8px;"></div>
+      <div id="cofrePinErr" style="font-size:12px;color:#ef4444;min-height:16px;margin-bottom:4px;"></div>
+      <div id="cofrePinTimer" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#C9A84C;letter-spacing:4px;margin-bottom:10px;min-height:36px;text-align:center"></div>
       <div style="display:flex;gap:8px;">
-        <button onclick="document.getElementById('cofrePinModal').remove()"
+        <button onclick="document.getElementById('cofrePinModal').remove();clearInterval(window._cofrePinTimerIv)"
           style="flex:1;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px;color:rgba(255,255,255,0.5);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">CANCELAR</button>
         <button onclick="_verificarCofrePin()"
           style="flex:1;background:linear-gradient(135deg,#a07820,#C9A84C);border:none;border-radius:10px;padding:12px;color:#090909;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;">ENTRAR</button>
@@ -7018,8 +7283,25 @@ function _mostrarCofrePinModal() {
     </div>`;
   document.body.appendChild(modal);
   setTimeout(()=>{ const inp = document.getElementById('cofrePinInput'); if(inp) inp.focus(); }, 100);
-  // Enter key
   modal.querySelector('input').addEventListener('keydown', e=>{ if(e.key==='Enter') _verificarCofrePin(); });
+  // Timer 60s
+  let _cofreTimerSecs = 60;
+  const _timerEl = document.getElementById('cofrePinTimer');
+  if (_timerEl) _timerEl.textContent = '1:00';
+  clearInterval(window._cofrePinTimerIv);
+  window._cofrePinTimerIv = setInterval(() => {
+    _cofreTimerSecs--;
+    const el = document.getElementById('cofrePinTimer');
+    if (el) {
+      el.textContent = _cofreTimerSecs > 0 ? '0:' + String(_cofreTimerSecs).padStart(2,'0') : '0:00';
+      if (_cofreTimerSecs <= 10) el.style.color = '#ef4444';
+    }
+    if (_cofreTimerSecs <= 0) {
+      clearInterval(window._cofrePinTimerIv);
+      const modal = document.getElementById('cofrePinModal');
+      if (modal) modal.remove();
+    }
+  }, 1000);
 }
 
 function _verificarCofrePin() {
@@ -9478,15 +9760,15 @@ setTimeout(() => {
   50%      { box-shadow: 0 4px 28px rgba(201,168,76,0.3), 0 0 0 3px rgba(201,168,76,0.07); border-color: rgba(201,168,76,0.85); }
 }
 #feedFabBtn.feed-open {
-  background: linear-gradient(135deg, #C9A84C, #a07820);
-  border-color: #C9A84C;
+  background: #090909;
+  border: 2px solid #C9A84C;
   animation: none;
-  box-shadow: 0 4px 24px rgba(201,168,76,0.6), 0 0 0 3px rgba(201,168,76,0.15);
+  box-shadow: 0 4px 24px rgba(201,168,76,0.4);
 }
 #feedFabBtn.feed-open #feedFabIcon {
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 900;
-  color: #090909;
+  color: #C9A84C;
   line-height: 1;
 }
 #feedFabIcon { font-size: 21px; line-height: 1; display: block; }
@@ -9618,7 +9900,40 @@ if (typeof _origCarregarDashPatch === 'function') {
 </script>
 
 <!-- ═══════════════════════════════════════════════════════ -->
-<!-- JOGO 3 — RASPADINHA                                     -->
+<!-- JOGO 4 — PLINKO DROP                                    -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<style>
+#plinkoOverlay {
+  display:none;position:fixed;inset:0;z-index:99000;
+  background:rgba(0,0,0,0.96);align-items:center;justify-content:center;
+  flex-direction:column;padding:12px;
+}
+#plinkoCard {
+  background:#0d0b12;border:2px solid rgba(171,71,188,0.45);border-radius:24px;
+  padding:20px 16px 18px;width:100%;max-width:380px;text-align:center;
+  box-shadow:0 0 60px rgba(171,71,188,0.15),0 20px 60px rgba(0,0,0,0.8);
+}
+</style>
+<div id="plinkoOverlay">
+  <div id="plinkoCard">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:5px;color:rgba(206,147,216,0.6);margin-bottom:4px">JOGO 4 · OCASIÃO ESPECIAL</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;color:#CE93D8;margin-bottom:12px;text-shadow:0 0 20px rgba(206,147,216,0.4)">🎯 PLINKO DROP</div>
+    <canvas id="plinkoCanvas" style="width:100%;border-radius:12px;display:block;touch-action:none"></canvas>
+    <div id="plinkoResultMsg" style="display:none;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;margin-top:14px;animation:raspaReveal 0.5s cubic-bezier(0.34,1.56,0.64,1) both"></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button id="plinkoDropBtn" onclick="_plinkoLargar()"
+        style="display:none;flex:1;background:linear-gradient(135deg,#7B1FA2,#AB47BC);border:none;border-radius:12px;padding:13px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3px;cursor:pointer">
+        🎯 JOGAR DE NOVO
+      </button>
+      <button onclick="_fecharPlinko()"
+        style="flex:1;background:transparent;border:1px solid rgba(171,71,188,0.25);border-radius:12px;padding:13px;color:rgba(206,147,216,0.6);font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;cursor:pointer">
+        ← FECHAR
+      </button>
+    </div>
+  </div>
+</div>
+
+
 <!-- ═══════════════════════════════════════════════════════ -->
 <style>
 #raspadinhaOverlay {
