@@ -5385,168 +5385,217 @@ function _abrirPlinko() {
   const overlay = document.getElementById('plinkoOverlay');
   if (!overlay) return;
   overlay.style.display = 'flex';
-  _plinkoIniciar();
+  // Show start button, draw idle board
+  document.getElementById('plinkoDropBtn').textContent = '🎯 LARGAR A BOLA';
+  document.getElementById('plinkoDropBtn').style.display = '';
+  const el = document.getElementById('plinkoResultMsg');
+  if (el) { el.textContent = ''; el.style.display = 'none'; }
+  _plinkoDrawIdle();
 }
 
-function _plinkoIniciar() {
+// Plinko audio context
+let _plinkoAC = null;
+function _plinkoSom(freq, dur) {
+  try {
+    if (!_plinkoAC) _plinkoAC = new (window.AudioContext || window.webkitAudioContext)();
+    const ac = _plinkoAC;
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'sine'; o.frequency.value = freq;
+    o.connect(g); g.connect(ac.destination);
+    g.gain.setValueAtTime(0.15, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
+    o.start(); o.stop(ac.currentTime + dur);
+  } catch(e) {}
+}
+
+function _plinkoGetDimensions() {
+  const canvas = document.getElementById('plinkoCanvas');
+  const W = canvas.offsetWidth || 340;
+  const SLOT_H = 60; // bigger slots
+  const H = 420 + SLOT_H;
+  return { W, H, SLOT_H };
+}
+
+function _plinkoDrawIdle() {
   const canvas = document.getElementById('plinkoCanvas');
   if (!canvas) return;
-  const W = canvas.offsetWidth || 340;
-  const H = 480;
+  const { W, H, SLOT_H } = _plinkoGetDimensions();
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
+  const PRIZES = _plinkoPrizes();
+  _plinkoDrawBoard(ctx, W, H, SLOT_H, PRIZES, null, { x: W/2, y: 22, done:true });
+}
 
-  const PRIZES = [
-    {label:'10 min',mins:10,color:'#4CAF50'},
-    {label:'15 min',mins:15,color:'#8BC34A'},
-    {label:'20 min',mins:20,color:'#CDDC39'},
-    {label:'25 min',mins:25,color:'#FFC107'},
-    {label:'30 min',mins:30,color:'#FF9800'},
-    {label:'45 min',mins:45,color:'#FF5722'},
-    {label:'1 hora',mins:60,color:'#E91E63'},
-    {label:'30 min',mins:30,color:'#FF9800'},
-    {label:'20 min',mins:20,color:'#CDDC39'},
-    {label:'10 min',mins:10,color:'#4CAF50'},
+function _plinkoPrizes() {
+  return [
+    {label:'10 min',mins:10},
+    {label:'15 min',mins:15},
+    {label:'20 min',mins:20},
+    {label:'30 min',mins:30},
+    {label:'45 min',mins:45},
+    {label:'1 hora',mins:60},
+    {label:'45 min',mins:45},
+    {label:'30 min',mins:30},
+    {label:'20 min',mins:20},
+    {label:'10 min',mins:10},
   ];
+}
 
+function _plinkoGoldColor(mins) {
+  // From light gold (10min) to deep rich gold (1h)
+  const t = Math.min((mins - 10) / 50, 1);
+  const r = Math.round(180 + t * 21);
+  const g2 = Math.round(140 - t * 60);
+  const b = Math.round(20 + t * 10);
+  return `rgb(${r},${g2},${b})`;
+}
+
+function _plinkoDrawBoard(ctx, W, H, SLOT_H, PRIZES, result, ball) {
   const COLS = PRIZES.length;
   const ROWS = 8;
   const slotW = W / COLS;
   const pegR = 5;
   const ballR = 10;
+  const boardH = H - SLOT_H;
 
-  // Peg positions
+  // Background
+  ctx.fillStyle = '#0d0b04';
+  ctx.fillRect(0, 0, W, H);
+
+  // Pegs
+  for (let r = 0; r < ROWS; r++) {
+    const cols = r % 2 === 0 ? COLS - 1 : COLS;
+    const offsetX = r % 2 === 0 ? slotW : slotW / 2;
+    for (let c = 0; c < cols; c++) {
+      const px = offsetX + c * slotW;
+      const py = 60 + r * (boardH - 80) / ROWS;
+      ctx.beginPath();
+      ctx.arc(px, py, pegR, 0, Math.PI * 2);
+      const g = ctx.createRadialGradient(px-1, py-1, 0, px, py, pegR);
+      g.addColorStop(0, '#F5D87E'); g.addColorStop(1, '#a07820');
+      ctx.fillStyle = g;
+      ctx.fill();
+    }
+  }
+
+  // Prize slots (bigger, gold-themed)
+  const slotY = boardH;
+  PRIZES.forEach((pr, i) => {
+    const x = i * slotW;
+    const isResult = result === i;
+    const col = _plinkoGoldColor(pr.mins);
+    // Slot bg
+    ctx.fillStyle = isResult ? col : 'rgba(201,168,76,0.10)';
+    ctx.strokeStyle = isResult ? col : 'rgba(201,168,76,0.35)';
+    ctx.lineWidth = isResult ? 2 : 1;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x + 2, slotY + 2, slotW - 4, SLOT_H - 4, 6);
+    else ctx.rect(x + 2, slotY + 2, slotW - 4, SLOT_H - 4);
+    ctx.fill(); ctx.stroke();
+    // Slot text
+    ctx.fillStyle = isResult ? '#090909' : '#C9A84C';
+    ctx.textAlign = 'center';
+    ctx.font = `bold ${slotW < 38 ? 8 : 9}px sans-serif`;
+    ctx.fillText(pr.label, x + slotW / 2, slotY + 22);
+    ctx.font = `bold ${slotW < 38 ? 10 : 13}px Barlow Condensed, sans-serif`;
+    ctx.fillText(pr.mins + 'm', x + slotW / 2, slotY + 42);
+  });
+
+  // Ball
+  if (ball) {
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ballR, 0, Math.PI * 2);
+    const bg = ctx.createRadialGradient(ball.x-3, ball.y-3, 1, ball.x, ball.y, ballR);
+    bg.addColorStop(0, '#fff'); bg.addColorStop(1, '#C9A84C');
+    ctx.fillStyle = bg;
+    ctx.shadowColor = 'rgba(201,168,76,0.8)';
+    ctx.shadowBlur = 10;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+}
+
+function _plinkoIniciar() {
+  const canvas = document.getElementById('plinkoCanvas');
+  if (!canvas) return;
+  const { W, H, SLOT_H } = _plinkoGetDimensions();
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const PRIZES = _plinkoPrizes();
+  const COLS = PRIZES.length;
+  const ROWS = 8;
+  const slotW = W / COLS;
+  const pegR = 5;
+  const ballR = 10;
+  const boardH = H - SLOT_H;
+
+  // Build pegs array
   const pegs = [];
   for (let r = 0; r < ROWS; r++) {
     const cols = r % 2 === 0 ? COLS - 1 : COLS;
     const offsetX = r % 2 === 0 ? slotW : slotW / 2;
     for (let c = 0; c < cols; c++) {
-      pegs.push({ x: offsetX + c * slotW, y: 70 + r * (H - 120) / ROWS });
+      pegs.push({ x: offsetX + c * slotW, y: 60 + r * (boardH - 80) / ROWS });
     }
   }
 
-  // Ball state
-  let ball = { x: W / 2, y: 20, vx: (Math.random() - 0.5) * 2, vy: 0, done: false };
-  let animFrame = null;
+  let ball = { x: W/2 + (Math.random()-0.5)*60, y: 22, vx:(Math.random()-0.5)*2, vy:1, done:false };
   let result = null;
-
-  function drawPegs() {
-    pegs.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, pegR, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(206,147,216,0.7)';
-      ctx.fill();
-    });
-  }
-
-  function drawSlots() {
-    const slotY = H - 48;
-    PRIZES.forEach((pr, i) => {
-      const x = i * slotW;
-      const isResult = result === i;
-      ctx.fillStyle = isResult ? pr.color : 'rgba(255,255,255,0.06)';
-      ctx.beginPath();
-      ctx.roundRect ? ctx.roundRect(x + 2, slotY, slotW - 4, 44, 6) : ctx.rect(x + 2, slotY, slotW - 4, 44);
-      ctx.fill();
-      ctx.fillStyle = isResult ? '#000' : 'rgba(255,255,255,0.6)';
-      ctx.font = `bold ${W < 320 ? 8 : 9}px sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.fillText(pr.label, x + slotW / 2, slotY + 16);
-      ctx.font = `bold ${W < 320 ? 9 : 11}px sans-serif`;
-      ctx.fillText(pr.mins + 'm', x + slotW / 2, slotY + 32);
-    });
-  }
-
-  function drawBall() {
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ballR, 0, Math.PI * 2);
-    const grad = ctx.createRadialGradient(ball.x - 3, ball.y - 3, 1, ball.x, ball.y, ballR);
-    grad.addColorStop(0, '#fff');
-    grad.addColorStop(1, '#C9A84C');
-    ctx.fillStyle = grad;
-    ctx.fill();
-  }
+  let animFrame = null;
 
   function update() {
     if (ball.done) return;
-    ball.vy += 0.35; // gravity
-    ball.vx *= 0.99; // friction
+    ball.vy += 0.4;
+    ball.vx *= 0.995;
     ball.x += ball.vx;
     ball.y += ball.vy;
-
-    // Bounce walls
-    if (ball.x - ballR < 0) { ball.x = ballR; ball.vx = Math.abs(ball.vx); }
-    if (ball.x + ballR > W) { ball.x = W - ballR; ball.vx = -Math.abs(ball.vx); }
-
-    // Peg collision
+    if (ball.x - ballR < 0) { ball.x = ballR; ball.vx = Math.abs(ball.vx) * 0.8; }
+    if (ball.x + ballR > W) { ball.x = W - ballR; ball.vx = -Math.abs(ball.vx) * 0.8; }
     pegs.forEach(p => {
       const dx = ball.x - p.x, dy = ball.y - p.y;
       const dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist < ballR + pegR) {
+      if (dist < ballR + pegR + 1) {
         const angle = Math.atan2(dy, dx);
         const speed = Math.sqrt(ball.vx*ball.vx + ball.vy*ball.vy);
-        ball.vx = Math.cos(angle) * speed * 0.8 + (Math.random() - 0.5) * 1.5;
-        ball.vy = Math.sin(angle) * speed * 0.8;
-        ball.x = p.x + Math.cos(angle) * (ballR + pegR + 1);
-        ball.y = p.y + Math.sin(angle) * (ballR + pegR + 1);
+        ball.vx = Math.cos(angle) * speed * 0.7 + (Math.random()-0.5)*2.5;
+        ball.vy = Math.abs(Math.sin(angle) * speed * 0.7) * 0.5;
+        ball.x = p.x + Math.cos(angle)*(ballR+pegR+2);
+        ball.y = p.y + Math.sin(angle)*(ballR+pegR+2);
+        // Peg hit sound — pitch varies by height
+        const pitchMap = 400 + (1 - p.y / boardH) * 600;
+        _plinkoSom(pitchMap, 0.12);
       }
     });
-
-    // Reached bottom
-    if (ball.y + ballR >= H - 48) {
+    if (ball.y + ballR >= boardH) {
       ball.done = true;
-      result = Math.max(0, Math.min(COLS - 1, Math.floor(ball.x / slotW)));
+      ball.y = boardH - ballR;
+      result = Math.max(0, Math.min(COLS-1, Math.floor(ball.x / slotW)));
       const prize = PRIZES[result];
+      // Victory fanfare
       setTimeout(() => {
+        [523,659,784,1047,1319].forEach((f,i) => {
+          setTimeout(() => _plinkoSom(f, 0.25), i*100);
+        });
         const el = document.getElementById('plinkoResultMsg');
         if (el) {
-          el.textContent = '🎉 ' + prize.label + ' mais cedo!';
-          el.style.color = prize.color;
+          el.textContent = '🏆 ' + prize.label + ' mais cedo!';
           el.style.display = 'block';
         }
-        document.getElementById('plinkoDropBtn').style.display = 'block';
-        // Victory sound
-        try {
-          const ac = new (window.AudioContext || window.webkitAudioContext)();
-          [523,659,784,1047].forEach((f,i) => {
-            const o=ac.createOscillator(),g=ac.createGain();
-            o.type='sine';o.frequency.value=f;
-            o.connect(g);g.connect(ac.destination);
-            const t=ac.currentTime+i*0.1;
-            g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.2,t+0.05);
-            g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
-            o.start(t);o.stop(t+0.32);
-          });
-        } catch(e) {}
-      }, 200);
+        const btn = document.getElementById('plinkoDropBtn');
+        if (btn) btn.textContent = '🎯 JOGAR DE NOVO';
+      }, 150);
     }
   }
 
-  function render() {
-    ctx.clearRect(0, 0, W, H);
-    // Background
-    ctx.fillStyle = '#0d0b12';
-    ctx.fillRect(0, 0, W, H);
-    drawPegs();
-    drawSlots();
-    drawBall();
-    if (!ball.done) animFrame = requestAnimationFrame(render);
-    else { update(); drawBall(); drawSlots(); }
-  }
-
   function loop() {
-    if (!ball.done) { update(); render(); animFrame = requestAnimationFrame(loop); }
+    update();
+    _plinkoDrawBoard(ctx, W, H, SLOT_H, PRIZES, result, ball);
+    if (!ball.done) animFrame = requestAnimationFrame(loop);
   }
 
-  // Reset
-  ball = { x: W / 2 + (Math.random() - 0.5) * 40, y: 20, vx: (Math.random() - 0.5) * 3, vy: 0, done: false };
-  result = null;
-  const el = document.getElementById('plinkoResultMsg');
-  if (el) { el.textContent = ''; el.style.display = 'none'; }
-  document.getElementById('plinkoDropBtn').style.display = 'none';
-  cancelAnimationFrame(animFrame);
-  animFrame = requestAnimationFrame(loop);
+  if (canvas._stopAnim) canvas._stopAnim();
   canvas._stopAnim = () => cancelAnimationFrame(animFrame);
+  animFrame = requestAnimationFrame(loop);
 }
 
 window._fecharPlinko = function() {
@@ -5556,6 +5605,10 @@ window._fecharPlinko = function() {
 };
 
 window._plinkoLargar = function() {
+  const el = document.getElementById('plinkoResultMsg');
+  if (el) { el.textContent = ''; el.style.display = 'none'; }
+  const btn = document.getElementById('plinkoDropBtn');
+  if (btn) btn.textContent = '⏳ A cair...';
   _plinkoIniciar();
 };
 
@@ -5667,24 +5720,6 @@ function _abrirRaspadinha() {
   const TOTAL = wrapW * wrapH;
   const REVEAL_THRESHOLD = 0.40;
   const STROKES_NEEDED = 25;
-
-  // Som de vitória ao abrir a raspadinha
-  (function _somVitoria() {
-    try {
-      const ac = new (window.AudioContext || window.webkitAudioContext)();
-      const notas = [523.25, 659.25, 783.99, 1046.50]; // C5 E5 G5 C6
-      notas.forEach((freq, i) => {
-        const o = ac.createOscillator(), g = ac.createGain();
-        o.connect(g); g.connect(ac.destination);
-        o.type = 'sine'; o.frequency.value = freq;
-        const t = ac.currentTime + i * 0.12;
-        g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(0.18, t + 0.04);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
-        o.start(t); o.stop(t + 0.3);
-      });
-    } catch(e) {}
-  })();
 
   // Contexto de áudio para som de raspar (reutilizado)
   let _raspaAC = null;
@@ -7922,7 +7957,45 @@ function handleKey(k) {
     void door.offsetWidth;
     door.classList.add('spinning');
     setTimeout(()=>door.classList.remove('spinning'), 400);
+    // Iniciar timer de 60s no primeiro dígito
+    if (currentEntry.length === 1) _iniciarCofreGameTimer();
   }
+}
+
+let _cofreGameTimerIv = null;
+function _iniciarCofreGameTimer() {
+  clearInterval(_cofreGameTimerIv);
+  let secs = 60;
+  const el = document.getElementById('cofreGameTimer');
+  if (!el) return;
+  el.style.display = 'block';
+  function fmt(s) { return '0:' + String(s).padStart(2,'0'); }
+  el.innerHTML = `<span style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:6px;color:#C9A84C;text-shadow:0 0 12px rgba(201,168,76,0.5)">${fmt(secs)}</span>`;
+  _cofreGameTimerIv = setInterval(() => {
+    secs--;
+    const span = el.querySelector('span');
+    if (span) {
+      span.textContent = fmt(Math.max(0,secs));
+      if (secs <= 10) span.style.color = '#ef4444';
+      if (secs <= 5) span.style.animation = 'rankDotPulse 0.5s ease-in-out infinite';
+    }
+    if (secs <= 0) {
+      clearInterval(_cofreGameTimerIv);
+      el.style.display = 'none';
+      // Limpar entrada se ainda não submeteu
+      if (currentEntry.length > 0 && currentEntry.length < CODE_LENGTH) {
+        currentEntry = '';
+        updateComboDisplay();
+        cofreToast('Tempo esgotado! Tenta de novo.', 'red');
+      }
+    }
+  }, 1000);
+}
+
+function _pararCofreGameTimer() {
+  clearInterval(_cofreGameTimerIv);
+  const el = document.getElementById('cofreGameTimer');
+  if (el) el.style.display = 'none';
 }
 
 function updateComboDisplay() {
@@ -7945,6 +8018,7 @@ function updateComboDisplay() {
 
 // ── SUBMIT ATTEMPT ──
 function submitAttempt() {
+  _pararCofreGameTimer();
   const guess = currentEntry;
   const secret = state.secretCode;
   currentEntry = '';
@@ -8396,6 +8470,8 @@ window.cofreSom = cofreSom;
 
         <!-- VAULT STATUS -->
         <div id="vaultStatusMsg"></div>
+        <!-- TIMER DA TENTATIVA -->
+        <div id="cofreGameTimer" style="display:none;text-align:center;margin:8px 0 0"></div>
 
         <!-- ATTEMPTS -->
         <div class="attempts-section">
@@ -9905,29 +9981,30 @@ if (typeof _origCarregarDashPatch === 'function') {
 <style>
 #plinkoOverlay {
   display:none;position:fixed;inset:0;z-index:99000;
-  background:rgba(0,0,0,0.96);align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.97);align-items:center;justify-content:center;
   flex-direction:column;padding:12px;
 }
 #plinkoCard {
-  background:#0d0b12;border:2px solid rgba(171,71,188,0.45);border-radius:24px;
-  padding:20px 16px 18px;width:100%;max-width:380px;text-align:center;
-  box-shadow:0 0 60px rgba(171,71,188,0.15),0 20px 60px rgba(0,0,0,0.8);
+  background:linear-gradient(160deg,#1a1508,#0d0b04);
+  border:2px solid rgba(201,168,76,0.55);border-radius:24px;
+  padding:20px 16px 18px;width:100%;max-width:400px;text-align:center;
+  box-shadow:0 0 60px rgba(201,168,76,0.15),0 20px 60px rgba(0,0,0,0.9);
 }
 </style>
 <div id="plinkoOverlay">
   <div id="plinkoCard">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:5px;color:rgba(206,147,216,0.6);margin-bottom:4px">JOGO 4 · OCASIÃO ESPECIAL</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;color:#CE93D8;margin-bottom:12px;text-shadow:0 0 20px rgba(206,147,216,0.4)">🎯 PLINKO DROP</div>
-    <canvas id="plinkoCanvas" style="width:100%;border-radius:12px;display:block;touch-action:none"></canvas>
-    <div id="plinkoResultMsg" style="display:none;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;margin-top:14px;animation:raspaReveal 0.5s cubic-bezier(0.34,1.56,0.64,1) both"></div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:5px;color:rgba(201,168,76,0.5);margin-bottom:4px">JOGO 4 · OCASIÃO ESPECIAL</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;color:#C9A84C;margin-bottom:12px;text-shadow:0 0 20px rgba(201,168,76,0.4)">🎯 PLINKO DROP</div>
+    <canvas id="plinkoCanvas" style="width:100%;border-radius:12px;display:block;touch-action:none;border:1px solid rgba(201,168,76,0.2)"></canvas>
+    <div id="plinkoResultMsg" style="display:none;font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:3px;color:#C9A84C;margin-top:14px;text-shadow:0 0 20px rgba(201,168,76,0.5);animation:raspaReveal 0.5s cubic-bezier(0.34,1.56,0.64,1) both"></div>
     <div style="display:flex;gap:8px;margin-top:14px">
       <button id="plinkoDropBtn" onclick="_plinkoLargar()"
-        style="display:none;flex:1;background:linear-gradient(135deg,#7B1FA2,#AB47BC);border:none;border-radius:12px;padding:13px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3px;cursor:pointer">
-        🎯 JOGAR DE NOVO
+        style="flex:2;background:linear-gradient(135deg,#a07820,#C9A84C,#F5D87E);border:none;border-radius:12px;padding:14px;color:#090909;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4)">
+        🎯 LARGAR A BOLA
       </button>
       <button onclick="_fecharPlinko()"
-        style="flex:1;background:transparent;border:1px solid rgba(171,71,188,0.25);border-radius:12px;padding:13px;color:rgba(206,147,216,0.6);font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;cursor:pointer">
-        ← FECHAR
+        style="flex:1;background:transparent;border:1px solid rgba(201,168,76,0.25);border-radius:12px;padding:14px;color:rgba(201,168,76,0.6);font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;cursor:pointer">
+        ← SAIR
       </button>
     </div>
   </div>
