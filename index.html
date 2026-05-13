@@ -7372,8 +7372,12 @@ function _verificarCofrePin() {
 function _abrirCofreDirecto() {
   document.getElementById('cofreOverlay').style.display = 'block';
   document.body.style.overflow = 'hidden';
-  if (!window._cofreInitDone) { window._cofreInitDone = true; cofreInit(); }
-  else { window.cofreRefreshDados && window.cofreRefreshDados(); }
+  // Sempre força novo cofreInit ao abrir → novo código e tentativas a zero
+  window._anonAttempts = 0;
+  window._cofreGameTimerRunning = false;
+  clearInterval(window._cofreGameTimerIv);
+  window._cofreInitDone = true;
+  cofreInit();
   // Sync jackpot
   try {
     const s = JSON.parse(localStorage.getItem('cofreState2') || localStorage.getItem('cofreState') || '{}');
@@ -7387,6 +7391,30 @@ function _abrirCofreDirecto() {
 function fecharCofre() {
   document.getElementById('cofreOverlay').style.display = 'none';
   document.body.style.overflow = '';
+  // Limpar tentativas e display ao fechar — novo código gerado ao reabrir
+  try {
+    const attList = document.getElementById('attemptsList');
+    if (attList) attList.innerHTML = '';
+    const attLabel = document.getElementById('attemptsLabel');
+    if (attLabel) attLabel.style.display = 'none';
+    const timer = document.getElementById('cofreGameTimer');
+    if (timer) timer.style.display = 'none';
+    window._cofreGameTimerRunning = false;
+    clearInterval(window._cofreGameTimerIv);
+    window._anonAttempts = 0;
+    // Limpar combo display
+    for (let i = 0; i < 4; i++) {
+      const el = document.getElementById('cd_' + i);
+      if (el) { el.textContent = '—'; el.className = 'combo-digit'; }
+    }
+    // Reset porta
+    const door = document.getElementById('vaultDoorCofre');
+    if (door) door.classList.remove('open-vault');
+    const lock = document.getElementById('lockIconCofre');
+    if (lock) { lock.classList.remove('unlocked'); lock.textContent = '🔒'; }
+    const msg = document.getElementById('vaultStatusMsg');
+    if (msg) msg.innerHTML = '';
+  } catch(e) {}
   // Sync jackpot display on button
   try {
     const s = JSON.parse(localStorage.getItem('cofreState2') || '{}');
@@ -8502,7 +8530,7 @@ window.cofreSom = cofreSom;
     <div class="status-bar">
       <div class="status-week" id="statusWeekCofre">SEMANA —</div>
       <div class="status-jackpot" id="statusJackpotCofre">€ 0,00</div>
-      <button onclick="_cofreReset()" title="Novo código / Jogar de novo" style="background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);border-radius:8px;color:#C9A84C;font-size:16px;cursor:pointer;padding:4px 10px;-webkit-tap-highlight-color:transparent;margin-right:6px">🔄</button><button onclick="fecharCofre()" style="background:transparent;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;padding:4px 8px;-webkit-tap-highlight-color:transparent;">✕</button>
+      <button onclick="fecharCofre()" style="background:transparent;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;padding:4px 8px;-webkit-tap-highlight-color:transparent;">✕</button>
     </div>
 
     <!-- HEADER -->
@@ -8520,7 +8548,7 @@ window.cofreSom = cofreSom;
         <span class="jackpot-amount" id="jackpotDisplayCofre">0,00</span>
       </div>
       <div>
-        <button class="jackpot-history-btn" onclick="document.getElementById('cofreHistModal').classList.add('open')">Ver histórico →</button>
+        
       </div>
       <div class="jackpot-week-info">Base €10,00 · +€2,00 por semana sem vencedor · <span id="weeksNoWinner">1</span> semana(s) acumulada(s)</div>
     </div>
