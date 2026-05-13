@@ -7391,29 +7391,19 @@ function _abrirCofreDirecto() {
 function fecharCofre() {
   document.getElementById('cofreOverlay').style.display = 'none';
   document.body.style.overflow = '';
-  // Limpar tentativas e display ao fechar — novo código gerado ao reabrir
+  // Limpar sessão ao fechar — novo código ao reabrir
+  window._anonAttempts = 0;
+  window._cofreGameTimerRunning = false;
+  clearInterval(window._cofreGameTimerIv);
   try {
-    const attList = document.getElementById('attemptsList');
-    if (attList) attList.innerHTML = '';
-    const attLabel = document.getElementById('attemptsLabel');
-    if (attLabel) attLabel.style.display = 'none';
-    const timer = document.getElementById('cofreGameTimer');
-    if (timer) timer.style.display = 'none';
-    window._cofreGameTimerRunning = false;
-    clearInterval(window._cofreGameTimerIv);
-    window._anonAttempts = 0;
-    // Limpar combo display
-    for (let i = 0; i < 4; i++) {
-      const el = document.getElementById('cd_' + i);
-      if (el) { el.textContent = '—'; el.className = 'combo-digit'; }
-    }
-    // Reset porta
-    const door = document.getElementById('vaultDoorCofre');
-    if (door) door.classList.remove('open-vault');
-    const lock = document.getElementById('lockIconCofre');
-    if (lock) { lock.classList.remove('unlocked'); lock.textContent = '🔒'; }
-    const msg = document.getElementById('vaultStatusMsg');
-    if (msg) msg.innerHTML = '';
+    const attList = document.getElementById('attemptsList'); if (attList) attList.innerHTML = '';
+    const attLabel = document.getElementById('attemptsLabel'); if (attLabel) attLabel.style.display = 'none';
+    const timer = document.getElementById('cofreGameTimer'); if (timer) timer.style.display = 'none';
+    const pad = document.getElementById('numpadCofre'); if (pad) { pad.style.opacity = '1'; pad.style.pointerEvents = ''; }
+    const msg = document.getElementById('vaultStatusMsg'); if (msg) msg.innerHTML = '';
+    for (let i=0;i<4;i++) { const el=document.getElementById('cd_'+i); if(el){el.textContent='—';el.className='combo-digit';} }
+    const door = document.getElementById('vaultDoorCofre'); if (door) door.classList.remove('open-vault');
+    const lock = document.getElementById('lockIconCofre'); if (lock) { lock.classList.remove('unlocked'); lock.textContent='🔒'; }
   } catch(e) {}
   // Sync jackpot display on button
   try {
@@ -7423,7 +7413,6 @@ function fecharCofre() {
     }
   } catch(e) {}
 }
-// Sync jackpot on medalhas screen open
 function syncCofreJackpot() {
   try {
     const s = JSON.parse(localStorage.getItem('cofreState2') || '{}');
@@ -7538,6 +7527,7 @@ const defaultState = () => ({
 });
 
 let state = loadState() || defaultState();
+if (state.top3) state.top3 = state.top3.filter(p => p.nome !== '_jogador');
 window._cofreState = state; // expor globalmente para _cofreReset
 // Migrate old state missing fields
 if (!state.history) state.history = [];
@@ -7565,19 +7555,31 @@ let sessionAttempts = []; // attempts this session (not persisted across page lo
 
 // ── INIT ──
 function cofreInit() {
-  window._anonAttempts = 0; // sempre começa com 0 tentativas ao abrir
+  window._anonAttempts = 0; // sempre começa com 0 ao abrir
+  // Gerar SEMPRE um novo código ao abrir
+  state.secretCode = generateCode();
+  // Limpar sessão anterior
+  sessionAttempts = [];
+  currentEntry = '';
+  currentPlayer = null;
+  // Limpar estado visual anterior
+  const _al = document.getElementById('attemptsList'); if (_al) _al.innerHTML = '';
+  const _alb = document.getElementById('attemptsLabel'); if (_alb) _alb.style.display = 'none';
+  const _pad = document.getElementById('numpadCofre');
+  if (_pad) { _pad.style.opacity = '1'; _pad.style.pointerEvents = ''; }
+  const _msg = document.getElementById('vaultStatusMsg'); if (_msg) _msg.innerHTML = '';
+  for (let i=0;i<4;i++) { const el=document.getElementById('cd_'+i); if(el){el.textContent='—';el.className='combo-digit';} }
   buildVaultVisuals();
   buildNumpad();
   buildComboDisplay();
   syncPlayersFromLocalStorage();
   renderJackpot();
-  // Definir jogador anónimo para que o numpad fique activo sem precisar de seleção
-  if (!currentPlayer) {
-    if (!state.top3) state.top3 = [];
-    let anon = state.top3.find(p => p.nome === '_jogador');
-    if (!anon) { anon = {nome:'_jogador', score:0, attempts:0, usedThisWeek:false}; state.top3.push(anon); }
-    currentPlayer = anon;
-  }
+  // Jogador anónimo
+  if (!state.top3) state.top3 = [];
+  let anon = state.top3.find(p => p.nome === '_jogador');
+  if (!anon) { anon = {nome:'_jogador', score:0, attempts:0, usedThisWeek:false}; state.top3.push(anon); }
+  anon.attempts = 0; anon.usedThisWeek = false;
+  currentPlayer = anon;
   renderVaultStatus();
   updateStatusBar();
   cofreRefreshDados();
@@ -7983,10 +7985,16 @@ function renderVaultStatus() {
   const pad = document.getElementById('numpadCofre');
   const door = document.getElementById('vaultDoorCofre');
 
-  // Sem necessidade de selecionar nome — cofre disponível diretamente
-  if (!currentPlayer) {
-    msg.innerHTML = '';
-    pad.style.opacity = '1'; pad.style.pointerEvents = '';
+  // Jogador anónimo — usar _anonAttempts
+  if (!currentPlayer || currentPlayer.nome === '_jogador') {
+    const _left = MAX_ATTEMPTS - (window._anonAttempts || 0);
+    if (_left <= 0) {
+      msg.innerHTML = '<span style="color:var(--muted)">Sai e volta a entrar para jogar de novo</span>';
+      pad.style.opacity = '0.3'; pad.style.pointerEvents = 'none';
+    } else {
+      msg.innerHTML = _left < MAX_ATTEMPTS ? '<span style="color:var(--gold)">Tens <strong>' + _left + '</strong> tentativa' + (_left!==1?'s':'') + ' restante' + (_left!==1?'s':'') + '</span>' : '';
+      pad.style.opacity = '1'; pad.style.pointerEvents = '';
+    }
     return;
   }
 
@@ -8178,7 +8186,8 @@ function submitAttempt() {
     if (attLeft <= 0) {
       _pararCofreGameTimer();
       if (currentPlayer.nome !== '_jogador') state.top3[pidx].usedThisWeek = true;
-      // Popup sem mencionar nome interno
+      const padEl = document.getElementById('numpadCofre');
+      if (padEl) { padEl.style.opacity = '0.3'; padEl.style.pointerEvents = 'none'; }
       _mostrarCofrePopupSemTentativas('');
     } else {
       cofreToast(`${attLeft} tentativa${attLeft!==1?'s':''} restante${attLeft!==1?'s':''}`, 'gold');
@@ -8234,7 +8243,7 @@ function _mostrarCofrePopupSemTentativas(nome) {
     <div style="background:linear-gradient(135deg,#1a0808,#2a0d0d);border:2px solid rgba(239,68,68,0.5);border-radius:20px;padding:24px 20px;text-align:center;box-shadow:0 8px 32px rgba(239,68,68,0.25);animation:cofreSemAnim 0.4s cubic-bezier(0.34,1.56,0.64,1) both">
       <div style="font-size:40px;margin-bottom:10px">🔒</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#ef4444;margin-bottom:8px">SEM MAIS TENTATIVAS</div>
-      <div style="font-size:14px;color:rgba(255,255,255,0.7);line-height:1.5">Esgotaste as tuas ${MAX_ATTEMPTS} tentativas.<br>Usa o botão 🔄 para gerar um novo código. 💪</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.7);line-height:1.5">Esgotaste as tuas ${MAX_ATTEMPTS} tentativas.<br>Sai e volta a entrar para jogar de novo. 💪</div>
     </div>`;
   document.body.appendChild(modal);
   setTimeout(() => {
@@ -8273,7 +8282,8 @@ function renderAttemptsList() {
   const label = document.getElementById('attemptsLabel');
   label.style.display = sessionAttempts.length ? '' : 'none';
 
-  list.innerHTML = sessionAttempts.map((a,i) => {
+  const last3 = sessionAttempts.slice(-3).reverse();
+  list.innerHTML = last3.map((a,i) => {
     const digits = a.guess.split('').map((d,j)=>`<div class="attempt-digit ${a.result[j]}">${d}</div>`).join('');
     const correct = a.result.filter(r=>r==='c').length;
     const partial = a.result.filter(r=>r==='p').length;
@@ -8282,7 +8292,7 @@ function renderAttemptsList() {
       <div class="attempt-digits">${digits}</div>
       <div class="attempt-info">#${i+1} &nbsp; ${info}</div>
     </div>`;
-  }).reverse().join('');
+  }).join('');
 }
 
 // ── WIN ──
