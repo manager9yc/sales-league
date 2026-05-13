@@ -511,6 +511,14 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
 
 @keyframes cofreSemAnim { from{opacity:0;transform:translateY(20px) scale(0.9)} to{opacity:1;transform:translateY(0) scale(1)} }
 
+/* RANK LOCK ANIMATION */
+.rank-lock-anim { display:inline-block; animation:lockBounce 1.2s ease-in-out infinite; }
+@keyframes lockBounce {
+  0%,100%{transform:scale(1) rotate(0deg)}
+  30%{transform:scale(1.25) rotate(-8deg)}
+  60%{transform:scale(1.1) rotate(5deg)}
+}
+
 /* NAV TAP BURST */
 @keyframes navTap { 0%{transform:scale(1)} 30%{transform:scale(1.35)} 60%{transform:scale(0.92)} 100%{transform:scale(1)} }
 .nav-icon-tap { animation: navTap 0.38s cubic-bezier(0.34,1.56,0.64,1) both; }
@@ -2431,7 +2439,7 @@ function _getSemanaAnterior() {
   const sabAnterior  = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diaSemana - 1);
 
   return [
-    { dom: domAtual,    sab: sabAtual,    label: '📅 Esta semana' },
+    { dom: domAtual,    sab: sabAtual,    label: '<span class="rank-lock-anim">🔐</span> Esta semana' },
     { dom: domAnterior, sab: sabAnterior, label: '📆 Semana anterior' }
   ];
 }
@@ -7533,7 +7541,7 @@ function syncPlayersFromLocalStorage() {
 
 function cofreRefreshDados() {
   const sel = document.getElementById('playerSelect');
-  if (sel) sel.innerHTML = '<option value="">⏳ A carregar...</option>';
+  if (sel) { sel.innerHTML = '<option value="">⏳ A carregar...</option>'; sel.style.display = 'none'; }
 
   const sheetsUrl = 'https://script.google.com/macros/s/AKfycbxpnTHL-_VI1WrxzVD5H5uSciwJZHVGHW__jH0I4JBMjYBfzxQAcAK0oKFU8728OzJQ/exec';
   const url = sheetsUrl + '?action=getTodos';
@@ -7763,7 +7771,7 @@ function getCofreElegiveis() {
 function renderPlayerSelect() {
   const sel = document.getElementById('playerSelect');
   const current = sel.value;
-  sel.innerHTML = '<option value="">— Seleciona o teu nome —</option>';
+  sel.innerHTML = '<option value="">— Seleciona —</option>'; sel.style.display = 'none';
   const elegiveis = getCofreElegiveis();
   elegiveis.forEach(p => {
     const opt = document.createElement('option');
@@ -7873,7 +7881,8 @@ function renderEligibility() {
         ? `<span class="elig-badge eligible">${attLeft} tent.</span>`
         : `<span class="elig-badge used">Esgotado</span>`;
     const catsLabel = p.cats.join(' · ');
-    return `<div class="elig-item">
+    const isSelected = currentPlayer && currentPlayer.nome === p.nome;
+    return `<div class="elig-item" onclick="cofreSelectPlayer('${p.nome.replace(/'/g,'&#39;')}')" style="cursor:pointer;${isSelected ? 'border-color:rgba(201,168,76,0.6);background:rgba(201,168,76,0.08)' : ''}">
       <div style="flex:1">
         <div class="elig-name">${p.nome}</div>
         <div style="font-size:10px;color:var(--gold);margin-top:2px">${catsLabel}</div>
@@ -7881,6 +7890,22 @@ function renderEligibility() {
       ${badge}
     </div>`;
   }).join('');
+}
+
+// ── SELECT PLAYER VIA CLICK (sem dropdown) ──
+function cofreSelectPlayer(nome) {
+  const sel = document.getElementById('playerSelect');
+  if (!sel) return;
+  // Ensure option exists
+  let opt = Array.from(sel.options).find(o => o.value === nome);
+  if (!opt) {
+    opt = document.createElement('option');
+    opt.value = nome; opt.textContent = nome;
+    sel.appendChild(opt);
+  }
+  sel.value = nome;
+  onPlayerChange();
+  renderEligibility();
 }
 
 // ── VAULT STATUS ──
@@ -8042,9 +8067,7 @@ function submitAttempt() {
       attempts: currentPlayer.attempts,
       usedThisWeek: currentPlayer.usedThisWeek
     });
-    // Mudar código após cada tentativa falhada de um jogador
-    // O código é único por jogador+semana+tentativa, para que outros jogadores vejam código diferente
-    _rotateCodeForPlayer(currentPlayer.nome, currentPlayer.attempts);
+    // Código mantém-se igual durante toda a sessão — não muda entre tentativas
     saveState();
     renderEligibility();
     renderVaultStatus();
