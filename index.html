@@ -530,15 +530,12 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
   display:inline-block;
   font-size:16px;
   margin-left:4px;
-  animation:lockFireSwitch 1.4s ease-in-out infinite;
+  animation:lockGlow 3s ease-in-out infinite;
   transform-origin:bottom center;
 }
-@keyframes lockFireSwitch {
-  0%,40%  { content:'🔐'; transform:scale(1) rotate(0deg); }
-  45%     { transform:scale(0.5); opacity:0; }
-  50%,90% { transform:scale(1) rotate(0deg); opacity:1; }
-  95%     { transform:scale(0.5); opacity:0; }
-  100%    { transform:scale(1); opacity:1; }
+@keyframes lockGlow {
+  0%,100% { transform:scale(1); filter:drop-shadow(0 0 0px rgba(201,168,76,0)); }
+  50%     { transform:scale(1.2); filter:drop-shadow(0 0 8px rgba(201,168,76,0.9)); }
 }
 
 /* NAV TAP BURST */
@@ -7976,28 +7973,31 @@ function renderVaultStatus() {
 }
 
 function _cofreReset() {
-  // Limpar tentativa atual e gerar novo código
+  // Garantir jogador anónimo
+  if (!state.top3) state.top3 = [];
+  let anon = state.top3.find(p => p.nome === '_jogador');
+  if (!anon) { anon = {nome:'_jogador', score:0, attempts:0, usedThisWeek:false}; state.top3.push(anon); }
+  anon.attempts = 0;
+  anon.usedThisWeek = false;
+  currentPlayer = anon;
+
+  // Novo código oficial
+  const code = generateCode();
+  state.secretCode = code;
+  if (!state.playerCodes) state.playerCodes = {};
+  state.playerCodes['_jogador_' + getMondayKeyPersist()] = code;
+
+  // Limpar UI
   currentEntry = '';
   sessionAttempts = [];
   updateComboDisplay();
-  // Regenerar código aleatório para a sessão
-  let code = '';
-  for (let i = 0; i < CODE_LENGTH; i++) code += Math.floor(Math.random() * 10).toString();
-  if (code[0] === '0') code = (Math.floor(Math.random() * 9) + 1).toString() + code.slice(1);
-  state.secretCode = code;
-  if (!state.playerCodes) state.playerCodes = {};
-  if (currentPlayer) {
-    // Reset tentativas do jogador anónimo para poder voltar a jogar
-    currentPlayer.attempts = 0;
-    currentPlayer.usedThisWeek = false;
-    const pKey = currentPlayer.nome + '_' + getMondayKeyPersist();
-    state.playerCodes[pKey] = code;
-  }
+  saveState();
+
   // Re-enable numpad
   const pad = document.getElementById('numpadCofre');
   if (pad) { pad.style.opacity = '1'; pad.style.pointerEvents = ''; }
   const msg = document.getElementById('vaultStatusMsg');
-  if (msg) msg.innerHTML = '<span style="color:var(--gold)">Novo código gerado — boa sorte!</span>';
+  if (msg) msg.innerHTML = '<span style="color:var(--gold)">✓ Novo código gerado — boa sorte!</span>';
   const timer = document.getElementById('cofreGameTimer');
   if (timer) timer.style.display = 'none';
   const attList = document.getElementById('attemptsList');
@@ -8005,6 +8005,12 @@ function _cofreReset() {
   const attLabel = document.getElementById('attemptsLabel');
   if (attLabel) attLabel.style.display = 'none';
   _pararCofreGameTimer();
+  // Reset vault door animation
+  const door = document.getElementById('vaultDoorCofre');
+  if (door) { door.classList.remove('open-vault'); }
+  const lock = document.getElementById('lockIconCofre');
+  if (lock) { lock.classList.remove('unlocked'); lock.textContent = '🔒'; }
+  cofreToast('🔄 Novo código gerado!', 'gold');
 }
 
 // ── KEY HANDLING ──
@@ -8504,13 +8510,10 @@ window.cofreSom = cofreSom;
       <div class="jackpot-week-info">Base €10,00 · +€2,00 por semana sem vencedor · <span id="weeksNoWinner">1</span> semana(s) acumulada(s)</div>
     </div>
 
-    <!-- PLAYER SELECT -->
-    <div class="player-select-wrap">
-      <label class="player-select-label">O teu nome</label>
-      <select class="player-select" id="playerSelect" style="display:none" onchange="onPlayerChange()">
-        <option value="">— Escolhe o teu nome —</option>
-      </select>
-    </div>
+    <!-- PLAYER SELECT (hidden) -->
+    <select class="player-select" id="playerSelect" style="display:none" onchange="onPlayerChange()">
+      <option value="">—</option>
+    </select>
 
     <!-- VAULT -->
     <div class="vault-section">
