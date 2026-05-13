@@ -519,6 +519,28 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacit
   60%{transform:scale(1.1) rotate(5deg)}
 }
 
+/* RANK LOCK ANIMATION */
+.rank-lock-anim { display:inline-block; animation:lockBounce 1.2s ease-in-out infinite; }
+@keyframes lockBounce {
+  0%,100%{transform:scale(1) rotate(0deg)}
+  30%{transform:scale(1.25) rotate(-8deg)}
+  60%{transform:scale(1.1) rotate(5deg)}
+}
+.rank-1-lock-fire {
+  display:inline-block;
+  font-size:16px;
+  margin-left:4px;
+  animation:lockFireSwitch 1.4s ease-in-out infinite;
+  transform-origin:bottom center;
+}
+@keyframes lockFireSwitch {
+  0%,40%  { content:'🔐'; transform:scale(1) rotate(0deg); }
+  45%     { transform:scale(0.5); opacity:0; }
+  50%,90% { transform:scale(1) rotate(0deg); opacity:1; }
+  95%     { transform:scale(0.5); opacity:0; }
+  100%    { transform:scale(1); opacity:1; }
+}
+
 /* NAV TAP BURST */
 @keyframes navTap { 0%{transform:scale(1)} 30%{transform:scale(1.35)} 60%{transform:scale(0.92)} 100%{transform:scale(1)} }
 .nav-icon-tap { animation: navTap 0.38s cubic-bezier(0.34,1.56,0.64,1) both; }
@@ -2359,7 +2381,13 @@ function buildRows(sorted, key) {
     const secaoVendedor = (()=>{ for(const e of equipas){ if(e.nomes&&e.nomes.includes(nome)) return e.label.replace(/^\S+\s/,''); } return ''; })();
     const streak = streakMap[nome] || 0;
     const streakHtml = streak >= 3 ? `<span class="streak-badge"><span class="streak-fire">🚀</span>${streak}</span>` : '';
-    const fire1Html = i === 0 ? `<span class="rank-1-fire">🔥</span>` : '';
+    // Weekly filter: show animated lock↔fire on 1st place; monthly: just fire
+    const isWeekly = _rankFilter && _rankFilter !== 'mes';
+    const fire1Html = i === 0
+      ? isWeekly
+        ? `<span class="rank-1-lock-fire" id="lockFire_${key}">🔐</span>`
+        : `<span class="rank-1-fire">🔥</span>`
+      : '';
     // Rows 6-10 hidden by default
     const hiddenStyle = i >= 5 ? ' class="rank-extra" style="display:none"' : '';
     return `<tr${hiddenStyle}>
@@ -2439,7 +2467,7 @@ function _getSemanaAnterior() {
   const sabAnterior  = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diaSemana - 1);
 
   return [
-    { dom: domAtual,    sab: sabAtual,    label: '<span class="rank-lock-anim">🔐</span> Esta semana' },
+    { dom: domAtual,    sab: sabAtual,    label: '📅 Esta semana' },
     { dom: domAnterior, sab: sabAnterior, label: '📆 Semana anterior' }
   ];
 }
@@ -6366,6 +6394,16 @@ function renderDesafiosMedalhas() {
   btn.addEventListener('mouseleave', () => { if(lp){clearTimeout(lp);lp=null;} });
 })();
 
+// Alternate lock/fire emoji on 1st place in weekly filter
+(function _startLockFireAnim() {
+  let _lf = false;
+  setInterval(() => {
+    document.querySelectorAll('.rank-1-lock-fire').forEach(el => {
+      el.textContent = _lf ? '🔥' : '🔐';
+    });
+    _lf = !_lf;
+  }, 700);
+})();
 </script>
 
 <!-- DESAFIOS -->
@@ -7508,9 +7546,15 @@ function cofreInit() {
   buildVaultVisuals();
   buildNumpad();
   buildComboDisplay();
-  // Sincronizar estado dos jogadores do localStorage para o state.top3
   syncPlayersFromLocalStorage();
   renderJackpot();
+  // Definir jogador anónimo para que o numpad fique activo sem precisar de seleção
+  if (!currentPlayer) {
+    if (!state.top3) state.top3 = [];
+    let anon = state.top3.find(p => p.nome === '_jogador');
+    if (!anon) { anon = {nome:'_jogador', score:0, attempts:0, usedThisWeek:false}; state.top3.push(anon); }
+    currentPlayer = anon;
+  }
   renderVaultStatus();
   updateStatusBar();
   cofreRefreshDados();
@@ -7541,7 +7585,7 @@ function syncPlayersFromLocalStorage() {
 
 function cofreRefreshDados() {
   const sel = document.getElementById('playerSelect');
-  if (sel) { sel.innerHTML = '<option value="">⏳ A carregar...</option>'; sel.style.display = 'none'; }
+  if (sel) { sel.innerHTML = '<option value="">⏳ A carregar...</option>';  }
 
   const sheetsUrl = 'https://script.google.com/macros/s/AKfycbxpnTHL-_VI1WrxzVD5H5uSciwJZHVGHW__jH0I4JBMjYBfzxQAcAK0oKFU8728OzJQ/exec';
   const url = sheetsUrl + '?action=getTodos';
@@ -7771,7 +7815,7 @@ function getCofreElegiveis() {
 function renderPlayerSelect() {
   const sel = document.getElementById('playerSelect');
   const current = sel.value;
-  sel.innerHTML = '<option value="">— Seleciona —</option>'; sel.style.display = 'none';
+  sel.innerHTML = '<option value="">— Seleciona —</option>'; 
   const elegiveis = getCofreElegiveis();
   elegiveis.forEach(p => {
     const opt = document.createElement('option');
@@ -7914,9 +7958,10 @@ function renderVaultStatus() {
   const pad = document.getElementById('numpadCofre');
   const door = document.getElementById('vaultDoorCofre');
 
+  // Sem necessidade de selecionar nome — cofre disponível diretamente
   if (!currentPlayer) {
-    msg.innerHTML = '<span style="color:var(--muted)">Seleciona o teu nome para jogar</span>';
-    pad.style.opacity = '0.3'; pad.style.pointerEvents = 'none';
+    msg.innerHTML = '';
+    pad.style.opacity = '1'; pad.style.pointerEvents = '';
     return;
   }
 
@@ -8432,7 +8477,7 @@ window.cofreSom = cofreSom;
     <!-- PLAYER SELECT -->
     <div class="player-select-wrap">
       <label class="player-select-label">O teu nome</label>
-      <select class="player-select" id="playerSelect" onchange="onPlayerChange()">
+      <select class="player-select" id="playerSelect" style="display:none" onchange="onPlayerChange()">
         <option value="">— Escolhe o teu nome —</option>
       </select>
     </div>
@@ -8493,7 +8538,7 @@ window.cofreSom = cofreSom;
             <div class="elig-sub">1º lugar de cada categoria do ranking</div>
           </div>
         </div>
-        <div class="elig-list" id="eligListCofre"></div>
+        <div class="elig-list" id="eligListCofre" style="display:none"></div>
       </div>
     </div>
 
