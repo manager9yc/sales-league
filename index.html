@@ -2385,7 +2385,7 @@ function buildRows(sorted, key) {
     const isWeekly = _rankFilter && _rankFilter !== 'mes';
     const fire1Html = i === 0
       ? isWeekly
-        ? `<span class="rank-1-lock-fire" id="lockFire_${key}">🔐</span>`
+        ? `<span class="rank-1-lock-fire">🔐</span>`
         : `<span class="rank-1-fire">🔥</span>`
       : '';
     // Rows 6-10 hidden by default
@@ -5752,7 +5752,7 @@ function _abrirRaspadinha() {
   let scratching = false;
   let scratchedPixels = 0;
   const TOTAL = wrapW * wrapH;
-  const REVEAL_THRESHOLD = 0.40;
+  const REVEAL_THRESHOLD = 0.30;
   const STROKES_NEEDED = 25;
 
   // Contexto de áudio para som de raspar (reutilizado)
@@ -6395,15 +6395,7 @@ function renderDesafiosMedalhas() {
 })();
 
 // Alternate lock/fire emoji on 1st place in weekly filter
-(function _startLockFireAnim() {
-  let _lf = false;
-  setInterval(() => {
-    document.querySelectorAll('.rank-1-lock-fire').forEach(el => {
-      el.textContent = _lf ? '🔥' : '🔐';
-    });
-    _lf = !_lf;
-  }, 700);
-})();
+
 </script>
 
 <!-- DESAFIOS -->
@@ -7983,9 +7975,47 @@ function renderVaultStatus() {
   pad.style.opacity = '1'; pad.style.pointerEvents = '';
 }
 
+function _cofreReset() {
+  // Limpar tentativa atual e gerar novo código
+  currentEntry = '';
+  sessionAttempts = [];
+  updateComboDisplay();
+  // Regenerar código aleatório para a sessão
+  let code = '';
+  for (let i = 0; i < CODE_LENGTH; i++) code += Math.floor(Math.random() * 10).toString();
+  if (code[0] === '0') code = (Math.floor(Math.random() * 9) + 1).toString() + code.slice(1);
+  state.secretCode = code;
+  if (!state.playerCodes) state.playerCodes = {};
+  if (currentPlayer) {
+    // Reset tentativas do jogador anónimo para poder voltar a jogar
+    currentPlayer.attempts = 0;
+    currentPlayer.usedThisWeek = false;
+    const pKey = currentPlayer.nome + '_' + getMondayKeyPersist();
+    state.playerCodes[pKey] = code;
+  }
+  // Re-enable numpad
+  const pad = document.getElementById('numpadCofre');
+  if (pad) { pad.style.opacity = '1'; pad.style.pointerEvents = ''; }
+  const msg = document.getElementById('vaultStatusMsg');
+  if (msg) msg.innerHTML = '<span style="color:var(--gold)">Novo código gerado — boa sorte!</span>';
+  const timer = document.getElementById('cofreGameTimer');
+  if (timer) timer.style.display = 'none';
+  const attList = document.getElementById('attemptsList');
+  if (attList) attList.innerHTML = '';
+  const attLabel = document.getElementById('attemptsLabel');
+  if (attLabel) attLabel.style.display = 'none';
+  _pararCofreGameTimer();
+}
+
 // ── KEY HANDLING ──
 function handleKey(k) {
-  if (!currentPlayer) return;
+  // Allow play without player selection — use anonymous player
+  if (!currentPlayer) {
+    if (!state.top3) state.top3 = [];
+    let anon = state.top3.find(p => p.nome === '_jogador');
+    if (!anon) { anon = {nome:'_jogador', score:0, attempts:0, usedThisWeek:false}; state.top3.push(anon); }
+    currentPlayer = anon;
+  }
   const attLeft = MAX_ATTEMPTS - (currentPlayer.attempts||0);
   if (currentPlayer.usedThisWeek || attLeft <= 0) return;
 
@@ -8451,7 +8481,7 @@ window.cofreSom = cofreSom;
     <div class="status-bar">
       <div class="status-week" id="statusWeekCofre">SEMANA —</div>
       <div class="status-jackpot" id="statusJackpotCofre">€ 0,00</div>
-      <button onclick="fecharCofre()" style="background:transparent;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;padding:4px 8px;-webkit-tap-highlight-color:transparent;">✕</button>
+      <button onclick="_cofreReset()" title="Novo código / Jogar de novo" style="background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);border-radius:8px;color:#C9A84C;font-size:16px;cursor:pointer;padding:4px 10px;-webkit-tap-highlight-color:transparent;margin-right:6px">🔄</button><button onclick="fecharCofre()" style="background:transparent;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;padding:4px 8px;-webkit-tap-highlight-color:transparent;">✕</button>
     </div>
 
     <!-- HEADER -->
