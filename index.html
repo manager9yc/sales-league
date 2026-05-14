@@ -1485,7 +1485,7 @@ body.theme-ucl .submit-btn:active{background:linear-gradient(135deg,#22C55E,#16A
       </div>
       <div class="card">
         <div class="prod-row">
-          <div class="prod-info"><div class="prod-emoji">💧</div><div class="prod-text"><div class="prod-name">Garrafas</div><div class="prod-hint">Garrafas da liga de vendas</div></div></div>
+          <div class="prod-info"><div class="prod-emoji">🦟</div><div class="prod-text"><div class="prod-name">Anti-Mosquitos</div><div class="prod-hint">Anti-Mosquitos da liga de vendas</div></div></div>
           <div class="counter"><button class="cbtn minus" onmousedown="startChange('garrafas',-1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',-1,event)" ontouchend="tapChange('garrafas',-1,event)" ontouchcancel="stopChange()">−</button><div class="cval" id="garrafas">0</div><button class="cbtn plus" onmousedown="startChange('garrafas',1,event)" onmouseup="stopChange()" onmouseleave="stopChange()" ontouchstart="startChange('garrafas',1,event)" ontouchend="tapChange('garrafas',1,event)" ontouchcancel="stopChange()">+</button></div>
         </div>
       </div>
@@ -1795,7 +1795,7 @@ const categorias = [
   { key:'palmilhas', label:'Palmilhas',           emoji:'🦶' },
   { key:'camisolas', label:'Camisolas Oficiais',   emoji:'⚽' },
   { key:'sacos',     label:'Sacos Reutilizáveis', emoji:'🛍️' },
-  { key:'garrafas',  label:'Garrafas',            emoji:'💧' },
+  { key:'garrafas',  label:'Anti-Mosquitos',            emoji:'🦟' },
   { key:'elogios',   label:'Elogios',             emoji:'⭐' },
   { key:'szclub',    label:'SZClub',              emoji:'🎫' },
 ];
@@ -1949,7 +1949,7 @@ function goTo(screen, btn) {
 }
 
 function _skeletonRanking() {
-  const categoriaLabels = ['🏆 Total','🖥️ Onlines','🧴 Sprays','🦶 Palmilhas','👕 Camisolas','🛍️ Sacos','💧 Garrafas','⭐ Elogios','🎫 SZClub'];
+  const categoriaLabels = ['🏆 Total','🖥️ Onlines','🧴 Sprays','🦶 Palmilhas','👕 Camisolas','🛍️ Sacos','🦟 Anti-Mosquitos','⭐ Elogios','🎫 SZClub'];
   const rows = [85,70,60,52,45,38,30].map(w => `
     <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
       <div class="skel" style="width:22px;height:22px;border-radius:50%;flex-shrink:0"></div>
@@ -3565,7 +3565,7 @@ async function carregarSplashTop3(){
       }catch(e){return;}
     }
     if(!Array.isArray(dados)||!dados.length)return;
-    const cats=[{key:'onlines',emoji:'🖥️',label:'Onlines'},{key:'sprays',emoji:'🧴',label:'Sprays'},{key:'palmilhas',emoji:'🦶',label:'Palmilhas'},{key:'camisolas',emoji:'⚽',label:'Camisolas'},{key:'sacos',emoji:'🛍️',label:'Sacos'},{key:'garrafas',emoji:'💧',label:'Garrafas'}];
+    const cats=[{key:'onlines',emoji:'🖥️',label:'Onlines'},{key:'sprays',emoji:'🧴',label:'Sprays'},{key:'palmilhas',emoji:'🦶',label:'Palmilhas'},{key:'camisolas',emoji:'⚽',label:'Camisolas'},{key:'sacos',emoji:'🛍️',label:'Sacos'},{key:'garrafas',emoji:'🦟',label:'Anti-Mosquitos'}];
     const medals=['🥇','🥈','🥉'];
     let html='';
     cats.forEach(cat=>{
@@ -4123,8 +4123,8 @@ function toggleMetasEditor() {
 function renderMetasFields() {
   const wrap = document.getElementById('metasFieldsWrap');
   if (!wrap) return;
-  const labels = {onlines:'Onlines',sprays:'Sprays',palmilhas:'Palmilhas',camisolas:'Camisolas',sacos:'Sacos',garrafas:'Garrafas',elogios:'Elogios'};
-  const emojis = {onlines:'🖥️',sprays:'🧴',palmilhas:'🦶',camisolas:'⚽',sacos:'🛍️',garrafas:'💧',elogios:'⭐'};
+  const labels = {onlines:'Onlines',sprays:'Sprays',palmilhas:'Palmilhas',camisolas:'Camisolas',sacos:'Sacos',garrafas:'Anti-Mosquitos',elogios:'Elogios'};
+  const emojis = {onlines:'🖥️',sprays:'🧴',palmilhas:'🦶',camisolas:'⚽',sacos:'🛍️',garrafas:'🦟',elogios:'⭐'};
   wrap.innerHTML = Object.keys(metasDefault).map(k =>
     `<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
       <span style="font-size:13px">${emojis[k]} ${labels[k]}</span>
@@ -4158,8 +4158,8 @@ function renderMedalhasFields() {
     {key:'tCamisolas_normal',label:'Camisolas (outros)'},
     {key:'tSacos_caixa',label:'Sacos (Caixa)'},
     {key:'tSacos_normal',label:'Sacos (outros)'},
-    {key:'tGarrafas_caixa',label:'Garrafas (Caixa)'},
-    {key:'tGarrafas_normal',label:'Garrafas (outros)'},
+    {key:'tGarrafas_caixa',label:'Anti-Mosquitos (Caixa)'},
+    {key:'tGarrafas_normal',label:'Anti-Mosquitos (outros)'},
     {key:'tElogios',label:'Elogios'},
   ];
   wrap.innerHTML = fields.map(f =>
@@ -4297,7 +4297,7 @@ function calcularMedalhas(dados) {
     { icon:'🦶', name:'Palmilhas Master',  desc:tPalmilhas+' palmilhas este mês',  earned: palmilhasMes >= tPalmilhas },
     { icon:'👕', name:'Camisolas Pro',     desc:tCamisolas+' camisolas este mês',  earned: camisolasMes >= tCamisolas },
     { icon:'🛍️', name:'Eco Champion',     desc:tSacos+' sacos este mês',          earned: sacosMes     >= tSacos },
-    { icon:'💧', name:'Hydration Boss',    desc:tGarrafas+' garrafas este mês',    earned: garrafasMes  >= tGarrafas },
+    { icon:'🦟', name:'Hydration Boss',    desc:tGarrafas+' anti-mosquitos este mês',    earned: garrafasMes  >= tGarrafas },
     { icon:'⭐', name:'Favorito',          desc:'3 elogios este mês',              earned: elogiosMes >= 3 && nome !== 'Dário Santos' },
     { icon:'🎫', name:'SZClub Star',       desc:(isCaixa?100:isCalcadoSneaker2?50:30)+' adesões SZClub este mês', earned: szclubMes >= (isCaixa ? (medalhasConfig.tSZClub_caixa||100) : isCalcadoSneaker2 ? (medalhasConfig.tSZClub_calcado||50) : (medalhasConfig.tSZClub_normal||30)) },
     { icon:'📅', name:'Consistente',       desc:th.consistente+' registos este mês', earned: diasComRegisto >= th.consistente },
@@ -5022,7 +5022,7 @@ const infoSections=[
   {title:'📊 Como ganhar pontos',content:'Os pontos são atribuídos com base no teu desempenho:\n• Unidades vendidas\n• Elogios recebidos\nQuanto melhor o teu desempenho, mais pontos acumulas.'},
   {title:'📈 Ranking e classificação',content:'O ranking atualiza automaticamente.\n• Os melhores destacam-se no topo\n• A classificação muda diariamente\n• Todos têm oportunidade de subir posições'},
   {title:'🥇 Medalhas',content:'As medalhas são ajustadas consoante o horário (full-time e part-time) e equipa.\nAo desbloquear uma medalha, ganhas acesso a rodar um slot machine com prémios aleatórios:\n• Sair 30 min ou 1h mais cedo, um chocolate, um café, um pastel de nata, um saco de gomas, uma raspadinha, pausa extra, etc'},
-  {title:'🔐 Abertura do Cofre',content:'Tentará a abertura do cofre aquele que tiver em primeiro lugar no ranking de cada categoria, com vista semanal, sempre da semana anterior de domingo a sábado.\n\nA abertura do cofre é feita pela seguinte ordem:\n1.º 🖥️ Onlines\n2.º 🧴 Sprays\n3.º 🦶 Palmilhas\n4.º ⭐ Elogios\n5.º 👕 Camisolas\n6.º 🛍️ Sacos\n7.º 💧 Garrafas\n\nCada líder tem 3 tentativas para descobrir o código.'},
+  {title:'🔐 Abertura do Cofre',content:'Tentará a abertura do cofre aquele que tiver em primeiro lugar no ranking de cada categoria, com vista semanal, sempre da semana anterior de domingo a sábado.\n\nA abertura do cofre é feita pela seguinte ordem:\n1.º 🖥️ Onlines\n2.º 🧴 Sprays\n3.º 🦶 Palmilhas\n4.º ⭐ Elogios\n5.º 👕 Camisolas\n6.º 🛍️ Sacos\n7.º 🦟 Anti-Mosquitos\n\nCada líder tem 3 tentativas para descobrir o código.'},
   {title:'⚙️ Como usar a app',content:'1. Basta inserires os teus valores diáriamente de forma consistente. Consulta o teu desempenho diariamente\n2. Acompanha o ranking da equipa\n3. Define objetivos pessoais\n4. Foca-te nos indicadores com mais impacto\nA consistência diária faz a diferença.'},
   {title:'📅 Períodos de competição',content:'A liga funciona por ciclos mensais.\nNo final de cada ciclo:\n• O ranking é fechado\n• São atribuídos os prémios\n• Inicia-se uma nova competição'},
   {title:'⚠️ Regras importantes',content:'• Apenas vendas válidas são contabilizadas\n• Todos os dados devem ser corretos e não devem ser manipulados.\n• Competição saudável e fair play obrigatório\n\n📌 Nota: As regras podem mudar a qualquer momento, tendo em conta que toda esta liga é uma nova experiência. Eventuais ajustes serão comunicados à equipa.'},
@@ -6327,7 +6327,7 @@ function renderDesafiosMedalhas() {
     { icon:'🦶', name:'Palmilhas Master', desc:'Palmilhas acumuladas no mês', thresholds:[{label:'Calçado',val:20},{label:'Outros',val:10}] },
     { icon:'👕', name:'Camisolas Pro', desc:'Camisolas oficiais no mês', thresholds:[{label:'Calçado/Têxtil',val:25},{label:'Outros',val:12}] },
     { icon:'🛍️', name:'Eco Champion', desc:'Sacos reutilizáveis no mês', thresholds:[{label:'Caixa',val:1000},{label:'Outros',val:150}] },
-    { icon:'💧', name:'Hydration Boss', desc:'Garrafas vendidas no mês', thresholds:[{label:'Caixa',val:30},{label:'Outros',val:15}] },
+    { icon:'🦟', name:'Hydration Boss', desc:'Anti-Mosquitos vendidos no mês', thresholds:[{label:'Caixa',val:30},{label:'Outros',val:15}] },
     { icon:'⭐', name:'Favorito', desc:'Elogios escritos ou Google Reviews', thresholds:[{label:'Todos',val:3}] },
     { icon:'📅', name:'Consistente', desc:'Registos no mês (dias diferentes)', thresholds:[{label:'Full-time',val:20},{label:'Part-time',val:8}] },
     { icon:'🌟', name:'Super Online', desc:'Onlines num único dia', thresholds:[{label:'Qualquer',val:8}] },
@@ -7775,7 +7775,7 @@ function getCofreElegiveis() {
   const todos = window.dashAllDados || [];
   // Ordem definida: onlines → sprays → palmilhas → elogios → camisolas → sacos → garrafas
   const catsOrdem = ['onlines','sprays','palmilhas','elogios','camisolas','sacos','garrafas'];
-  const catLabels = {onlines:'🖥️ Onlines',sprays:'🧴 Sprays',palmilhas:'🦶 Palmilhas',camisolas:'👕 Camisolas',sacos:'🛍️ Sacos',garrafas:'💧 Garrafas',elogios:'⭐ Elogios',szclub:'🎫 SZClub'};
+  const catLabels = {onlines:'🖥️ Onlines',sprays:'🧴 Sprays',palmilhas:'🦶 Palmilhas',camisolas:'👕 Camisolas',sacos:'🛍️ Sacos',garrafas:'🦟 Anti-Mosquitos',elogios:'⭐ Elogios',szclub:'🎫 SZClub'};
 
   // Calcular semana anterior (dom→sab) em hora local
   const now = new Date();
@@ -8972,8 +8972,8 @@ function generateAutoFeedEvents() {
   }
 
   // ── DESTAQUE POR CATEGORIA ──
-  const catEmjs = {onlines:'🖥️',sprays:'🧴',palmilhas:'🦶',camisolas:'👕',sacos:'🛍️',garrafas:'💧',elogios:'⭐',szclub:'🎫'};
-  const catNomes = {onlines:'Onlines',sprays:'Sprays',palmilhas:'Palmilhas',camisolas:'Camisolas',sacos:'Sacos Eco',garrafas:'Garrafas',elogios:'Elogios',szclub:'SZClub'};
+  const catEmjs = {onlines:'🖥️',sprays:'🧴',palmilhas:'🦶',camisolas:'👕',sacos:'🛍️',garrafas:'🦟',elogios:'⭐',szclub:'🎫'};
+  const catNomes = {onlines:'Onlines',sprays:'Sprays',palmilhas:'Palmilhas',camisolas:'Camisolas',sacos:'Sacos Eco',garrafas:'Anti-Mosquitos',elogios:'Elogios',szclub:'SZClub'};
   const catRandKey = cats[Math.floor((hora / 2) % cats.length)]; // categoria diferente a cada 2h
   const sortedCat = Object.values(agg).filter(r=>(r[catRandKey]||0)>0).sort((a,b)=>b[catRandKey]-a[catRandKey]);
   if (sortedCat[0]) {
@@ -9128,8 +9128,8 @@ function mergeAutoEvents() {
   const anoAtual = now.getFullYear();
   const today = now.toISOString().slice(0,10);
   const cats = ['onlines','sprays','palmilhas','camisolas','sacos','garrafas','elogios','szclub'];
-  const catLabels = {onlines:'Onlines',sprays:'Sprays',palmilhas:'Palmilhas',camisolas:'Camisolas',sacos:'Sacos',garrafas:'Garrafas',elogios:'Elogios',szclub:'SZClub'};
-  const catEmojis = {onlines:'🖥️',sprays:'🧴',palmilhas:'🦶',camisolas:'👕',sacos:'🛍️',garrafas:'💧',elogios:'⭐',szclub:'🎫'};
+  const catLabels = {onlines:'Onlines',sprays:'Sprays',palmilhas:'Palmilhas',camisolas:'Camisolas',sacos:'Sacos',garrafas:'Anti-Mosquitos',elogios:'Elogios',szclub:'SZClub'};
+  const catEmojis = {onlines:'🖥️',sprays:'🧴',palmilhas:'🦶',camisolas:'👕',sacos:'🛍️',garrafas:'🦟',elogios:'⭐',szclub:'🎫'};
 
   function ev(id, tag, highlight, text, tsExtra, extra) {
     return { id, type:'auto', tag, author:'Super Liga', ts: today + (tsExtra||'T07:00:00'),
