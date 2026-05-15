@@ -1830,7 +1830,7 @@ const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxpnTHL-_VI1WrxzVD5H
       Promise.race([
         fetch(url, {cache:'no-store'}).then(r=>r.json()),
         fetch(proxy, {cache:'no-store'}).then(r=>r.json()),
-        new Promise((_,rej)=>setTimeout(()=>rej('t'),4000))
+        new Promise((_,rej)=>setTimeout(()=>rej('t'),8000))
       ]).then(data => {
         if (Array.isArray(data) && data.length) {
           window._rankingCache = data;
@@ -1845,7 +1845,7 @@ const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxpnTHL-_VI1WrxzVD5H
       Promise.race([
         fetch(url2, {cache:'no-store'}).then(r=>r.json()),
         fetch(proxy2, {cache:'no-store'}).then(r=>r.json()),
-        new Promise((_,rej)=>setTimeout(()=>rej('t'),5000))
+        new Promise((_,rej)=>setTimeout(()=>rej('t'),9000))
       ]).then(data => {
         if (Array.isArray(data)) {
           window._todosPreloaded = data;
@@ -2616,7 +2616,7 @@ async function carregarRanking() {
     return Promise.race([
       fetch(directUrl, {cache:'no-store', signal}).then(r=>r.json()).catch(()=>Promise.reject()),
       fetch(proxyUrl, {cache:'no-store', signal}).then(r=>r.json()).catch(()=>Promise.reject()),
-      new Promise((_,reject) => setTimeout(()=>reject('timeout'), 4000))
+      new Promise((_,reject) => setTimeout(()=>reject('timeout'), 8000))
     ]);
   })();
 
@@ -2626,7 +2626,7 @@ async function carregarRanking() {
     return Promise.race([
       fetch(todosUrl, {cache:'no-store', signal}).then(r=>r.json()).catch(()=>Promise.reject()),
       fetch(todosProxy, {cache:'no-store', signal}).then(r=>r.json()).catch(()=>Promise.reject()),
-      new Promise((_,reject) => setTimeout(()=>reject('timeout'), 5000))
+      new Promise((_,reject) => setTimeout(()=>reject('timeout'), 9000))
     ]);
   })() : Promise.resolve(null);
 
@@ -3572,7 +3572,7 @@ async function carregarSplashTop3(){
         const r=await Promise.race([
           fetch(SHEETS_URL+'?action=getRanking',{cache:'no-store'}),
           fetch('https://corsproxy.io/?'+encodeURIComponent(SHEETS_URL+'?action=getRanking'),{cache:'no-store'}),
-          new Promise((_,rej)=>setTimeout(()=>rej(),4000))
+          new Promise((_,rej)=>setTimeout(()=>rej(),8000))
         ]);
         dados=await r.json();
         if(Array.isArray(dados)&&dados.length)try{localStorage.setItem('rankingCache',JSON.stringify(dados));}catch(e){}
