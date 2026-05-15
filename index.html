@@ -1810,7 +1810,7 @@ const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxpnTHL-_VI1WrxzVD5H
     const rankAge = Date.now() - parseInt(localStorage.getItem('rankingCacheTime')||'0');
     const todosCached = localStorage.getItem('todosCache');
     const todosAge = Date.now() - parseInt(localStorage.getItem('todosCacheTime')||'0');
-    const TTL = 15 * 60 * 1000; // 15 minutos
+    const TTL = 30 * 60 * 1000; // 30 minutos
 
     // Restaurar cache em memória imediatamente
     if (rankCached && rankAge < TTL) {
@@ -1830,7 +1830,7 @@ const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxpnTHL-_VI1WrxzVD5H
       Promise.race([
         fetch(url, {cache:'no-store'}).then(r=>r.json()),
         fetch(proxy, {cache:'no-store'}).then(r=>r.json()),
-        new Promise((_,rej)=>setTimeout(()=>rej('t'),8000))
+        new Promise((_,rej)=>setTimeout(()=>rej('t'),4000))
       ]).then(data => {
         if (Array.isArray(data) && data.length) {
           window._rankingCache = data;
@@ -1845,7 +1845,7 @@ const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxpnTHL-_VI1WrxzVD5H
       Promise.race([
         fetch(url2, {cache:'no-store'}).then(r=>r.json()),
         fetch(proxy2, {cache:'no-store'}).then(r=>r.json()),
-        new Promise((_,rej)=>setTimeout(()=>rej('t'),10000))
+        new Promise((_,rej)=>setTimeout(()=>rej('t'),5000))
       ]).then(data => {
         if (Array.isArray(data)) {
           window._todosPreloaded = data;
@@ -2557,7 +2557,7 @@ async function carregarRanking() {
   const elU = document.getElementById('rankLastUpdate');
 
   // Mostrar cache imediatamente (ranking instântaneo)
-  const CACHE_TTL = 15 * 60 * 1000;
+  const CACHE_TTL = 30 * 60 * 1000;
   let hadCache = false;
   try {
     const cached = localStorage.getItem('rankingCache');
@@ -2607,65 +2607,79 @@ async function carregarRanking() {
 
   if (elU && !hadCache) elU.innerHTML = '<span style="display:inline-flex;align-items:center;gap:5px;color:rgba(201,168,76,0.6)"><span style="width:7px;height:7px;border-radius:50%;background:#C9A84C;display:inline-block;animation:rankDotPulse 0.9s ease-in-out infinite"></span>A carregar...</span>';
 
-  try {
+  // ── Fetches paralelos: getRanking + getTodos ao mesmo tempo ──
+  const needsTodos = !dashAllDados.length && !(window._todosPreloaded && window._todosPreloaded.length);
+
+  const fetchRanking = (async () => {
     const directUrl = SHEETS_URL + '?action=getRanking';
     const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(directUrl);
-    const result = await Promise.race([
+    return Promise.race([
       fetch(directUrl, {cache:'no-store', signal}).then(r=>r.json()).catch(()=>Promise.reject()),
       fetch(proxyUrl, {cache:'no-store', signal}).then(r=>r.json()).catch(()=>Promise.reject()),
+      new Promise((_,reject) => setTimeout(()=>reject('timeout'), 4000))
+    ]);
+  })();
+
+  const fetchTodos = needsTodos ? (async () => {
+    const todosUrl = SHEETS_URL + '?action=getTodos';
+    const todosProxy = 'https://corsproxy.io/?' + encodeURIComponent(todosUrl);
+    return Promise.race([
+      fetch(todosUrl, {cache:'no-store', signal}).then(r=>r.json()).catch(()=>Promise.reject()),
+      fetch(todosProxy, {cache:'no-store', signal}).then(r=>r.json()).catch(()=>Promise.reject()),
       new Promise((_,reject) => setTimeout(()=>reject('timeout'), 5000))
     ]);
-    if (signal.aborted) return;
-    if (Array.isArray(result) && result.length) {
-      window._rankingCache = result;
-      try { localStorage.setItem('rankingCache', JSON.stringify(result)); localStorage.setItem('rankingCacheTime', Date.now().toString()); } catch(e2) {}
-      if (!signal.aborted) {
-        if (_rankFilter === 'mes') {
-          renderRanking(result);
-        }
-      }
-      const elU = document.getElementById('rankLastUpdate');
-      if (elU && !signal.aborted) elU.textContent = '✓ Atualizado agora';
-    }
-  } catch(e) {}
+  })() : Promise.resolve(null);
 
+  const [rankRes, todosRes] = await Promise.allSettled([fetchRanking, fetchTodos]);
+  if (signal.aborted) return;
+
+  // Processar getRanking
+  const elU2 = document.getElementById('rankLastUpdate');
+  if (rankRes.status === 'fulfilled' && Array.isArray(rankRes.value) && rankRes.value.length) {
+    const result = rankRes.value;
+    window._rankingCache = result;
+    try { localStorage.setItem('rankingCache', JSON.stringify(result)); localStorage.setItem('rankingCacheTime', Date.now().toString()); } catch(e2) {}
+    if (!signal.aborted && _rankFilter === 'mes') renderRanking(result);
+    if (elU2 && !signal.aborted) elU2.textContent = '\u2713 Atualizado agora';
+  } else {
+    // Fetch falhou ou retornou vazio — mostrar hora do cache ou aviso
+    if (elU2 && !signal.aborted) {
+      const cachedTime = parseInt(localStorage.getItem('rankingCacheTime') || '0');
+      if (cachedTime) {
+        const label = new Date(cachedTime).toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+        elU2.textContent = '\u26a0 Sem liga\u00e7\u00e3o \u2014 cache das ' + label;
+      } else {
+        elU2.textContent = '\u26a0 Sem liga\u00e7\u00e3o';
+      }
+    }
+    // Se temos cache em memória mas ainda não foi renderizado, renderizar agora
+    if (window._rankingCache && window._rankingCache.length && !signal.aborted && _rankFilter === 'mes') {
+      renderRanking(window._rankingCache);
+    }
+  }
+
+  // Processar getTodos (ou usar _todosPreloaded)
   if (!dashAllDados.length && !signal.aborted) {
-    // Usar dados pré-carregados no arranque se disponíveis (evita segundo fetch)
+    let td = null;
     if (window._todosPreloaded && Array.isArray(window._todosPreloaded) && window._todosPreloaded.length) {
-      dashAllDados = normalizarDatasArray(window._todosPreloaded);
+      td = window._todosPreloaded;
       window._todosPreloaded = null;
+    } else if (todosRes.status === 'fulfilled' && Array.isArray(todosRes.value) && todosRes.value.length) {
+      td = todosRes.value;
+      try { localStorage.setItem('todosCache', JSON.stringify(td)); localStorage.setItem('todosCacheTime', Date.now().toString()); } catch(e2) {}
+    }
+    if (td && !signal.aborted) {
+      dashAllDados = normalizarDatasArray(td);
       _patchSecaoRegistos();
-      // Patch secção de registos se já renderizado com placeholder
-      
-      if (!signal.aborted && _rankFilter === 'mes') {
+      if (_rankFilter === 'mes') {
         renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []);
-      } else if (!signal.aborted && _rankFilter !== 'mes') {
+      } else {
         const chip = document.querySelector('.rank-filter-chip.active[data-dom]');
         if (chip) _renderRankingPorSemana(chip.dataset.dom, chip.dataset.sab);
       }
-    } else {
-      try {
-        const todosUrl = SHEETS_URL + '?action=getTodos';
-        const todosProxy = 'https://corsproxy.io/?' + encodeURIComponent(todosUrl);
-        const td = await Promise.race([
-          fetch(todosUrl, {signal}).then(r=>r.json()).catch(()=>Promise.reject()),
-          fetch(todosProxy, {signal}).then(r=>r.json()).catch(()=>Promise.reject()),
-          new Promise((_,reject) => setTimeout(()=>reject('timeout'), 8000))
-        ]);
-        if (!signal.aborted && Array.isArray(td)) {
-          dashAllDados = normalizarDatasArray(td);
-          try { localStorage.setItem('todosCache', JSON.stringify(td)); localStorage.setItem('todosCacheTime', Date.now().toString()); } catch(e2) {}
-          _patchSecaoRegistos();
-          if (!signal.aborted && _rankFilter === 'mes') {
-            renderRanking(dashAllDados.length ? await getRankingFromDados(dashAllDados) : []);
-          } else if (!signal.aborted && _rankFilter !== 'mes') {
-            const chip = document.querySelector('.rank-filter-chip.active[data-dom]');
-            if (chip) _renderRankingPorSemana(chip.dataset.dom, chip.dataset.sab);
-          }
-        }
-      } catch(e) {}
     }
   }
+
   if (!signal.aborted) verificarMedalhasRanking();
 }
 
